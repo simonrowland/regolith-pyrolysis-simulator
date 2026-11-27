@@ -34,8 +34,8 @@ experiments:
 - experiment_id: 10.1016/0016-7037(89)90165-8::experiment::kress_carmichael_1989_table1_runs
   kind: literature
   method:
-    tag: unknown
-    reason: experiment method not published
+    tag: value
+    value: quench_equilibration
   sample: {}
   conditions:
     temperature_K:
@@ -65,11 +65,11 @@ experiments:
     pdf_page_index: 2
     table: '1'
     note: Table 1, 52 sample rows.
-- experiment_id: 10.1016/0016-7037(89)90165-8::kress-carmichael-1989-lime-iron-silicate-redox::declared:10.1016/0016-7037(89)90165-8::experiment::kress_carmichael_1989_table1_runs::method:quench_equilibration
+- experiment_id: 10.1016/0016-7037(89)90165-8::kress-carmichael-1989-lime-iron-silicate-redox::declared:10.1016/0016-7037(89)90165-8::experiment::kress_carmichael_1989_table1_runs::method:electron_microprobe
   kind: literature
   method:
     tag: value
-    value: quench_equilibration
+    value: electron_microprobe
   sample: {}
   conditions:
     temperature_K:

@@ -33,114 +33,6 @@ experiments:
 - experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'vacuum_free_evaporation_ir_wire_loop' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    printed_composition:
-      state:
-        tag: value
-        value: B133-glass 12.0 wt% MgO, 46.1 wt% SiO2, 19.4 wt% Al2O3, 25.5 wt% CaO
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-    form:
-      state:
-        tag: value
-        value: Suspended on Ir-wire loops of 1.0, 2.5, 3.3 and 6.0 mm diameter
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '2073.15'
-          approximate: false
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-        note: 'DERIVED: 1800 C + 273.15 = 2073.15 K; rate averages reported at 1800 C'
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: source prints P≤10^-6 torr; no scalar total-pressure value in Pa
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-        note: P≤10^-6 torr as printed; retained as typed absence rather than inferred Pa
-    sweep_gas:
-      state:
-        tag: not_applicable
-        reason: vacuum
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d
-  locator:
-    pdf_page_index: 1
-    section: Experimental methods
-  bench_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::bench::chicago-high-vacuum-furnace-cai
-- experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'vacuum_free_evaporation_ir_wire_loop' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    printed_composition:
-      state:
-        tag: value
-        value: B133-glass 12.0 wt% MgO, 46.1 wt% SiO2, 19.4 wt% Al2O3, 25.5 wt% CaO
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-    form:
-      state:
-        tag: value
-        value: Ir-wire loop suspended melt droplets
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: experiment temperature not published
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: source prints P≤10^-6 torr; no scalar total-pressure value in Pa
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-        note: P≤10^-6 torr as printed; retained as typed absence rather than inferred Pa
-    sweep_gas:
-      state:
-        tag: not_applicable
-        reason: vacuum
-      locator:
-        pdf_page_index: 1
-        section: Experimental methods
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d
-  locator:
-    pdf_page_index: 1
-    section: Experimental methods
-    note: campaigns at 1800/1700/1600 C; page-2 Results prints 1.0 mm multi-T rates and Ea=580 kJ/mole
-  bench_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::bench::chicago-high-vacuum-furnace-cai
-- experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::ta-mendybaev-2002-lpsc::declared:902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series::method:unspecified
-  kind: literature
-  method:
     tag: value
     value: unspecified
   sample:
@@ -195,7 +87,7 @@ experiments:
     pdf_page_index: 1
     section: Experimental methods
   bench_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::bench::chicago-high-vacuum-furnace-cai
-- experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::ta-mendybaev-2002-lpsc::declared:902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign::method:unspecified
+- experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
   kind: literature
   method:
     tag: value

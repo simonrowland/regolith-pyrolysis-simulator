@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2008-zinc-phosphate-melts.yaml
 observations:
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_p4o10_curve_5
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated
   identity:
     quantity:
       tag: value
@@ -95,7 +95,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Lines 4, 5 and 6 are activities and oxide-formation
+      Gibbs energies calculated in the present study. The caption does not print discrete calculated points.'' is not a closed
+      method token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_p4o10_curve_5
     policy:
       id: DP-106
@@ -134,7 +136,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_p4o10_series_2
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots
   identity:
     quantity:
       tag: value
@@ -224,16 +226,17 @@ observations:
         note: Panel a, open squares, legend symbol 2. Thirteen data squares on the 600 dpi crop; the legend glyph is not a
           point.
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_p4o10_series_2
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: knudsen_effusion
       units: method token
   source_id: shornikov-2008-zinc-phosphate-melts
   locator:
@@ -267,7 +270,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_zno_curve_4
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated
   identity:
     quantity:
       tag: value
@@ -358,7 +361,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Lines 4, 5 and 6 are activities and oxide-formation
+      Gibbs energies calculated in the present study. The caption does not print discrete calculated points.'' is not a closed
+      method token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_zno_curve_4
     policy:
       id: DP-106
@@ -397,7 +402,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_zno_series_1
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots
   identity:
     quantity:
       tag: value
@@ -487,16 +492,17 @@ observations:
         note: Panel a, filled triangles, legend symbol 1. Ten data triangles on the 600 dpi crop; the legend glyph is not
           a point.
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_zno_series_1
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: knudsen_effusion
       units: method token
   source_id: shornikov-2008-zinc-phosphate-melts
   locator:
@@ -530,7 +536,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c02
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -613,7 +619,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c02
     policy:
       id: DP-106
@@ -648,7 +656,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c04
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -730,7 +738,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c04
     policy:
       id: DP-106
@@ -765,7 +775,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -847,7 +857,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c06
     policy:
       id: DP-106
@@ -882,7 +894,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c02
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -965,7 +977,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c02
     policy:
       id: DP-106
@@ -1000,7 +1014,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c04
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -1082,7 +1096,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c04
     policy:
       id: DP-106
@@ -1117,7 +1133,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -1199,7 +1215,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c06
     policy:
       id: DP-106
@@ -1234,7 +1252,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c02
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -1317,7 +1335,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c02
     policy:
       id: DP-106
@@ -1352,7 +1372,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c04
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -1434,7 +1454,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c04
     policy:
       id: DP-106
@@ -1469,7 +1491,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -1551,7 +1573,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c06
     policy:
       id: DP-106
@@ -1586,7 +1610,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c02
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -1669,7 +1693,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c02
     policy:
       id: DP-106
@@ -1704,7 +1730,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c04
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -1786,7 +1812,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c04
     policy:
       id: DP-106
@@ -1821,7 +1849,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -1903,7 +1931,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c06
     policy:
       id: DP-106
@@ -1938,7 +1968,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c02
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2021,7 +2051,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c02
     policy:
       id: DP-106
@@ -2056,7 +2088,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c04
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2138,7 +2170,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c04
     policy:
       id: DP-106
@@ -2173,7 +2207,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2255,7 +2289,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c06
     policy:
       id: DP-106
@@ -2290,7 +2326,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r08_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2372,7 +2408,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r08_c06
     policy:
       id: DP-106
@@ -2407,7 +2445,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r09_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2489,7 +2527,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r09_c06
     policy:
       id: DP-106
@@ -2524,7 +2564,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r10_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2606,7 +2646,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r10_c06
     policy:
       id: DP-106
@@ -2641,7 +2683,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r11_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2723,7 +2765,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r11_c06
     policy:
       id: DP-106
@@ -2758,7 +2802,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r12_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2840,7 +2884,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r12_c06
     policy:
       id: DP-106
@@ -2875,7 +2921,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r13_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -2957,7 +3003,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r13_c06
     policy:
       id: DP-106
@@ -2992,7 +3040,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r14_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -3074,7 +3122,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r14_c06
     policy:
       id: DP-106
@@ -3109,7 +3159,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r15_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -3191,7 +3241,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r15_c06
     policy:
       id: DP-106
@@ -3226,7 +3278,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r16_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -3308,7 +3360,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r16_c06
     policy:
       id: DP-106
@@ -3343,7 +3397,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r17_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -3425,7 +3479,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r17_c06
     policy:
       id: DP-106
@@ -3460,7 +3516,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r18_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -3542,7 +3598,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r18_c06
     policy:
       id: DP-106
@@ -3577,7 +3635,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r19_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -3659,7 +3717,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r19_c06
     policy:
       id: DP-106
@@ -3694,7 +3754,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r20_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -3776,7 +3836,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r20_c06
     policy:
       id: DP-106
@@ -3811,7 +3873,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r21_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -3893,7 +3955,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r21_c06
     policy:
       id: DP-106
@@ -3928,7 +3992,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r22_c06
-  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   identity:
     quantity:
       tag: value
@@ -4010,7 +4074,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fG
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''The table caption says the Gibbs energies were
+      calculated in the present study according to data [1, 6-9]. Per-row parents are not printed.'' is not a closed method
+      token (kems_effusion alone is insufficient)'
     origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r22_c06
     policy:
       id: DP-106

@@ -59,7 +59,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_si2c_formation_enthalpies
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -103,16 +103,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_si2c_formation_enthalpies
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 139
@@ -122,7 +112,7 @@ observations:
       mol⁻¹, respectively'
   read_from: pdf:kems-184-behrens-1979
 - observation_id: kems-184-behrens-1979::behrens_1979_si_activation_enthalpy
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -174,7 +164,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_least_squares_model'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: least_squares_fit_of_Rln_IT'
     origin: kems-184-behrens-1979::behrens_1979_si_activation_enthalpy
     policy:
       id: DP-106
@@ -191,7 +181,7 @@ observations:
   provenance:
     printed_phase: hexagonal_SiC_basal_plane
 - observation_id: kems-184-behrens-1979::behrens_1979_si_assumed_entropy_alpha
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -280,17 +270,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - evaporation_coefficient_alpha
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_activation_barrier_model'
-    origin: kems-184-behrens-1979::behrens_1979_si_assumed_entropy_alpha
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -314,7 +293,7 @@ observations:
         note: quote=vaporization coefficients of 1.5 x 10⁻³ and 8.1 x 10⁻³, respectively, at 2350 K if it is assumed there
           are no corresponding entropy barriers
 - observation_id: kems-184-behrens-1979::behrens_1979_si_equilibrium_enthalpy_and_barrier
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -358,16 +337,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_si_equilibrium_enthalpy_and_barrier
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -376,7 +345,7 @@ observations:
       kcal mol⁻¹ and 22.5 kcal mol⁻¹ for Si(g) and SiC₂(g) sublimation.
   read_from: pdf:kems-184-behrens-1979
 - observation_id: kems-184-behrens-1979::behrens_1979_si_langmuir_intensity_induction
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-langmuir-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-langmuir-series
   identity:
     quantity:
       tag: unknown
@@ -418,16 +387,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_single_crystal'
-    origin: kems-184-behrens-1979::behrens_1979_si_langmuir_intensity_induction
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -437,7 +396,7 @@ observations:
   provenance:
     printed_phase: hexagonal_SiC_basal_plane
 - observation_id: kems-184-behrens-1979::behrens_1979_si_langmuir_vs_extrapolated_knudsen
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-langmuir-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-langmuir-series
   identity:
     quantity:
       tag: unknown
@@ -483,16 +442,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_to_extrapolated_knudsen_comparison'
-    origin: kems-184-behrens-1979::behrens_1979_si_langmuir_vs_extrapolated_knudsen
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -511,7 +460,7 @@ observations:
         note: quote=At 2400 K, measured steady-state ion intensities are a factor of 80-100 lower than intensities extrapolated
           from those measured in the Knudsen effusion experiments.
 - observation_id: kems-184-behrens-1979::behrens_1979_sic2_activation_enthalpy
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -563,7 +512,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_least_squares_model'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: least_squares_fit_of_Rln_IT'
     origin: kems-184-behrens-1979::behrens_1979_sic2_activation_enthalpy
     policy:
       id: DP-106
@@ -580,7 +529,7 @@ observations:
   provenance:
     printed_phase: hexagonal_SiC_basal_plane
 - observation_id: kems-184-behrens-1979::behrens_1979_sic2_assumed_entropy_alpha
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -669,17 +618,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - evaporation_coefficient_alpha
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_activation_barrier_model'
-    origin: kems-184-behrens-1979::behrens_1979_sic2_assumed_entropy_alpha
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -703,7 +641,7 @@ observations:
         note: quote=vaporization coefficients of 1.5 x 10⁻³ and 8.1 x 10⁻³, respectively, at 2350 K if it is assumed there
           are no corresponding entropy barriers
 - observation_id: kems-184-behrens-1979::behrens_1979_sic2_equilibrium_enthalpy_and_barrier
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -747,16 +685,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_sic2_equilibrium_enthalpy_and_barrier
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -765,7 +693,7 @@ observations:
       kcal mol⁻¹ and 22.5 kcal mol⁻¹ for Si(g) and SiC₂(g) sublimation.
   read_from: pdf:kems-184-behrens-1979
 - observation_id: kems-184-behrens-1979::behrens_1979_sic2_formation_enthalpies
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -809,16 +737,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_sic2_formation_enthalpies
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 139
@@ -828,7 +746,7 @@ observations:
       mol⁻¹, respectively'
   read_from: pdf:kems-184-behrens-1979
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si2c_second_law_reference_10
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -899,7 +817,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si2c_second_law_this_work
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -953,7 +871,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: second_law_least_squares_fit'
     origin: kems-184-behrens-1979::behrens_1979_table1_si2c_second_law_this_work
     policy:
       id: DP-106
@@ -970,7 +888,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si2c_third_law_reference_10
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -1041,7 +959,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si2c_third_law_this_work
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -1095,7 +1013,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: third_law'
     origin: kems-184-behrens-1979::behrens_1979_table1_si2c_third_law_this_work
     policy:
       id: DP-106
@@ -1112,7 +1030,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si_second_law_reference_10
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -1183,7 +1101,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si_second_law_this_work
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -1237,7 +1155,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: second_law_least_squares_fit'
     origin: kems-184-behrens-1979::behrens_1979_table1_si_second_law_this_work
     policy:
       id: DP-106
@@ -1254,7 +1172,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si_third_law_reference_10
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -1325,7 +1243,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si_third_law_this_work
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -1379,7 +1297,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: third_law'
     origin: kems-184-behrens-1979::behrens_1979_table1_si_third_law_this_work
     policy:
       id: DP-106
@@ -1396,7 +1314,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_sic2_second_law_reference_10
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -1467,7 +1385,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_sic2_second_law_this_work
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -1521,7 +1439,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: second_law_least_squares_fit'
     origin: kems-184-behrens-1979::behrens_1979_table1_sic2_second_law_this_work
     policy:
       id: DP-106
@@ -1538,7 +1456,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_sic2_third_law_reference_10
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -1609,7 +1527,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_sic2_third_law_this_work
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -1663,7 +1581,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: third_law'
     origin: kems-184-behrens-1979::behrens_1979_table1_sic2_third_law_this_work
     policy:
       id: DP-106
@@ -1680,7 +1598,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::T=1800:h=2ee965b5fff4
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -1854,7 +1772,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::T=2000:h=942470278bf7
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -2028,7 +1946,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::T=2200:h=0748d4ddda06
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -2202,7 +2120,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work::T=1800:h=67123101a42e
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -2292,17 +2210,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2376,7 +2283,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work::T=2000:h=e63fa02dbc34
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -2466,17 +2373,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2550,7 +2446,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work::T=2200:h=119636de6204
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -2640,17 +2536,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2724,7 +2609,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::T=1800:h=dbc69c973531
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -2898,7 +2783,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::T=2000:h=628c3e0f2d6e
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -3072,7 +2957,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::T=2200:h=627362fa14ee
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -3246,7 +3131,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si_this_work::T=1800:h=9267113753b7
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -3336,17 +3221,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_si_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3420,7 +3294,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si_this_work::T=2000:h=e73f375ebe20
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -3510,17 +3384,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_si_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3594,7 +3457,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_si_this_work::T=2200:h=b05ec4ddb080
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -3684,17 +3547,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_si_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3768,7 +3620,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::T=1800:h=b6e38572c374
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -3942,7 +3794,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::T=2000:h=3507e02e2cbe
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -4116,7 +3968,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::T=2200:h=fae0f32980ae
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -4290,7 +4142,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work::T=1800:h=cc28a38f7f81
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -4380,17 +4232,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4464,7 +4305,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work::T=2000:h=5dfe72191d83
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -4554,17 +4395,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4638,7 +4468,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work::T=2200:h=b84149ec1eee
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: value
@@ -4728,17 +4558,6 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_unstated
-    affected_quantities:
-    - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4812,7 +4631,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::T=1800:h=a05990ca94d4
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -4884,7 +4703,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::T=2000:h=9c88acb2eb5e
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -4956,7 +4775,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::T=2200:h=e0b6f175282a
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -5028,7 +4847,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work::T=1800:h=d35a4c18a57d
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -5074,16 +4893,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -5100,7 +4909,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work::T=2000:h=02ebd646f955
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -5146,16 +4955,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -5172,7 +4971,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work::T=2200:h=809b0da9ebc4
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-knudsen-series
   identity:
     quantity:
       tag: unknown
@@ -5218,16 +5017,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
-    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -5244,7 +5033,7 @@ observations:
   provenance:
     printed_phase: SiC_hexagonal_plus_graphite
 - observation_id: kems-184-behrens-1979::behrens_1979_total_flux_time_dependence
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-langmuir-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-langmuir-series
   identity:
     quantity:
       tag: unknown
@@ -5287,16 +5076,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_total_mass_loss'
-    origin: kems-184-behrens-1979::behrens_1979_total_flux_time_dependence
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -5305,7 +5084,7 @@ observations:
       drops to zero
   read_from: pdf:kems-184-behrens-1979
 - observation_id: kems-184-behrens-1979::behrens_1979_total_initial_langmuir_flux
-  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979::declared:91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-langmuir-series::method:unspecified
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::experiment::sic-langmuir-series
   identity:
     quantity:
       tag: unknown
@@ -5351,16 +5130,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_total_mass_loss'
-    origin: kems-184-behrens-1979::behrens_1979_total_initial_langmuir_flux
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 135

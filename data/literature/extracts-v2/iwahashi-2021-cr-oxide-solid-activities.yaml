@@ -165,7 +165,7 @@ observations:
     reaction_as_printed: 2[Cr]Cu + (3/2)O2(g) = <Cr2O3>
     printed_phase: cr
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq24_log_gamma_Cr
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::declared:10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series::method:unspecified
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
   identity:
     quantity:
       tag: value
@@ -249,20 +249,7 @@ observations:
         pdf_page_index: 4
         equation: '24'
         note: Eq. 24 reports log gamma_Cr = 1.54 at 1 573 K; regression range X_Cr < 10^-2.
-  notices:
-  - kind: method_unstated
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Henry-law range X_Cr
-      < 10^-2; printed source evidence: Henry-law regression intercept from the authors'' equilibrium measurements in pure
-      Cr2O3 crucibles, using Eq. 14 and Eq. 23.'
-    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq24_log_gamma_Cr
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
+  notices: []
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 5
@@ -356,7 +343,7 @@ observations:
     printed_value: '1.54'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq26_log_activity_Cr2O3
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::declared:10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series::method:unspecified
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
   identity:
     quantity:
       tag: value
@@ -448,20 +435,7 @@ observations:
         pdf_page_index: 5
         equation: '26'
         note: Eq. (26) prints log a_Cr2O3 = -1.33 ± 0.09 for CaO + CaCr2O4.
-  notices:
-  - kind: method_unstated
-    affected_quantities:
-    - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid-phase assemblage;
-      printed source evidence: Activity reduced by the authors from equilibrium X_Cr versus log(P_O2/atm) data using Eq. 25;
-      the source states no confidence level for the printed ± width.'
-    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq26_log_activity_Cr2O3
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
+  notices: []
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 6
@@ -566,7 +540,7 @@ observations:
     printed_value: '-1.33'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq27_log_activity_Cr2O3
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::declared:10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series::method:unspecified
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
   identity:
     quantity:
       tag: value
@@ -658,20 +632,7 @@ observations:
         pdf_page_index: 5
         equation: '27'
         note: Eq. (27) prints log a_Cr2O3 = -0.35 ± 0.08 for CaSiO3 + SiO2 + Ca3Cr2Si3O12.
-  notices:
-  - kind: method_unstated
-    affected_quantities:
-    - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid-phase assemblage;
-      printed source evidence: Activity reduced by the authors from equilibrium X_Cr versus log(P_O2/atm) data using Eq. 25;
-      the source states no confidence level for the printed ± width.'
-    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq27_log_activity_Cr2O3
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
+  notices: []
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 6
@@ -5260,7 +5221,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r02_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -5412,7 +5373,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r02_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -5564,7 +5525,7 @@ observations:
     printed_value: '-4.81'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r02_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -5716,7 +5677,7 @@ observations:
     printed_value: '-1.33'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -5868,7 +5829,7 @@ observations:
     printed_value: '-0.02'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -6020,7 +5981,7 @@ observations:
     printed_value: '-4.75'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -6172,7 +6133,7 @@ observations:
     printed_value: '-1.31'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -6324,7 +6285,7 @@ observations:
     printed_value: '-1.33'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -6476,7 +6437,7 @@ observations:
     printed_value: '-2.12'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -6628,7 +6589,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -6780,7 +6741,7 @@ observations:
     printed_value: '-1.66'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -6932,7 +6893,7 @@ observations:
     printed_value: '-1.46'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -7084,7 +7045,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -7236,7 +7197,7 @@ observations:
     printed_value: '-1.84'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -7388,7 +7349,7 @@ observations:
     printed_value: '-1.20'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -7540,7 +7501,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -7692,7 +7653,7 @@ observations:
     printed_value: '-2.07'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -7844,7 +7805,7 @@ observations:
     printed_value: '-0.85'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -7996,7 +7957,7 @@ observations:
     printed_value: '-0.35'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -8148,7 +8109,7 @@ observations:
     printed_value: '-2.92'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -8300,7 +8261,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -8452,7 +8413,7 @@ observations:
     printed_value: '-0.35'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -8604,7 +8565,7 @@ observations:
     printed_value: '-3.04'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value
@@ -8756,7 +8717,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
   identity:
     quantity:
       tag: value

@@ -68,256 +68,11 @@ experiments:
     published_page: 195
     pdf_page_index: 2
     table: I
-- experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample:
-    form:
-      state:
-        tag: value
-        value: CaSiO3 melt
-      locator:
-        published_page: 196
-        table: III
-    characterization:
-      state:
-        tag: value
-        value: Melt prepared by fusing pseudowollastonite; a CaSiO3 glass precursor was prepared by quenching this melt.
-      locator:
-        published_page: 195
-        section: Experimental
-    pretreatment:
-      state:
-        tag: value
-        value: pseudowollastonite fused and heated 4 h at about 1870 K; melt quenched to make the CaSiO3 glass precursor
-      locator:
-        published_page: 195
-        section: Experimental
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 196
-        table: III
-        note: Individual sample temperatures are transcribed in the observation points; no single series setpoint applies.
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: in_cited_source
-      locator:
-        published_page: 194
-        section: Experimental
-        note: Drop-calorimeter atmosphere and pressure are not stated here; apparatus details are referred to [10].
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: in_cited_source
-      locator:
-        published_page: 194
-        section: Experimental
-        note: No sweep gas is stated; apparatus details are referred to [10].
-    regime:
-      regime_class:
-        tag: unknown
-        reason: in_cited_source
-  work_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce
-  locator:
-    published_page: 196
-    table: III
-    section: Experimental
-  bench_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::bench::adamkovicova-drop-calorimeter
-- experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample:
-    form:
-      state:
-        tag: value
-        value: CaSiO3 melt sample, represented by the glass produced on cooling
-      locator:
-        published_page: 194
-        section: Experimental
-    characterization:
-      state:
-        tag: value
-        value: CaSiO3 melt prepared by fusing pseudowollastonite; the corresponding glass precursor was obtained by quenching.
-      locator:
-        published_page: 195
-        section: Experimental
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '298'
-          approximate: false
-      locator:
-        published_page: 194
-        section: Experimental
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 194
-        section: Experimental
-        note: No solution-calorimeter pressure is stated.
-    sweep_gas:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        published_page: 194
-        section: Experimental
-        note: Solution calorimetry in liquid solvent; no sweep gas applies.
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce
-  locator:
-    published_page: 196
-    table: III
-    section: Experimental
-  bench_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::bench::adamkovicova-solution-calorimeter
-- experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample:
-    form:
-      state:
-        tag: value
-        value: pseudowollastonite
-      locator:
-        published_page: 195
-        section: Experimental
-    characterization:
-      state:
-        tag: value
-        value: Prepared from a precursor with molar CaO:SiO2 = 1:1; the precursor was heated 8 h at about 1670 K; pure pseudowollastonite
-          was confirmed by X-ray phase analysis and IR spectroscopy. After drop-calorimeter measurements, X-ray phase analysis
-          found no transformation to β-wollastonite.
-      locator:
-        published_page: 195
-        section: Experimental
-    pretreatment:
-      state:
-        tag: value
-        value: precursor heated 8 h at about 1670 K
-      locator:
-        published_page: 195
-        section: Experimental
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 195
-        table: I
-        note: Individual sample temperatures are transcribed in the observation points; no single series setpoint applies.
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: in_cited_source
-      locator:
-        published_page: 194
-        section: Experimental
-        note: Drop-calorimeter atmosphere and pressure are not stated here; apparatus details are referred to [10].
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: in_cited_source
-      locator:
-        published_page: 194
-        section: Experimental
-        note: No sweep gas is stated; apparatus details are referred to [10].
-    regime:
-      regime_class:
-        tag: unknown
-        reason: in_cited_source
-  work_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce
-  locator:
-    published_page: 195
-    table: I
-    section: Experimental
-  bench_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::bench::adamkovicova-drop-calorimeter
-- experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample:
-    form:
-      state:
-        tag: value
-        value: pseudowollastonite
-      locator:
-        published_page: 196
-        section: Experimental
-    characterization:
-      state:
-        tag: value
-        value: Same pseudowollastonite sample used for the drop-calorimeter measurements; pure phase confirmed by X-ray phase
-          analysis and IR spectroscopy.
-      locator:
-        published_page: 196
-        section: Experimental
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '298'
-          approximate: false
-      locator:
-        published_page: 194
-        section: Experimental
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 194
-        section: Experimental
-        note: No solution-calorimeter pressure is stated.
-    sweep_gas:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        published_page: 194
-        section: Experimental
-        note: Solution calorimetry in liquid solvent; no sweep gas applies.
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce
-  locator:
-    published_page: 196
-    table: II
-    section: Experimental
-  bench_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::bench::adamkovicova-solution-calorimeter
 - experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
   kind: literature
   method:
-    tag: unknown
-    reason: 'unmapped published method: drop calorimetry'
+    tag: value
+    value: unspecified
   sample:
     form:
       state:
@@ -379,8 +134,8 @@ experiments:
 - experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
   kind: literature
   method:
-    tag: unknown
-    reason: 'unmapped published method: solution calorimetry'
+    tag: value
+    value: unspecified
   sample:
     form:
       state:
@@ -437,8 +192,8 @@ experiments:
 - experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
   kind: literature
   method:
-    tag: unknown
-    reason: 'unmapped published method: drop calorimetry'
+    tag: value
+    value: unspecified
   sample:
     form:
       state:
@@ -502,8 +257,8 @@ experiments:
 - experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
   kind: literature
   method:
-    tag: unknown
-    reason: 'unmapped published method: solution calorimetry'
+    tag: value
+    value: unspecified
   sample:
     form:
       state:

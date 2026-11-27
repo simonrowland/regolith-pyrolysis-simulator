@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2019-ca-feo-vapor.yaml
 observations:
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_c2f2o5_decomposition_allen_snow_1955
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::allen-snow-1955::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::allen-snow-1955
   identity:
     quantity:
       tag: value
@@ -122,7 +122,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_c2f2o5_decomposition_oelsen_maetz_1941
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::oelsen-maetz-1941::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::oelsen-maetz-1941
   identity:
     quantity:
       tag: value
@@ -239,7 +239,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_c2feo3_dissociation_allen_snow_1955
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::allen-snow-1955::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::allen-snow-1955
   identity:
     quantity:
       tag: value
@@ -2697,7 +2697,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_cafeo2_delta_fh298_shugurov_2005
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shugurov-2005::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shugurov-2005
   identity:
     quantity:
       tag: value
@@ -2816,7 +2816,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_a_curve_4
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -2906,7 +2906,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_a_curve_4
     policy:
       id: DP-106
@@ -2945,7 +2946,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_a_curve_6
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -3035,7 +3036,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_a_curve_6
     policy:
       id: DP-106
@@ -3074,7 +3076,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_a_curve_8
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -3164,7 +3166,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_a_curve_8
     policy:
       id: DP-106
@@ -3203,7 +3206,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_b_curve_4
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -3293,7 +3296,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_b_curve_4
     policy:
       id: DP-106
@@ -3332,7 +3336,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_b_curve_6
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -3422,7 +3426,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_b_curve_6
     policy:
       id: DP-106
@@ -3461,7 +3466,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_b_curve_8
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -3551,7 +3556,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_cao_panel_b_curve_8
     policy:
       id: DP-106
@@ -3590,7 +3596,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_a_curve_3
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -3680,7 +3686,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_a_curve_3
     policy:
       id: DP-106
@@ -3719,7 +3726,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_a_curve_5
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -3809,7 +3816,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_a_curve_5
     policy:
       id: DP-106
@@ -3848,7 +3856,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_a_curve_7
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -3938,7 +3946,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_a_curve_7
     policy:
       id: DP-106
@@ -3977,7 +3986,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_b_curve_3
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -4067,7 +4076,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_b_curve_3
     policy:
       id: DP-106
@@ -4106,7 +4116,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_b_curve_5
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -4196,7 +4206,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_b_curve_5
     policy:
       id: DP-106
@@ -4235,7 +4246,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_b_curve_7
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
   identity:
     quantity:
       tag: value
@@ -4325,7 +4336,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Present-study activity calculations within the
+      ideal associated solution model.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_feo_panel_b_curve_7
     policy:
       id: DP-106
@@ -4364,7 +4376,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=0a3a9a20f312
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -4454,7 +4466,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -4501,7 +4514,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=1350bb0b7066
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -4591,7 +4604,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -4638,7 +4652,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=2e64d6afd183
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -4728,7 +4742,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -4775,7 +4790,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=3cbfdfb5d549
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -4865,7 +4880,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -4912,7 +4928,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=4311ae86e057
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -5002,7 +5018,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -5049,7 +5066,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=44c26ffcc063
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -5139,7 +5156,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -5186,7 +5204,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=48c625e6c743
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -5276,7 +5294,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -5323,7 +5342,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=54b556d45641
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -5413,7 +5432,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -5460,7 +5480,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=675d1e472d1a
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -5550,7 +5570,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -5597,7 +5618,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=68d40e83b1c9
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -5687,7 +5708,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -5734,7 +5756,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=960dc9c453b9
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -5824,7 +5846,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -5871,7 +5894,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=a5581ded3eb0
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -5961,7 +5984,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -6008,7 +6032,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=b1e38207d92b
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -6098,7 +6122,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -6145,7 +6170,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=b80d4273683e
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -6235,7 +6260,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -6282,7 +6308,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=d613cfdfffab
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -6372,7 +6398,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -6419,7 +6446,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=df2da9aee0b5
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -6509,7 +6536,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -6556,7 +6584,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=e67bfc5fe410
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -6646,7 +6674,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -6693,7 +6722,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers::T=1673:h=f3c247b801cf
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
   identity:
     quantity:
       tag: value
@@ -6783,7 +6812,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Hydrogen-water gas mixture equilibria with slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -6830,7 +6860,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=130821e36052
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -6920,7 +6950,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -6979,7 +7010,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=137926e9eeca
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -7069,7 +7100,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -7128,7 +7160,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=2251a3f4302e
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -7218,7 +7250,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -7277,7 +7310,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=2c3a1fe5af8f
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -7367,7 +7400,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -7426,7 +7460,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=54d9448b9a58
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -7516,7 +7550,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -7575,7 +7610,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=63f1eabe8e78
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -7665,7 +7700,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -7724,7 +7760,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=6f0e783c37ca
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -7814,7 +7850,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -7873,7 +7910,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=7f276d3d8716
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -7963,7 +8000,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -8022,7 +8060,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=9a28e8eb81b4
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -8112,7 +8150,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -8171,7 +8210,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=aabf79710198
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -8261,7 +8300,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -8320,7 +8360,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=b452cc08d70b
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -8410,7 +8450,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -8469,7 +8510,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=b4afeb766068
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -8559,7 +8600,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -8618,7 +8660,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=baf80f766f2f
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -8708,7 +8750,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -8767,7 +8810,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=c377d079d1ae
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -8857,7 +8900,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -8916,7 +8960,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=c79bbaa9a80f
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -9006,7 +9050,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -9065,7 +9110,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=c7d8cfe5c7a0
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -9155,7 +9200,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -9214,7 +9260,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=d08bbcb20b55
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -9304,7 +9350,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106
@@ -9363,7 +9410,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers::T=1833:h=e64650e4247b
-  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
   identity:
     quantity:
       tag: value
@@ -9453,7 +9500,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Oxygen distribution between molten iron and slag,
+      as described in the text.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2019-ca-feo-vapor::shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
     policy:
       id: DP-106

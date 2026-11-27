@@ -34,8 +34,8 @@ experiments:
 - experiment_id: 10.1007/s00410-013-0896-z::experiment::wood_wade_2013_bw1102
   kind: literature
   method:
-    tag: unknown
-    reason: The source describes metal-silicate partitioning, but MethodToken has no exact metal-silicate-partitioning token.
+    tag: value
+    value: unspecified
   sample:
     initial_composition:
       state:
@@ -154,95 +154,6 @@ experiments:
     pdf_page_index: 4
     figure: '2'
     note: row=gamma = 0.5; branch 1; digitized point 1
-- experiment_id: 10.1007/s00410-013-0896-z::wood-wade-2013-trace-activities::declared:10.1007/s00410-013-0896-z::experiment::wood_wade_2013_bw1102::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample:
-    initial_composition:
-      state:
-        tag: unknown
-        reason: The paper does not state the compositional basis for the starting recipe, so it cannot be mapped to an engine
-          composition.
-      locator:
-        page: 8
-        published_page: 918
-        pdf_page_index: 7
-        note: 'Proof string: ‘starting silicate composition of Diopside28–Forsterite22–Anorthite50’; basis is not stated.'
-    printed_composition:
-      state:
-        tag: value
-        value: 'Initial bulk recipe: Diopside28–Forsterite22–Anorthite50'
-      locator:
-        page: 8
-        published_page: 918
-        pdf_page_index: 7
-        note: 'Proof string: ‘starting silicate composition of Diopside28–Forsterite22–Anorthite50’; basis and total are not
-          stated.'
-  conditions:
-    T_C:
-      state:
-        tag: value
-        value: '1650'
-      locator:
-        page: 8
-        published_page: 918
-        pdf_page_index: 7
-        note: 'Proof string: ‘1.5 GPa and 1,650 °C’.'
-    fO2_log:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        page: 8
-        published_page: 918
-        pdf_page_index: 7
-        note: 'Proof string: ‘1.5 GPa and 1,650 °C’; the BW1102 run description gives no fO2 control or value.'
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '1500000000'
-          approximate: false
-      locator:
-        page: 8
-        published_page: 918
-        pdf_page_index: 7
-        table: '1'
-        note: 'Proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’.'
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        page: 8
-        published_page: 918
-        pdf_page_index: 7
-        note: 'Proof string: ‘1.5 GPa and 1,650 °C’; no sweep or carrier gas is stated for the BW1102 high-pressure run.'
-    regime:
-      regime_class:
-        tag: unknown
-        reason: The paper does not classify a gas-flow regime for the high-pressure partitioning experiment.
-  work_id: 10.1007/s00410-013-0896-z
-  locator:
-    page: 8
-    published_page: 918
-    pdf_page_index: 7
-    note: 'Proof string: ‘1.5 GPa and 1,650 °C’; this paragraph identifies the single experiment linked to Table 1 identifier
-      BW1102.'
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: SiO2 glass
-      locator:
-        page: 8
-        published_page: 918
-        pdf_page_index: 7
-        note: 'Proof string: ‘The capsule was made of SiO2 glass’.'
 context:
 - observation_id: wood_wade_2013_bw1102_table1_partitioning_inputs
   type: typed_context

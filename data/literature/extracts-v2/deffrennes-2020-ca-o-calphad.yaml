@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml
 observations:
 - observation_id: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_air_solidification
-  experiment_id: 10.1016/j.calphad.2020.101764::deffrennes-2020-ca-o-calphad::declared:10.1016/j.calphad.2020.101764::experiment::manara_2014_air_laser_heating::method:unspecified
+  experiment_id: 10.1016/j.calphad.2020.101764::experiment::manara_2014_air_laser_heating
   identity:
     quantity:
       tag: value
@@ -87,7 +87,7 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: quasi-containerless laser heating'
     origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_air_solidification
     policy:
       id: DP-106
@@ -138,7 +138,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_reducing_solidification
-  experiment_id: 10.1016/j.calphad.2020.101764::deffrennes-2020-ca-o-calphad::declared:10.1016/j.calphad.2020.101764::experiment::manara_2014_reducing_laser_heating::method:unspecified
+  experiment_id: 10.1016/j.calphad.2020.101764::experiment::manara_2014_reducing_laser_heating
   identity:
     quantity:
       tag: value
@@ -222,7 +222,7 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: quasi-containerless laser heating'
     origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_reducing_solidification
     policy:
       id: DP-106
@@ -248,7 +248,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: deffrennes-2020-ca-o-calphad::deffrennes_2020_yamada_solidification
-  experiment_id: 10.1016/j.calphad.2020.101764::deffrennes-2020-ca-o-calphad::declared:10.1016/j.calphad.2020.101764::experiment::yamada_1986_digital_pyrometry::method:unspecified
+  experiment_id: 10.1016/j.calphad.2020.101764::experiment::yamada_1986_digital_pyrometry
   identity:
     quantity:
       tag: value
@@ -330,7 +330,7 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: digital pyrometry'
     origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_yamada_solidification
     policy:
       id: DP-106

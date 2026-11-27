@@ -2470,7 +2470,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_quoted_naoh_pressure_1e5_atm
-  experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::sanders-1977-water-vapour-na-vaporization::declared:80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_quoted_NaOH_pressure::method:unspecified
+  experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_quoted_NaOH_pressure
   identity:
     quantity:
       tag: value
@@ -2560,7 +2560,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''literature'' is not a closed method token (kems_effusion
+      alone is insufficient)'
     origin: sanders-1977-water-vapour-na-vaporization::sanders_1977_quoted_naoh_pressure_1e5_atm
     policy:
       id: DP-106

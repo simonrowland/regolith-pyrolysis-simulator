@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/sossi-2020-magma-ocean-redox.yaml
 observations:
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-10::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-10
   identity:
     quantity:
       tag: value
@@ -106,17 +106,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -318,7 +307,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-11::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-11
   identity:
     quantity:
       tag: value
@@ -421,17 +410,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -633,7 +611,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-12::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-12
   identity:
     quantity:
       tag: value
@@ -736,17 +714,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -948,7 +915,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-1::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-1
   identity:
     quantity:
       tag: value
@@ -1052,17 +1019,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -1281,7 +1237,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-2::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-2
   identity:
     quantity:
       tag: value
@@ -1384,17 +1340,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1591,7 +1536,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-3::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-3
   identity:
     quantity:
       tag: value
@@ -1694,17 +1639,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -1906,7 +1840,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-6::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-6
   identity:
     quantity:
       tag: value
@@ -2009,17 +1943,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -2221,7 +2144,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-7::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-7
   identity:
     quantity:
       tag: value
@@ -2324,17 +2247,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -2536,7 +2448,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-8::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-8
   identity:
     quantity:
       tag: value
@@ -2639,17 +2551,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -2851,7 +2752,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-9::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-9
   identity:
     quantity:
       tag: value
@@ -2954,17 +2855,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -3166,7 +3056,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-ts1::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-ts1
   identity:
     quantity:
       tag: value
@@ -3269,17 +3159,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio
@@ -3481,7 +3360,7 @@ observations:
   provenance:
     printed_phase: quenched peridotite glass
 - observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes
-  experiment_id: 10.1126/sciadv.abd1387::sossi-2020-magma-ocean-redox::declared:10.1126/sciadv.abd1387::experiment::sossi-per-ts2::method:unspecified
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-ts2
   identity:
     quantity:
       tag: value
@@ -3584,17 +3463,6 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Fe K-edge XANES'
-    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: fo2_frame_from_printed_atmosphere
     affected_quantities:
     - fe3_fe2_ratio

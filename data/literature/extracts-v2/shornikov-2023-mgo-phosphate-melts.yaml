@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2023-mgo-phosphate-melts.yaml
 observations:
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_curve_1
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model::method:unspecified
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
   identity:
     quantity:
       tag: value
@@ -94,7 +94,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Semi-empirical model, 600–1800 K, described in
+      Shornikov (2019). Oxide activities, mixing energies and partial pressures are calculated. Parents are the cited ΔG°
+      compilations, not printed per point.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_curve_1
     policy:
       id: DP-106
@@ -133,7 +135,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_curve_3
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model::method:unspecified
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
   identity:
     quantity:
       tag: value
@@ -224,7 +226,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Semi-empirical model, 600–1800 K, described in
+      Shornikov (2019). Oxide activities, mixing energies and partial pressures are calculated. Parents are the cited ΔG°
+      compilations, not printed per point.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_curve_3
     policy:
       id: DP-106
@@ -263,7 +267,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_symbols_4_to_8
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points::method:unspecified
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points
   identity:
     quantity:
       tag: value
@@ -356,7 +360,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Symbols on Figs. 2 and 3 are Ding et al. (2015),
+      Oetting and McDonald (1963), Lopatin et al. (1986) and Lopatin and Semenov (1989). They are not measurements of this
+      article.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_symbols_4_to_8
     policy:
       id: DP-106
@@ -394,7 +400,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_symbol_2
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points::method:unspecified
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points
   identity:
     quantity:
       tag: value
@@ -485,7 +491,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Symbols on Figs. 2 and 3 are Ding et al. (2015),
+      Oetting and McDonald (1963), Lopatin et al. (1986) and Lopatin and Semenov (1989). They are not measurements of this
+      article.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_symbol_2
     policy:
       id: DP-106
@@ -524,7 +532,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig3_partial_pressures
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model::method:unspecified
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
   identity:
     quantity:
       tag: value
@@ -616,7 +624,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Semi-empirical model, 600–1800 K, described in
+      Shornikov (2019). Oxide activities, mixing energies and partial pressures are calculated. Parents are the cited ΔG°
+      compilations, not printed per point.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig3_partial_pressures
     policy:
       id: DP-106

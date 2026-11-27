@@ -307,7 +307,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: ta-yamanaka-1997-metsoc::yamanaka_1997_na_thermogravimetry_conditions
-  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc::declared:0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::experiment::yamanaka-1997-na-evaporation-series::method:unspecified
+  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::experiment::yamanaka-1997-na-evaporation-series
   identity:
     quantity:
       tag: unknown
@@ -362,16 +362,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetry_low_pressure_gas_mixing'
-    origin: ta-yamanaka-1997-metsoc::yamanaka_1997_na_thermogravimetry_conditions
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: ta-yamanaka-1997-metsoc
   locator:
     page: 1

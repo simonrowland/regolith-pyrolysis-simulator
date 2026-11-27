@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/stebbins-carmichael-weill-1983.yaml
 observations:
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:calorimetry
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: unknown
@@ -329,7 +329,7 @@ observations:
   provenance:
     printed_phase: NaAlSi3O8_liquid_and_disordered_crystalline_albite
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:unspecified
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: value
@@ -427,7 +427,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: high-temperature diphenyl-ether
+      drop calorimetry'
     origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
     policy:
       id: DP-106
@@ -867,7 +868,7 @@ observations:
   provenance:
     printed_phase: NaAlSi3O8_liquid_and_crystalline_disordered_albite
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_calorimetry_measured_table_1
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::calvet-inverse-drop-series::method:calorimetry
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::calvet-inverse-drop-series
   identity:
     quantity:
       tag: unknown
@@ -1194,7 +1195,7 @@ observations:
   provenance:
     printed_phase: CaAl2Si2O8_glass_and_crystalline_anorthite
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:calorimetry
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: unknown
@@ -1519,7 +1520,7 @@ observations:
   provenance:
     printed_phase: CaMgSi2O6_liquid_and_crystalline_diopside
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:unspecified
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: value
@@ -1617,7 +1618,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: high-temperature diphenyl-ether
+      drop calorimetry'
     origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
     policy:
       id: DP-106
@@ -2051,7 +2053,7 @@ observations:
   provenance:
     printed_phase: CaMgSi2O6_liquid_and_crystalline_diopside
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:calorimetry
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: unknown
@@ -2254,7 +2256,7 @@ observations:
   provenance:
     printed_phase: NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:unspecified
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: value
@@ -2352,7 +2354,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: high-temperature diphenyl-ether
+      drop calorimetry'
     origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
     policy:
       id: DP-106
@@ -2530,7 +2533,7 @@ observations:
   provenance:
     printed_phase: NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_measured_table_3
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:calorimetry
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: unknown
@@ -2724,7 +2727,7 @@ observations:
   provenance:
     printed_phase: KAlSi3O8_liquid_and_crystalline_sanidine
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:unspecified
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: value
@@ -2822,7 +2825,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: high-temperature diphenyl-ether
+      drop calorimetry'
     origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
     policy:
       id: DP-106

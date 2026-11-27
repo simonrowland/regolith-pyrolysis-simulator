@@ -100,7 +100,7 @@ observations:
   provenance:
     printed_phase: gas_phase_Boudouard_equilibrium
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_cm2_method_and_feedstock
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -148,7 +148,9 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_and_stepwise_degassing_helium'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_cm2_method_and_feedstock
     policy:
       id: DP-106
@@ -166,7 +168,7 @@ observations:
   provenance:
     printed_phase: Murchison_CM2_powder_in_quartz_boat
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_ir_fig3_figure_only
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -213,7 +215,9 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: FTIR_ATR_residue'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_ir_fig3_figure_only
     policy:
       id: DP-106
@@ -235,7 +239,7 @@ observations:
   provenance:
     printed_phase: solid_residue_after_anneal
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1::T=1073.15:h=d164eb7c2348
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -318,7 +322,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1
     policy:
       id: DP-106
@@ -380,7 +386,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1::T=473.15:h=a7853d5ea30f
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -463,7 +469,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1
     policy:
       id: DP-106
@@ -525,7 +533,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1::T=773.15:h=a0dec7aab163
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -608,7 +616,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1
     policy:
       id: DP-106
@@ -670,7 +680,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co2_table1::T=1073.15:h=8a82372f1b5d
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -753,7 +763,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co2_table1
     policy:
       id: DP-106
@@ -815,7 +827,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co2_table1::T=473.15:h=312be3688da8
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -898,7 +910,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co2_table1
     policy:
       id: DP-106
@@ -960,7 +974,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co2_table1::T=773.15:h=5fc0be5b08c7
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -1043,7 +1057,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co2_table1
     policy:
       id: DP-106
@@ -1105,7 +1121,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co_table1::T=1073.15:h=7d71484f95bb
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -1188,7 +1204,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co_table1
     policy:
       id: DP-106
@@ -1250,7 +1268,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co_table1::T=473.15:h=7623cd1e467e
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -1333,7 +1351,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co_table1
     policy:
       id: DP-106
@@ -1395,7 +1415,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co_table1::T=773.15:h=d62fbab4cbf4
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -1478,7 +1498,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co_table1
     policy:
       id: DP-106
@@ -1540,7 +1562,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_cos_table1::T=1073.15:h=882b600d0903
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -1623,7 +1645,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_cos_table1
     policy:
       id: DP-106
@@ -1685,7 +1709,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_cos_table1::T=473.15:h=f72860d5c97c
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -1768,7 +1792,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_cos_table1
     policy:
       id: DP-106
@@ -1830,7 +1856,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_cos_table1::T=773.15:h=5fbe2838df46
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -1913,7 +1939,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_cos_table1
     policy:
       id: DP-106
@@ -1975,7 +2003,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2_table1::T=1073.15:h=8682c77e1f75
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -2058,7 +2086,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2_table1
     policy:
       id: DP-106
@@ -2120,7 +2150,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2_table1::T=473.15:h=633793a1696a
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -2203,7 +2233,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2_table1
     policy:
       id: DP-106
@@ -2265,7 +2297,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2_table1::T=773.15:h=ee028d04edfa
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -2348,7 +2380,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2_table1
     policy:
       id: DP-106
@@ -2410,7 +2444,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2o_table1::T=1073.15:h=b1b710af9ad2
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -2493,7 +2527,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2o_table1
     policy:
       id: DP-106
@@ -2555,7 +2591,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2o_table1::T=473.15:h=cad06c22faa7
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -2638,7 +2674,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2o_table1
     policy:
       id: DP-106
@@ -2700,7 +2738,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2o_table1::T=773.15:h=e34001622c25
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -2783,7 +2821,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2o_table1
     policy:
       id: DP-106
@@ -2845,7 +2885,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2s_table1::T=1073.15:h=060ca68b7a86
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -2928,7 +2968,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2s_table1
     policy:
       id: DP-106
@@ -2990,7 +3032,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2s_table1::T=473.15:h=7f87b2da31b0
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -3073,7 +3115,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2s_table1
     policy:
       id: DP-106
@@ -3135,7 +3179,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2s_table1::T=773.15:h=89603b995e82
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -3218,7 +3262,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2s_table1
     policy:
       id: DP-106
@@ -3280,7 +3326,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_n2_table1::T=1073.15:h=c36809972878
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -3363,7 +3409,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_n2_table1
     policy:
       id: DP-106
@@ -3425,7 +3473,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_n2_table1::T=473.15:h=8089a54ef35e
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -3508,7 +3556,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_n2_table1
     policy:
       id: DP-106
@@ -3570,7 +3620,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_n2_table1::T=773.15:h=3bf9854e22af
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-isothermal-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: value
@@ -3653,7 +3703,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isothermal_degassing_helium_headspace_GC'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «экспериментов с изотермической
+      выдержкой при различных температурах, T: 200, 500 и 800°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_n2_table1
     policy:
       id: DP-106
@@ -3715,7 +3767,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=1073.15:h=23d1629dd8ba
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -3797,7 +3849,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -3859,7 +3913,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=323.15:h=209f31ca84f6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -3941,7 +3995,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -4003,7 +4059,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=383.15:h=3acb927eeb34
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -4085,7 +4141,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -4147,7 +4205,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=473.15:h=3e1be4469ae1
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -4229,7 +4287,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -4291,7 +4351,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=573.15:h=eeea65f5a6ad
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -4373,7 +4433,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -4435,7 +4497,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=673.15:h=7d7e558cff4f
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -4517,7 +4579,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -4579,7 +4643,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=773.15:h=761be68b620d
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -4661,7 +4725,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -4723,7 +4789,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=873.15:h=50a4c4a84591
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -4805,7 +4871,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -4867,7 +4935,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::T=973.15:h=2b6b8cdd9ba3
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -4949,7 +5017,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -5011,7 +5081,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2::points:h=37b577c59776
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -5093,7 +5163,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
     policy:
       id: DP-106
@@ -5145,7 +5217,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=1073.15:h=eb9426c1b3b4
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -5227,7 +5299,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -5289,7 +5363,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=323.15:h=209f31ca84f6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -5371,7 +5445,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -5433,7 +5509,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=383.15:h=3acb927eeb34
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -5515,7 +5591,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -5577,7 +5655,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=473.15:h=2dce63ff26fc
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -5659,7 +5737,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -5721,7 +5801,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=573.15:h=3ca4d5e39169
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -5803,7 +5883,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -5865,7 +5947,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=673.15:h=ade1c502018b
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -5947,7 +6029,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -6009,7 +6093,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=773.15:h=515f899542de
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -6091,7 +6175,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -6153,7 +6239,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=873.15:h=d082a057ef01
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -6235,7 +6321,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -6297,7 +6385,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::T=973.15:h=e28266178eab
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -6379,7 +6467,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -6441,7 +6531,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2::points:h=ebec6a9a390b
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -6523,7 +6613,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
     policy:
       id: DP-106
@@ -6575,7 +6667,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=1073.15:h=eda59d0d321d
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -6657,7 +6749,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -6719,7 +6813,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=323.15:h=209f31ca84f6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -6801,7 +6895,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -6863,7 +6959,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=383.15:h=3acb927eeb34
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -6945,7 +7041,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -7007,7 +7105,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=473.15:h=b988152b15f8
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -7089,7 +7187,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -7151,7 +7251,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=573.15:h=0b17c702a5e5
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -7233,7 +7333,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -7295,7 +7397,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=673.15:h=b527a4314481
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -7377,7 +7479,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -7439,7 +7543,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=773.15:h=106d820c14f3
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -7521,7 +7625,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -7583,7 +7689,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=873.15:h=2dc1d2289d58
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -7665,7 +7771,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -7727,7 +7835,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::T=973.15:h=a017d1b4f995
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -7809,7 +7917,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -7871,7 +7981,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2::points:h=86cc43352bfd
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -7953,7 +8063,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
     policy:
       id: DP-106
@@ -8005,7 +8117,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=1073.15:h=70deafc364c6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -8087,7 +8199,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -8149,7 +8263,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=323.15:h=209f31ca84f6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -8231,7 +8345,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -8293,7 +8409,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=383.15:h=a7fe4fb4ef53
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -8375,7 +8491,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -8437,7 +8555,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=473.15:h=0160f62b2ea3
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -8519,7 +8637,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -8581,7 +8701,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=573.15:h=080f47a52042
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -8663,7 +8783,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -8725,7 +8847,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=673.15:h=dd262b9071dd
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -8807,7 +8929,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -8869,7 +8993,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=773.15:h=6fe53061d8c9
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -8951,7 +9075,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -9013,7 +9139,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=873.15:h=f4ea402bead1
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -9095,7 +9221,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -9157,7 +9285,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::T=973.15:h=1bec529c6118
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -9239,7 +9367,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -9301,7 +9431,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2::points:h=97b020514ec9
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -9383,7 +9513,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
     policy:
       id: DP-106
@@ -9435,7 +9567,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=1073.15:h=e3a4f1b1376c
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -9517,7 +9649,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -9579,7 +9713,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=323.15:h=209f31ca84f6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -9661,7 +9795,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -9723,7 +9859,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=383.15:h=3acb927eeb34
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -9805,7 +9941,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -9867,7 +10005,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=473.15:h=b988152b15f8
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -9949,7 +10087,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -10011,7 +10151,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=573.15:h=895ba33b18f6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -10093,7 +10233,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -10155,7 +10297,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=673.15:h=52dca37b49da
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -10237,7 +10379,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -10299,7 +10443,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=773.15:h=59af898a07f1
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -10381,7 +10525,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -10443,7 +10589,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=873.15:h=13eac710b7e7
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -10525,7 +10671,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -10587,7 +10735,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::T=973.15:h=01d6a9fffe48
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -10669,7 +10817,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -10731,7 +10881,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2::points:h=9c40a2087fa5
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -10813,7 +10963,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
     policy:
       id: DP-106
@@ -10865,7 +11017,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=1073.15:h=91a4142303b5
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -10947,7 +11099,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -11009,7 +11163,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=323.15:h=7dcd82ef97d4
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -11091,7 +11245,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -11153,7 +11309,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=383.15:h=94181abce173
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -11235,7 +11391,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -11297,7 +11455,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=473.15:h=3916627cfdda
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -11379,7 +11537,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -11441,7 +11601,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=573.15:h=bff4abb9470c
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -11523,7 +11683,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -11585,7 +11747,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=673.15:h=0a78aef16e06
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -11667,7 +11829,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -11729,7 +11893,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=773.15:h=e8ac2ceb36b6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -11811,7 +11975,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -11873,7 +12039,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=873.15:h=2a85fd7996d0
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -11955,7 +12121,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -12017,7 +12185,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::T=973.15:h=f0c419ad6913
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -12099,7 +12267,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -12161,7 +12331,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2::points:h=528fe3d92c6e
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -12243,7 +12413,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
     policy:
       id: DP-106
@@ -12295,7 +12467,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=1073.15:h=1d44ab91d433
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -12377,7 +12549,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -12439,7 +12613,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=323.15:h=209f31ca84f6
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -12521,7 +12695,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -12583,7 +12759,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=383.15:h=3acb927eeb34
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -12665,7 +12841,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -12727,7 +12905,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=473.15:h=b988152b15f8
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -12809,7 +12987,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -12871,7 +13051,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=573.15:h=3e57dd380460
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -12953,7 +13133,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -13015,7 +13197,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=673.15:h=aeb914d8cab2
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -13097,7 +13279,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -13159,7 +13343,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=773.15:h=bde53ca1c1c2
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -13241,7 +13425,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -13303,7 +13489,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=873.15:h=99ecf0581e04
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -13385,7 +13571,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -13447,7 +13635,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::T=973.15:h=8b41c30d1247
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -13529,7 +13717,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -13591,7 +13781,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2::points:h=f4539efc7550
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -13673,7 +13863,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
     policy:
       id: DP-106
@@ -13725,7 +13917,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=1073.15:h=abddde2a200a
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -13807,7 +13999,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -13869,7 +14063,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=323.15:h=cca9ce9d85e9
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -13951,7 +14145,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -14013,7 +14209,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=383.15:h=316e88f9b8b8
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -14095,7 +14291,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -14157,7 +14355,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=473.15:h=c4a37a16133b
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -14239,7 +14437,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -14301,7 +14501,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=573.15:h=fd28fdd02bfa
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -14383,7 +14583,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -14445,7 +14647,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=673.15:h=e3150b0888ee
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -14527,7 +14729,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -14589,7 +14793,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=773.15:h=d37abafe17b1
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -14671,7 +14875,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -14733,7 +14939,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=873.15:h=67abd2e26fa0
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -14815,7 +15021,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -14877,7 +15085,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=973.15:h=db77ef55f67c
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -14959,7 +15167,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106
@@ -15021,7 +15231,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::points:h=0175b1aef886
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer::declared:10.1134/s0038094623050064::experiment::murchison-stepwise-series::method:unspecified
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: value
@@ -15103,7 +15313,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - evolved_gas_yield
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: stepwise_degassing_helium_headspace_GC_no_accumulation'
+    reason: 'method_unstated: default=unspecified; original_reason=unmapped published method: «углистый хондрит Murchison
+      подвергался ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with volatile-component analysis by «газовом хроматографе
+      “Кристал-Люкс 4000М”»; no existing MethodToken represents this thermal-degassing and gas-chromatography method.'
     origin: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
     policy:
       id: DP-106

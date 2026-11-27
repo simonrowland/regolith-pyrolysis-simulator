@@ -70,45 +70,6 @@ experiments:
       is the hole centroid. The centre allowance is stated on this point. Series 1 open circle SiO2. Attribution Yakovlev
       et al. (1984, 1987). Page pixel (742.5, 3199.7) at 600 dpi. Centre allowance 1.0 px. T = 1397.65 ± 0.52 °C. log10(p/atm)
       = -6.195 ± 0.004. hole centroid.; series=1; marker_symbol=open circle
-- experiment_id: 10.1134/s0016702917020070::yakovlev-2017-cai-acidity::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1134/s0016702917020070
-  locator:
-    page: 2
-    published_page: 252
-    pdf_page_index: 1
-    figure: '2'
-    note: 600 dpi render. Calibrated on labelled tick lines only. x = 1068.234748 + 0.44365537*px, least-squares residual
-      max 0.26611. y = 5.474100 + -0.00364697*px, residual max 0.00146. Log axes are fitted in the printed log value. Filled-marker
-      centre is the centroid of ink at least 8 px from the background, inside that peak's Voronoi cell. Open-marker centre
-      is the hole centroid. The centre allowance is stated on this point. Series 1 open circle SiO2. Attribution Yakovlev
-      et al. (1984, 1987). Page pixel (742.5, 3199.7) at 600 dpi. Centre allowance 1.0 px. T = 1397.65 ± 0.52 °C. log10(p/atm)
-      = -6.195 ± 0.004. hole centroid.; series=1; marker_symbol=open circle
 context:
 - observation_id: yakovlev_2017_activity_partial_pressure_relation
   type: thermodynamic_relation

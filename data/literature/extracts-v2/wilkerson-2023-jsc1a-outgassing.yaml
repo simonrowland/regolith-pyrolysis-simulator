@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml
 observations:
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -52,16 +52,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 12
@@ -71,7 +61,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -120,16 +110,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 13
@@ -139,7 +119,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig4_idealized_ht_tg_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   identity:
     quantity:
       tag: unknown
@@ -188,16 +168,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig4_idealized_ht_tg_figure_only
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 17
@@ -207,7 +177,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_h2_reduction_extra_water_windows
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -250,16 +220,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_reducing_ar_5h2'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_h2_reduction_extra_water_windows
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 13
@@ -269,7 +229,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   identity:
     quantity:
       tag: unknown
@@ -314,16 +274,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_he_ramp_then_ar5h2_750C_hold'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 17
@@ -333,7 +283,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_printed_gas_release_windows
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -376,16 +326,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_high_vacuum'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_printed_gas_release_windows
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 12
@@ -456,7 +396,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table1_mossbauer_metallic_fe_arh2
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:mossbauer_spectroscopy
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -511,7 +451,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_heated_under_Ar_H2_at_1050C
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_carbon_sulfur
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   identity:
     quantity:
       tag: unknown
@@ -557,16 +497,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: destructive_C_S_analysis'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_carbon_sulfur
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 14
@@ -576,7 +506,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_residue_after_1050C_treatments
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_sulfur_pointer
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   identity:
     quantity:
       tag: unknown
@@ -618,16 +548,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: destructive_C_S_analysis'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_sulfur_pointer
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 14
@@ -702,7 +622,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_powder_untreated_and_heat_treated
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -750,16 +670,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_to_1050C_avoid_vitrification'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 13
@@ -769,7 +679,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_apparatus_and_thermal_program
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -815,16 +725,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_apparatus_and_thermal_program
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 6
@@ -834,7 +734,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_vacuum_ms_apparatus
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::vacuum-ms-series::method:unspecified
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::vacuum-ms-series
   identity:
     quantity:
       tag: unknown
@@ -879,16 +779,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_vacuum_ms_quartz_tube'
-    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_vacuum_ms_apparatus
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 7

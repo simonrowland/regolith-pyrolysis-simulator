@@ -34,8 +34,8 @@ experiments:
 - experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::cited-results
   kind: literature
   method:
-    tag: unknown
-    reason: experiment method not published
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:
@@ -232,70 +232,6 @@ experiments:
         published_page: 550
         section: 2.4 Sample
         note: Pre-melting duration is preparation, not a measurement hold
-- experiment_id: 10.2355/tetsutohagane1955.70.6_549::kems-120-ueshima-1984::declared:10.2355/tetsutohagane1955.70.6_549::experiment::cited-results::method:knudsen_effusion
-  kind: literature
-  method:
-    tag: value
-    value: knudsen_effusion
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: experiment temperature not published
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.70.6_549
-  locator:
-    published_page: 552
-    table: '4'
-    note: Fe-Mo revision and Nesmeyanov result are cited/compiled results, not this work's Fe-W bench
-- experiment_id: 10.2355/tetsutohagane1955.70.6_549::kems-120-ueshima-1984::declared:10.2355/tetsutohagane1955.70.6_549::experiment::cited-results::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: experiment temperature not published
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.70.6_549
-  locator:
-    published_page: 552
-    table: '4'
-    note: Fe-Mo revision and Nesmeyanov result are cited/compiled results, not this work's Fe-W bench
 benches:
 - id: 10.2355/tetsutohagane1955.70.6_549::bench::rm6k
   work_id: 10.2355/tetsutohagane1955.70.6_549

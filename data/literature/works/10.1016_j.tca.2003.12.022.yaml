@@ -94,139 +94,6 @@ experiments:
   locator:
     page: 4
     table: '3'
-- experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
-  kind: literature
-  method:
-    tag: value
-    value: emf_cell
-  sample:
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_percent
-          components:
-          - - SiO2
-            - '0.657'
-          - - Na2O
-            - '0.343'
-          amount_basis: mole_fraction
-      locator:
-        page: 2
-        section: Experimental
-    printed_composition:
-      state:
-        tag: value
-        value: 65.7 m/o SiO2–34.3 m/o Na2O
-      locator:
-        page: 2
-        section: Experimental
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: Multiple point temperatures
-      locator:
-        page: 3
-        table: '2'
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        page: 2
-        section: Experimental
-        note: Pure oxygen at 1 atm was maintained over both electrodes.
-    sweep_gas:
-      state:
-        tag: value
-        value:
-          species: O2
-          flow_sccm:
-            tag: unknown
-            reason: Flow rate not stated
-          partial_pressure_Pa:
-            tag: value
-            value: '101325'
-      locator:
-        page: 2
-        section: Experimental
-        note: Pure oxygen at 1 atm was maintained over both electrodes.
-    regime:
-      regime_class:
-        tag: unknown
-        reason: Flow regime not stated
-  work_id: 10.1016/j.tca.2003.12.022
-  locator:
-    page: 3
-    table: '2'
-- experiment_id: 10.1016/j.tca.2003.12.022::kim-2004-na2o-float-glass-emf::declared:10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample:
-    initial_composition:
-      state:
-        tag: unknown
-        reason: Printed Cl component has no composition component token; full composition retained in table context.
-      locator:
-        page: 2
-        table: '1'
-    printed_composition:
-      state:
-        tag: value
-        value: Table 1 float-glass composition, m/o
-      locator:
-        page: 2
-        table: '1'
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: Multiple point temperatures
-      locator:
-        page: 4
-        table: '3'
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        page: 2
-        section: Experimental
-        note: Pure oxygen at 1 atm was maintained over both electrodes.
-    sweep_gas:
-      state:
-        tag: value
-        value:
-          species: O2
-          flow_sccm:
-            tag: unknown
-            reason: Flow rate not stated
-          partial_pressure_Pa:
-            tag: value
-            value: '101325'
-      locator:
-        page: 2
-        section: Experimental
-        note: Pure oxygen at 1 atm was maintained over both electrodes.
-    regime:
-      regime_class:
-        tag: unknown
-        reason: Flow regime not stated
-  work_id: 10.1016/j.tca.2003.12.022
-  locator:
-    page: 4
-    table: '3'
   fO2_control:
     channel:
       tag: unknown
@@ -265,11 +132,11 @@ experiments:
               section: Experimental
         output_unit: Pa
         references: []
-- experiment_id: 10.1016/j.tca.2003.12.022::kim-2004-na2o-float-glass-emf::declared:10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check::method:unspecified
+- experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
   kind: literature
   method:
     tag: value
-    value: unspecified
+    value: emf_cell
   sample:
     initial_composition:
       state:

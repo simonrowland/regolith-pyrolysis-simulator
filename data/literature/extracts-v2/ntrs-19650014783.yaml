@@ -59,7 +59,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_fit_this_work
-  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::ntrs-19650014783::declared:85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-vapor-pressure-series::method:unspecified
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-vapor-pressure-series
   identity:
     quantity:
       tag: unknown
@@ -95,17 +95,7 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices:
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: author_least_squares_integrated_clausius_clapeyron_fit'
-    origin: ntrs-19650014783::bowles_rosenblum_1965_na_fit_this_work
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
+  notices: []
   source_id: ntrs-19650014783
   locator:
     published_page: 7

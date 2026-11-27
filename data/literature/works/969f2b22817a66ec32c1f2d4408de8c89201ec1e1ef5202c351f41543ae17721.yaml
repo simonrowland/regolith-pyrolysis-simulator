@@ -33,115 +33,6 @@ experiments:
 - experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
   kind: literature
   method:
-    tag: unknown
-    reason: experiment method not published
-  sample: {}
-  conditions:
-    composition:
-      state:
-        tag: unknown
-        reason: condition composition is not a scalar numeric value
-      locator:
-        page: 2
-        published_page: 1598
-        section: Experimental Methods
-    temperature_C:
-      state:
-        tag: value
-        value: '1409'
-      locator:
-        page: 2
-        published_page: 1598
-        table: '1'
-        note: D60 is 1400 °C nominal.
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        page: 2
-        published_page: 1598
-        table: '1'
-        note: Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721
-  locator:
-    page: 2
-    published_page: 1598
-    table: '1'
-  equipment_context_id: jayasuriya-2004-iron-mossbauer::context::jayasuriya_2004_low_fe_apparatus_and_protocol
-- experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
-  kind: literature
-  method:
-    tag: unknown
-    reason: experiment method not published
-  sample: {}
-  conditions:
-    composition:
-      state:
-        tag: unknown
-        reason: condition composition is not a scalar numeric value
-      locator:
-        page: 7
-        published_page: 1603
-        table: '4'
-    temperature_C:
-      state:
-        tag: value
-        value: '1409'
-      locator:
-        page: 2
-        published_page: 1598
-        table: '1'
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        page: 2
-        published_page: 1598
-        table: '1'
-        note: Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721
-  locator:
-    page: 7
-    published_page: 1603
-    table: '4'
-  equipment_context_id: jayasuriya-2004-iron-mossbauer::context::jayasuriya_2004_high_fe_apparatus_and_protocol
-- experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
-  kind: literature
-  method:
     tag: value
     value: unspecified
   sample:
@@ -207,7 +98,7 @@ experiments:
     published_page: 1598
     table: '1'
   equipment_context_id: jayasuriya-2004-iron-mossbauer::context::jayasuriya_2004_low_fe_apparatus_and_protocol
-- experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
+- experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
   kind: literature
   method:
     tag: value

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
 observations:
 - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound
-  experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_fig13b_no_boiling_test::method:unspecified
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig13b_no_boiling_test
   identity:
     quantity:
       tag: unknown
@@ -125,7 +125,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_gold_areal_mass_loss_rate
-  experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series::method:unspecified
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
   identity:
     quantity:
       tag: unknown
@@ -255,7 +255,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silica_areal_mass_loss_rate
-  experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series::method:unspecified
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
   identity:
     quantity:
       tag: unknown
@@ -385,7 +385,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silver_areal_mass_loss_rate
-  experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series::method:unspecified
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
   identity:
     quantity:
       tag: unknown
@@ -515,7 +515,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_areal_mass_loss_rate
-  experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series::method:unspecified
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
   identity:
     quantity:
       tag: unknown
@@ -645,7 +645,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure
-  experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series::method:unspecified
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
   identity:
     quantity:
       tag: unknown
@@ -775,7 +775,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit
-  experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_summary_fit_record::method:unspecified
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_summary_fit_record
   identity:
     quantity:
       tag: unknown
@@ -818,7 +818,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=Aggregate fit record, not a single experimental run.'
     origin: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit
     policy:
       id: DP-106
@@ -846,7 +846,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit_old_comparison
-  experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::quoted_chapman_larson_1963_relation::method:unspecified
+  experiment_id: 10.1029/jz071i006p01735::experiment::quoted_chapman_larson_1963_relation
   identity:
     quantity:
       tag: unknown
@@ -890,7 +890,8 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=The cited equation is attributed to Chapman and Larson
+      [1963]; its experimental method is not restated.'
     origin: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit_old_comparison
     policy:
       id: DP-106

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2024-alkali-phosphate.yaml
 observations:
 - observation_id: shornikov-2024-alkali-phosphate::shornikov_2024_k2o_fig2_partial_pressures
-  experiment_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::shornikov-2024-alkali-phosphate::declared:750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::experiment::shornikov-2024-k2o-model::method:unspecified
+  experiment_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::experiment::shornikov-2024-k2o-model
   identity:
     quantity:
       tag: value
@@ -96,7 +96,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Semi-empirical model, 600–1900 K, described in
+      Shornikov (2019). Oxide activities, mixing energies and partial pressures are calculated. Parents are the cited ΔG°
+      compilations, not printed per point.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2024-alkali-phosphate::shornikov_2024_k2o_fig2_partial_pressures
     policy:
       id: DP-106
@@ -134,7 +136,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2024-alkali-phosphate::shornikov_2024_k2o_fig3_curve_1
-  experiment_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::shornikov-2024-alkali-phosphate::declared:750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::experiment::shornikov-2024-k2o-model::method:unspecified
+  experiment_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::experiment::shornikov-2024-k2o-model
   identity:
     quantity:
       tag: value
@@ -225,7 +227,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Semi-empirical model, 600–1900 K, described in
+      Shornikov (2019). Oxide activities, mixing energies and partial pressures are calculated. Parents are the cited ΔG°
+      compilations, not printed per point.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2024-alkali-phosphate::shornikov_2024_k2o_fig3_curve_1
     policy:
       id: DP-106
@@ -264,7 +268,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2024-alkali-phosphate::shornikov_2024_k2o_fig3_p4o10_curve_3
-  experiment_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::shornikov-2024-alkali-phosphate::declared:750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::experiment::shornikov-2024-k2o-model::method:unspecified
+  experiment_id: 750f601f8a2ebcc3a2b32d47aafceebe00531c883b2acb4f02fe61981b87803e::experiment::shornikov-2024-k2o-model
   identity:
     quantity:
       tag: value
@@ -356,7 +360,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - activity
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''Semi-empirical model, 600–1900 K, described in
+      Shornikov (2019). Oxide activities, mixing energies and partial pressures are calculated. Parents are the cited ΔG°
+      compilations, not printed per point.'' is not a closed method token (kems_effusion alone is insufficient)'
     origin: shornikov-2024-alkali-phosphate::shornikov_2024_k2o_fig3_p4o10_curve_3
     policy:
       id: DP-106

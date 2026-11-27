@@ -11202,7 +11202,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: muan-1959-manganese-silica-air::muan1959_t2_r16_liquid1_mn2o3_unreported
-  experiment_id: 32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::muan-1959-manganese-silica-air::declared:32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::experiment::muan1959-table2-row-16::method:unspecified
+  experiment_id: 32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::experiment::muan1959-table2-row-16
   identity:
     quantity:
       tag: value
@@ -11407,7 +11407,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: muan-1959-manganese-silica-air::muan1959_t2_r16_liquid1_mno_unreported
-  experiment_id: 32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::muan-1959-manganese-silica-air::declared:32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::experiment::muan1959-table2-row-16::method:unspecified
+  experiment_id: 32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::experiment::muan1959-table2-row-16
   identity:
     quantity:
       tag: value
@@ -11612,7 +11612,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: muan-1959-manganese-silica-air::muan1959_t2_r16_liquid1_sio2
-  experiment_id: 32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::muan-1959-manganese-silica-air::declared:32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::experiment::muan1959-table2-row-16::method:unspecified
+  experiment_id: 32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::experiment::muan1959-table2-row-16
   identity:
     quantity:
       tag: value
@@ -11707,7 +11707,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=the printed composition is attributed to Sosman (1955);
+      Muan (1959) does not state the source experiment method'
     origin: muan-1959-manganese-silica-air::muan1959_t2_r16_liquid1_sio2
     policy:
       id: DP-106

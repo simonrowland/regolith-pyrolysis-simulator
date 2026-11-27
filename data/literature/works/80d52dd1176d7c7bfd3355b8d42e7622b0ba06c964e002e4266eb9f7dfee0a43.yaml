@@ -131,8 +131,8 @@ experiments:
 - experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_quoted_NaOH_pressure
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'literature' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -261,40 +261,6 @@ experiments:
     published_page: 138
     pdf_page_index: 0
     section: II. Experimental Procedure
-- experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::sanders-1977-water-vapour-na-vaporization::declared:80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_quoted_NaOH_pressure::method:unspecified
-  kind: literature
-  method:
-    tag: value
-    value: unspecified
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: experiment temperature not published
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
-  locator:
-    page: 3
-    published_page: 140
-    pdf_page_index: 2
-    equation: '17'
-    note: Footnote below Eq. (17).
 context:
 - observation_id: sanders_1977_figure_only_results_context
   type: context

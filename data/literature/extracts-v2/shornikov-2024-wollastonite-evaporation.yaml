@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2024-wollastonite-evaporation.yaml
 observations:
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
       tag: value
@@ -130,7 +130,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_enthalpy
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
       tag: unknown
@@ -211,7 +211,7 @@ observations:
   provenance:
     printed_phase: crystalline wollastonite
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_entropy
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
       tag: unknown
@@ -985,7 +985,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_enthalpy
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
       tag: unknown
@@ -1066,7 +1066,7 @@ observations:
   provenance:
     printed_phase: liquid wollastonite
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_entropy
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
       tag: unknown
@@ -1147,7 +1147,7 @@ observations:
   provenance:
     printed_phase: liquid wollastonite
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
   identity:
     quantity:
       tag: value
@@ -1274,7 +1274,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_adamcovicova_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:solution_calorimetry
   identity:
     quantity:
       tag: value
@@ -1369,7 +1369,7 @@ observations:
     note: Table 1 row attributed to reference [38].
   read_from: pdf:shornikov-2024-wollastonite-evaporation
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_barin_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:unspecified
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
   identity:
     quantity:
       tag: value
@@ -1474,7 +1474,7 @@ observations:
     note: Table 1 row attributed to reference [35].
   read_from: pdf:shornikov-2024-wollastonite-evaporation
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_botvinkin_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:solution_calorimetry
   identity:
     quantity:
       tag: value
@@ -1569,7 +1569,7 @@ observations:
     note: Table 1 row attributed to reference [36].
   read_from: pdf:shornikov-2024-wollastonite-evaporation
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_current_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:unspecified
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
   identity:
     quantity:
       tag: value
@@ -1691,7 +1691,7 @@ observations:
     output_unit: K
     references: []
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_richet_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:calorimetry
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
   identity:
     quantity:
       tag: value

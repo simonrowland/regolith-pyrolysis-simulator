@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/engelschion-2020-eac1a-simulant.yaml
 observations:
 - observation_id: engelschion-2020-eac1a-simulant::engelschion_2020_eac1_dsc
-  experiment_id: 10.1038/s41598-020-62312-4::engelschion-2020-eac1a-simulant::declared:10.1038/s41598-020-62312-4::experiment::dsc-simulant-series::method:unspecified
+  experiment_id: 10.1038/s41598-020-62312-4::experiment::dsc-simulant-series
   identity:
     quantity:
       tag: unknown
@@ -48,15 +48,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: argon_dsc'
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: argon_dsc'
     origin: engelschion-2020-eac1a-simulant::engelschion_2020_eac1_dsc
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: calorimetry
       units: method token
   source_id: engelschion-2020-eac1a-simulant
   locator:
