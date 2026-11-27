@@ -1886,22 +1886,20 @@ class EvaporationMixin:
             error_reason = None
         if error_reason:
             reason = str(error_reason)
-        elif notices:
-            # Selector state can carry a typed source reason. Closure notices
-            # are downstream detail and never become a terminal code, even
-            # when their free-form text happens to be identifier-shaped.
-            selector_source = selector.get('selection_source')
-            if selector_source in {
+        else:
+            # Selector labels identify the value source, not a terminal
+            # refusal. Closure notices are downstream detail and likewise
+            # never become a terminal code.
+            selection_source = (
+                selector.get('selection_source')
+                if notices
+                else overlay.get('selection_source')
+            )
+            if selection_source in {
                 TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
                 LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+                PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
             }:
-                selector_source = None
-            reason = str(
-                selector_source or _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
-            )
-        else:
-            selection_source = overlay.get('selection_source')
-            if selection_source == TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH:
                 selection_source = None
             reason = str(
                 selection_source or _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
@@ -2157,7 +2155,6 @@ class EvaporationMixin:
             effective_pressure_source=effective_pressure_source,
             resolution_error=resolve_error or None,
         )
-        selector_flux_overlay = copy.deepcopy(flux_overlay_report)
         flux_overlay_report.update(
             compare_live_shadow_to_batch_flux(
                 batch=vapour_batch,
@@ -2345,6 +2342,10 @@ class EvaporationMixin:
                 species=species,
                 reason=reason,
             )
+        # This is the complete batch-level baseline for capacity trials:
+        # comparison disclosure and persistent selector notices are fixed
+        # across the Picard loop; only closure notices are trial-specific.
+        selector_flux_overlay = copy.deepcopy(flux_overlay_report)
         EvaporationMixin._record_langmuir_refusal_notices(
             self,
             flux_overlay_report,

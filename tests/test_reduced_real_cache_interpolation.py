@@ -418,7 +418,9 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     )
     requested_pressure_bar = query["controls"]["pressure_bar"]
     requested_fO2_log = query["controls"].get("log_fO2")
-    vapor_pressures = {"O2": 0.7025, "SiO": 7.025}
+    # O2 is 10% of each neighbor's SiO pressure; equal-weight interpolation
+    # preserves the binary float result instead of rounding it for the pin.
+    vapor_pressures = {"O2": 0.7025000000000001, "SiO": 7.025}
     vapor_pressure_sources = {
         species: "cached_interpolated" for species in vapor_pressures
     }
