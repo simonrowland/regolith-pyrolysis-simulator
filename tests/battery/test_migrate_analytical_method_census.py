@@ -12,7 +12,26 @@ from simulator.battery.migrate import Migrator, REPO_ROOT
 
 
 SOSS_SOURCE = "sossi-2020-magma-ocean-redox"
-ASSEMBLY_EXPERIMENT_COUNT = 8222
+AITHALA_SOURCE = "aithala-2026-magmatic-iron-redox-to-2100c"
+AITHALA_XANES_RUN_IDS = {
+    "aithala-2026-1800-30",
+    "aithala-2026-1900-30",
+    "aithala-2026-2000-10",
+    "aithala-2026-2000-120",
+    "aithala-2026-2000-30",
+    "aithala-2026-2100-30",
+    "aithala-2026-vf231",
+    "aithala-2026-vf268",
+    "aithala-2026-vf270",
+    "aithala-2026-vf271",
+    "aithala-2026-vf274",
+}
+AITHALA_DECLARED_EXPERIMENT_PREFIX = (
+    "10.7185/geochemlet.2617::experiment::"
+)
+AITHALA_SPLIT_SUFFIX = "::method:xanes_spectroscopy"
+CURRENT_EXPERIMENT_COUNT = 8211
+LEGACY_EXPERIMENT_COUNT = 8234
 
 
 def _extracts_with_analytical_methods() -> dict[str, Path]:
@@ -77,6 +96,11 @@ def test_analytical_method_split_census_across_the_store(monkeypatch) -> None:
             legacy._migrate_extract(source_paths[source_id])
         legacy.finalize()
         legacy_ids = _experiment_ids_by_source(legacy.result, source_ids)
+        legacy_aithala_observation_ids = {
+            observation.observation_id
+            for observation in legacy.result.observations.values()
+            if observation.source_id == AITHALA_SOURCE
+        }
 
     del legacy
     gc.collect()
@@ -84,6 +108,15 @@ def test_analytical_method_split_census_across_the_store(monkeypatch) -> None:
     current = migration_module.migrate(REPO_ROOT, write=False)
     current_ids = _experiment_ids_by_source(current, source_ids)
     current_total = len(current.experiments)
+    current_aithala_observations = [
+        observation
+        for observation in current.observations.values()
+        if observation.source_id == AITHALA_SOURCE
+    ]
+    current_aithala_observation_ids = {
+        observation.observation_id
+        for observation in current_aithala_observations
+    }
     changes = {
         source_id: {
             "before": len(legacy_ids[source_id]),
@@ -111,10 +144,76 @@ def test_analytical_method_split_census_across_the_store(monkeypatch) -> None:
         )
     )
 
-    assert set(changes) == {SOSS_SOURCE}, changes
+    assert set(changes) == {SOSS_SOURCE, AITHALA_SOURCE}, changes
     assert changes[SOSS_SOURCE]["before"] == 24
     assert changes[SOSS_SOURCE]["after"] == 12
     assert len(changes[SOSS_SOURCE]["removed"]) == 12
     assert not changes[SOSS_SOURCE]["added"]
-    assert current_total == ASSEMBLY_EXPERIMENT_COUNT
-    assert legacy_store_total == ASSEMBLY_EXPERIMENT_COUNT + 12
+
+    aithala_change = changes[AITHALA_SOURCE]
+    assert aithala_change["before"] == 84
+    assert aithala_change["after"] == 73
+    assert len(aithala_change["removed"]) == 11
+    assert not aithala_change["added"]
+
+    aithala_document = migration_module.load_yaml(source_paths[AITHALA_SOURCE])
+    declared_runs = {
+        str(experiment["experiment_id"])
+        for experiment in aithala_document["experiments"]
+    }
+    analytical_methods_by_run: dict[str, set[str]] = {}
+    for _formula, observation in migration_module.iter_extract_observations(
+        aithala_document
+    ):
+        run_id = str(observation["experiment"])
+        values = migration_module._plain_observation_values(observation)
+        analytical_method = (
+            migration_module._method_text_value(
+                observation.get("analytical_method")
+            )
+            or migration_module._method_text_value(
+                values.get("analytical_method")
+            )
+        )
+        if analytical_method is not None:
+            analytical_methods_by_run.setdefault(run_id, set()).add(
+                analytical_method
+            )
+
+    aithala_parent_ids = {
+        split_id.split("::declared:", 1)[1].removesuffix(
+            AITHALA_SPLIT_SUFFIX
+        )
+        for split_id in aithala_change["removed"]
+    }
+    expected_aithala_parent_ids = {
+        AITHALA_DECLARED_EXPERIMENT_PREFIX + run_id
+        for run_id in AITHALA_XANES_RUN_IDS
+    }
+    assert aithala_parent_ids == expected_aithala_parent_ids
+    assert AITHALA_XANES_RUN_IDS <= declared_runs
+    assert all(
+        {"XANES", "WDS EPMA"} <= analytical_methods_by_run[run_id]
+        for run_id in AITHALA_XANES_RUN_IDS
+    )
+
+    aithala_work_ids = {
+        work.work_id
+        for work in current.works.values()
+        if AITHALA_SOURCE in work.source_ids
+    }
+    aithala_experiment_ids = {
+        experiment_id
+        for experiment_id, experiment in current.experiments.items()
+        if experiment.work_id in aithala_work_ids
+    }
+    assert expected_aithala_parent_ids <= aithala_experiment_ids
+    assert len(current_aithala_observations) == 89
+    assert current_aithala_observation_ids == legacy_aithala_observation_ids
+    assert all(
+        observation.experiment_id in aithala_experiment_ids
+        for observation in current_aithala_observations
+    )
+
+    assert current_total == CURRENT_EXPERIMENT_COUNT
+    assert legacy_store_total == LEGACY_EXPERIMENT_COUNT
