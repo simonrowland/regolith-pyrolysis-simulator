@@ -769,6 +769,7 @@ from simulator.chemistry.kernel import (
     normalize_oxygen_sink_channel_mode,
 )
 from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
@@ -11999,7 +12000,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     result.warnings.append(warning)
         from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 
-        if T_C + 273.15 < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+        if T_C + CELSIUS_TO_KELVIN_OFFSET < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             restore_retained_backend_activity_sources()
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}
