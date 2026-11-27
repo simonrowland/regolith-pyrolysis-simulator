@@ -5383,8 +5383,14 @@ def test_markerless_gate_curve_row_is_a_miss_and_can_be_replaced(
     assert replay._lookup("freeze_gate_curve", key) == current_payload
 
 
-def test_pt1_recapture_supersedes_stale_row_without_decoding_payload(
+@pytest.mark.parametrize(
+    "old_repair_notices_json",
+    ["{invalid notice JSON", '[{"kind":"old repair"}]'],
+    ids=("malformed-stale-notices", "valid-stale-notices"),
+)
+def test_pt1_recapture_supersedes_stale_row_without_decoding_payload_or_notices(
     tmp_path: Path,
+    old_repair_notices_json: str,
 ) -> None:
     db_path = tmp_path / "stale-invalid-gate-payload.sqlite"
     store = PT0DeterminismStore("capture", db_path=db_path)
@@ -5422,12 +5428,14 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload(
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-            "SET key_bytes = ?, payload_bytes = ?, payload_sha256 = ? "
+            "SET key_bytes = ?, payload_bytes = ?, payload_sha256 = ?, "
+            "repair_notices_json = ? "
             "WHERE key_hash = ?",
             (
                 sqlite3.Binary(invalid_old_key),
                 sqlite3.Binary(invalid_old_payload),
                 hashlib.sha256(invalid_old_payload).hexdigest(),
+                old_repair_notices_json,
                 key_hash,
             ),
         )
@@ -5438,11 +5446,13 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload(
             "is_liquidus_floor": False,
         },
     }
+    new_notice = {"kind": "new repair"}
     recapture = PT0DeterminismStore("capture", db_path=db_path)
     recapture._store(
         "freeze_gate_curve",
         key,
         current_payload,
+        repair_notices=[new_notice],
         law_disclosures=[],
     )
 
@@ -5456,9 +5466,10 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload(
             stored_payload_sha256,
             stored_payload_bytes,
             stored_codec_version,
+            stored_repair_notices_json,
         ) = conn.execute(
             f"SELECT key_hash, key_sha256, key_bytes, payload_sha256, "
-            f"payload_bytes, payload_codec_version FROM "
+            f"payload_bytes, payload_codec_version, repair_notices_json FROM "
             f"{PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
             (key_hash,),
         ).fetchone()
@@ -5468,6 +5479,7 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload(
     assert stored_payload_sha256 == hashlib.sha256(current_payload_bytes).hexdigest()
     assert bytes(stored_payload_bytes) == current_payload_bytes
     assert stored_codec_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
+    assert stored_repair_notices_json == rrd.encode_repair_notices_json([new_notice])
 
     replay = PT0DeterminismStore("replay", db_path=db_path)
     assert replay._lookup("freeze_gate_curve", key) == current_payload

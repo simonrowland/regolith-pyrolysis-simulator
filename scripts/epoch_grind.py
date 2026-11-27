@@ -444,7 +444,10 @@ def duplication_rate_from_merge(summary: Mapping[str, Any]) -> float:
                     f"seed_rows={seed_rows}; merge accounting is corrupt"
                 )
             source_rows += produced_rows
-    return duplication_rate(source_rows, int(summary.get("inserted_rows", 0)))
+    newly_available_rows = int(summary.get("inserted_rows", 0)) + int(
+        summary.get("replaced_rows", 0)
+    )
+    return duplication_rate(source_rows, newly_available_rows)
 
 
 def adaptive_decision(

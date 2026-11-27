@@ -1507,6 +1507,31 @@ def test_epoch_merge_uses_admitted_rows_for_duplication_labels_and_cleanup(
     assert seed_source_hashes == {current_id}
 
 
+def test_epoch_stale_target_replacement_counts_as_new_work(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"
+    key_hash = _put_pt1_cache_row(base, "stale-target-replacement")
+    _put_pt1_cache_row(shard, "stale-target-replacement")
+    with sqlite3.connect(base) as conn:
+        conn.execute(
+            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_codec_version = ? WHERE key_hash = ?",
+            (PT0_GATE_CURVE_CODEC_VERSION - 1, key_hash),
+        )
+
+    merge_summary = epoch_grind.merge_epoch_shards(base, [shard])
+
+    assert merge_summary["inserted_rows"] == 0
+    assert merge_summary["replaced_rows"] == 1
+    assert epoch_grind.duplication_rate_from_merge(merge_summary) == 0.0
+    with sqlite3.connect(base) as conn:
+        assert conn.execute(
+            f"SELECT payload_codec_version FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()[0] == PT0_GATE_CURVE_CODEC_VERSION
+
+
 @pytest.mark.parametrize(
     "base_layout",
     ("fresh", "migrated", "unmigrated"),

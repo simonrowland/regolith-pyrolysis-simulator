@@ -1370,9 +1370,10 @@ class PT0DeterminismStore:
                     f"{key_hash}"
                 )
             self._verify_entry(artifact, key, key_bytes, key_hash, existing)
-            effective_notices_json = monotonic_repair_notices_json(
+            effective_notices_json = _repair_notices_for_recapture(
                 existing.get("repair_notices_json"),
                 repair_notices_json,
+                stale_existing_row=stale_payload,
             )
         else:
             effective_notices_json = repair_notices_json
@@ -2107,10 +2108,13 @@ class PT1PersistentEquilibriumStore:
                         raise PT1PersistentStoreCorrupt(
                             f"PT-1 payload collision for {artifact}: {key_hash}"
                         )
-                existing_notices_json = _row_repair_notices(existing)
-                effective_notices_json = monotonic_repair_notices_json(
+                existing_notices_json = (
+                    None if stale_payload else _row_repair_notices(existing)
+                )
+                effective_notices_json = _repair_notices_for_recapture(
                     existing_notices_json,
                     repair_notices_json,
+                    stale_existing_row=stale_payload,
                 )
                 local_row = conn.execute(
                     f"SELECT 1 FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
@@ -2134,7 +2138,7 @@ class PT1PersistentEquilibriumStore:
                                 key_hash,
                             ),
                         )
-                    if effective_notices_json != existing_notices_json:
+                    elif effective_notices_json != existing_notices_json:
                         conn.execute(
                             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
                             "SET repair_notices_json = ? WHERE key_hash = ?",
@@ -5214,6 +5218,17 @@ def monotonic_repair_notices_json(
     old_values = {canonical_json_bytes(notice) for notice in old_notices}
     new_values = {canonical_json_bytes(notice) for notice in new_notices}
     return incoming if old_values < new_values else existing
+
+
+def _repair_notices_for_recapture(
+    existing: str | None,
+    incoming: str | None,
+    *,
+    stale_existing_row: bool,
+) -> str | None:
+    if stale_existing_row:
+        return incoming
+    return monotonic_repair_notices_json(existing, incoming)
 
 
 def record_repair_notice(sim: Any, notice: Mapping[str, Any]) -> None:
