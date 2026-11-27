@@ -139,7 +139,7 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
     assert first.get_engine_version() == 'MAGEMin 1.9.6'
     assert second.get_engine_version() == 'MAGEMin 1.9.6'
     assert len(run_calls) == 1
-    assert slot_calls == [5]
+    assert slot_calls == [magemin._MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S]
 
     @contextmanager
     def timed_out_slot(_timeout_s):

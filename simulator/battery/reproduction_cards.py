@@ -218,7 +218,15 @@ def _review_causes(run: Document, review: Document, scope: Document) -> list[dic
 
 def _rms_text(values: Sequence[Decimal]) -> str | None:
     value = _rms(values)
-    return None if value is None else str(value)
+    if value is None:
+        return None
+    # Native zero is "0". An absolute residual of two 2-place values
+    # (22.74 wt% - 22.74 wt%) is Decimal("0.00"), and sqrt keeps that
+    # exponent, so str(value) would be "0.00". That string belongs to
+    # the band receipt. is_zero() is exact; a non-zero keeps its exponent.
+    if value.is_zero():
+        return "0"
+    return str(value)
 
 
 def _band_rms_text(values: Sequence[Decimal]) -> str | None:

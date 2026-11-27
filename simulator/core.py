@@ -7001,12 +7001,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # The buffer stays. The batch settle runs the Fe split
             # against it and books only the O2 that split did not take.
             # A positive source does not clear the ferric lock.
-            # A couple at the noop has no uptake to defer. An empty
-            # skip_reason records the term as applied, which says the
-            # oxygen was integrated. It was not. p_total = 0 uses the
-            # 1e-9 bar vacuum floor, so this bound is -9, the log the
-            # no-capacity refusal plants. That refusal stays a skip.
-            if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
+            # The no-capacity refusal is the vacuum-floor plant only.
+            # Premise: p_total <= 0 is floored to the vacuum floor
+            # (1e-9 bar), and log10(1e-9) = -9, the log that refusal
+            # plants. Algebra: pressure_bar = p_total_mbar / 1000.
+            # The plant is pressure_bar <= vacuum_floor_bar. A physical
+            # ceiling is not that plant: 10 mbar is 0.01 bar and
+            # log10(0.01) = -2. An empty skip_reason there means the
+            # ceiling rule was applied. The batch settle still books
+            # the O2 the couple did not take. Limit: pressure exactly
+            # at the floor is the plant.
+            pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+            vacuum_floor_bar = float(self._vacuum_floor_bar())
+            at_vacuum_floor_plant = (
+                math.isfinite(pressure_bar)
+                and math.isfinite(vacuum_floor_bar)
+                and pressure_bar <= vacuum_floor_bar
+            )
+            if (
+                C_m <= OXYGEN_RESERVOIR_NOOP_MOL
+                and at_vacuum_floor_plant
+            ):
                 skip_reason = 'no_melt_redox_capacity'
         elif reducing_books:
             # Premise: bookable O2 is 1/2 mol per mol Fe2O3

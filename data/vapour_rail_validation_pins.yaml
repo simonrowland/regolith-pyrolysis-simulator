@@ -43,7 +43,7 @@ species:
         # Fe saturation floor on one comparison cell, not a new Al
         # vapour pressure. At 1950 K and the printed log10(fO2/bar) = -9
         # the floor is -8.924713987633552. VapoRock stayed at -9.
-        # 4/3 Al + O2 = 2/3 Al2O3, so p_Al ∝ pO2^(-3/4).
+        # 4/3 Al + O2 = 2/3 Al2O3, so p_Al proportional to pO2^(-3/4).
         # 0.75 * 0.0752860123664476 = 0.0564645092748357, and the old
         # residual plus that shift is the raised pin. Other grid cells
         # do not bind. The rail cell now dissociates at the printed log,
@@ -670,7 +670,7 @@ species:
         # 2026-11-26 fold 3. Receipt e1976c37 raised this pin from
         # 0.17562698423078063 to 0.23155145669969357. Same cell as Al:
         # 1950 K, printed log10(fO2/bar) = -9, Fe floor
-        # -8.924713987633552. Ti + O2 = TiO2, so p_Ti ∝ pO2^(-1).
+        # -8.924713987633552. Ti + O2 = TiO2, so p_Ti proportional to pO2^(-1).
         # The stored residual at that cell is 0.15626544433324602.
         # Adding the floor raise 0.0752860123664476 gives the raised
         # pin, which then exceeds the unfloored worst cell at 1700 K.

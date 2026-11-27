@@ -2628,43 +2628,68 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 binary_stat.st_size,
                 binary_stat.st_mtime_ns,
             )
+        # One binary has one banner. A 5 s slot wait on a busy studio
+        # raises, and that path fallback is not cached, so the next call
+        # can record the ``--version`` banner instead. Gate-curve memo
+        # evidence then differs across lazy init of the same install.
+        # Wait is the host-wide launch bound (300 s), the same bound an
+        # equilibrium launch uses before a typed refusal. The subprocess
+        # itself stays on a 5 s clock once a slot is held. The cache lock
+        # is not held across that wait: a caller that already owns a slot
+        # must still be able to read a cached banner.
         with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
             legacy = (
                 _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
                 if version_key is not None
                 else None
             )
-            if legacy is None:
-                try:
-                    with (
-                        _magemin_subprocess_slot(5),
-                        tempfile.TemporaryDirectory() as tmpdir,
-                    ):
-                        result = subprocess.run(
-                            [
-                                str(resolved_binary_path),
-                                '--version',
-                                '--db',
-                            self._effective_database(),
-                            ],
-                            cwd=tmpdir,
-                            capture_output=True,
-                            text=True,
-                            timeout=5,
-                            env=_magemin_subprocess_env(),
-                        )
-                    lines = (result.stdout or result.stderr).strip().splitlines()
-                    if result.returncode == 0 and lines:
-                        legacy = lines[0].strip()
-                        if version_key is not None:
-                            _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = legacy
-                    else:
-                        legacy = f'MAGEMin subprocess ({resolved_binary_path})'
-                except (
-                    _MAGEMinEngineLifecycleError,
-                    OSError,
-                    subprocess.TimeoutExpired,
+        if legacy is None:
+            probed: Optional[str] = None
+            try:
+                with (
+                    _magemin_subprocess_slot(
+                        _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
+                    ),
+                    tempfile.TemporaryDirectory() as tmpdir,
                 ):
+                    result = subprocess.run(
+                        [
+                            str(resolved_binary_path),
+                            '--version',
+                            '--db',
+                            self._effective_database(),
+                        ],
+                        cwd=tmpdir,
+                        capture_output=True,
+                        text=True,
+                        timeout=5,
+                        env=_magemin_subprocess_env(),
+                    )
+                lines = (result.stdout or result.stderr).strip().splitlines()
+                if result.returncode == 0 and lines:
+                    probed = lines[0].strip()
+            except (
+                _MAGEMinEngineLifecycleError,
+                OSError,
+                subprocess.TimeoutExpired,
+            ):
+                probed = None
+            with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
+                cached = (
+                    _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
+                    if version_key is not None
+                    else None
+                )
+                if cached is not None:
+                    legacy = cached
+                elif probed:
+                    if version_key is not None:
+                        _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = probed
+                    legacy = probed
+                else:
+                    # A real probe failure. Not cached: the next call
+                    # still probes, so a transient slot refusal cannot
+                    # become the permanent identity either.
                     legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         warn_legacy_once(
             'magemin',
