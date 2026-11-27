@@ -1692,6 +1692,40 @@ def test_refusal_closure_fixed_point_before_solve_bundles() -> None:
     assert any("Na" in members for members in batch.solve_bundle_ids.values())
 
 
+def test_pre_rg_claimed_catalog_refusal_stays_local_to_its_species() -> None:
+    refused_k = replace(
+        _selector_rule("K"),
+        origin="u0_v",
+        has_pressure_evaluator=False,
+        has_alpha=False,
+        has_route=False,
+    )
+    batch = resolve_vapour_batch(
+        rules=(_selector_rule("Na"), refused_k),
+        ledger_snapshot={"process.cleaned_melt": {"P": 1.0}},
+        state=VapourResolveState(temperature_K=1600.0),
+        catalog_species=_selector_catalog_species("Na"),
+        flux_activation_context=_pre_rg_activation_context("Na", "K"),
+    )
+
+    assert batch.requested_species_ids == frozenset({"Na", "K"})
+    assert batch.flux_active_species_ids == frozenset({"Na"})
+    assert batch.channel("Na").is_flux_active
+    assert batch.channel("K").is_refused
+    pressures, overlay = flux_pressures_from_batch(
+        batch,
+        effective_pressure_source=EffectivePressureSource(
+            "pre_rg_fixture",
+            {"Na": 12.0, "K": 24.0},
+        ),
+    )
+    assert pressures == {"Na": 12.0}
+    assert overlay["batch_channel_states"] == {
+        "K": "refusal",
+        "Na": "eligible",
+    }
+
+
 def test_build_solve_bundles_only_from_flux_active_survivors() -> None:
     rules = (
         RequestRule(

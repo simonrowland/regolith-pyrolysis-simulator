@@ -365,6 +365,615 @@ def test_live_and_capacity_keep_unresolved_k_unavailable_with_fe_zero(
         assert overlay["notices"] == unresolved
 
 
+@pytest.mark.xdist_group("serial")
+def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
+    """Exercise every state pair through the batch/provider decision owners."""
+    from itertools import product
+
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+    from simulator.chemistry.kernel.dto import ProviderAccountView
+    from simulator.evaporation import (
+        _append_capacity_solve_exclusion_notice,
+        _append_vapour_batch_unresolved_notice,
+        _provider_flux_outcome_refusal,
+        _record_unavailable_provider_flux_channels,
+    )
+    from simulator.langmuir_surface_oxygen import (
+        LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+        apply_langmuir_surface_oxygen,
+    )
+    from simulator.state import EvaporationFlux, MOLAR_MASS
+
+    states = (
+        "resolved",
+        "catalog_proven_zero",
+        "closure_proven_zero",
+        "unavailable_batch",
+        "unavailable_provider",
+        "unavailable_transport",
+    )
+    species_ids = ("Fe", "Si")
+    legacy_catalog = _load_yaml("vapor_pressures.yaml")
+    host = SimpleNamespace(melt=SimpleNamespace(hour=4))
+    rates_by_peer_state = {species: {} for species in species_ids}
+    live_rates_by_peer_state = {species: {} for species in species_ids}
+    capacity_rates_by_peer_state = {species: {} for species in species_ids}
+
+    def answer(species, state):
+        if state == "catalog_proven_zero":
+            pressure = ZeroByPhysics("b1318_catalog_proven_zero")
+            flux = FluxEligible(alpha_ref=f"alpha:{species}")
+            return VapourAnswer(
+                species_id=species,
+                pressure=pressure,
+                selected_runtime_pressure=pressure,
+                flux=flux,
+                source_label="b1318_state_matrix",
+                formula_id=species,
+                source_account="process.cleaned_melt",
+                solve_group_id="b1318_state_matrix",
+                state_fingerprint=f"state:{species}:zero",
+                validation_status="pending_validation",
+            )
+        if state == "unavailable_batch":
+            reason = f"{species.lower()}_batch_unavailable"
+            pressure = PressureRefusal(code=reason, detail=reason)
+            flux = FluxRefusal(code=reason, detail=reason)
+            return VapourAnswer(
+                species_id=species,
+                pressure=pressure,
+                selected_runtime_pressure=pressure,
+                flux=flux,
+                source_label="b1318_state_matrix",
+                formula_id=species,
+                source_account="process.cleaned_melt",
+                solve_group_id="b1318_state_matrix",
+                state_fingerprint=f"state:{species}:batch-refusal",
+                validation_status="pending_validation",
+                refusal_code=reason,
+            )
+        pressure = PressureValue(50.0)
+        return VapourAnswer(
+            species_id=species,
+            pressure=pressure,
+            selected_runtime_pressure=pressure,
+            flux=FluxEligible(alpha_ref=f"alpha:{species}"),
+            source_label="b1318_state_matrix",
+            formula_id=species,
+            source_account="process.cleaned_melt",
+            solve_group_id="b1318_state_matrix",
+            state_fingerprint=f"state:{species}:{state}",
+            validation_status="pending_validation",
+        )
+
+    for left_state, right_state in product(states, repeat=2):
+        state_by_species = dict(zip(species_ids, (left_state, right_state)))
+        channels = {
+            species: answer(species, state_by_species[species])
+            for species in species_ids
+        }
+        active = frozenset(
+            species
+            for species, state in state_by_species.items()
+            if state not in {"catalog_proven_zero", "unavailable_batch"}
+        )
+        batch = VapourBatch(
+            requested_species_ids=frozenset(species_ids),
+            channels_by_species=channels,
+            flux_active_species_ids=active,
+        )
+        effective_pressure_source = EffectivePressureSource(
+            PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
+            {
+                species: 50.0
+                for species, state in state_by_species.items()
+                if state not in {"catalog_proven_zero", "unavailable_batch"}
+            },
+        )
+        batch_pressures, overlay = flux_pressures_from_batch(
+            batch,
+            effective_pressure_source=effective_pressure_source,
+        )
+        for species, state in state_by_species.items():
+            if state == "unavailable_batch":
+                _append_vapour_batch_unresolved_notice(
+                    host,
+                    overlay,
+                    species=species,
+                    reason=f"{species.lower()}_batch_unavailable",
+                )
+
+        # Run the real surface solver for each row. Ca is a closure driver,
+        # while the matrix carriers that are not testing closure remain
+        # transport-headspace channels and therefore retain their own state.
+        provenance = {
+            "Ca": {
+                "pressure_rail": "gas_fugacity",
+                "pO2_bar": 1.0e-9,
+                "activity_factor": 0.2,
+            },
+        }
+        closure_pressures = {"Ca": 1000.0, **batch_pressures}
+        for species, state in state_by_species.items():
+            if state == "closure_proven_zero":
+                provenance[species] = {
+                    "pressure_rail": "condensed_raoult_psat",
+                    "pO2_bar": 1.0e-9,
+                    "pO2_exponent": -0.5,
+                    "activity_factor": 0.5,
+                    "raw_metal_activity_root": 0.5,
+                    "P_reference_Antoine_Pa": 100.0,
+                }
+            else:
+                provenance[species] = {
+                    "oxygen_fugacity_channel": "transport_headspace",
+                    "pO2_bar": 1.0e-9,
+                    "pO2_exponent": -0.5,
+                }
+        overhead_partials = {
+            "Ca": 0.0,
+            "O2": 100000.0,
+            **{
+                species: (
+                    100.0
+                    if state_by_species[species] == "closure_proven_zero"
+                    else 0.0
+                )
+                for species in species_ids
+            },
+        }
+        surface = apply_langmuir_surface_oxygen(
+            closure_pressures,
+            temperature_K=1873.15,
+            provenance_by_species=provenance,
+            source_reaction_fO2_bar=1.0e-9,
+            legacy_catalog=legacy_catalog,
+            melt_redox_capacity_mol_per_ln_fO2=0.0,
+            overhead_partials_Pa=overhead_partials,
+            conductance_mol_s_m2_Pa={
+                species: 1.0 for species in (*species_ids, "Ca", "O2")
+            },
+            allow_unmeasured_alpha_fallback=True,
+            unmeasured_alpha_fallback_species_allowlist={
+                *species_ids,
+                "Ca",
+            },
+        )
+        assert surface.applied is True
+        final_pressures = {
+            species: pressure
+            for species, pressure in surface.pressures_Pa.items()
+            if species in species_ids
+        }
+        selector_overlay = copy.deepcopy(overlay)
+        EvaporationMixin._record_langmuir_refusal_notices(
+            host,
+            overlay,
+            surface,
+            final_pressures=final_pressures,
+        )
+        production_overlay = copy.deepcopy(overlay)
+        vapor_pressure_diagnostic = {
+            "vapor_pressure_numerator_provenance": provenance,
+        }
+        EvaporationMixin._classify_proven_zero_langmuir_channels(
+            host,
+            overlay,
+            vapor_pressure_diagnostic,
+            surface=surface,
+            overhead_partials_Pa=overhead_partials,
+        )
+
+        closure_zeros = {
+            species
+            for species, state in state_by_species.items()
+            if state == "closure_proven_zero"
+        }
+        for species in closure_zeros:
+            assert (
+                surface.refusal_codes_by_species[species]
+                == LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED
+            )
+            assert overlay["batch_channel_states"][species] == "zero_by_physics"
+            assert species not in final_pressures
+
+        stoich = {
+            "Fe": {"parent_oxide": "FeO", "oxide_per_product_kg": 1.286},
+            "Si": {"parent_oxide": "SiO2", "oxide_per_product_kg": 2.139},
+        }
+        provider_pressures = dict(final_pressures)
+        provider_stoich = dict(stoich)
+        for species, state in state_by_species.items():
+            if state == "unavailable_provider" and species in provider_pressures:
+                provider_stoich.pop(species, None)
+        from simulator.condensation import _LENNARD_JONES_PARAMS
+
+        molar_masses = {
+            species: float(MOLAR_MASS[species]) / 1000.0
+            for species in species_ids
+        }
+        controls = {
+            "vapour_batch_flux_pressures_Pa": provider_pressures,
+            "overhead_partials_Pa": {"Fe": 0.0, "Si": 0.0},
+            "overhead_pressure_pa": 1000.0,
+            "commanded_pressure_pa": 0.0,
+            "molar_mass_kg_mol": molar_masses,
+            "stoich_by_species": provider_stoich,
+            "available_oxide_kg": {species: 10.0 for species in species_ids},
+            "melt_surface_area_m2": 1.0,
+            "alpha": {species: 0.5 for species in species_ids},
+            "pipe_diameter_m": 0.12,
+            "gas_temperature_K": 1873.15,
+            "carrier_gas": "N2",
+            "evaporation_series_resistance": {"gas_resistance_enabled": True},
+        }
+        request = IntentRequest(
+            intent=ChemistryIntent.EVAPORATION_FLUX,
+            account_view=ProviderAccountView(
+                accounts={},
+                species_formula_registry={},
+            ),
+            temperature_C=1600.0,
+            pressure_bar=0.0,
+            control_inputs=controls,
+        )
+        with pytest.MonkeyPatch.context() as local:
+            for species, state in state_by_species.items():
+                if state == "unavailable_transport":
+                    local.delitem(_LENNARD_JONES_PARAMS, species, raising=False)
+            provider_result = BuiltinEvaporationFluxProvider().dispatch(request)
+
+        from simulator.state import EvaporationFlux
+
+        provider_flux = EvaporationFlux()
+        provider_unavailable = _record_unavailable_provider_flux_channels(
+            host,
+            provider_result.diagnostic,
+            overlay,
+            expected_species=provider_pressures,
+            stoich_by_species=provider_stoich,
+            flux=provider_flux,
+        )
+        provider_refusal = _provider_flux_outcome_refusal(
+            host,
+            provider_result.status,
+            provider_result.diagnostic,
+            provider_unavailable,
+            overlay,
+            selector_overlay=selector_overlay,
+        )
+
+        direct_live_refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+            host,
+            {},
+            overlay,
+            selector_overlay=selector_overlay,
+            flux_pressures=final_pressures,
+            include_unresolved_notices=True,
+        ) or provider_refusal
+        capacity_overlay = copy.deepcopy(overlay)
+        capacity_bound = _append_capacity_solve_exclusion_notice(
+            host,
+            capacity_overlay,
+        )
+        direct_capacity_refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+            host,
+            {},
+            capacity_overlay,
+            selector_overlay=selector_overlay,
+            flux_pressures=final_pressures,
+            include_unresolved_notices=True,
+        ) or provider_refusal
+        assert (direct_live_refusal is not None) == (
+            direct_capacity_refusal is not None
+        )
+        provider_path_refusal = provider_refusal or direct_live_refusal
+        closure_path_refusal = direct_live_refusal
+
+        # Exercise both public simulation paths with this production-shaped
+        # resolved batch tuple. The matrix owns the typed input seam; provider
+        # dispatch, capacity solve, live projection, and route commit stay real.
+        sim = _real_capacity_sim()
+        sim.melt.temperature_C = 1600.0
+        sim._freeze_gate_enabled = lambda: False
+        closure_holdup = {
+            species: 100.0
+            * sim._headspace_volume_m3()
+            / (GAS_CONSTANT * sim._headspace_temperature_K())
+            for species in closure_zeros
+        }
+        if closure_holdup:
+            sim._overhead_holdup_mol = lambda: dict(closure_holdup)
+        capacity = FiniteCapacity(0.05)
+        cold_train = SimpleNamespace(
+            accumulator_enabled=False,
+            relief={
+                "k_relief_kg_hr_Pa": 1.0e-30,
+                "p_open_Pa": 1.0e9,
+                "vessel_rating_Pa": 1.0e12,
+            },
+        )
+        sim._cold_train_capacity_policy = lambda: (capacity, cold_train)
+        sim._headspace_bleed_conductance_kg_s = lambda **_kwargs: 0.0
+        original_aux_builder = sim._build_evaporation_aux_maps
+        omitted_stoich_species = {
+            species
+            for species, state in state_by_species.items()
+            if state == "unavailable_provider"
+        }
+        if omitted_stoich_species:
+            def build_aux_maps(pressures):
+                masses, aux_stoich, available = original_aux_builder(pressures)
+                return (
+                    masses,
+                    {
+                        species: value
+                        for species, value in aux_stoich.items()
+                        if species not in omitted_stoich_species
+                    },
+                    available,
+                )
+
+            sim._build_evaporation_aux_maps = build_aux_maps
+
+        equilibrium = SimpleNamespace(
+            temperature_C=1600.0,
+            vapor_pressures_Pa={"Fe": 50.0, "Si": 50.0},
+            vapor_pressures_source={},
+            activity_coefficients={},
+            liquid_fraction=1.0,
+            diagnostics={},
+        )
+        film_partials = {"Fe": 0.0, "Si": 0.0}
+        sim._last_vapour_batch_resolve_error = {}
+
+        def resolve_matrix_state(_equilibrium, **kwargs):
+            partials = dict(kwargs.get("overhead_partials_Pa") or film_partials)
+            sim._last_vapor_pressure_diagnostic = dict(vapor_pressure_diagnostic)
+            sim._last_vapour_batch_flux_overlay = copy.deepcopy(production_overlay)
+            sim._last_langmuir_surface_oxygen = {
+                **surface.as_diagnostic(),
+                "overhead_partials_Pa": dict(overhead_partials),
+            }
+            sim._langmuir_flux_closure_context = {
+                "publication_Pa": dict(batch_pressures),
+                "temperature_K": 1873.15,
+                "provenance_by_species": provenance,
+                "source_reaction_fO2_bar": 1.0e-9,
+                "transport_pO2_bar": 1.0e-9,
+                "melt_redox_capacity_mol_per_ln_fO2": 0.0,
+                "film_partials_Pa": partials,
+                "film_pressure_Pa": 1000.0,
+                "root_closed": False,
+            }
+            return (
+                dict(final_pressures),
+                copy.deepcopy(production_overlay),
+                batch,
+                {},
+                dict(vapor_pressure_diagnostic),
+                effective_pressure_source,
+                copy.deepcopy(selector_overlay),
+            )
+
+        sim._resolve_evaporation_batch_flux_state = resolve_matrix_state
+        sim._reclose_langmuir_pressures = lambda _partials: surface
+        ledger_before_capacity = sim.atom_ledger.mol_by_account()
+        transitions_before_capacity = len(sim.atom_ledger.transitions)
+        live_refusal = None
+        capacity_refusal = None
+        capacity_result = None
+        transport_missing = {
+            species
+            for species, state in state_by_species.items()
+            if state == "unavailable_transport"
+        }
+        with pytest.MonkeyPatch.context() as local:
+            from simulator.condensation import _LENNARD_JONES_PARAMS
+
+            for species in transport_missing:
+                local.delitem(_LENNARD_JONES_PARAMS, species, raising=False)
+            try:
+                capacity_result = PyrolysisSimulator._compute_capacity_coupling_shadow_impl(
+                    sim,
+                    equilibrium,
+                )
+            except EvaporationFluxRefusal as exc:
+                capacity_refusal = exc
+            capacity_overlay = copy.deepcopy(
+                getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {}
+            )
+            try:
+                live_flux = sim._calculate_evaporation(
+                    equilibrium,
+                    overhead_partials_override_Pa=film_partials,
+                )
+            except EvaporationFluxRefusal as exc:
+                live_refusal = exc
+                live_flux = None
+            live_overlay = copy.deepcopy(
+                getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {}
+            )
+        assert sim.atom_ledger.mol_by_account() == ledger_before_capacity
+        assert len(sim.atom_ledger.transitions) == transitions_before_capacity
+
+        resolved_species = {
+            species
+            for species, state in state_by_species.items()
+            if state in {
+                "resolved",
+                "catalog_proven_zero",
+                "closure_proven_zero",
+            }
+        }
+        should_refuse = not resolved_species
+        path_refusals = {
+            "live evaporation": live_refusal,
+            "capacity coupling": capacity_refusal,
+            "provider classifier": provider_path_refusal,
+            "Langmuir closure": closure_path_refusal,
+        }
+        for path, refusal in path_refusals.items():
+            assert (refusal is not None) is should_refuse, (
+                path,
+                state_by_species,
+                overlay,
+                provider_result.status,
+            )
+        assert (live_refusal is not None) is should_refuse
+        assert (capacity_refusal is not None) is should_refuse
+        if should_refuse:
+            assert live_refusal.reason == "vapour_batch_no_debiting_pressure_outcome"
+            assert capacity_refusal.reason == "vapour_batch_no_debiting_pressure_outcome"
+        else:
+            assert live_refusal is None
+            assert capacity_refusal is None
+            assert isinstance(capacity_result, CapacityShadowResult)
+        assert provider_result.transition is None
+
+        unavailable_species = {
+            species
+            for species, state in state_by_species.items()
+            if state in {
+                "unavailable_batch",
+                "unavailable_provider",
+                "unavailable_transport",
+            }
+        }
+        unresolved_species = {
+            str(notice.get("species"))
+            for notice in overlay.get("notices", ())
+            if isinstance(notice, dict)
+            and notice.get("kind") == "vapour_batch_unresolved"
+        }
+        assert unavailable_species <= unresolved_species
+        provider_rates = dict(
+            provider_result.diagnostic.get("evaporation_flux_kg_hr", {}) or {}
+        )
+        below = provider_result.diagnostic.get(
+            "below_threshold_evaporation_flux", {}
+        ) or {}
+        provider_rates.update(dict(below.get("fluxes_kg_hr", {}) or {}))
+        assert unavailable_species.isdisjoint(provider_rates)
+        assert unavailable_species.isdisjoint(provider_flux.species_kg_hr)
+
+        def outcome_overlay(refusal, fallback):
+            if refusal is not None:
+                diagnostic = getattr(refusal, "diagnostic", {}) or {}
+                candidate = diagnostic.get("vapour_batch_flux_overlay")
+                if isinstance(candidate, dict):
+                    return candidate
+            return fallback
+
+        actual_live_overlay = outcome_overlay(live_refusal, live_overlay)
+        actual_capacity_overlay = outcome_overlay(
+            capacity_refusal,
+            capacity_overlay,
+        )
+        for actual_overlay in (actual_live_overlay, actual_capacity_overlay):
+            actual_unresolved = {
+                str(notice.get("species"))
+                for notice in actual_overlay.get("notices", ())
+                if isinstance(notice, dict)
+                and notice.get("kind") == "vapour_batch_unresolved"
+            }
+            assert unavailable_species <= actual_unresolved
+            for species, state in state_by_species.items():
+                if state in {"catalog_proven_zero", "closure_proven_zero"}:
+                    assert (
+                        actual_overlay["batch_channel_states"][species]
+                        == "zero_by_physics"
+                    )
+                    assert species not in actual_unresolved
+        if unavailable_species and capacity_refusal is None:
+            actual_bound = next(
+                notice
+                for notice in actual_capacity_overlay.get("notices", ())
+                if isinstance(notice, dict)
+                and notice.get("kind")
+                == "capacity_solve_excludes_unavailable_species"
+            )
+            assert actual_bound["bound_direction"] == {
+                "resolved_fluxes": "upper",
+                "headspace_pressure": "lower",
+            }
+
+        if live_flux is not None and live_flux.species_kg_hr:
+            before_route = len(sim.atom_ledger.transitions)
+            routed = sim._apply_analytic_evaporation_depletion(live_flux)
+            sim._route_to_condensation(routed)
+            committed = sim.atom_ledger.transitions[before_route:]
+            booked_species = {
+                species
+                for transition in committed
+                for lot in (*transition.debits, *transition.credits)
+                for species in lot.species_kg
+            }
+            forbidden_bookings = set(unavailable_species)
+            if "Fe" in unavailable_species:
+                forbidden_bookings.add("FeO")
+            if "Si" in unavailable_species:
+                forbidden_bookings.update({"SiO", "SiO2"})
+            assert forbidden_bookings.isdisjoint(booked_species)
+
+        for species, state in state_by_species.items():
+            if state in {"catalog_proven_zero", "closure_proven_zero"}:
+                assert overlay["batch_channel_states"][species] == "zero_by_physics"
+                assert species not in unresolved_species
+            assert overlay["batch_channel_states"][species] != "dormant_by_epoch"
+
+        if capacity_bound is not None:
+            assert capacity_bound["bound_direction"] == {
+                "resolved_fluxes": "upper",
+                "headspace_pressure": "lower",
+            }
+
+        for species, state in state_by_species.items():
+            if state != "resolved":
+                continue
+            peer = species_ids[1] if species == species_ids[0] else species_ids[0]
+            assert provider_rates[species] > 0.0
+            rates_by_peer_state[species][state_by_species[peer]] = (
+                provider_rates[species]
+            )
+            assert live_flux is not None
+            assert live_flux.species_kg_hr[species] > 0.0
+            live_rates_by_peer_state[species][state_by_species[peer]] = (
+                live_flux.species_kg_hr[species]
+            )
+            assert isinstance(capacity_result, CapacityShadowResult)
+            capacity_rates_by_peer_state[species][state_by_species[peer]] = (
+                capacity_result.evaporation_flux_kg_hr[species]
+            )
+
+    for species in species_ids:
+        baseline = rates_by_peer_state[species]["resolved"]
+        assert set(rates_by_peer_state[species]) == set(states)
+        for peer_state, rate in rates_by_peer_state[species].items():
+            assert rate == pytest.approx(baseline, rel=1.0e-12, abs=1.0e-12), (
+                species,
+                peer_state,
+            )
+        live_baseline = live_rates_by_peer_state[species]["resolved"]
+        assert set(live_rates_by_peer_state[species]) == set(states)
+        for peer_state, rate in live_rates_by_peer_state[species].items():
+            assert rate == pytest.approx(
+                live_baseline,
+                rel=1.0e-12,
+                abs=1.0e-12,
+            ), (species, peer_state)
+        capacity_baseline = capacity_rates_by_peer_state[species]["resolved"]
+        assert set(capacity_rates_by_peer_state[species]) == set(states)
+        for peer_state, rate in capacity_rates_by_peer_state[species].items():
+            assert rate + 1.0e-12 >= capacity_baseline, (
+                species,
+                peer_state,
+                rate,
+                capacity_baseline,
+            )
+
+
 @pytest.mark.parametrize("path", ["live", "capacity"])
 def test_zero_pressure_eligible_peer_does_not_resolve_unavailable_batch(
     path,
@@ -669,13 +1278,13 @@ def test_excluding_unavailable_species_bounds_resolved_capacity_flux():
                 assert all(
                     not (
                         debit.account == "process.cleaned_melt"
-                        and debit.species == "SiO2"
+                        and "SiO2" in debit.species_kg
                     )
                     for transition in committed
                     for debit in transition.debits
                 )
                 assert all(
-                    lot.species not in {"Si", "SiO"}
+                    not {"Si", "SiO"}.intersection(lot.species_kg)
                     for transition in committed
                     for lot in (*transition.debits, *transition.credits)
                 )

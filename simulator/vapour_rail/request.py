@@ -2665,9 +2665,9 @@ def resolve_vapour_batch(
     # supplied by the typed effective-pressure seam, but only after refusal
     # closure proves every *remaining debit claim* is catalog-eligible.
     # Typed non-debiting answers (genuine PressureUpperBound /
-    # FluxDiagnosticUpperBound, ZeroByPhysics) demote the seam claim rather
-    # than hard-fail the batch.
-    # True refusals among claimed species still hard-fail construction.
+    # FluxDiagnosticUpperBound, ZeroByPhysics) and typed refusals stay local
+    # to their exact-key channels; neither can erase a different eligible
+    # channel from the batch.
     # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
@@ -2679,7 +2679,14 @@ def resolve_vapour_batch(
             and not answers[species_id].is_refused
             and not answers[species_id].is_flux_active
         )
-        required_debit_claims = claimed - demoted_non_debiting
+        refused_claims = frozenset(
+            species_id
+            for species_id in claimed
+            if species_id in answers and answers[species_id].is_refused
+        )
+        required_debit_claims = (
+            claimed - demoted_non_debiting - refused_claims
+        )
         missing_effective = required_debit_claims - union_eligible
         if missing_effective:
             raise VapourRequestConstructionError(

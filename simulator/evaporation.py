@@ -1393,6 +1393,34 @@ def _append_vapour_batch_unresolved_notice(
         notices.append(notice)
 
 
+def _provider_resolved_flux_species(
+    diagnostic: Mapping[str, Any],
+    flux_overlay: Mapping[str, Any] | None = None,
+) -> frozenset[str]:
+    """Return computed provider channels plus selector-proven physical zeros."""
+    below = diagnostic.get('below_threshold_evaporation_flux', {})
+    below_rates = below.get('fluxes_kg_hr', {}) if isinstance(below, Mapping) else {}
+    resolved: set[str] = set()
+    for key in (
+        'evaporation_flux_kg_hr',
+        'zero_net_evaporation_flux',
+        'evaporation_series_resistance',
+    ):
+        channels = diagnostic.get(key, {})
+        if isinstance(channels, Mapping):
+            resolved.update(str(species) for species in channels)
+    if isinstance(below_rates, Mapping):
+        resolved.update(str(species) for species in below_rates)
+    channel_states = (flux_overlay or {}).get('batch_channel_states', {})
+    if isinstance(channel_states, Mapping):
+        resolved.update(
+            str(species)
+            for species, state in channel_states.items()
+            if state == 'zero_by_physics'
+        )
+    return frozenset(resolved)
+
+
 def _record_unavailable_provider_flux_channels(
     host: Any,
     diagnostic: Mapping[str, Any],
@@ -1416,20 +1444,7 @@ def _record_unavailable_provider_flux_channels(
     stoich_by_species = (
         stoich_by_species if isinstance(stoich_by_species, Mapping) else {}
     )
-    below = diagnostic.get('below_threshold_evaporation_flux', {})
-    below_rates = below.get('fluxes_kg_hr', {}) if isinstance(below, Mapping) else {}
-    computed_species: set[str] = set()
-    for key in (
-        'evaporation_flux_kg_hr',
-        'zero_net_evaporation_flux',
-        'evaporation_series_resistance',
-    ):
-        channels = diagnostic.get(key, {})
-        if isinstance(channels, Mapping):
-            computed_species.update(str(species) for species in channels)
-    if isinstance(below_rates, Mapping):
-        computed_species.update(str(species) for species in below_rates)
-
+    computed_species = _provider_resolved_flux_species(diagnostic, overlay)
     unavailable: dict[str, str] = {}
     candidates = {str(species) for species in expected_species}
     candidates.update(
@@ -1523,23 +1538,6 @@ def _transport_only_unavailable_result(
     )
 
 
-def _provider_has_resolved_flux_channels(
-    diagnostic: Mapping[str, Any],
-) -> bool:
-    """Whether the provider computed any channel, including a typed zero."""
-    below = diagnostic.get('below_threshold_evaporation_flux', {})
-    below_rates = below.get('fluxes_kg_hr', {}) if isinstance(below, Mapping) else {}
-    return any(
-        isinstance(channels, Mapping) and bool(channels)
-        for channels in (
-            diagnostic.get('evaporation_flux_kg_hr'),
-            diagnostic.get('zero_net_evaporation_flux'),
-            diagnostic.get('evaporation_series_resistance'),
-            below_rates,
-        )
-    )
-
-
 def _provider_flux_outcome_refusal(
     host: Any,
     status: Any,
@@ -1570,9 +1568,11 @@ def _provider_flux_outcome_refusal(
                 else 'evaporation_flux_refused'
             )
         return EvaporationFluxRefusal(reason, diagnostic)
-    if provider_unavailable and not _provider_has_resolved_flux_channels(
-        diagnostic
-    ):
+    resolved_species = _provider_resolved_flux_species(
+        diagnostic,
+        flux_overlay,
+    )
+    if provider_unavailable and not resolved_species:
         return EvaporationMixin._vapour_batch_resolution_refusal(
             host,
             {
