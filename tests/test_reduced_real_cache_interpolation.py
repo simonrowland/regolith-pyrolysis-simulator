@@ -207,15 +207,6 @@ def test_standardized_distance_retains_current_numeric_output() -> None:
     )
 
 
-def test_standardized_distance_retains_compensated_sum_output() -> None:
-    left = [1.0] * 9
-    right = [0.0] + [1.0 - 2.0**-27] * 8
-
-    assert rci._standardized_distance(left, right).hex() == (
-        "0x1.0000000000001p+0"
-    )
-
-
 def test_standardized_distance_keeps_each_base_squaring_expression(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

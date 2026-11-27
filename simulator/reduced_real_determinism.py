@@ -5569,15 +5569,14 @@ def physics_ladder_bucket_distance_from_replay_key(
     rung_controls = rung_bucket.get("controls", {})
     if not isinstance(rung_controls, Mapping):
         rung_controls = {}
-    exact_temperature = controls.get("T_K")
-    snapped_temperature = rung_controls.get("T_K")
-    if exact_temperature is None or snapped_temperature is None:
+    try:
+        temperature_distance = _normalized_sigfig_distance(
+            float(controls.get("T_K", 0.0) or 0.0),
+            float(rung_controls.get("T_K", 0.0) or 0.0),
+            sig_figs,
+        )
+    except (OverflowError, TypeError, ValueError):
         return math.inf
-    temperature_distance = _normalized_sigfig_distance(
-        float(exact_temperature),
-        float(snapped_temperature),
-        sig_figs,
-    )
     if not math.isfinite(temperature_distance):
         return math.inf
     distance += temperature_distance
@@ -5588,12 +5587,15 @@ def physics_ladder_bucket_distance_from_replay_key(
             exact_value = controls.get(control_name)
             snapped_value = rung_controls.get(control_name)
             if exact_value is None or snapped_value is None:
+                continue
+            try:
+                control_distance = _normalized_sigfig_distance(
+                    float(exact_value),
+                    float(snapped_value),
+                    sig_figs,
+                )
+            except (OverflowError, TypeError, ValueError):
                 return math.inf
-            control_distance = _normalized_sigfig_distance(
-                float(exact_value),
-                float(snapped_value),
-                sig_figs,
-            )
             if not math.isfinite(control_distance):
                 return math.inf
             distance += control_distance

@@ -4539,6 +4539,7 @@ def _rewrite_pt1_key_and_derived_indexes(
         sqlite3.Binary(bucket_bytes),
     ]
     for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        distance = ladder_values[rung_tag]["distance"]
         assignments.extend(
             (
                 f"{rrd._physics_ladder_hash_column(rung_tag)} = ?",
@@ -4548,7 +4549,7 @@ def _rewrite_pt1_key_and_derived_indexes(
         values.extend(
             (
                 ladder_values[rung_tag]["sha256"],
-                ladder_values[rung_tag]["distance"],
+                distance if math.isfinite(distance) else 0.0,
             )
         )
     if payload_sha256 is not None:
@@ -4561,6 +4562,69 @@ def _rewrite_pt1_key_and_derived_indexes(
             (*values, original_key_hash),
         )
     return key_bytes, key_hash, bucket_key, bucket_bytes
+
+
+@pytest.mark.parametrize(
+    "include_controls",
+    (True, False),
+    ids=("with-T-K", "exact-only-without-T-K"),
+)
+def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
+    tmp_path: Path,
+    include_controls: bool,
+) -> None:
+    source_db = tmp_path / "writer-ladder-source.sqlite"
+    target_db = tmp_path / "writer-ladder-seed.sqlite"
+    key = _freeze_gate_key()
+    if not include_controls:
+        key.pop("controls")
+    payload = _valid_test_gate_payload()
+
+    PT0DeterminismStore("capture", db_path=source_db)._store(
+        "freeze_gate_curve",
+        key,
+        payload,
+        law_disclosures=[],
+    )
+
+    key_bytes = canonical_json_bytes(key)
+    key_hash = rrd._sha256(key_bytes)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+
+    def assert_all_readers_admit(db_path: Path) -> None:
+        persistent = PT1PersistentEquilibriumStore(db_path)
+        assert persistent.get(
+            artifact="freeze_gate_curve",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+        ) is not None
+        assert persistent.get_by_physics_bucket(
+            artifact="freeze_gate_curve",
+            physics_bucket_key=bucket_key,
+            physics_bucket_bytes=bucket_bytes,
+            physics_bucket_hash=rrd._sha256(bucket_bytes),
+            query_key=key,
+        ) is not None
+        for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+            rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+                key,
+                rung_tag,
+            )
+            rung_bytes = canonical_json_bytes(rung_key)
+            assert persistent.get_by_physics_ladder_bucket(
+                artifact="freeze_gate_curve",
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rrd._sha256(rung_bytes),
+                query_key=key,
+            ) is not None
+
+    assert_all_readers_admit(source_db)
+    seeded = seed_cache(target_db, [source_db])
+    assert seeded["inserted_rows"] == 1
+    assert_all_readers_admit(target_db)
 
 
 @pytest.mark.parametrize(
