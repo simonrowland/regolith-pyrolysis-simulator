@@ -3113,6 +3113,33 @@ def test_derivation_rejects_temperature_parent_from_another_observation():
     assert "different observation" in rendered, rendered
 
 
+def test_derivation_rejects_equal_parent_from_wrong_destination_field():
+    doc = _derivation_extract()
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"]["other_measure"] = "1630"
+    doc["fidelity_samples"][0]["value"]["other_measure"] = "1630"
+    observation["point_conditions"]["T_C"]["state"]["value"] = "1630"
+    derivation = doc["fidelity_samples"][1]
+    derivation["value"]["T_C"]["state"]["value"] = "1630"
+    derivation["verification"]["parents"][-1]["path"] = (
+        "species.Fe.observations[fe_alpha_1].values.other_measure"
+    )
+    observation_map, _ambiguous, _missing = vle._scored_observations(doc)
+
+    defects = vle._derivation_pass_defects(
+        doc,
+        doc["fidelity_samples"],
+        [1],
+        [0],
+        {},
+        observation_map,
+        extractor_id="figure-extractor",
+    )
+    rendered = " ".join(defect for _index, group in defects for defect in group)
+
+    assert "is not an attested parent" in rendered, rendered
+
+
 def test_derivation_recompute_attests_a_closed_composition():
     doc = _derivation_extract()
 
@@ -3236,6 +3263,77 @@ def test_derivation_recompute_mutation_turns_wrong_value_red(monkeypatch):
 
     with pytest.raises(AssertionError, match="recomputed value differs from stored"):
         test_derivation_rejects_a_wrong_stored_value()
+
+
+def test_derivation_destination_mutation_turns_sample_rel_tol_attack_red(monkeypatch):
+    original = vle.resolve_fidelity_sample
+
+    def use_sample_payload(doc, sample):
+        if (
+            isinstance(sample, dict)
+            and isinstance(sample.get("verification"), dict)
+            and sample["verification"].get("method") == "derivation"
+        ):
+            return sample["value"]
+        return original(doc, sample)
+
+    monkeypatch.setattr(vle, "resolve_fidelity_sample", use_sample_payload)
+    with pytest.raises(AssertionError, match="recomputed value differs from stored"):
+        test_derivation_rejects_extract_value_drift_despite_sample_rel_tol()
+
+
+def test_derivation_basis_mutation_turns_mole_fraction_attack_red(monkeypatch):
+    original = vle._derivation_recompute_defects
+
+    def omit_basis_check(*args, **kwargs):
+        return [
+            defect
+            for defect in original(*args, **kwargs)
+            if "amount_basis" not in defect
+        ]
+
+    monkeypatch.setattr(vle, "_derivation_recompute_defects", omit_basis_check)
+    with pytest.raises(AssertionError, match="amount_basis"):
+        test_derivation_rejects_mass_percent_amounts_declared_as_mole_fraction()
+
+
+def test_derivation_joint_closure_mutation_turns_open_total_red(monkeypatch):
+    original = vle._derivation_recompute_defects
+
+    def omit_joint_closure(*args, **kwargs):
+        return [
+            defect
+            for defect in original(*args, **kwargs)
+            if "jointly close" not in defect
+        ]
+
+    monkeypatch.setattr(vle, "_derivation_recompute_defects", omit_joint_closure)
+    with pytest.raises(AssertionError, match="joint"):
+        test_derivation_rejects_independent_component_bands_that_open_total()
+
+
+def test_derivation_observation_identity_mutation_turns_cross_row_red(monkeypatch):
+    original = vle._fidelity_sample_observation_key
+
+    def collapse_observation_identity(doc, sample):
+        key = original(doc, sample)
+        return (key[0], "fe_alpha_1") if key is not None else None
+
+    monkeypatch.setattr(vle, "_fidelity_sample_observation_key", collapse_observation_identity)
+    with pytest.raises(AssertionError, match="different observation"):
+        test_derivation_rejects_temperature_parent_from_another_observation()
+
+
+def test_derivation_destination_field_mutation_turns_wrong_field_red(monkeypatch):
+    monkeypatch.setattr(
+        vle,
+        "_derivation_parent_supports_leaf",
+        lambda address, stored, parent, value: vle._within_tighter_half_ulp(
+            stored, value
+        ),
+    )
+    with pytest.raises(AssertionError, match="is not an attested parent"):
+        test_derivation_rejects_equal_parent_from_wrong_destination_field()
 
 
 def test_independence_mutation_turns_same_extractor_rejection_red(monkeypatch):

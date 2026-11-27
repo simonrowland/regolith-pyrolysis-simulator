@@ -4343,7 +4343,7 @@ def _derivation_recompute_defects(
     mole_fraction: Decimal | None = None
     mole_step: Decimal | None = None
     fixed: list[tuple[str, Decimal]] = []
-    parent_values: list[Any] = []
+    parent_values: list[tuple[Mapping[str, Any], Any]] = []
     for parent in parents:
         if not isinstance(parent, Mapping):
             return ["derivation recompute failed: parent is not a mapping"]
@@ -4355,7 +4355,7 @@ def _derivation_recompute_defects(
             resolved = resolve_field_path(doc, path)
         except KeyError:
             return [f"derivation parent path does not resolve: {path}"]
-        parent_values.append(resolved)
+        parent_values.append((parent, resolved))
         if role == "copied":
             continue
         spelling = _decimal_spelling(resolved)
@@ -4375,8 +4375,10 @@ def _derivation_recompute_defects(
             mole_fraction = number
             mole_step = _stored_half_ulp(spelling)
         elif role == "mass_percent":
-            if number < 0:
-                return ["derivation recompute failed: mass_percent parent is negative"]
+            if number < 0 or number > 100:
+                return [
+                    "derivation recompute failed: mass_percent parent is outside 0..100"
+                ]
             fixed.append((component, number))
         else:
             return ["derivation recompute failed: parent role is not a closure role"]
@@ -4386,6 +4388,8 @@ def _derivation_recompute_defects(
         or mole_step is None
     ):
         return ["derivation recompute failed: mole parent is missing"]
+    if mole_fraction < 0 or mole_fraction > 1:
+        return ["derivation recompute failed: mole parent is outside 0..1"]
 
     fixed_pairs = tuple(fixed)
     center = _by_difference_masses(
@@ -4424,7 +4428,11 @@ def _derivation_recompute_defects(
         band[component] = max(deltas)
 
     defects: list[str] = []
-    state = _composition_state(sample.get("value"))
+    try:
+        destination = resolve_fidelity_sample(doc, sample)
+    except KeyError:
+        return ["recomputed value differs from stored: derivation destination is missing"]
+    state = _composition_state(destination)
     if state is None:
         return ["recomputed value differs from stored: composition state is missing"]
     tag = _state_tag(state)
@@ -4438,7 +4446,7 @@ def _derivation_recompute_defects(
                 "is not an unknown state without numeric components"
             )
         _certify_derivation_leaves(
-            sample.get("value"),
+            destination,
             parent_values,
             center,
             defects,
@@ -4454,6 +4462,10 @@ def _derivation_recompute_defects(
         )
         return defects
     components = state_value.get("components") if isinstance(state_value, Mapping) else None
+    if state_value.get("amount_basis") != "mass_percent":
+        defects.append(
+            "recomputed value differs from stored: derived amount_basis must be mass_percent"
+        )
     if not isinstance(components, list):
         return [
             "recomputed value differs from stored: composition components are missing"
@@ -4484,6 +4496,11 @@ def _derivation_recompute_defects(
             continue
         stored_amounts[name] = (spelling, index)
     for name, recomputed in center.items():
+        if recomputed < 0 or recomputed > 100:
+            defects.append(
+                "recomputed value differs from stored: physical component "
+                f"{name} is outside 0..100"
+            )
         stored = stored_amounts.get(name)
         if stored is None:
             defects.append(
@@ -4502,14 +4519,32 @@ def _derivation_recompute_defects(
                 f"components[{index}][1]: stored {spelling} "
                 f"recomputed {recomputed}"
             )
+        if Decimal(spelling) < 0 or Decimal(spelling) > 100:
+            defects.append(
+                "recomputed value differs from stored: physical component "
+                f"{name} at components[{index}][1] is outside 0..100"
+            )
     for name in stored_amounts:
         if name not in center:
             defects.append(
                 "recomputed value differs from stored: "
                 f"component {name} is not produced by the closure"
             )
+    stored_total = sum(
+        (Decimal(spelling) for spelling, _index in stored_amounts.values()),
+        Decimal(0),
+    )
+    rounding_total = sum(
+        (_stored_half_ulp(spelling) for spelling, _index in stored_amounts.values()),
+        Decimal(0),
+    )
+    if abs(stored_total - Decimal(100)) > rounding_total:
+        defects.append(
+            "recomputed value differs from stored: stored component amounts do not "
+            "jointly close to 100 within stored rounding"
+        )
     _certify_derivation_leaves(
-        sample.get("value"),
+        destination,
         parent_values,
         center,
         defects,
@@ -4520,7 +4555,7 @@ def _derivation_recompute_defects(
 
 def _certify_derivation_leaves(
     sample_value: Any,
-    parent_values: Sequence[Any],
+    parent_values: Sequence[tuple[Mapping[str, Any], Any]],
     masses: Mapping[str, Decimal],
     defects: list[str],
     *,
@@ -4551,12 +4586,54 @@ def _certify_derivation_leaves(
                 f"{address}: {stored!r}"
             )
             continue
-        if any(_within_tighter_half_ulp(stored, parent) for parent in parent_values):
+        if any(
+            _derivation_parent_supports_leaf(address, stored, parent, value)
+            for parent, value in parent_values
+        ):
             continue
         defects.append(
             "recomputed value differs from stored at "
             f"{address}: {stored!r} is not an attested parent"
         )
+
+
+def _derivation_parent_supports_leaf(
+    address: tuple[Any, ...],
+    stored: Any,
+    parent: Mapping[str, Any],
+    value: Any,
+) -> bool:
+    """Bind a copied source to its destination field and component basis."""
+    role = parent.get("role")
+    path = parent.get("path")
+    if not isinstance(path, str):
+        return False
+    source_field = path.rsplit(".", 1)[-1]
+    if role == "copied":
+        return (
+            bool(address)
+            and source_field == address[0]
+            and _within_tighter_half_ulp(stored, value)
+        )
+    if (
+        len(address) >= 3
+        and address[0] == "composition"
+        and address[1] == "printed_coordinates"
+    ):
+        component = parent.get("component")
+        if not isinstance(component, str):
+            return False
+        if role in _DERIVATION_MOLE_ROLES:
+            expected_field = f"N_{component}_mole_fraction"
+        elif role == "mass_percent":
+            expected_field = f"{component}_mass_percent_as_series"
+        else:
+            return False
+        return (
+            address[2] == expected_field
+            and _within_tighter_half_ulp(stored, value)
+        )
+    return False
 
 
 def _derivation_shape_defects(
@@ -4568,6 +4645,8 @@ def _derivation_shape_defects(
     verification = sample.get("verification")
     if not isinstance(verification, Mapping):
         return ["derivation verification is required"]
+    if "rel_tol" in sample:
+        defects.append("derivation samples may not supply rel_tol")
     declared = verification.get("closure")
     values = observation.get("values") if isinstance(observation, Mapping) else None
     closure = (
@@ -4784,6 +4863,16 @@ def _derivation_pass_defects(
                         continue
                     path = parent.get("path")
                     if not isinstance(path, str) or not path.strip():
+                        continue
+                    child_key = _fidelity_sample_observation_key(doc, sample)
+                    parent_key = _fidelity_sample_observation_key(
+                        doc, {"path": path}
+                    )
+                    if child_key is None or parent_key != child_key:
+                        defects.append(
+                            "derivation parent is from a different observation: "
+                            f"{path}"
+                        )
                         continue
                     status, hits = _derivation_parent_status(
                         doc, path, base_covers, derivation_covers
