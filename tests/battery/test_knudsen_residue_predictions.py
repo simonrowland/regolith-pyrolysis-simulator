@@ -126,17 +126,17 @@ def test_knudsen_extent_limits_rhs_evaluations(monkeypatch):
     assert exc.value.reason == "residue_integration_budget_exceeded"
 
 
-def test_knudsen_pressure_state_key_preserves_full_precision_inputs():
-    from simulator.battery.residue import _knudsen_pressure_state_key
+def test_residue_pressure_state_key_preserves_full_precision_inputs():
+    from simulator.battery.residue import _residue_pressure_state_key
 
-    base = _knudsen_pressure_state_key({"MgO": 0.5}, -4.0, 2173.15)
-    assert _knudsen_pressure_state_key(
+    base = _residue_pressure_state_key({"MgO": 0.5}, -4.0, 2173.15)
+    assert _residue_pressure_state_key(
         {"MgO": math.nextafter(0.5, 1.0)}, -4.0, 2173.15
     ) != base
-    assert _knudsen_pressure_state_key(
+    assert _residue_pressure_state_key(
         {"MgO": 0.5}, math.nextafter(-4.0, -3.0), 2173.15
     ) != base
-    assert _knudsen_pressure_state_key(
+    assert _residue_pressure_state_key(
         {"MgO": 0.5}, -4.0, math.nextafter(2173.15, 2174.0)
     ) != base
 

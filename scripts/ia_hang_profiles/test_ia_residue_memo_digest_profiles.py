@@ -1,6 +1,6 @@
 import pytest
 
-from tests.battery._ia_rhs_profile_support import profile_ia_residue_source
+from _ia_rhs_profile_support import profile_ia_residue_source
 
 
 @pytest.mark.parametrize(
@@ -22,11 +22,12 @@ from tests.battery._ia_rhs_profile_support import profile_ia_residue_source
 )
 @pytest.mark.parametrize("memoize", (True, False), ids=("memo", "no-memo"))
 def test_ia_prior_study_digest_is_unchanged(
-    label, source_id, expected_count, expected_digest, memoize, monkeypatch,
+    label, source_id, expected_count, expected_digest, memoize, monkeypatch, capsys,
 ):
-    report = profile_ia_residue_source(
-        label, source_id, monkeypatch, memoize=memoize,
-    )
+    with capsys.disabled():
+        report = profile_ia_residue_source(
+            label, source_id, monkeypatch, memoize=memoize,
+        )
     assert report["row_count"] == expected_count
     assert report["numeric_rows"] + report["typed_refusal_rows"] == expected_count
     assert report["residual_digest"] == expected_digest

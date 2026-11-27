@@ -9,9 +9,9 @@ import io
 import json
 import os
 import pstats
+import signal
 import tempfile
 import time
-import warnings
 from pathlib import Path
 
 
@@ -23,6 +23,9 @@ def profile_ia_residue_source(
     observation_ids=None,
     cprofile_target=False,
     memoize=True,
+    rhs_cap=None,
+    single_hashimoto_experiment=False,
+    flush_every_n_rhs=5,
 ):
     import scipy.integrate
 
@@ -66,6 +69,7 @@ def profile_ia_residue_source(
 
     active_row = ContextVar(f"ia_profile_row_{label}", default=None)
     active_rhs = ContextVar(f"ia_profile_rhs_{label}", default=None)
+    active_rhs_started = ContextVar(f"ia_profile_rhs_started_{label}", default=None)
     active_record = ContextVar(f"ia_profile_record_{label}", default=None)
     integration_records = []
 
@@ -82,18 +86,33 @@ def profile_ia_residue_source(
         score, "_extent_residue_prediction",
         scope_row(score._extent_residue_prediction),
     )
+    original_hashimoto_prediction = score._hashimoto_residue_prediction
+
+    def scoped_hashimoto_prediction(context, reference, engine, *args, **kwargs):
+        token = active_row.set(reference.observation_id)
+        try:
+            if single_hashimoto_experiment:
+                kwargs["test_experiment_ids"] = frozenset(
+                    (reference.experiment_id,)
+                )
+            return original_hashimoto_prediction(
+                context, reference, engine, *args, **kwargs
+            )
+        finally:
+            active_row.reset(token)
+
     monkeypatch.setattr(
-        score, "_hashimoto_residue_prediction",
-        scope_row(score._hashimoto_residue_prediction),
+        score, "_hashimoto_residue_prediction", scoped_hashimoto_prediction
     )
 
     original_integrate = residue.integrate_knudsen_residue_inventory
+    original_finite_integrate = residue.integrate_residue_inventory
     if not memoize:
-        original_key = residue._knudsen_pressure_state_key
+        original_key = residue._residue_pressure_state_key
         unique_state = count()
         monkeypatch.setattr(
             residue,
-            "_knudsen_pressure_state_key",
+            "_residue_pressure_state_key",
             lambda inventory, logp, temperature: (
                 original_key(inventory, logp, temperature), next(unique_state)
             ),
@@ -201,15 +220,91 @@ def profile_ia_residue_source(
             "ia_vapor_pressure_cpu_seconds_inclusive": 0.0,
             "openimcc_calls": 0,
             "openimcc_gas_calls": 0,
+            "rhs_cap": rhs_cap,
+            "profile_cap_reached": False,
             "openimcc_cpu_seconds": 0.0,
             "per_rhs": {},
         }
         profiler = (
-            cProfile.Profile(timer=time.process_time, timeunit=1.0)
+            cProfile.Profile(timer=time.process_time_ns, timeunit=1e-9)
             if cprofile_target
             else None
         )
         record_token = active_record.set(record)
+        profile_stem = (
+            f"ia_rhs_{label.lower().replace(' ', '_')}_{os.getpid()}_"
+            f"{len(integration_records)}"
+        )
+        rhs_metrics_path = Path(tempfile.gettempdir()) / f"{profile_stem}_metrics.json"
+        profile_path = Path(tempfile.gettempdir()) / f"{profile_stem}_cprofile.txt"
+
+        def persist_snapshot(*, resume_profiler=False):
+            if profiler is not None:
+                profiler.disable()
+            if isinstance(record["per_rhs"], dict):
+                rhs_rows = [
+                    {"rhs_index": int(index), **metrics}
+                    for index, metrics in sorted(
+                        record["per_rhs"].items(), key=lambda item: int(item[0])
+                    )
+                ]
+            else:
+                rhs_rows = [dict(row) for row in record["per_rhs"]]
+            active_index = active_rhs.get()
+            active_started = active_rhs_started.get()
+            if active_index is not None and active_started is not None:
+                for row in rhs_rows:
+                    if row["rhs_index"] == active_index:
+                        row["rhs_cpu_seconds_in_progress"] = max(
+                            0.0, time.process_time() - active_started
+                        )
+                        break
+            for row in rhs_rows:
+                ia = row.get("ia_cpu_seconds_inclusive", 0.0)
+                openimcc_cpu = row.get("openimcc_cpu_seconds", 0.0)
+                row["ia_vapor_pressure_cpu_seconds_exclusive"] = max(
+                    0.0, ia - openimcc_cpu
+                )
+                row["everything_else_cpu_seconds"] = max(
+                    0.0, row.get("rhs_cpu_seconds", 0.0) - ia
+                )
+            try:
+                with rhs_metrics_path.open("w", encoding="utf-8") as stream:
+                    json.dump(rhs_rows, stream, indent=2)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                if profiler is not None:
+                    stream = io.StringIO()
+                    pstats.Stats(profiler, stream=stream).strip_dirs().sort_stats(
+                        "cumulative"
+                    ).print_stats(20)
+                    with profile_path.open("w", encoding="utf-8") as output:
+                        output.write(stream.getvalue())
+                        output.flush()
+                        os.fsync(output.fileno())
+            except OSError:
+                # The in-memory warning remains useful if the scratch volume
+                # itself refuses a periodic write.
+                pass
+            if resume_profiler and profiler is not None:
+                profiler.enable()
+
+        old_alarm_handler = None
+        alarm_handler_installed = False
+        if cprofile_target and hasattr(signal, "SIGALRM"):
+            try:
+                old_alarm_handler = signal.getsignal(signal.SIGALRM)
+
+                def on_alarm(signum, frame):
+                    persist_snapshot()
+                    if callable(old_alarm_handler):
+                        old_alarm_handler(signum, frame)
+                    raise TimeoutError("profile snapshot written on SIGALRM")
+
+                signal.signal(signal.SIGALRM, on_alarm)
+                alarm_handler_installed = True
+            except (ValueError, OSError):
+                alarm_handler_installed = False
 
         def add_rhs_metric(name, elapsed):
             if not cprofile_target:
@@ -249,16 +344,32 @@ def profile_ia_residue_source(
 
             def counted_rhs(*rhs_args, **rhs_kwargs):
                 rhs_index = record["rhs_calls"]
+                if rhs_cap is not None and rhs_index >= rhs_cap:
+                    record["profile_cap_reached"] = True
+                    from simulator.battery.residue import ResidueInventoryRefusal
+
+                    raise ResidueInventoryRefusal(
+                        "ia_rhs_profile_cap_reached",
+                        f"profile stopped before RHS {rhs_index + 1}; cap={rhs_cap}",
+                    )
                 record["rhs_calls"] += 1
                 token = active_rhs.set(rhs_index)
                 started = time.process_time()
+                started_token = active_rhs_started.set(started)
                 try:
                     return function(*rhs_args, **rhs_kwargs)
                 finally:
                     elapsed = time.process_time() - started
                     record["rhs_cpu_seconds"] += elapsed
                     add_rhs_metric("rhs_cpu_seconds", elapsed)
+                    active_rhs_started.reset(started_token)
                     active_rhs.reset(token)
+                    if (
+                        cprofile_target
+                        and flush_every_n_rhs > 0
+                        and record["rhs_calls"] % flush_every_n_rhs == 0
+                    ):
+                        persist_snapshot(resume_profiler=True)
 
             solution = original_solve(
                 counted_rhs, t_span, y0, *args, **solve_kwargs
@@ -293,6 +404,8 @@ def profile_ia_residue_source(
         finally:
             if profiler is not None:
                 profiler.disable()
+            if alarm_handler_installed:
+                signal.signal(signal.SIGALRM, old_alarm_handler)
             scipy.integrate.solve_ivp = original_solve
             oxygen_balance.brentq = original_brentq
             record["process_cpu_seconds"] = time.process_time() - started
@@ -321,8 +434,7 @@ def profile_ia_residue_source(
                     0.0, ia - openimcc_cpu
                 )
                 rhs["everything_else_cpu_seconds"] = max(
-                    0.0,
-                    rhs["rhs_cpu_seconds"] - ia,
+                    0.0, rhs["rhs_cpu_seconds"] - ia
                 )
             if cprofile_target:
                 per_rhs = record["per_rhs"]
@@ -368,26 +480,14 @@ def profile_ia_residue_source(
                         row["everything_else_cpu_seconds"] for row in per_rhs
                     ) / rhs_count,
                 }
-            record["raw_rhs_metrics_path"] = None
+            record["raw_rhs_metrics_path"] = str(rhs_metrics_path)
             if cprofile_target:
-                rhs_metrics_path = Path(tempfile.gettempdir()) / (
-                    f"ia_rhs_{label.lower().replace(' ', '_')}_"
-                    f"{len(integration_records)}_metrics.json"
-                )
-                rhs_metrics_path.write_text(json.dumps(record["per_rhs"], indent=2))
-                record["raw_rhs_metrics_path"] = str(rhs_metrics_path)
-                del record["per_rhs"]
-            if profiler is not None:
+                persist_snapshot()
                 stream = io.StringIO()
                 pstats.Stats(profiler, stream=stream).strip_dirs().sort_stats(
                     "cumulative"
                 ).print_stats(20)
                 profile_text = stream.getvalue()
-                profile_path = Path(tempfile.gettempdir()) / (
-                    f"ia_rhs_{label.lower().replace(' ', '_')}_"
-                    f"{len(integration_records)}_cprofile.txt"
-                )
-                profile_path.write_text(profile_text)
                 record["cprofile_path"] = str(profile_path)
                 record["cprofile_top20"] = profile_text
             integration_records.append(record)
@@ -396,6 +496,216 @@ def profile_ia_residue_source(
     monkeypatch.setattr(
         residue, "integrate_knudsen_residue_inventory", profiled_integrate
     )
+    if single_hashimoto_experiment:
+        finite_integration_count = 0
+
+        def profiled_finite_integrate(initial, channels, pressure_model, **kwargs):
+            nonlocal finite_integration_count
+            if finite_integration_count >= 1:
+                integration_records[-1]["profile_cap_reached"] = True
+                integration_records[-1]["profile_cap_reason"] = (
+                    "stopped after one Hashimoto finite-step inventory integration"
+                )
+                from simulator.battery.residue import ResidueInventoryRefusal
+
+                raise ResidueInventoryRefusal(
+                    "ia_rhs_profile_cap_reached",
+                    "bounded profile stops before Hashimoto integration call 2",
+                )
+            finite_integration_count += 1
+            wall_started = time.perf_counter()
+            process_started = time.process_time()
+            try:
+                loadavg_started = os.getloadavg()
+            except (AttributeError, OSError):
+                loadavg_started = None
+            record = {
+                "observation_id": active_row.get(),
+                "method": "Hashimoto finite-step inventory update",
+                "nfev": None,
+                "njev": None,
+                "rhs_calls": 0,
+                "pressure_model_calls": 0,
+                "root_calls": 0,
+                "root_evaluations": 0,
+                "ia_vapor_pressure_calls": 0,
+                "ia_vapor_pressure_cpu_seconds_inclusive": 0.0,
+                "openimcc_calls": 0,
+                "openimcc_gas_calls": 0,
+                "openimcc_cpu_seconds": 0.0,
+                "rhs_cap": rhs_cap,
+                "profile_cap_reached": False,
+                "per_rhs": {},
+            }
+            profiler = cProfile.Profile(timer=time.process_time_ns, timeunit=1e-9)
+            record_token = active_record.set(record)
+            rhs_token = active_rhs.set(0)
+            started_token = active_rhs_started.set(process_started)
+            profile_stem = (
+                f"ia_rhs_{label.lower().replace(' ', '_')}_{os.getpid()}_"
+                f"{len(integration_records)}"
+            )
+            rhs_metrics_path = (
+                Path(tempfile.gettempdir()) / f"{profile_stem}_metrics.json"
+            )
+            profile_path = (
+                Path(tempfile.gettempdir()) / f"{profile_stem}_cprofile.txt"
+            )
+            metrics = record["per_rhs"].setdefault(
+                "0",
+                {"root_calls": 0, "root_evaluations": 0,
+                 "pressure_model_calls": 0, "rhs_cpu_seconds": 0.0,
+                 "ia_vapor_pressure_calls": 0, "openimcc_calls": 0,
+                 "ia_cpu_seconds_inclusive": 0.0, "openimcc_cpu_seconds": 0.0,
+                 "openimcc_gas_calls": 0},
+            )
+
+            def persist_finite_snapshot(*, resume_profiler=False):
+                profiler.disable()
+                row = {"rhs_index": 0, **metrics}
+                row["ia_vapor_pressure_cpu_seconds_exclusive"] = max(
+                    0.0,
+                    row["ia_cpu_seconds_inclusive"] - row["openimcc_cpu_seconds"],
+                )
+                row["everything_else_cpu_seconds"] = max(
+                    0.0, row["rhs_cpu_seconds"] - row["ia_cpu_seconds_inclusive"]
+                )
+                try:
+                    with rhs_metrics_path.open("w", encoding="utf-8") as stream:
+                        json.dump([row], stream, indent=2)
+                        stream.flush()
+                        os.fsync(stream.fileno())
+                    stream = io.StringIO()
+                    pstats.Stats(profiler, stream=stream).strip_dirs().sort_stats(
+                        "cumulative"
+                    ).print_stats(20)
+                    with profile_path.open("w", encoding="utf-8") as output:
+                        output.write(stream.getvalue())
+                        output.flush()
+                        os.fsync(output.fileno())
+                except OSError:
+                    pass
+                if resume_profiler:
+                    profiler.enable()
+
+            old_alarm_handler = signal.getsignal(signal.SIGALRM)
+
+            def on_alarm(signum, frame):
+                persist_finite_snapshot()
+                if callable(old_alarm_handler):
+                    old_alarm_handler(signum, frame)
+                raise TimeoutError("Hashimoto profile snapshot written on SIGALRM")
+
+            alarm_handler_installed = False
+            try:
+                signal.signal(signal.SIGALRM, on_alarm)
+                alarm_handler_installed = True
+            except (ValueError, OSError):
+                pass
+
+            def finite_pressure_probe(inventory, logp):
+                if rhs_cap is not None and record["pressure_model_calls"] >= rhs_cap:
+                    record["profile_cap_reached"] = True
+                    from simulator.battery.residue import ResidueInventoryRefusal
+
+                    raise ResidueInventoryRefusal(
+                        "ia_rhs_profile_cap_reached",
+                        f"profile stopped before pressure evaluation {rhs_cap + 1}",
+                    )
+                record["pressure_model_calls"] += 1
+                metrics["pressure_model_calls"] += 1
+                started = time.process_time()
+                try:
+                    return pressure_model(inventory, logp)
+                finally:
+                    elapsed = time.process_time() - started
+                    record["pressure_model_cpu_seconds"] = (
+                        record.get("pressure_model_cpu_seconds", 0.0) + elapsed
+                    )
+                    if record["pressure_model_calls"] % max(flush_every_n_rhs, 1) == 0:
+                        metrics["rhs_cpu_seconds"] = (
+                            time.process_time() - process_started
+                        )
+                        persist_finite_snapshot(resume_profiler=True)
+
+            def finite_root_probe(function, *args, **root_kwargs):
+                record["root_calls"] += 1
+                metrics["root_calls"] += 1
+
+                def counted_root(value):
+                    record["root_evaluations"] += 1
+                    metrics["root_evaluations"] += 1
+                    return function(value)
+
+                return original_brentq(counted_root, *args, **root_kwargs)
+
+            oxygen_balance.brentq = finite_root_probe
+            profiler.enable()
+            try:
+                result = original_finite_integrate(
+                    initial, channels, finite_pressure_probe, **kwargs
+                )
+                return result
+            except Exception as exc:
+                record["refusal_reason"] = getattr(exc, "reason", None)
+                raise
+            finally:
+                profiler.disable()
+                oxygen_balance.brentq = original_brentq
+                if alarm_handler_installed:
+                    signal.signal(signal.SIGALRM, old_alarm_handler)
+                record["process_cpu_seconds"] = time.process_time() - process_started
+                record["wall_seconds"] = time.perf_counter() - wall_started
+                record["wall_to_process_cpu_ratio"] = (
+                    record["wall_seconds"] / record["process_cpu_seconds"]
+                    if record["process_cpu_seconds"] > 0.0
+                    else None
+                )
+                try:
+                    record["loadavg_1_5_15_start"] = loadavg_started
+                    record["loadavg_1_5_15_end"] = os.getloadavg()
+                except (AttributeError, OSError):
+                    record["loadavg_1_5_15_start"] = None
+                    record["loadavg_1_5_15_end"] = None
+                metrics["rhs_cpu_seconds"] = record["process_cpu_seconds"]
+                record["per_rhs"] = [{"rhs_index": 0, **metrics}]
+                record["per_rhs_summary"] = {
+                    "rhs_count": 1,
+                    "root_calls_total": record["root_calls"],
+                    "root_evaluations_total": record["root_evaluations"],
+                    "pressure_model_calls_total": record["pressure_model_calls"],
+                    "mean_root_calls_per_rhs": record["root_calls"],
+                    "mean_root_evaluations_per_rhs": record["root_evaluations"],
+                    "mean_pressure_model_calls_per_rhs": record["pressure_model_calls"],
+                    "mean_rhs_cpu_seconds": record["process_cpu_seconds"],
+                    "mean_ia_vapor_pressure_cpu_seconds_exclusive": max(
+                        0.0,
+                        metrics["ia_cpu_seconds_inclusive"]
+                        - metrics["openimcc_cpu_seconds"],
+                    ),
+                    "mean_openimcc_cpu_seconds": metrics["openimcc_cpu_seconds"],
+                    "mean_everything_else_cpu_seconds": max(
+                        0.0,
+                        record["process_cpu_seconds"]
+                        - metrics["ia_cpu_seconds_inclusive"],
+                    ),
+                }
+                record["raw_rhs_metrics_path"] = str(rhs_metrics_path)
+                persist_finite_snapshot()
+                stream = io.StringIO()
+                pstats.Stats(profiler, stream=stream).strip_dirs().sort_stats(
+                    "cumulative"
+                ).print_stats(20)
+                record["cprofile_path"] = str(profile_path)
+                record["cprofile_top20"] = stream.getvalue()
+                integration_records.append(record)
+                active_rhs_started.reset(started_token)
+                active_rhs.reset(rhs_token)
+                active_record.reset(record_token)
+
+        monkeypatch.setattr(
+            residue, "integrate_residue_inventory", profiled_finite_integrate
+        )
     score_started = time.process_time()
     score_wall_started = time.perf_counter()
     try:
@@ -493,10 +803,13 @@ def profile_ia_residue_source(
             "counts uncached endpoint, warm-bracket, and final diagnostic calls"
         ),
         "integrations": integration_records if cprofile_target else [],
+        "profile_cap_reached": any(
+            record.get("profile_cap_reached") for record in integration_records
+        ),
     }
-    warnings.warn(
-        "IA_RHS_PROFILE " + json.dumps(report, sort_keys=True, separators=(",", ":")),
-        UserWarning,
-        stacklevel=2,
+    print(
+        "IA_RHS_PROFILE "
+        + json.dumps(report, sort_keys=True, separators=(",", ":")),
+        flush=True,
     )
     return report

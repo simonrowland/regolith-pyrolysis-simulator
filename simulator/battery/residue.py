@@ -132,10 +132,10 @@ class ResidueEngineNonconvergence(RuntimeError):
         }
 
 
-def _knudsen_pressure_state_key(
+def _residue_pressure_state_key(
     inventory: Mapping[str, float], logp: float, temperature: float
 ) -> tuple[tuple[tuple[str, str], ...], str, str]:
-    """Identify the exact dynamic inputs to one Knudsen pressure evaluation."""
+    """Identify the exact dynamic inputs to one residue pressure evaluation."""
 
     composition = tuple(
         sorted(
@@ -1114,6 +1114,9 @@ def integrate_residue_inventory(
     bracket_boundary_steps: list[OxygenBalanceBracketBoundary | None] = []
     buffer_oxygen_exchange_mol = 0.0
     pressure_law_diagnostics: dict[str, PressureLawChannelDiagnostic] = {}
+    pressure_state_cache: dict[
+        tuple[tuple[tuple[str, str], ...], str, str], Mapping[str, float]
+    ] = {}
 
     # Supplied channels define the supported pressure bundle. Root metadata
     # uses formula atom counts, matching R1a's (nO_gas - nO_parent) balance.
@@ -1136,7 +1139,16 @@ def integrate_residue_inventory(
                 for species, amount in inventory.items()
                 if amount > 0.0
             }
-            pressures = pressure_model(engine_inventory, float(log10_pO2_bar))
+            key = _residue_pressure_state_key(
+                engine_inventory, float(log10_pO2_bar), temperature
+            )
+            try:
+                pressures = pressure_state_cache[key]
+            except KeyError:
+                pressures = pressure_model(
+                    engine_inventory, float(log10_pO2_bar)
+                )
+                pressure_state_cache[key] = pressures
             _inherit_residue_pressure_contract(pressure_at, pressure_model)
             return pressures
 
@@ -1462,7 +1474,7 @@ def integrate_knudsen_residue_inventory(
                 current_temperature = previous_temperature + fraction * (temperature - previous_temperature)
 
             def pressure_at(p):
-                key = _knudsen_pressure_state_key(current, p, current_temperature)
+                key = _residue_pressure_state_key(current, p, current_temperature)
                 try:
                     pressures = pressure_state_cache[key]
                 except KeyError:
