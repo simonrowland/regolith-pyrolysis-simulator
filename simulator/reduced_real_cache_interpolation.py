@@ -12,6 +12,7 @@ from simulator.reduced_real_determinism import (
     _composition_items,
     _physics_bucket_consumes_log_fO2,
     _physics_bucket_consumes_pO2_bar,
+    _replay_key_composition_shape,
     _replay_scope_hash,
     canonical_physics_bucket_key_from_replay_key,
     physics_control_rung_error_budget,
@@ -64,33 +65,9 @@ def interpolation_key_domain_violation(
 ) -> str | None:
     """Validate a stored key's own coordinates before it can be a neighbor."""
 
-    composition_present = "composition_mol_fraction" in key
-    composition = key.get("composition_mol_fraction")
-    if composition_present and not isinstance(composition, (list, tuple)):
-        return "composition_mol_fraction"
-    for component in composition or ():
-        if isinstance(component, Mapping):
-            species = component.get("species")
-            fraction = component.get("mol_fraction")
-        elif isinstance(component, (list, tuple)) and len(component) == 2:
-            species = component[0]
-            fraction = component[1]
-        else:
-            return "composition_mol_fraction"
-        if not isinstance(species, str) or not species:
-            return "composition_mol_fraction"
-        if not is_declared_real_scalar(fraction):
-            return "composition_mol_fraction"
-        try:
-            numeric_fraction = float(fraction)
-        except (OverflowError, TypeError, ValueError):
-            return "composition_mol_fraction"
-        if (
-            not math.isfinite(numeric_fraction)
-            or numeric_fraction < 0.0
-            or numeric_fraction > 1.0
-        ):
-            return "composition_mol_fraction"
+    _composition, composition_error = _replay_key_composition_shape(key)
+    if composition_error is not None:
+        return composition_error
 
     controls_present = "controls" in key
     controls = key.get("controls")
@@ -198,7 +175,7 @@ def greedy_nearest_neighbors(
             (
                 composition_distance,
                 total_distance,
-                float(candidate_key.get("controls", {}).get("T_K", 0.0) or 0.0),
+                float(candidate_controls["T_K"]),
                 str(candidate.get("key_hash", "")),
                 candidate,
             )

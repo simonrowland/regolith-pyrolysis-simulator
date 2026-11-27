@@ -3276,20 +3276,6 @@ def test_pt2_control_ladder_hit_records_error_budget(tmp_path: Path) -> None:
 
 
 def test_pt2_control_ladder_refuses_po2_knee_crossing(tmp_path: Path) -> None:
-    same_key = _c3a_ladder_key(
-        "same-knee-key",
-        feo_fraction=0.123456,
-        temperature_K=1234.5678,
-    )
-    same_key["controls"]["pO2_bar"] = rrd.CONTROL_RUNG_SIO_PO2_KNEE_BAR
-    same_pO2_budget = rrd.physics_control_rung_error_budget(
-        same_key,
-        same_key,
-        "h30c",
-    )
-    assert same_pO2_budget["accepted"] is True
-    assert same_pO2_budget["relative_error"] == 0.0
-
     query_key = _c3a_ladder_key(
         "query-knee",
         feo_fraction=0.123456,
@@ -4902,9 +4888,9 @@ def test_ladder_indexability_special_float_class(
         key["vapor_pressure_provider_selection"] = None
     if field == "composition.FeO":
         components = key["composition_mol_fraction"]
-        for component in components:
+        for index, component in enumerate(components):
             if component[0] == "FeO":
-                component[1] = value
+                components[index] = (component[0], value)
                 break
         else:
             pytest.fail("the gate key has no FeO composition coordinate")
@@ -4913,7 +4899,32 @@ def test_ladder_indexability_special_float_class(
         if field == "pO2_bar":
             key["vapor_pressure_provider_selection"] = "builtin-vapor-pressure"
 
-    payload = _valid_test_gate_payload()
+    curve = {
+        "source": "gate_liquid_fraction",
+        "solidus_T_C": 1200.0,
+        "liquidus_T_C": 1300.0,
+        "path": ((1200.0, 0.0), (1300.0, 1.0)),
+        "is_liquidus_floor": False,
+    }
+    magemin_identity = rrd._magemin_identity_from_replay_key(key)
+    if (
+        magemin_identity is not None
+        and magemin_identity.silica_verdict == "extrapolated"
+    ):
+        assert magemin_identity.certified_band is not None
+        curve.update(
+            authority="extrapolated",
+            certified_band={
+                "sio2_wt_pct": list(magemin_identity.certified_band)
+            },
+        )
+    payload = {"curve": rrd._curve_payload(curve)}
+    assert rrd._admission_rejection(
+        artifact,
+        payload,
+        payload_codec_version=rrd.PT0_GATE_CURVE_CODEC_VERSION,
+        keys=(key,),
+    ) is None
     memory_capture = PT0DeterminismStore("capture")
     db_path = tmp_path / "special-float-ladder.sqlite"
     persistent_capture = PT0DeterminismStore("capture", db_path=db_path)
@@ -7724,13 +7735,17 @@ def test_current_equilibrium_capture_hits_after_admission(
         float(component[1]) > 1.0
         for component in key["composition_mol_fraction"]
     )
-    current_payload = capture._entries[_key_hash(key)]["payload"]
-
-    replay = (
-        PT0DeterminismStore("replay", db_path=db_path)
-        if persistent
-        else capture
+    assert math.isfinite(
+        rrd.physics_ladder_bucket_distance_from_replay_key(key, "h40")
     )
+    current_payload = capture._lookup("equilibrium_post_record", key, sim=sim)
+    assert current_payload is not None
+    assert capture.hits == 1
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    if not persistent:
+        replay._entries = copy.deepcopy(capture._entries)
+        replay.physics_bucket_entries = dict(capture.physics_bucket_entries)
     assert replay._lookup("equilibrium_post_record", key, sim=sim) == current_payload
     assert replay.hits == 1
 

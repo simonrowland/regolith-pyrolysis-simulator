@@ -16,6 +16,7 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
+    PT1PersistentEquilibriumStore,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
 )
@@ -322,7 +323,7 @@ def test_greedy_nn_accepts_temperature_above_old_domain_cap(
     query["controls"]["T_K"] = 12_000.0
     nearby["controls"]["T_K"] = 12_001.0
     query["controls"].update(pressure_bar=1_000_001.0, log_fO2=301.0)
-    nearby["controls"].update(pressure_bar=1_000_002.0, log_fO2=302.0)
+    nearby["controls"].update(pressure_bar=1_000_001.0, log_fO2=301.0)
     assert any(
         float(component[1]) > 1.0
         for component in query["composition_mol_fraction"]
@@ -348,33 +349,14 @@ def test_greedy_nn_accepts_temperature_above_old_domain_cap(
         canonical_json_bytes(nearby)
     ).hexdigest()
 
-
-def test_large_finite_composition_is_admitted_but_not_a_neighbor(
-    tmp_path: Path,
-) -> None:
-    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
-    candidate_key = copy.deepcopy(query)
-    candidate_key["composition_mol_fraction"] = [
-        ["FeO", 1.0e160],
-        ["SiO2", 0.8],
-    ]
-    db_path = tmp_path / "large-composition-not-neighbor.sqlite"
-    _put_interpolation_row(
-        db_path,
-        candidate_key,
-        liquid_fraction=0.8,
-        sio_pa=8.0,
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    cached_payload = replay._lookup_optional(
+        "equilibrium_post_record",
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
     )
-
-    assert rci.interpolation_key_domain_violation(candidate_key) is None
-    store = rrd.PT1PersistentEquilibriumStore(db_path)
-    candidates = store._list_interpolation_candidates(
-        artifact="equilibrium_post_record",
-        replay_scope_sha256=rci.replay_scope_for_interpolation(query),
-        query_key=query,
-    )
-    assert len(candidates) == 1
-    assert rci.greedy_nearest_neighbors(query, candidates) == []
+    assert cached_payload is not None
+    assert replay.hits == 1
 
 
 def test_subnormal_composition_is_not_a_ladder_neighbor_and_put_is_typed(
@@ -1005,15 +987,21 @@ def test_interpolation_admission_rejects_null_stored_controls(
     tmp_path: Path,
 ) -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
-    malformed_key = copy.deepcopy(query)
-    malformed_key["controls"] = None
     db_path = tmp_path / "null-interpolation-controls.sqlite"
-    # The real PT1 writer gives this malformed key matching hashes and indexes.
     _put_interpolation_row(
         db_path,
-        malformed_key,
+        query,
         liquid_fraction=0.7,
         sio_pa=7.0,
+    )
+    original_hash = hashlib.sha256(canonical_json_bytes(query)).hexdigest()
+    malformed_key = copy.deepcopy(query)
+    malformed_key["controls"] = None
+    # Inject after a valid write so the row reader, rather than put(), sees it.
+    _rewrite_pt1_key_and_derived_indexes(
+        db_path,
+        original_hash,
+        malformed_key,
     )
 
     replay = PT0DeterminismStore("replay", db_path=db_path)
@@ -1024,14 +1012,14 @@ def test_interpolation_admission_rejects_null_stored_controls(
         replay._lookup_interpolated("equilibrium_post_record", query)
 
 
-def test_interpolation_admission_rejects_out_of_range_composition_fraction(
+def test_interpolation_admission_keeps_large_finite_composition_non_neighbor(
     tmp_path: Path,
 ) -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     malformed_key = copy.deepcopy(query)
     malformed_key["composition_mol_fraction"][0][1] = 1.0e160
-    db_path = tmp_path / "out-of-range-interpolation-composition.sqlite"
-    # The PT1 writer stamps matching hashes and indexes for this malformed row.
+    db_path = tmp_path / "large-interpolation-composition.sqlite"
+    # Large finite composition remains shape-valid; arithmetic excludes it.
     _put_interpolation_row(
         db_path,
         malformed_key,
@@ -1055,6 +1043,101 @@ def test_interpolation_admission_rejects_out_of_range_composition_fraction(
 
     replay = PT0DeterminismStore("replay", db_path=db_path)
     assert replay._lookup_interpolated("equilibrium_post_record", query) is None
+
+
+def test_pt1_ladder_unsnappable_stored_temperature_is_not_a_neighbor(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "unsnappable-stored-temperature.sqlite"
+    key = _interpolation_key("stored", feo_fraction=0.20, temperature_K=1500.0)
+    _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
+    stored_key = copy.deepcopy(key)
+    stored_key["controls"]["T_K"] = float.fromhex("0x1.fffffffffffffp+1023")
+    stored_hash = hashlib.sha256(canonical_json_bytes(key)).hexdigest()
+    _rewrite_pt1_key_and_derived_indexes(db_path, stored_hash, stored_key)
+
+    rung_tag = "h40"
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        stored_key,
+        rung_tag,
+    )
+    rung_hash = hashlib.sha256(canonical_json_bytes(rung_key)).hexdigest()
+    assert math.isinf(
+        rrd.physics_ladder_bucket_distance_from_replay_key(stored_key, rung_tag)
+    )
+    indexability = rrd._ladder_indexability(stored_key, rung_tag=rung_tag)
+    assert isinstance(indexability, rrd.UncacheableKey)
+    assert indexability.rung_tag == rung_tag
+    assert PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+        artifact="equilibrium_post_record",
+        rung_tag=rung_tag,
+        rung_key=rung_key,
+        rung_hash=rung_hash,
+        query_key=key,
+    ) is None
+
+
+@pytest.mark.parametrize(
+    ("bad_input", "prepopulate", "expected_error"),
+    (
+        ("physics_bucket_hash", False, rrd.UncacheableKey),
+        ("physics_bucket_hash", True, rrd.UncacheableKey),
+        ("payload_hash", False, rrd.UncacheablePayload),
+        ("payload_collision", True, rrd.UncacheablePayload),
+    ),
+)
+def test_pt1_put_maps_fresh_candidate_integrity_rejections_to_typed_refusals(
+    tmp_path: Path,
+    bad_input: str,
+    prepopulate: bool,
+    expected_error: type[Exception],
+) -> None:
+    db_path = tmp_path / f"fresh-candidate-{bad_input}.sqlite"
+    key = _interpolation_key("fresh", feo_fraction=0.20, temperature_K=1500.0)
+    if prepopulate:
+        _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
+    payload = _interpolation_payload(
+        liquid_fraction=0.8 if bad_input == "payload_collision" else 0.7,
+        sio_pa=8.0 if bad_input == "payload_collision" else 7.0,
+    )
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    kwargs: dict[str, object] = {}
+    payload_hash = hashlib.sha256(payload_bytes).hexdigest()
+    if bad_input == "physics_bucket_hash":
+        kwargs = {
+            "physics_bucket_key": bucket_key,
+            "physics_bucket_bytes": bucket_bytes,
+            "physics_bucket_hash": "0" * 64,
+        }
+    elif bad_input == "payload_hash":
+        payload_hash = "0" * 64
+
+    with pytest.raises(expected_error):
+        PT1PersistentEquilibriumStore(db_path).put(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=hashlib.sha256(key_bytes).hexdigest(),
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=payload_hash,
+            **kwargs,
+        )
+    with sqlite3.connect(db_path) as conn:
+        row_count = conn.execute(
+            f"SELECT COUNT(*) FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+    assert row_count == (1 if prepopulate else 0)
+    if prepopulate:
+        assert PT1PersistentEquilibriumStore(db_path).get(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        ) is not None
 
 
 @pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))

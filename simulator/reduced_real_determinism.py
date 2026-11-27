@@ -3037,6 +3037,11 @@ def _admit_stored_row(
                     "PT-1 row invalid stored equilibrium replay key "
                     f"{section} ({domain_violation}): {row_hash}"
                 )
+        if rung_tag is not None and _ladder_indexability(
+            row_key,
+            rung_tag=rung_tag,
+        ) is not None:
+            nonfinite_requested_rung = True
         all_index_columns = (
             "physics_bucket_schema_version",
             "physics_bucket_sha256",
@@ -3256,16 +3261,36 @@ def _require_write_candidate_admission(
     key: Mapping[str, Any],
     key_bytes: bytes,
     key_hash: str,
+    physics_bucket_key: Mapping[str, Any] | None = None,
+    physics_bucket_bytes: bytes | None = None,
+    physics_bucket_hash: str | None = None,
 ) -> _AdmittedStoredRow:
-    admitted = _admit_stored_row(
-        row,
-        store_kind=store_kind,
-        artifact=artifact,
-        key=key,
-        key_bytes=key_bytes,
-        key_hash=key_hash,
-        validate_interpolation_domain=True,
-    )
+    try:
+        admitted = _admit_stored_row(
+            row,
+            store_kind=store_kind,
+            artifact=artifact,
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+            physics_bucket_key=physics_bucket_key,
+            physics_bucket_bytes=physics_bucket_bytes,
+            physics_bucket_hash=physics_bucket_hash,
+            validate_interpolation_domain=True,
+        )
+    except PT1PersistentStoreCorrupt as exc:
+        if store_kind != "pt1":
+            raise
+        message = str(exc).lower()
+        if any(
+            marker in message
+            for marker in ("key", "bucket", "scope", "ladder", "distance")
+        ):
+            raise UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "write_candidate_index",
+            ) from exc
+        raise UncacheablePayload(artifact, key_hash) from exc
     if admitted is None or admitted.decoded_payload is None:
         raise UncacheablePayload(artifact, key_hash)
     return admitted
@@ -3369,9 +3394,7 @@ class PT1PersistentEquilibriumStore:
                     entry["payload_hash"] != payload_hash
                     or canonical_json_bytes(entry["payload"]) != payload_bytes
                 ):
-                    raise PT1PersistentStoreCorrupt(
-                        f"PT-1 payload collision for {artifact}: {key_hash}"
-                    )
+                    raise UncacheablePayload(artifact, key_hash)
                 existing_notices_json = entry["repair_notices_json"]
                 effective_notices_json = monotonic_repair_notices_json(
                     existing_notices_json,
@@ -3426,6 +3449,9 @@ class PT1PersistentEquilibriumStore:
                         key=key,
                         key_bytes=key_bytes,
                         key_hash=key_hash,
+                        physics_bucket_key=physics_bucket_key,
+                        physics_bucket_bytes=physics_bucket_bytes,
+                        physics_bucket_hash=physics_bucket_hash,
                     )
                     if stale_payload:
                         conn.execute(
@@ -3579,6 +3605,9 @@ class PT1PersistentEquilibriumStore:
                 key=key,
                 key_bytes=key_bytes,
                 key_hash=key_hash,
+                physics_bucket_key=physics_bucket_key,
+                physics_bucket_bytes=physics_bucket_bytes,
+                physics_bucket_hash=physics_bucket_hash,
             )
             columns_sql = ", ".join(insert_columns)
             values_sql = ", ".join("?" for _ in insert_columns)
@@ -5716,17 +5745,22 @@ def physics_ladder_bucket_distance_from_replay_key(
     rung_controls = rung_bucket.get("controls", {})
     if not isinstance(rung_controls, Mapping):
         rung_controls = {}
-    try:
-        temperature_distance = _normalized_sigfig_distance(
-            float(controls.get("T_K", 0.0) or 0.0),
-            float(rung_controls.get("T_K", 0.0) or 0.0),
-            sig_figs,
-        )
-    except (OverflowError, TypeError, ValueError):
-        return math.inf
-    if not math.isfinite(temperature_distance):
-        return math.inf
-    distance += temperature_distance
+    if "T_K" in controls:
+        exact_temperature = controls["T_K"]
+        snapped_temperature = rung_controls.get("T_K")
+        if exact_temperature is None or snapped_temperature is None:
+            return math.inf
+        try:
+            temperature_distance = _normalized_sigfig_distance(
+                float(exact_temperature),
+                float(snapped_temperature),
+                sig_figs,
+            )
+        except (OverflowError, TypeError, ValueError):
+            return math.inf
+        if not math.isfinite(temperature_distance):
+            return math.inf
+        distance += temperature_distance
     if _physics_ladder_coarsens_controls(rung_tag):
         for control_name in ("pressure_bar", "pO2_bar"):
             if control_name not in controls or control_name not in rung_controls:
@@ -5781,11 +5815,6 @@ def physics_control_rung_error_budget(
     source_pO2 = _control_float(source_key, "pO2_bar")
     result["query_pO2_bar"] = query_pO2
     result["source_pO2_bar"] = source_pO2
-    if query_pO2 is not None and query_pO2 == source_pO2 and query_pO2 >= 0.0:
-        # A ladder hit at the same nonnegative pO2 has no approximation error,
-        # even when its rounded bucket touches the SiO knee.
-        result["relative_error"] = 0.0
-        return result
     if query_pO2 is None or source_pO2 is None or query_pO2 <= 0.0 or source_pO2 <= 0.0:
         result["accepted"] = False
         result["refusal_reason"] = "pO2_missing_or_nonpositive"
@@ -7189,15 +7218,14 @@ def _physics_ladder_values_from_replay_key(
     return values
 
 
-def _ladder_indexability(
+def _replay_key_composition_shape(
     key: Mapping[str, Any],
-) -> UncacheableKey | None:
+) -> tuple[list[tuple[str, float]] | None, str | None]:
+    """Return normalized composition when it is finite and nonnegative."""
+
     raw_composition = key.get("composition_mol_fraction", [])
     if not isinstance(raw_composition, (list, tuple)):
-        return UncacheableKey(
-            PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-            "composition_mol_fraction",
-        )
+        return None, "composition_mol_fraction"
     composition: list[tuple[str, float]] = []
     for component in raw_composition:
         if isinstance(component, Mapping):
@@ -7206,64 +7234,72 @@ def _ladder_indexability(
         elif isinstance(component, (list, tuple)) and len(component) == 2:
             species, raw_fraction = component
         else:
-            return UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                "composition_mol_fraction",
-            )
+            return None, "composition_mol_fraction"
         if not isinstance(species, str) or not species or not is_declared_real_scalar(
             raw_fraction
         ):
-            return UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                f"composition_mol_fraction.{species}",
-            )
+            return None, "composition_mol_fraction"
         try:
             fraction = float(raw_fraction)
         except (OverflowError, TypeError, ValueError):
-            return UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                f"composition_mol_fraction.{species}",
-            )
-        if not math.isfinite(fraction) or fraction < 0.0 or fraction > 1.0:
-            return UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                f"composition_mol_fraction.{species}",
-            )
+            return None, "composition_mol_fraction"
+        if not math.isfinite(fraction) or fraction < 0.0:
+            return None, "composition_mol_fraction"
         composition.append((species, fraction))
+    return composition, None
+
+
+def _ladder_indexability(
+    key: Mapping[str, Any],
+    *,
+    rung_tag: str | None = None,
+) -> UncacheableKey | None:
+    composition, composition_error = _replay_key_composition_shape(key)
+    first_rung = rung_tag or PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0]
+    if composition_error is not None or composition is None:
+        return UncacheableKey(
+            first_rung,
+            composition_error or "composition_mol_fraction",
+        )
 
     raw_controls = key.get("controls", {})
     if not isinstance(raw_controls, Mapping):
-        return UncacheableKey(PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0], "controls")
+        return UncacheableKey(first_rung, "controls")
     controls: dict[str, float] = {}
     for name, value in raw_controls.items():
         if not isinstance(name, str) or not is_declared_real_scalar(value):
             return UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                first_rung,
                 f"controls.{name}",
             )
         try:
             number = float(value)
         except (OverflowError, TypeError, ValueError):
             return UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                first_rung,
                 f"controls.{name}",
             )
         if not math.isfinite(number):
             return UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                first_rung,
                 f"controls.{name}",
             )
         controls[name] = number
 
-    for rung_tag, sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+    rungs = (
+        ((rung_tag, _physics_ladder_sig_figs(rung_tag)),)
+        if rung_tag is not None
+        else PHYSICS_BUCKET_ALL_LADDER_RUNGS
+    )
+    for current_rung, sig_figs in rungs:
         for species, fraction in composition:
             if _sigfig_snap(fraction, sig_figs) is None:
                 return UncacheableKey(
-                    rung_tag,
+                    current_rung,
                     f"composition_mol_fraction.{species}",
                 )
         snapped_controls = ["T_K"] if "T_K" in controls else []
-        if _physics_ladder_coarsens_controls(rung_tag):
+        if _physics_ladder_coarsens_controls(current_rung):
             if "pressure_bar" in controls:
                 snapped_controls.append("pressure_bar")
             if (
@@ -7273,16 +7309,16 @@ def _ladder_indexability(
                 snapped_controls.append("pO2_bar")
         for name in snapped_controls:
             if _sigfig_snap(controls[name], sig_figs) is None:
-                return UncacheableKey(rung_tag, f"controls.{name}")
+                return UncacheableKey(current_rung, f"controls.{name}")
         try:
             distance = physics_ladder_bucket_distance_from_replay_key(
                 key,
-                rung_tag,
+                current_rung,
             )
         except (OverflowError, TypeError, ValueError, ZeroDivisionError):
-            return UncacheableKey(rung_tag, "distance")
+            return UncacheableKey(current_rung, "distance")
         if not math.isfinite(distance):
-            return UncacheableKey(rung_tag, "distance")
+            return UncacheableKey(current_rung, "distance")
     return None
 
 
