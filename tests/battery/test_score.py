@@ -43,6 +43,7 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     Quantity,
     QUANTITY_UNITS,
     Rail,
@@ -4896,6 +4897,71 @@ def test_species_formula_parser_requires_polymorph_axis_for_suffix() -> None:
         "SiO2(quartz)",
         species=Species("SiO2", Phase.CR, State.of(Polymorph.QUARTZ)),
     ) == (("O", 2.0), ("Si", 1.0))
+
+
+def test_unrecognised_nepheline_polymorph_keeps_formula_atom_counts(
+    monkeypatch,
+) -> None:
+    species = Species(
+        "NaAlSiO4",
+        Phase.CR,
+        State.unknown(
+            "unrecognised polymorph 'nepheline' is not a closed Polymorph token",
+            rejection_kind=PolymorphRejectionKind.UNRECOGNISED,
+        ),
+    )
+    expected = (("Al", 1.0), ("Na", 1.0), ("O", 4.0), ("Si", 1.0))
+
+    def assert_nepheline_counts() -> None:
+        assert score_mod.parse_species_formula("NaAlSiO4", species=species) == expected
+
+    assert_nepheline_counts()
+
+    parse_formula = score_mod.parse_species_formula
+
+    def restore_blanket_polymorph_veto(
+        formula: str, *, species: Species | None = None
+    ) -> tuple[tuple[str, float], ...] | None:
+        if species is not None and score_mod._source_polymorph_is_rejected(
+            species.polymorph
+        ):
+            return None
+        return parse_formula(formula, species=species)
+
+    monkeypatch.setattr(
+        score_mod, "parse_species_formula", restore_blanket_polymorph_veto
+    )
+    with pytest.raises(AssertionError):
+        assert_nepheline_counts()
+
+
+def test_diamond_reason_still_refuses_carbon_formula_counts() -> None:
+    diamond = Species(
+        "C",
+        Phase.CR,
+        State.unknown(
+            score_mod.DIAMOND_POLYMORPH_REFUSAL_REASON,
+            rejection_kind=PolymorphRejectionKind.UNRECOGNISED,
+        ),
+    )
+    assert parse_species_formula("C", species=diamond) is None
+
+
+def test_contradictory_polymorph_does_not_blank_parseable_formula_counts() -> None:
+    contradictory = Species(
+        "NaAlSiO4",
+        Phase.CR,
+        State.unknown(
+            "polymorph tridymite does not denote formula NaAlSiO4",
+            rejection_kind=PolymorphRejectionKind.CONTRADICTS_FORMULA,
+        ),
+    )
+    assert parse_species_formula("NaAlSiO4", species=contradictory) == (
+        ("Al", 1.0),
+        ("Na", 1.0),
+        ("O", 4.0),
+        ("Si", 1.0),
+    )
 
 
 def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> None:

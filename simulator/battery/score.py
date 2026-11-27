@@ -45,6 +45,7 @@ from typing import (
 import yaml
 
 from simulator.accounting.formulas import (
+    DIAMOND_POLYMORPH_REFUSAL_REASON,
     _clean_formula_text,
     _strip_terminal_phase_suffix,
     atoms_parse_formula_else_janaf,
@@ -1215,11 +1216,18 @@ def parse_species_formula(
 
     Phase, polymorph, and charge annotations must match the typed species axis
     before the accounting owner parses atom counts and hydrate/adduct segments.
+    An unrecognised polymorph does not change formula stoichiometry; the
+    explicit diamond refusal remains tied to its typed source reason.
     """
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    if species is not None and _source_polymorph_is_rejected(species.polymorph):
+    if (
+        species is not None
+        and species.polymorph is not None
+        and species.polymorph.is_unknown
+        and species.polymorph.reason == DIAMOND_POLYMORPH_REFUSAL_REASON
+    ):
         return None
 
     text = _clean_formula_text(formula)
