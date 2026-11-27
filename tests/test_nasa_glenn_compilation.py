@@ -9,6 +9,7 @@ validation measurements.
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -30,6 +31,7 @@ from simulator.reference_data.nasa_glenn import (
     parse_thermo_inp,
     published_float_pairs,
 )
+from simulator.reference_data import nasa_glenn
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = COMPILATION_ROOT / "source" / "thermo.inp"
@@ -45,6 +47,127 @@ def manifest():
 @pytest.fixture(scope="module")
 def record_docs():
     return load_all_record_documents()
+
+
+@pytest.fixture(scope="module")
+def source_records():
+    text = SOURCE.read_text(encoding="latin-1")
+    return parse_thermo_inp(text, source_path=SOURCE_REL).records
+
+
+def test_record_formula_weight_witness_accepts_air_and_refuses_inertair(
+    source_records, monkeypatch
+) -> None:
+    from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, parse_formula
+
+    records = {record.record_id: record for record in source_records}
+    air = records["NG-2031"]
+    inert_air = records["NG-2032"]
+
+    def parse_record(record):
+        return nasa_glenn._parse_record_formula_with_printed_weight(
+            record.formula, record.composition_slots, record.molecular_weight
+        )
+
+    air_formula, air_refusal = parse_record(air)
+    assert air_formula is not None
+    assert air_refusal is None
+    assert dict(air_formula.elements) == {
+        "Ar": 0.00937,
+        "C": 0.00032,
+        "N": 1.5617,
+        "O": 0.41959,
+    }
+    assert round(air.molecular_weight.value, 4) == 28.9651
+    assert abs(air_formula.molar_mass_g_mol - air.molecular_weight.value) <= (
+        nasa_glenn._record_formula_mass_tolerance(
+            air.composition_slots,
+            air.molecular_weight,
+            parse_formula,
+            ATOMIC_WEIGHTS_G_PER_MOL,
+        )
+    )
+
+    def assert_inert_air_refused() -> None:
+        parsed, refusal = parse_record(inert_air)
+        assert parsed is None
+        assert refusal is not None
+        assert refusal["kind"] == "formula_molecular_weight_disagreement"
+        assert refusal["formula_as_published"] == inert_air.formula
+        assert refusal["printed_molecular_weight_g_mol"] == 28.9651159
+        assert refusal["difference_g_mol"] > refusal["precision_tolerance_g_mol"]
+        assert any(
+            item.get("kind") == "formula_molecular_weight_disagreement"
+            for item in inert_air.ambiguities
+        )
+
+    assert_inert_air_refused()
+
+    no_weight, no_weight_refusal = nasa_glenn._parse_record_formula_with_printed_weight(
+        inert_air.formula,
+        inert_air.composition_slots,
+        nasa_glenn.PublishedNumber(as_published="", value=None),
+    )
+    assert no_weight_refusal is None
+    assert no_weight is not None
+    assert dict(no_weight.elements)["I"] == 1.0
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            nasa_glenn,
+            "_parse_record_formula_with_printed_weight",
+            lambda formula, _slots, _weight: (parse_formula(formula), None),
+        )
+        with pytest.raises(AssertionError):
+            assert_inert_air_refused()
+
+
+def test_record_formula_weight_witness_census(source_records, capsys) -> None:
+    refusals = []
+    for record in source_records:
+        row = next(
+            (
+                item
+                for item in record.ambiguities
+                if item.get("kind") == "formula_molecular_weight_disagreement"
+            ),
+            None,
+        )
+        if row is None:
+            continue
+        assert row["difference_g_mol"] > row["precision_tolerance_g_mol"]
+        refusals.append(
+            {
+                "source": "nasa-glenn",
+                "record_id": record.record_id,
+                "name": record.name_as_published,
+                "formula": row["formula_as_published"],
+                "printed_weight_g_mol": row["printed_molecular_weight_g_mol"],
+                "parsed_weight_g_mol": row["parsed_molecular_weight_g_mol"],
+                "difference_g_mol": row["difference_g_mol"],
+                "precision_tolerance_g_mol": row["precision_tolerance_g_mol"],
+            }
+        )
+    assert [
+        (
+            row["record_id"],
+            row["name"],
+            row["formula"],
+            row["printed_weight_g_mol"],
+            row["parsed_weight_g_mol"],
+        )
+        for row in refusals
+    ] == [
+        (
+            "NG-2032",
+            "InertAir",
+            "N1.5617IO.41959Ar.00937C.00032",
+            28.9651159,
+            pytest.approx(155.87037859),
+        )
+    ]
+    with capsys.disabled():
+        print("NASA_GLENN_FORMULA_WEIGHT_CENSUS " + json.dumps(refusals, sort_keys=True))
 
 
 def _source_sha256() -> str:

@@ -11,9 +11,11 @@ On-disk home: ``data/literature/compilations/nasa-glenn/``.
 from __future__ import annotations
 
 import json
+import math
 import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
@@ -301,6 +303,91 @@ class ThermoInpFile:
     default_t_line_number: int
     source_path: str
     source_sha256: str
+
+
+def _half_printed_unit(token: str) -> float:
+    """Half the unit represented by the last printed digit, or zero if absent."""
+    try:
+        value = Decimal(token.strip().replace("D", "E").replace("d", "e"))
+    except InvalidOperation:
+        return 0.0
+    if not value.is_finite():
+        return 0.0
+    return float(Decimal("0.5").scaleb(value.as_tuple().exponent))
+
+
+def _record_formula_mass_tolerance(
+    slots: list[CompositionSlot],
+    molecular_weight: PublishedNumber,
+    parse_formula: Any,
+    atomic_weights: Mapping[str, float],
+) -> float:
+    # Each printed count and the header mass can differ from its exact value by
+    # at most half a unit in its last printed place. Propagate each count's
+    # half-unit through the atom masses, then add the header mass's half-unit.
+    bounds = [_half_printed_unit(molecular_weight.as_published)]
+    for slot in slots:
+        if (
+            slot.filler
+            or slot.count is None
+            or slot.count <= 0
+            or not slot.count_as_published.strip()
+        ):
+            continue
+        if slot.element in atomic_weights:
+            mass_per_count = atomic_weights[slot.element]
+        else:
+            try:
+                slot_formula = parse_formula(
+                    f"{slot.element}{slot.count_as_published.strip()}"
+                )
+            except ValueError:
+                continue
+            mass_per_count = sum(
+                atomic_weights[element]
+                for element, count in slot_formula.elements.items()
+                if math.isclose(count, slot.count, rel_tol=0.0, abs_tol=1e-12)
+            )
+        bounds.append(_half_printed_unit(slot.count_as_published) * mass_per_count)
+    return math.fsum(bounds)
+
+
+def _parse_record_formula_with_printed_weight(
+    formula: str,
+    slots: list[CompositionSlot],
+    molecular_weight: PublishedNumber,
+) -> tuple[Any | None, dict[str, Any] | None]:
+    from simulator.accounting.exceptions import AccountingError
+    from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, parse_formula
+
+    try:
+        parsed = parse_formula(formula)
+    except AccountingError:
+        return None, None
+    if molecular_weight.value is None or not math.isfinite(molecular_weight.value):
+        return parsed, None
+
+    parsed_mass = parsed.molar_mass_g_mol
+    if parsed_mass is None:
+        return parsed, None
+    tolerance = _record_formula_mass_tolerance(
+        slots,
+        molecular_weight,
+        parse_formula,
+        ATOMIC_WEIGHTS_G_PER_MOL,
+    )
+    difference = abs(molecular_weight.value - parsed_mass)
+    if difference <= tolerance:
+        return parsed, None
+    return None, {
+        "kind": "formula_molecular_weight_disagreement",
+        "formula_as_published": formula,
+        "printed_molecular_weight_as_published": molecular_weight.as_published,
+        "printed_molecular_weight_g_mol": molecular_weight.value,
+        "parsed_molecular_weight_g_mol": parsed_mass,
+        "difference_g_mol": difference,
+        "precision_tolerance_g_mol": tolerance,
+    }
 
 
 def _interval_source_lines(intervals: Iterable[IntervalRecord]) -> list[str]:
@@ -1128,6 +1215,17 @@ def parse_thermo_inp(
     by_name: dict[str, list[int]] = defaultdict(list)
     for index, rec in enumerate(records):
         rec.record_id = f"NG-{index + 1:04d}"
+        _, formula_refusal = _parse_record_formula_with_printed_weight(
+            rec.formula, rec.composition_slots, rec.molecular_weight
+        )
+        if formula_refusal is not None:
+            rec.ambiguities.append(
+                {
+                    "record_id": rec.record_id,
+                    "name_as_published": rec.name_as_published,
+                    **formula_refusal,
+                }
+            )
         by_name[rec.name_as_published].append(index)
     by_phase: dict[tuple[str, str], list[int]] = defaultdict(list)
     for index, rec in enumerate(records):
