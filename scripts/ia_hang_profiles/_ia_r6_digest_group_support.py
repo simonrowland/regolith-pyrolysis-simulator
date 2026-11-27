@@ -10,9 +10,9 @@ import tempfile
 import time
 
 
-BASE_SHA = "0207386f7c1a6a98e807bf9e2bdcfac8ab14c8ea"
-CANDIDATE_PRODUCT_SHA = "511c3d84a85c372c9ed8da40d4385decd1bd6a58"
-GROUP_SIZE = 8
+BASE_SHA = "8d953a6cd26d42310b9fba5851c4f87dc0991d13"
+CANDIDATE_PRODUCT_SHA = "d6acf7b21d9e4d719b91eb891bb1ccfcc136f1a9"
+GROUP_SIZE = 16
 STUDIES = {
     "mendybaev": (
         "Mendybaev 2013",
