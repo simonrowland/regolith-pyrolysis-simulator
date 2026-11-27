@@ -204,7 +204,50 @@ def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> 
         _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0),
     )
 
-    assert rci.greedy_nearest_neighbors(query, [candidate]) == []
+    assert rci.interpolation_key_domain_violation(
+        candidate_key,
+        query_keys=(query,),
+    ) is None
+    assert rci.greedy_nearest_neighbors(
+        query,
+        [candidate],
+        max_distance=float("inf"),
+    ) == []
+    uncertainty = rci.build_interpolation_uncertainty_vector(query, [candidate])
+    assert uncertainty["components"]["cache_distance"]["status"] == (
+        "insufficient_neighbors"
+    )
+
+
+def test_greedy_nn_accepts_temperature_above_old_domain_cap(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=12_000.0)
+    nearby = _interpolation_key(
+        "nearby", feo_fraction=0.20, temperature_K=12_001.0
+    )
+    query["controls"].update(pressure_bar=1_000_001.0, log_fO2=301.0)
+    nearby["controls"].update(pressure_bar=1_000_002.0, log_fO2=302.0)
+    db_path = tmp_path / "above-old-temperature-cap.sqlite"
+    _put_interpolation_row(
+        db_path,
+        nearby,
+        liquid_fraction=0.8,
+        sio_pa=8.0,
+    )
+
+    assert rci.interpolation_key_domain_violation(query) is None
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    candidates = store._list_interpolation_candidates(
+        artifact="equilibrium_post_record",
+        replay_scope_sha256=rci.replay_scope_for_interpolation(query),
+        query_key=query,
+    )
+    neighbors = rci.greedy_nearest_neighbors(query, candidates)
+    assert len(neighbors) == 1
+    assert neighbors[0]["key_hash"] == hashlib.sha256(
+        canonical_json_bytes(nearby)
+    ).hexdigest()
 
 
 def test_interpolation_refuses_dependency_vector_mismatch() -> None:
@@ -993,6 +1036,60 @@ def test_interpolation_refuses_attached_base_dependency_vector_mismatch(
 
     assert payload is None
     assert store.hits == 0
+
+
+@pytest.mark.parametrize(
+    "shadow_with_local",
+    (True, False),
+    ids=("duplicate-local-wins", "explicitly-excluded"),
+)
+def test_interpolation_filters_shadowed_or_excluded_corrupt_candidate_before_admission(
+    tmp_path: Path,
+    shadow_with_local: bool,
+) -> None:
+    key = _interpolation_key("shared", feo_fraction=0.20, temperature_K=1490.0)
+    local_db = tmp_path / "interpolation-filter-local.sqlite"
+    base_db = tmp_path / "interpolation-filter-base.sqlite"
+    if shadow_with_local:
+        _put_interpolation_row(
+            local_db,
+            key,
+            liquid_fraction=0.7,
+            sio_pa=7.0,
+        )
+    _put_interpolation_row(
+        base_db,
+        key,
+        liquid_fraction=0.8,
+        sio_pa=8.0,
+    )
+    key_hash = hashlib.sha256(canonical_json_bytes(key)).hexdigest()
+    malformed_payload = sqlite3.Binary(b"{")
+    with sqlite3.connect(base_db) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+            (
+                malformed_payload,
+                hashlib.sha256(bytes(malformed_payload)).hexdigest(),
+                key_hash,
+            ),
+        )
+
+    store = rrd.PT1PersistentEquilibriumStore(
+        local_db,
+        read_only_base_db_path=base_db,
+    )
+    candidates = store._list_interpolation_candidates(
+        artifact="equilibrium_post_record",
+        replay_scope_sha256=rci.replay_scope_for_interpolation(key),
+        exclude_key_hash=None if shadow_with_local else key_hash,
+        query_key=key,
+    )
+
+    assert [candidate["key_hash"] for candidate in candidates] == (
+        [key_hash] if shadow_with_local else []
+    )
 
 
 def test_interpolation_unions_known_notice_with_legacy_attached_base(

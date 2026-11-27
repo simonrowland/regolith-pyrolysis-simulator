@@ -557,7 +557,9 @@ def _computed_neighbor_distances(
         vector = _coordinate_vector(key)
         if len(vector) != len(query_vector):
             continue
-        distances.append(_standardized_distance(query_vector, vector))
+        distance = _standardized_distance(query_vector, vector)
+        if math.isfinite(distance):
+            distances.append(distance)
     return distances
 
 
@@ -576,13 +578,20 @@ def _coordinate_vector(key: Mapping[str, Any]) -> list[float]:
 
 
 def _standardized_distance(left: Sequence[float], right: Sequence[float]) -> float:
-    scales = [max(abs(value), 1.0e-9) for value in left]
-    return math.sqrt(
-        sum(
-            ((float(a) - float(b)) / scale) ** 2
-            for a, b, scale in zip(left, right, scales, strict=False)
-        )
-    )
+    squared_distance = 0.0
+    for left_value, right_value in zip(left, right, strict=False):
+        left_number = float(left_value)
+        right_number = float(right_value)
+        delta = (left_number - right_number) / max(abs(left_number), 1.0e-9)
+        if not math.isfinite(delta):
+            return math.inf
+        squared_delta = delta * delta
+        if not math.isfinite(squared_delta):
+            return math.inf
+        squared_distance += squared_delta
+        if not math.isfinite(squared_distance):
+            return math.inf
+    return math.sqrt(squared_distance)
 
 
 def _composition_species(key: Mapping[str, Any]) -> tuple[str, ...]:

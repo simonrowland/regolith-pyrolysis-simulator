@@ -65,7 +65,7 @@ def interpolation_key_domain_violation(
     *,
     query_keys: Sequence[Mapping[str, Any]] = (),
 ) -> str | None:
-    """Return the first interpolation/ladder coordinate outside its domain."""
+    """Return the first malformed or non-finite replay coordinate."""
 
     composition = key.get("composition_mol_fraction")
     if not isinstance(composition, (list, tuple)) or not composition:
@@ -89,36 +89,27 @@ def interpolation_key_domain_violation(
     controls = key.get("controls")
     if not isinstance(controls, Mapping):
         return "controls"
+    for control_name, value in controls.items():
+        control_path = (
+            f"controls.{control_name}"
+            if isinstance(control_name, str)
+            else "controls"
+        )
+        if not is_declared_real_scalar(value):
+            return control_path
+        try:
+            numeric_value = float(value)
+        except (OverflowError, TypeError, ValueError):
+            return control_path
+        if not math.isfinite(numeric_value):
+            return control_path
+
     control_names = set(_interpolation_control_names(key))
     for query_key in query_keys:
         control_names.update(_interpolation_control_names(query_key))
 
-    # These broad physical bounds also keep squared interpolation deltas safe.
-    domains = {
-        "T_K": (0.0, 10_000.0),
-        "pressure_bar": (0.0, 1_000_000.0),
-        "pO2_bar": (0.0, 1_000_000.0),
-        "log_fO2": (-300.0, 300.0),
-    }
     for control_name in sorted(control_names):
-        value = controls.get(control_name)
-        if not is_declared_real_scalar(value):
-            return f"controls.{control_name}"
-        try:
-            numeric_value = float(value)
-        except (OverflowError, TypeError, ValueError):
-            return f"controls.{control_name}"
-        low, high = domains[control_name]
-        below_domain = (
-            numeric_value <= low
-            if control_name == "T_K"
-            else numeric_value < low
-        )
-        if (
-            not math.isfinite(numeric_value)
-            or below_domain
-            or numeric_value > high
-        ):
+        if control_name not in controls:
             return f"controls.{control_name}"
     return None
 
@@ -188,6 +179,10 @@ def greedy_nearest_neighbors(
             query_vector,
             candidate_vector,
         )
+        if not math.isfinite(composition_distance) or not math.isfinite(
+            total_distance
+        ):
+            continue
         scored.append(
             (
                 composition_distance,
@@ -815,9 +810,18 @@ def _operating_point_differs(
 
 
 def _euclidean_distance(left: Sequence[float], right: Sequence[float]) -> float:
-    return math.sqrt(
-        sum((float(a) - float(b)) ** 2 for a, b in zip(left, right, strict=False))
-    )
+    squared_distance = 0.0
+    for left_value, right_value in zip(left, right, strict=False):
+        delta = float(left_value) - float(right_value)
+        if not math.isfinite(delta):
+            return math.inf
+        squared_delta = delta * delta
+        if not math.isfinite(squared_delta):
+            return math.inf
+        squared_distance += squared_delta
+        if not math.isfinite(squared_distance):
+            return math.inf
+    return math.sqrt(squared_distance)
 
 
 def _axis_aligned_bracketed(

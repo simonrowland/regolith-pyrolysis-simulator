@@ -1832,10 +1832,7 @@ class PT0DeterminismStore:
                 key_bytes=key_bytes,
                 key_hash=key_hash,
             )
-            if (
-                existing_admission is None
-                or existing_admission.stale_payload_codec
-            ):
+            if existing_admission is None:
                 existing = None
             else:
                 existing = existing_admission.entry
@@ -2197,6 +2194,7 @@ class PT0DeterminismStore:
                 key=key,
                 key_bytes=key_bytes,
                 key_hash=key_hash,
+                validate_interpolation_domain=True,
             )
             decoded = None if admitted is None else admitted.decoded_payload
             if decoded is None:
@@ -2456,6 +2454,7 @@ class PT0DeterminismStore:
             physics_bucket_key=physics_bucket_key,
             physics_bucket_bytes=physics_bucket_bytes,
             physics_bucket_hash=physics_bucket_hash,
+            validate_interpolation_domain=True,
         )
         return None if admitted is None else admitted.decoded_payload
 
@@ -2569,16 +2568,6 @@ def _admit_stored_row(
                 raise PT0CacheCollision(
                     f"PT-0 stored key is not a mapping for {artifact}: {key_hash}"
                 )
-            if validate_interpolation_domain:
-                from simulator.reduced_real_cache_interpolation import (
-                    interpolation_key_domain_violation,
-                )
-
-                if interpolation_key_domain_violation(
-                    stored_key,
-                    query_keys=admission_keys or (),
-                ) is not None:
-                    return None
             stored_key_bytes = raw_row.get("key_bytes")
             if isinstance(stored_key_bytes, str):
                 stored_key_bytes = stored_key_bytes.encode("utf-8")
@@ -2601,9 +2590,6 @@ def _admit_stored_row(
             stored_bucket = canonical_physics_bucket_key_from_replay_key(stored_key)
             stored_bucket_bytes = canonical_json_bytes(stored_bucket)
             stored_bucket_hash = _sha256(stored_bucket_bytes)
-            stored_ladder_values = _physics_ladder_values_from_replay_key(
-                stored_key
-            )
             if (
                 raw_row.get("physics_bucket_hash") is not None
                 and raw_row["physics_bucket_hash"] != stored_bucket_hash
@@ -2617,6 +2603,22 @@ def _admit_stored_row(
                 raise PT0CacheCollision(
                     f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
                 )
+            if validate_interpolation_domain:
+                from simulator.reduced_real_cache_interpolation import (
+                    interpolation_key_domain_violation,
+                )
+
+                if interpolation_key_domain_violation(
+                    stored_key,
+                    query_keys=(
+                        tuple(admission_keys or ())
+                        + ((key,) if key is not None else ())
+                    ),
+                ) is not None:
+                    return None
+            stored_ladder_values = _physics_ladder_values_from_replay_key(
+                stored_key
+            )
             if physics_bucket_hash is not None:
                 if (
                     stored_bucket != _json_ready(physics_bucket_key)
@@ -2789,13 +2791,6 @@ def _admit_stored_row(
                     f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
                 )
             indexed_distance = row[_physics_ladder_distance_column(rung_tag)]
-            if indexed_distance is None:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
-                )
-            indexed_distance = finite_ladder_distance(
-                indexed_distance, rung_tag, rung_hash
-            )
         if expected_replay_scope_sha256 is not None and (
             row["replay_scope_sha256"] != expected_replay_scope_sha256
         ):
@@ -2805,22 +2800,6 @@ def _admit_stored_row(
 
         # Indexed metadata has precedence; byte integrity then precedes admission.
         verify_key_hashes()
-
-        row_payload_bytes = _pt1_row_bytes(
-            row["payload_bytes"], field="payload", key_hash=row_hash
-        )
-        if _sha256(row_payload_bytes) != row["payload_sha256"]:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row payload hash mismatch (stored payload bytes): "
-                f"{row_artifact}: {row_hash}"
-            )
-        row_payload = _pt1_row_json(
-            row_payload_bytes, field="payload", key_hash=row_hash
-        )
-        if _payload_integrity_bytes(row_payload) != row_payload_bytes:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row non-canonical payload bytes: {row_hash}"
-            )
 
         row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
         verify_canonical_key(row_key)
@@ -2832,7 +2811,10 @@ def _admit_stored_row(
 
             domain_violation = interpolation_key_domain_violation(
                 row_key,
-                query_keys=admission_keys or (),
+                query_keys=(
+                    tuple(admission_keys or ())
+                    + ((key,) if key is not None else ())
+                ),
             )
             if domain_violation is not None:
                 section = (
@@ -2883,6 +2865,17 @@ def _admit_stored_row(
                 f"PT-1 row exact key does not reproduce physics bucket: {physics_bucket_hash}"
             )
         ladder_values = _physics_ladder_values_from_replay_key(row_key)
+        if rung_tag is not None:
+            derived_rung_distance = float(ladder_values[rung_tag]["distance"])
+            if not math.isfinite(derived_rung_distance):
+                return None
+            if indexed_distance is None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
+                )
+            indexed_distance = finite_ladder_distance(
+                indexed_distance, rung_tag, rung_hash
+            )
         for stored_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
             hash_column = _physics_ladder_hash_column(stored_rung_tag)
             distance_column = _physics_ladder_distance_column(stored_rung_tag)
@@ -2892,6 +2885,8 @@ def _admit_stored_row(
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row exact key does not reproduce {stored_rung_tag} hash: {row_hash}"
                 )
+            if not math.isfinite(float(ladder_values[stored_rung_tag]["distance"])):
+                continue
             if row.get(distance_column) is not None:
                 row_distance = finite_ladder_distance(
                     row[distance_column], stored_rung_tag
@@ -2913,6 +2908,22 @@ def _admit_stored_row(
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
                 )
+
+        row_payload_bytes = _pt1_row_bytes(
+            row["payload_bytes"], field="payload", key_hash=row_hash
+        )
+        if _sha256(row_payload_bytes) != row["payload_sha256"]:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row payload hash mismatch (stored payload bytes): "
+                f"{row_artifact}: {row_hash}"
+            )
+        row_payload = _pt1_row_json(
+            row_payload_bytes, field="payload", key_hash=row_hash
+        )
+        if _payload_integrity_bytes(row_payload) != row_payload_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row non-canonical payload bytes: {row_hash}"
+            )
 
         all_index_columns = (
             "physics_bucket_schema_version",
@@ -3043,6 +3054,8 @@ def _admit_stored_row(
                         if isinstance(row_payload, Mapping)
                         else copy.deepcopy(row_payload)
                     ),
+                    "repair_notices_json": repair_notices_json,
+                    "law_disclosures": law_disclosures,
                 },
                 None,
                 stored_columns=row,
@@ -3198,19 +3211,6 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                 )
-                if existing_admission.stale_payload_codec:
-                    local_row = conn.execute(
-                        f"SELECT 1 FROM {PT1_EQUILIBRIUM_TABLE} "
-                        "WHERE key_hash = ?",
-                        (key_hash,),
-                    ).fetchone()
-                    if local_row is not None:
-                        conn.execute(
-                            f"DELETE FROM {PT1_EQUILIBRIUM_TABLE} "
-                            "WHERE key_hash = ?",
-                            (key_hash,),
-                        )
-                    existing = None
             if existing is not None:
                 assert existing_admission is not None
                 entry = existing_admission.entry
@@ -3554,6 +3554,12 @@ class PT1PersistentEquilibriumStore:
             for table in tables:
                 rows = conn.execute(query.format(table=table), params)
                 for row in rows:
+                    row_hash = str(row["key_hash"])
+                    if exclude_key_hash is not None and row_hash == exclude_key_hash:
+                        continue
+                    if row_hash in seen_hashes:
+                        continue
+                    seen_hashes.add(row_hash)
                     admitted = _admit_stored_row(
                         row,
                         store_kind="pt1",
@@ -3567,12 +3573,6 @@ class PT1PersistentEquilibriumStore:
                         continue
                     entry = admitted.entry
                     decoded = admitted.decoded_payload
-                    row_hash = str(entry["key_hash"])
-                    if exclude_key_hash is not None and row_hash == exclude_key_hash:
-                        continue
-                    if row_hash in seen_hashes:
-                        continue
-                    seen_hashes.add(row_hash)
                     if decoded is None:
                         continue
                     candidates.append(
@@ -3660,7 +3660,8 @@ class PT1PersistentEquilibriumStore:
                         admission_keys=(query_key,) if query_key is not None else (),
                         validate_interpolation_domain=True,
                     )
-                    assert admitted is not None
+                    if admitted is None:
+                        continue
                     entry, decoded = admitted.entry, admitted.decoded_payload
                     if decoded is None:
                         continue
@@ -4060,6 +4061,7 @@ class PT1PersistentEquilibriumStore:
             key_hash=key_hash,
             admission_keys=admission_keys,
             expected_replay_scope_sha256=expected_replay_scope_sha256,
+            validate_interpolation_domain=True,
         )
         assert admitted is not None
         return (
@@ -5461,23 +5463,37 @@ def physics_ladder_bucket_distance_from_replay_key(
     )
     distance = 0.0
     for species, snapped_fraction in snapped_composition:
+        if snapped_fraction is None:
+            return math.inf
         exact_fraction = exact_composition.get(species, 0.0)
-        distance += _normalized_sigfig_distance(
+        component_distance = _normalized_sigfig_distance(
             exact_fraction,
             float(snapped_fraction),
             sig_figs,
         )
+        if not math.isfinite(component_distance):
+            return math.inf
+        distance += component_distance
+        if not math.isfinite(distance):
+            return math.inf
     controls = key.get("controls", {})
     if not isinstance(controls, Mapping):
         controls = {}
     rung_controls = rung_bucket.get("controls", {})
     if not isinstance(rung_controls, Mapping):
         rung_controls = {}
-    distance += _normalized_sigfig_distance(
-        float(controls.get("T_K", 0.0) or 0.0),
-        float(rung_controls.get("T_K", 0.0) or 0.0),
+    exact_temperature = controls.get("T_K")
+    snapped_temperature = rung_controls.get("T_K")
+    if exact_temperature is None or snapped_temperature is None:
+        return math.inf
+    temperature_distance = _normalized_sigfig_distance(
+        float(exact_temperature),
+        float(snapped_temperature),
         sig_figs,
     )
+    if not math.isfinite(temperature_distance):
+        return math.inf
+    distance += temperature_distance
     if _physics_ladder_coarsens_controls(rung_tag):
         for control_name in ("pressure_bar", "pO2_bar"):
             if control_name not in controls or control_name not in rung_controls:
@@ -5485,13 +5501,19 @@ def physics_ladder_bucket_distance_from_replay_key(
             exact_value = controls.get(control_name)
             snapped_value = rung_controls.get(control_name)
             if exact_value is None or snapped_value is None:
-                continue
-            distance += _normalized_sigfig_distance(
+                return math.inf
+            control_distance = _normalized_sigfig_distance(
                 float(exact_value),
                 float(snapped_value),
                 sig_figs,
             )
-    return float(round(distance, 15))
+            if not math.isfinite(control_distance):
+                return math.inf
+            distance += control_distance
+            if not math.isfinite(distance):
+                return math.inf
+    rounded_distance = float(round(distance, 15))
+    return rounded_distance if math.isfinite(rounded_distance) else math.inf
 
 
 def physics_control_rung_error_budget(
@@ -7409,15 +7431,26 @@ def _sigfig_snap(value: Any, sig_figs: float) -> float | None:
         return None
     if number == 0.0:
         return 0.0
-    quantum = _sigfig_quantum(number, sig_figs)
-    snapped = round(number / quantum) * quantum
+    try:
+        quantum = _sigfig_quantum(number, sig_figs)
+        if not math.isfinite(quantum) or quantum <= 0.0:
+            return None
+        snapped = round(number / quantum) * quantum
+    except (OverflowError, ValueError, ZeroDivisionError):
+        return None
+    if not math.isfinite(snapped):
+        return None
     if snapped == 0.0:
         return 0.0
     digits = max(
         0,
         int(math.ceil(float(sig_figs) - math.floor(math.log10(abs(snapped))) - 1)),
     )
-    return round(snapped, digits)
+    try:
+        rounded = round(snapped, digits)
+    except (OverflowError, ValueError):
+        return None
+    return rounded if math.isfinite(rounded) else None
 
 
 def _normalized_sigfig_distance(
@@ -7425,11 +7458,24 @@ def _normalized_sigfig_distance(
     snapped_center: float,
     sig_figs: float,
 ) -> float:
-    quantum = _sigfig_quantum(exact_value if exact_value != 0.0 else snapped_center, sig_figs)
-    if quantum == 0.0:
-        return 0.0
-    delta = (float(exact_value) - float(snapped_center)) / quantum
-    return delta * delta
+    exact_number = float(exact_value)
+    snapped_number = float(snapped_center)
+    if not math.isfinite(exact_number) or not math.isfinite(snapped_number):
+        return math.inf
+    try:
+        quantum = _sigfig_quantum(
+            exact_number if exact_number != 0.0 else snapped_number,
+            sig_figs,
+        )
+    except (OverflowError, ValueError):
+        return math.inf
+    if not math.isfinite(quantum) or quantum <= 0.0:
+        return math.inf
+    delta = (exact_number - snapped_number) / quantum
+    if not math.isfinite(delta):
+        return math.inf
+    distance = delta * delta
+    return distance if math.isfinite(distance) else math.inf
 
 
 def _diff_top_fields(left: Mapping[str, Any], right: Mapping[str, Any]) -> list[str]:

@@ -4527,32 +4527,38 @@ def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
         )
 
     rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    assert math.isinf(
+        rrd.physics_ladder_bucket_distance_from_replay_key(corrupt_key, rung_tag)
+    )
     rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
         key,
         rung_tag,
     )
-    with pytest.raises(PT1PersistentStoreCorrupt) as raised:
-        PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
-            artifact="freeze_gate_curve",
-            rung_tag=rung_tag,
-            rung_key=rung_key,
-            rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
-            query_key=key,
-        )
-    assert isinstance(raised.value.__cause__, ZeroDivisionError)
+    assert PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+        artifact="freeze_gate_curve",
+        rung_tag=rung_tag,
+        rung_key=rung_key,
+        rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+        query_key=key,
+    ) is None
 
 
 @pytest.mark.parametrize(
     ("control_name", "invalid_value"),
-    (("T_K", 1.0e160), ("pressure_bar", -1.0)),
-    ids=("temperature-overflow-domain", "negative-pressure-domain"),
+    (("T_K", True), ("pressure_bar", True)),
+    ids=("boolean-temperature", "boolean-pressure"),
+)
+@pytest.mark.parametrize(
+    "reader",
+    ("exact", "bucket", "ladder", "interpolation"),
 )
 def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
     tmp_path: Path,
     control_name: str,
-    invalid_value: float,
+    invalid_value: bool,
+    reader: str,
 ) -> None:
-    db_path = tmp_path / f"pt1-invalid-{control_name}-ladder-key.sqlite"
+    db_path = tmp_path / f"pt1-invalid-{control_name}-{reader}-key.sqlite"
     key = _c3a_ladder_key(
         "domain-source",
         feo_fraction=0.123456,
@@ -4609,17 +4615,107 @@ def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
         corrupt_key,
         rung_tag,
     )
+    persistent = PT1PersistentEquilibriumStore(db_path)
     with pytest.raises(
         PT1PersistentStoreCorrupt,
         match=rf"controls\.{control_name}",
     ):
-        PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
-            artifact="equilibrium_post_record",
-            rung_tag=rung_tag,
-            rung_key=rung_key,
-            rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+        if reader == "exact":
+            persistent._get_with_decoded(
+                artifact="equilibrium_post_record",
+                key=corrupt_key,
+                key_bytes=corrupt_key_bytes,
+                key_hash=corrupt_key_hash,
+            )
+        elif reader == "bucket":
+            persistent._get_by_physics_bucket(
+                artifact="equilibrium_post_record",
+                physics_bucket_key=bucket_key,
+                physics_bucket_bytes=bucket_bytes,
+                physics_bucket_hash=rrd._sha256(bucket_bytes),
+                query_key=corrupt_key,
+            )
+        elif reader == "ladder":
+            persistent._get_by_physics_ladder_bucket(
+                artifact="equilibrium_post_record",
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+                query_key=corrupt_key,
+            )
+        else:
+            persistent._list_interpolation_candidates(
+                artifact="equilibrium_post_record",
+                replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
+                query_key=corrupt_key,
+            )
+
+
+def test_pt0_payload_collision_precedes_control_shape_rejection() -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    key = capture._equilibrium_key(sim)
+    original_hash = _key_hash(key)
+    corrupt_key = copy.deepcopy(rrd._json_ready(key))
+    corrupt_key["controls"]["T_K"] = True
+    corrupt_key_bytes = canonical_json_bytes(corrupt_key)
+    corrupt_hash = rrd._sha256(corrupt_key_bytes)
+    corrupt_bucket = canonical_physics_bucket_key_from_replay_key(corrupt_key)
+    corrupt_bucket_bytes = canonical_json_bytes(corrupt_bucket)
+    corrupt_bucket_hash = rrd._sha256(corrupt_bucket_bytes)
+
+    row = copy.deepcopy(capture._entries[original_hash])
+    row.update(
+        key=corrupt_key,
+        key_bytes=corrupt_key_bytes.decode("utf-8"),
+        key_hash=corrupt_hash,
+        physics_bucket_key=corrupt_bucket,
+        physics_bucket_hash=corrupt_bucket_hash,
+        payload_hash="0" * 64,
+    )
+    capture._entries[corrupt_hash] = row
+    capture.physics_bucket_entries[corrupt_bucket_hash] = corrupt_hash
+
+    with pytest.raises(
+        rrd.PT0CacheCollision,
+        match="stored payload bytes mismatch",
+    ):
+        capture._entry_for_physics_bucket(
+            "equilibrium_post_record",
+            corrupt_bucket,
             query_key=corrupt_key,
         )
+
+
+def test_pt0_exact_admission_rejects_boolean_control_shape() -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    key = capture._equilibrium_key(sim)
+    original_hash = _key_hash(key)
+    corrupt_key = copy.deepcopy(rrd._json_ready(key))
+    corrupt_key["controls"]["T_K"] = True
+    corrupt_key_bytes = canonical_json_bytes(corrupt_key)
+    corrupt_hash = rrd._sha256(corrupt_key_bytes)
+    corrupt_bucket = canonical_physics_bucket_key_from_replay_key(corrupt_key)
+    corrupt_bucket_hash = rrd._sha256(canonical_json_bytes(corrupt_bucket))
+    row = copy.deepcopy(capture._entries[original_hash])
+    row.update(
+        key=corrupt_key,
+        key_bytes=corrupt_key_bytes.decode("utf-8"),
+        key_hash=corrupt_hash,
+        physics_bucket_key=corrupt_bucket,
+        physics_bucket_hash=corrupt_bucket_hash,
+    )
+    capture._entries[corrupt_hash] = row
+
+    assert capture._entry_for_key(
+        "equilibrium_post_record",
+        corrupt_key,
+        corrupt_key_bytes,
+        corrupt_hash,
+    ) is None
 
 
 def test_pt1_shard_merge_wraps_nested_stored_repair_notices(
@@ -6804,10 +6900,19 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
     assert entry["payload_codec_version"] == (
         rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
     )
+    prior_notice = {"kind": "stale_codec_repair"}
+    prior_notices_json = rrd.encode_repair_notices_json([prior_notice])
+    entry["repair_notices_json"] = prior_notices_json
     entry["payload_codec_version"] = row_version
     if persistent:
         assert db_path is not None
         _set_pt1_payload_codec_version(db_path, key_hash, row_version)
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                "SET repair_notices_json = ? WHERE key_hash = ?",
+                (prior_notices_json, key_hash),
+            )
 
     miss_store = (
         PT0DeterminismStore("replay", db_path=db_path)
@@ -6824,6 +6929,7 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
         rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
     )
     assert entry["payload"] == current_payload
+    assert entry["repair_notices_json"] == prior_notices_json
     if persistent:
         assert capture.persistent_store is not None
         persisted_entry = capture.persistent_store.get(
@@ -6836,6 +6942,7 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
         assert persisted_entry["payload_codec_version"] == (
             rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
         )
+        assert persisted_entry["repair_notices_json"] == prior_notices_json
     replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
     assert replay._lookup("equilibrium_post_record", key, sim=sim) == current_payload
     assert replay.hits == 1
@@ -8005,12 +8112,14 @@ def test_pt1_verify_on_hit_fails_loudly(
         ("ladder", "missing", False),
         ("ladder", "incorrect", False),
         ("ladder", "missing", True),
+        ("ladder", "incorrect", True),
     ),
     ids=(
         "bucket-key-bytes",
         "ladder-distance-missing",
         "ladder-distance-wrong",
         "ladder-distance-missing-before-invalid-payload-bytes",
+        "ladder-distance-wrong-before-invalid-payload-bytes",
     ),
 )
 def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
@@ -8071,7 +8180,13 @@ def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
             )
 
     persistent = PT1PersistentEquilibriumStore(db_path)
-    expected_message = "distance is missing" if corrupt_payload_bytes else None
+    expected_message = (
+        "distance is missing"
+        if distance_corruption == "missing"
+        else "distance mismatch"
+        if distance_corruption == "incorrect"
+        else None
+    )
     with pytest.raises(PT1PersistentStoreCorrupt, match=expected_message):
         if index_kind == "bucket":
             persistent._get_by_physics_bucket(
