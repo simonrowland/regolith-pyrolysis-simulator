@@ -2712,12 +2712,37 @@ def _path_selector_names_observation_id(sample: Mapping[str, Any]) -> bool:
     return _INTEGER_SELECTOR_RE.fullmatch(match.group(2)) is None
 
 
-def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
-    """Missing reviewer, ISO date, or exactly one artifact locator."""
+def _is_figure_read_leaf(value: Any) -> bool:
+    """True when a pinned values mapping explicitly marks a figure read."""
+    return (
+        isinstance(value, Mapping)
+        and value.get("evidence_class") == "figure_only"
+        and "figure_read" in value
+    )
+
+
+def _sample_attestation_defects(
+    sample: Mapping[str, Any],
+    *,
+    figure_read_sample: bool = False,
+    figure_read: Any = None,
+    extractor_id: Any = None,
+) -> list[str]:
+    """Missing reviewer/date or the evidence required for this sample class."""
     defects: list[str] = []
     reviewer = sample.get("reviewed_by")
     if not isinstance(reviewer, str) or not reviewer.strip():
         defects.append("reviewed_by is required for source attestation")
+    elif figure_read_sample:
+        if not isinstance(extractor_id, str) or not extractor_id.strip():
+            defects.append(
+                "extraction.worker is required for figure-read attestation"
+            )
+        elif reviewer.strip().casefold() == extractor_id.strip().casefold():
+            defects.append(
+                "reviewed_by must differ from extraction.worker "
+                "for figure-read attestation"
+            )
     reviewed_on = sample.get("reviewed_on")
     if not isinstance(reviewed_on, str) or not _ISO_DATE_RE.fullmatch(reviewed_on):
         defects.append("reviewed_on must be an ISO YYYY-MM-DD date")
@@ -2729,7 +2754,67 @@ def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
     locator_keys = [key for key in ("locator", "source_locator") if key in sample]
     locator = sample.get(locator_keys[0]) if len(locator_keys) == 1 else None
     malformed_locator_keys = _malformed_locator_artifact_keys(locator)
-    if len(locator_keys) != 1 or (
+    if figure_read_sample:
+        page = locator.get("page") if isinstance(locator, Mapping) else None
+        figure = locator.get("figure") if isinstance(locator, Mapping) else None
+        has_page = (
+            isinstance(page, int) and not isinstance(page, bool) and page > 0
+        )
+        has_figure = isinstance(figure, str) and bool(figure.strip())
+        has_figure = has_figure or (
+            isinstance(figure, int)
+            and not isinstance(figure, bool)
+            and figure > 0
+        )
+        if (
+            len(locator_keys) != 1
+            or not _locator_ok(locator)
+            or not has_page
+            or not has_figure
+        ):
+            defects.append(
+                "figure-read attestation requires one locator with page and figure"
+            )
+
+        uncertainty = (
+            figure_read.get("read_uncertainty")
+            if isinstance(figure_read, Mapping)
+            else None
+        )
+        has_uncertainty = False
+        if isinstance(uncertainty, Mapping):
+            for axis in ("x", "y"):
+                raw_amount = uncertainty.get(axis)
+                unit = uncertainty.get(f"unit_{axis}")
+                if (
+                    isinstance(raw_amount, (int, float, str))
+                    and not isinstance(raw_amount, bool)
+                    and isinstance(unit, str)
+                    and unit.strip()
+                ):
+                    amount = _finite_decimal(str(raw_amount))
+                    if amount is not None and amount > 0:
+                        has_uncertainty = True
+                        break
+        if not has_uncertainty:
+            defects.append(
+                "figure-read attestation requires stated digitization uncertainty"
+            )
+
+        verification = sample.get("verification")
+        dpi = verification.get("dpi") if isinstance(verification, Mapping) else None
+        if (
+            not isinstance(verification, Mapping)
+            or verification.get("method") != "render"
+            or not isinstance(dpi, int)
+            or isinstance(dpi, bool)
+            or dpi <= 0
+        ):
+            defects.append(
+                "figure-read attestation requires verification method render "
+                "and positive dpi"
+            )
+    elif len(locator_keys) != 1 or (
         not _locator_ok(locator) and not malformed_locator_keys
     ):
         defects.append(
@@ -4268,14 +4353,18 @@ def fidelity_source_warnings(
     unattested sample can still supply addresses toward
     ``uncovered_observation``; attestation is its own count. Certification
     refuses while any of these counts is non-zero: a pilot pin or an
-    unattested sample anywhere in the file, an attestation-complete pin
-    whose locator was not opened, or an observation id that names more
-    than one scored row. An opened locator must be a paper, OCR, quotes,
+    unattested sample anywhere in the file, an attestation-complete text
+    pin whose locator was not opened, or an observation id that names more
+    than one scored row. A text-backed locator must be a paper, OCR, quotes,
     or reference transcription and must contain each pinned number as a
     complete token (sign and exponent included; Unicode signs folded onto
-    that token). The extract document and program source are not artifacts.
-    Drift stays a match error. ``source_blind_pin`` is that unopened or
-    absent-value count, including a resolved extract leaf the cited text
+    that token). A pinned value marked ``evidence_class: figure_only`` with
+    a ``figure_read`` record instead needs an independent reviewer, a
+    page-and-figure locator, stated digitization uncertainty, and render
+    verification with DPI. The extract document and program source are not
+    artifacts.
+    Drift stays a match error. For text-backed samples, ``source_blind_pin``
+    counts unopened artifacts or resolved extract leaves the cited text
     does not contain. A scored row with no usable observation id is
     ``missing_observation_id`` and is not dropped from this count. These
     warnings do not reject a draft corpus.
@@ -4313,6 +4402,10 @@ def fidelity_source_warnings(
     source_blind_extra = [0]
     source_blind_reason_codes: list[frozenset[str]] = []
     root = artifact_root if artifact_root is not None else ROOT
+    extraction = doc.get("extraction")
+    extractor_id = (
+        extraction.get("worker") if isinstance(extraction, Mapping) else None
+    )
     configured_corpus_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
     corpus_root = (
         Path(configured_corpus_root).expanduser() if configured_corpus_root else None
@@ -4335,7 +4428,23 @@ def fidelity_source_warnings(
                 f"{sample_label}: auto-migrated pilot sample cannot be "
                 "source-attested; replace it with a source-reviewed sample",
             )
-        defects = _sample_attestation_defects(sample)
+        sample_value = sample.get("value")
+        figure_read_sample = False
+        figure_read = None
+        if _is_figure_read_leaf(sample_value):
+            try:
+                resolved_value = resolve_fidelity_sample(doc, sample)
+            except KeyError:
+                resolved_value = None
+            figure_read_sample = _is_figure_read_leaf(resolved_value)
+            if figure_read_sample:
+                figure_read = resolved_value.get("figure_read")
+        defects = _sample_attestation_defects(
+            sample,
+            figure_read_sample=figure_read_sample,
+            figure_read=figure_read,
+            extractor_id=extractor_id,
+        )
         if defects:
             unattested += 1
             for defect in defects:
@@ -4344,9 +4453,9 @@ def fidelity_source_warnings(
                     unattested_extra,
                     f"{sample_label}: {defect}",
                 )
-        else:
+        elif not figure_read_sample:
             # Attestation-complete pins are the ones that would otherwise certify
-            # without opening the source. Unattested pins stay on that count.
+            # without opening the text source. Unattested pins stay on that count.
             blind = _locator_source_blind_reason(
                 sample,
                 artifact_root=root,

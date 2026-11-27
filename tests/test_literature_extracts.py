@@ -2796,6 +2796,108 @@ def test_numeric_index_path_does_not_cover_a_scored_observation():
     assert any("uncovered_observation" in line for line in refusals)
 
 
+def _figure_read_extract() -> dict:
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["extraction"]["worker"] = "figure-extractor"
+    values = {
+        "alpha": 0.24,
+        "evidence_class": "figure_only",
+        "figure_read": {
+            "read_uncertainty": {
+                "x": "0.01",
+                "y": "0.02",
+                "unit_x": "mole fraction",
+                "unit_y": "activity",
+            }
+        },
+    }
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"] = copy.deepcopy(values)
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values",
+            "value": copy.deepcopy(values),
+            "reviewed_by": "independent figure checker",
+            "reviewed_on": "2026-11-26",
+            "locator": {"page": 2, "figure": "1"},
+            "verification": {"method": "render", "dpi": 350},
+        }
+    ]
+    return doc
+
+
+def test_render_verified_figure_read_is_attested_without_text_artifact():
+    doc = _figure_read_extract()
+
+    warnings = vle.fidelity_source_warnings(doc, label="figure-read")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+
+    assert "unattested_sample" not in by_kind
+    assert "source_blind_pin" not in by_kind
+    assert "uncovered_observation" not in by_kind
+    assert vle.certify_extract_source_fidelity(doc, label="figure-read") == []
+
+
+def test_figure_read_rejects_extractor_as_reviewer():
+    doc = _figure_read_extract()
+    sample = doc["fidelity_samples"][0]
+    sample["reviewed_by"] = doc["extraction"]["worker"]
+
+    warnings = vle.fidelity_source_warnings(doc, label="same-extractor")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+
+    assert by_kind.get("unattested_sample") == 1, (
+        "reviewer must be independent from the extractor"
+    )
+
+
+def test_figure_read_requires_render_verification_and_dpi():
+    doc = _figure_read_extract()
+    del doc["fidelity_samples"][0]["verification"]
+
+    warnings = vle.fidelity_source_warnings(doc, label="missing-render")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert by_kind["unattested_sample"].count == 1
+    assert "verification method render and positive dpi" in by_kind[
+        "unattested_sample"
+    ].detail
+
+
+def test_render_verification_does_not_attest_a_non_figure_leaf():
+    doc = _figure_read_extract()
+    values = doc["species"]["Fe"]["observations"][0]["values"]
+    del values["evidence_class"]
+    del values["figure_read"]
+    doc["fidelity_samples"][0]["value"] = copy.deepcopy(values)
+
+    warnings = vle.fidelity_source_warnings(doc, label="non-figure")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+
+    assert by_kind.get("source_blind_pin") == 1
+    assert "unattested_sample" not in by_kind
+
+
+def test_independence_mutation_turns_same_extractor_rejection_red(monkeypatch):
+    original = vle._sample_attestation_defects
+
+    def without_independence_check(sample, **kwargs):
+        defects = original(sample, **kwargs)
+        return [
+            defect
+            for defect in defects
+            if not defect.startswith("reviewed_by must differ from extraction.worker")
+        ]
+
+    monkeypatch.setattr(vle, "_sample_attestation_defects", without_independence_check)
+
+    with pytest.raises(
+        AssertionError, match="reviewer must be independent from the extractor"
+    ):
+        test_figure_read_rejects_extractor_as_reviewer()
+
+
 def test_attested_page_locator_without_an_opened_artifact_does_not_certify():
     """Reviewer, date, and a page locator do not open the source.
 

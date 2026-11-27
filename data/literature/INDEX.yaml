@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 863
-  extracts: 856
+  sources: 864
+  extracts: 857
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 89
+  extracts_with_private_locators: 90
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 856
+  extracts_without_pdf: 857
   alias_groups_needing_resolution: 94
 gaps:
   pdfs_without_extract: []
@@ -525,6 +525,7 @@ gaps:
   - ohta-suito-1995-mno-activity-slags
   - oishi-1986-cu2o-cao-activities
   - okazaki-2022-ryugu-gas-treasure-box
+  - omori-sanbongi-jjim-25-sio2-al2o3-activity
   - oneill-2002-feo-activity-coefficients-cmas
   - oneill-2005-alkali-oxide-activities
   - ostrovski-2000-cao-tio2-sio2
@@ -946,6 +947,7 @@ gaps:
   - neubert-2025-vanadium-slag-evaporation
   - neuman-2026-levitation-k-isotopes
   - okazaki-2022-ryugu-gas-treasure-box
+  - omori-sanbongi-jjim-25-sio2-al2o3-activity
   - pahlevan-2026-protolunar-volatile-outflows
   - park-2021-vanadium-thermodynamics-thesis
   - pretorius-muan-1992-chromium-oxide-activities
@@ -31362,6 +31364,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: omori-sanbongi-jjim-25-sio2-al2o3-activity
+  aliases: []
+  citation: Omori, Y. and Sanbongi, K. (1961), “Activities of SiO2 and Al2O3 in the CaO-MgO-SiO2-Al2O3
+    slag system”, Journal of the Japan Institute of Metals 25(2), 136–139.
+  doi: 10.2320/jinstmet1952.25.2_136
+  report_number: null
+  identifier: 10.2320/jinstmet1952.25.2_136
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/omori-sanbongi-jjim-25-sio2-al2o3-activity.yaml
+    review_status: draft
+    rows: 84
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/omori-sanbongi-jjim-25-sio2-al2o3-activity/omori-sanbongi-jjim-25-sio2-al2o3-activity.pdf
+      present: true
+      sha256: f134c3080cee153282269828867f19982a5de6903bbd76ef7c769c9084b90a26
+      matches_simulator: null
+    sidecar:
+      path: raw/omori-sanbongi-jjim-25-sio2-al2o3-activity/sidecar.yaml
+      present: true
+    text:
+      path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity
+      exists: true
+      file_count: 55
+    tables:
+      path: tables/omori-sanbongi-jjim-25-sio2-al2o3-activity
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/omori-sanbongi-jjim-25-sio2-al2o3-activity.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/omori-sanbongi-jjim-25-sio2-al2o3-activity.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: oneill-2002-feo-activity-coefficients-cmas
   aliases: []
   citation: 'O''Neill, H.St.C. & Eggins, S.M. (2002), The effect of melt composition on trace element
