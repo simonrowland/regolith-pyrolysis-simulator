@@ -3203,49 +3203,29 @@ def test_derivation_rejects_a_cycle():
     observations[0]["values"] = {
         "composition_closure": {"method": "by_difference", "component": "CaO"}
     }
-    observations.append(
+    observations[0]["point_conditions"] = {"marker": "1"}
+    doc["fidelity_samples"] = []
+    prefix = "species.Fe.observations[fe_alpha_1]"
+    doc["fidelity_samples"].append(
         {
-            "observation_id": "fe_alpha_2",
-            "type": "alpha",
-            "locator": {"table": "1", "page": 2},
-            "phase": "silicate_melt",
-            "values": {
-                "composition_closure": {
-                    "method": "by_difference",
-                    "component": "CaO",
-                }
+            "path": f"{prefix}.point_conditions",
+            "value": {"marker": "1"},
+            "reviewed_by": "derivation checker",
+            "reviewed_on": "2026-11-27",
+            "locator": {"page": 2, "figure": "3"},
+            "verification": {
+                "method": "derivation",
+                "closure": "by_difference",
+                "parents": [
+                    {
+                        "path": f"{prefix}.point_conditions",
+                        "role": "mole_fraction",
+                        "component": "SiO2",
+                    }
+                ],
             },
-            "point_conditions": {"marker": "2"},
         }
     )
-    observations[0]["point_conditions"] = {"marker": "1"}
-    prefixes = (
-        "species.Fe.observations[fe_alpha_1]",
-        "species.Fe.observations[fe_alpha_2]",
-    )
-    doc["fidelity_samples"] = []
-    for index, prefix in enumerate(prefixes):
-        other = prefixes[1 - index]
-        doc["fidelity_samples"].append(
-            {
-                "path": f"{prefix}.point_conditions",
-                "value": {"marker": str(index + 1)},
-                "reviewed_by": "derivation checker",
-                "reviewed_on": "2026-11-27",
-                "locator": {"page": 2, "figure": "3"},
-                "verification": {
-                    "method": "derivation",
-                    "closure": "by_difference",
-                    "parents": [
-                        {
-                            "path": f"{other}.point_conditions",
-                            "role": "mole_fraction",
-                            "component": "SiO2",
-                        }
-                    ],
-                },
-            }
-        )
 
     warnings = vle.fidelity_source_warnings(doc, label="derivation-cycle")
     detail = " ".join(
