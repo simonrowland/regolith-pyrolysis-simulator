@@ -40,6 +40,11 @@ def _row_payload(residual, context, candidates, activity_case):
         "metric_operation": None if numeric is None else numeric.operation.value,
         "status": residual.status.value,
         "refusal": None if residual.refusal is None else residual.refusal.reason.value,
+        "refusal_detail": (
+            None
+            if residual.refusal is None
+            else {str(key): str(value) for key, value in residual.refusal.detail.items()}
+        ),
     }
 
 
@@ -105,28 +110,37 @@ def _k_crossover_temperature() -> float | None:
         return (left_t + right_t) / 2.0
 
 
-def run_cold_markova_vi_internal_analytical(activity_case, temperature_K, species):
+def run_cold_markova_vi_internal_analytical(activity_case):
     with tempfile.TemporaryDirectory(prefix="markova-parsed-cache-") as cache_dir:
         os.environ["REGOLITH_PARSED_YAML_CACHE"] = "on"
         os.environ["REGOLITH_PARSED_YAML_CACHE_DIR"] = cache_dir
 
         from simulator import equilibrium as equilibrium_module
+        from simulator.battery.enums import Rail
         from simulator.battery.score import Engine, load_score_context, score_store
         from simulator.engine_cache import _engine_cache_path_scope
 
-        case_token = f"{TARGET_TOKEN}::T={temperature_K:.2f}::{species}"
         context = load_score_context(sources=(SOURCE_ID,))
         target_observations = {
             observation_id: observation
             for observation_id, observation in context.observations.items()
             if TARGET_TOKEN in observation_id
-            and f"T={temperature_K:.2f}" in observation_id
-            and observation.identity.species.formula == species
         }
-        assert target_observations, f"No Markova VI rows selected for {case_token}"
-        # Keep the measured VI row and complete experiment/work context. This
-        # isolates one requested cell without changing its units or identity.
-        context = replace(context, observations=target_observations)
+        assert target_observations, f"No Markova VI rows selected for {TARGET_TOKEN}"
+        experiment_ids = {
+            observation.experiment_id for observation in target_observations.values()
+        }
+        assert len(experiment_ids) == 1, f"Expected one VI experiment, got {experiment_ids}"
+        # The Knudsen extent solve needs every VI oxide and mass-loss anchor.
+        # Keep that experiment's complete observation context, then select the
+        # requested composition-series rows only from its score output.
+        scoring_observations = {
+            observation_id: observation
+            for observation_id, observation in context.observations.items()
+            if observation.source_id == SOURCE_ID
+            and observation.experiment_id in experiment_ids
+        }
+        context = replace(context, observations=scoring_observations)
 
         original_activity = equilibrium_module.melt_oxide_activity
         gamma_by_oxide = (
@@ -151,28 +165,35 @@ def run_cold_markova_vi_internal_analytical(activity_case, temperature_K, specie
                 residuals, candidates = score_store(
                     context,
                     engines=(Engine.INTERNAL_ANALYTICAL,),
+                    rail=Rail.RESIDUE_COMPOSITION,
                     work_id=SOURCE_ID,
                     include_diagnostics=False,
                 )
         finally:
             equilibrium_module.melt_oxide_activity = original_activity
 
-        target_rows = [
-            residual
-            for residual in residuals
-            if TARGET_TOKEN in residual.reference
-            and f"T={temperature_K:.2f}" in residual.reference
-            and context.observations[residual.reference].identity.species.formula == species
-        ]
-        assert target_rows, f"No Markova VI residuals scored for {case_token}"
+        target_rows = []
+        for residual in residuals:
+            if TARGET_TOKEN not in residual.reference:
+                continue
+            observation = context.observations.get(residual.reference)
+            if observation is None or observation.identity.species.formula not in SPECIES:
+                continue
+            temperature = observation.identity.temperature_K
+            if temperature is None or not temperature.is_value:
+                continue
+            if float(temperature.value) in TEMPERATURES_K:
+                target_rows.append(residual)
+        assert len(target_rows) == len(TEMPERATURES_K) * len(SPECIES), (
+            f"Expected {len(TEMPERATURES_K) * len(SPECIES)} Markova VI rows, got {len(target_rows)}"
+        )
         rows = sorted(
             (_row_payload(residual, context, candidates, activity_case) for residual in target_rows),
-            key=lambda row: (row["temperature_K"] or "", row["species"]),
+            key=lambda row: (float(row["temperature_K"] or 0), row["species"]),
         )
         parsed_files = sum(1 for path in Path(cache_dir).rglob("*.pickle") if path.is_file())
         report = {
             "activity_case": activity_case,
-            "temperature_K": temperature_K,
             "warmth": {
                 "engine_result_cache": "disabled via _engine_cache_path_scope(None)",
                 "parsed_yaml_cache": "fresh empty private directory per test",
@@ -180,14 +201,15 @@ def run_cold_markova_vi_internal_analytical(activity_case, temperature_K, specie
                 "scorer_engine": Engine.INTERNAL_ANALYTICAL.value,
                 "work_filter": SOURCE_ID,
                 "row_filter": TARGET_TOKEN,
+                "scored_experiment_observations": len(scoring_observations),
             },
             "rows": rows,
         }
-        if activity_case == "gamma=1" and temperature_K == 2156.15 and species == "SiO2":
+        if activity_case == "gamma=1":
             report["k_crossover"] = {
                 "definition": "log10(K_SiO_liquid / K_Mg_liquid) = 0; common pO2 and activities divided out",
                 "temperature_K": _k_crossover_temperature(),
             }
         REPORT_DIR.mkdir(exist_ok=True)
-        report_path = REPORT_DIR / f"{activity_case.replace('=', '-')}-{temperature_K:.2f}-{species}.json"
+        report_path = REPORT_DIR / f"{activity_case.replace('=', '-')}.json"
         report_path.write_text(json.dumps(report, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
