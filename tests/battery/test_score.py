@@ -4639,7 +4639,7 @@ def test_species_formula_unparsed_never_string_matched() -> None:
 
 
 def test_species_formula_parser_preserves_200_existing_parses() -> None:
-    """Pin established formula results before extending the parser grammar."""
+    """Pin 200 established parse outcomes, including OCR refusals."""
 
     fixture = (
         Path(__file__).resolve().parents[1]
@@ -4648,11 +4648,29 @@ def test_species_formula_parser_preserves_200_existing_parses() -> None:
     )
     rows = json.loads(fixture.read_text(encoding="utf-8"))
     assert len(rows) == 200
+    phase_for_suffix = {
+        "cr": Phase.CR,
+        "gl": Phase.GLASS,
+        "l": Phase.L,
+        "g": Phase.G,
+        "aq": Phase.AQ,
+    }
     for row in rows:
+        formula = row["formula"]
+        expected_elements = row["elements"]
+        if expected_elements is None:
+            assert parse_species_formula(formula) is None
+            continue
         expected = tuple(
-            (str(symbol), float(count)) for symbol, count in row["elements"]
+            (str(symbol), float(count)) for symbol, count in expected_elements
         )
-        assert parse_species_formula(row["formula"]) == expected
+        body, phase_suffix = score_mod._strip_terminal_phase_suffix(formula)
+        species = (
+            None
+            if phase_suffix is None
+            else Species(body, phase_for_suffix[phase_suffix])
+        )
+        assert parse_species_formula(formula, species=species) == expected
 
 
 def test_species_formula_parser_accepts_published_typography() -> None:
@@ -4962,6 +4980,90 @@ def test_contradictory_polymorph_does_not_blank_parseable_formula_counts() -> No
         ("O", 4.0),
         ("Si", 1.0),
     )
+
+
+@pytest.mark.parametrize(
+    ("formula", "polymorph"),
+    (("CaC03", "aragonite"), ("CaMg(Si03)2", "diopside")),
+)
+def test_contradictory_b1259_formula_refuses_before_engine_parse(
+    formula: str, polymorph: str, monkeypatch
+) -> None:
+    reason = f"polymorph {polymorph} does not denote formula {formula}"
+    experiment = F.tabulation_experiment()
+    identity = F.oxide_identity(formula, Phase.CR)
+    assert identity.species is not None
+    identity = replace(
+        identity,
+        species=replace(
+            identity.species,
+            polymorph=State.unknown(
+                reason,
+                rejection_kind=PolymorphRejectionKind.CONTRADICTS_FORMULA,
+            ),
+        ),
+    )
+    observation = F.observation(
+        f"b1259-contradicted-{polymorph}",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        source_id="robie-waldbaum-1968-usgs-b1259",
+    )
+
+    def assert_identity_mismatch() -> None:
+        prediction = score_mod.predict_with_engine(
+            Engine.INTERNAL_ANALYTICAL, observation
+        )
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+        assert prediction.refusal_detail["reason"] == (
+            "species_polymorph_contradicts_formula"
+        )
+        assert prediction.refusal_detail["polymorph_reason"] == reason
+        residual, _candidate = score_mod.compile_residual(
+            observation,
+            Engine.INTERNAL_ANALYTICAL,
+            context=_context(
+                F.work(), experiment, observation, review="reviewed"
+            ),
+        )
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.IDENTITY_MISMATCH
+        assert residual.refusal.detail["reason"] == (
+            "species_polymorph_contradicts_formula"
+        )
+
+    assert_identity_mismatch()
+    with monkeypatch.context() as mutation:
+        mutation.setattr(score_mod, "_source_polymorph_is_rejected", lambda _: False)
+        with pytest.raises(AssertionError):
+            assert_identity_mismatch()
+
+
+@pytest.mark.parametrize("formula", ("CaC03", "CaMg(Si03)2"))
+def test_formula_parser_refuses_leading_zero_counts_and_mutation_is_caught(
+    formula: str, monkeypatch
+) -> None:
+
+    def assert_leading_zero_refused() -> None:
+        assert score_mod.parse_species_formula(formula) is None
+
+    assert_leading_zero_refused()
+
+    def restore_leading_zero_acceptance(
+        formula: str, *, species: Species | None = None
+    ) -> tuple[tuple[str, float], ...] | None:
+        return score_mod.atoms_parse_formula_else_janaf(formula)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score_mod, "parse_species_formula", restore_leading_zero_acceptance
+        )
+        with pytest.raises(AssertionError):
+            assert_leading_zero_refused()
 
 
 def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> None:

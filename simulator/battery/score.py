@@ -1288,6 +1288,14 @@ def parse_species_formula(
             return None
         text = text[: charge_annotation.start()]
 
+    # A multi-digit count beginning with zero is an OCR letter-for-digit
+    # corruption (for example O3 printed as 03), not a count to interpret.
+    # Refuse it here rather than silently turning CaC03 into CaC3.
+    if re.search(
+        r"(?:[A-Za-z]|[)\]}])0\d+|(?:^|·)0\d+|\.0\d+(?=[A-Z(])", text
+    ):
+        return None
+
     # d-420 treats wüstite's symbolic vacancy fraction as a reference-state
     # convention, not a measured x to invent. Fe_tO is total iron reported on
     # an FeO basis; the downstream comparison and typed flags own those bases.
@@ -2829,6 +2837,16 @@ def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
             PolymorphRejectionKind.UNRECOGNISED,
             PolymorphRejectionKind.CONTRADICTS_FORMULA,
         )
+    )
+
+
+def _source_polymorph_formula_contradicts(species: Species | None) -> bool:
+    if species is None or species.polymorph is None:
+        return False
+    return (
+        _source_polymorph_is_rejected(species.polymorph)
+        and species.polymorph.rejection_kind
+        is PolymorphRejectionKind.CONTRADICTS_FORMULA
     )
 
 
@@ -14813,10 +14831,30 @@ def _predict_with_engine(
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
     _require_score_engine(engine)
-    if engine is Engine.CATALOG_EVALUATOR:
-        return _predict_catalog_evaluator(observation)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if (
+        isinstance(identity, Identity)
+        and quantity is not None
+        and quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        and _source_polymorph_formula_contradicts(identity.species)
+    ):
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+            refusal_detail={
+                "reason": "species_polymorph_contradicts_formula",
+                "formula": identity.species.formula,
+                "polymorph_reason": identity.species.polymorph.reason,
+            },
+            identity=identity,
+        )
+    if engine is Engine.CATALOG_EVALUATOR:
+        return _predict_catalog_evaluator(observation)
     if engine is Engine.NASA_CEA_9 and quantity is not None:
         from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
@@ -18552,6 +18590,31 @@ def _compile_residual_with_lineage(
         rail=rail,
         temperature_K=T,
     )
+    if (
+        isinstance(identity, Identity)
+        and quantity is not None
+        and quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        and _source_polymorph_formula_contradicts(identity.species)
+    ):
+        assert identity.species is not None and identity.species.polymorph is not None
+        polymorph = identity.species.polymorph
+        return _refused_residual(
+            reference,
+            engine,
+            quantity,
+            rail,
+            key,
+            RefusalReason.IDENTITY_MISMATCH,
+            {
+                "reason": "species_polymorph_contradicts_formula",
+                "formula": identity.species.formula,
+                "polymorph_reason": polymorph.reason,
+            },
+            Execution(state=ExecutionState.NOT_PROBED),
+            (),
+            check_refs=("identity_equal",),
+            exclusions=("identity_equal",),
+        )
     origin = context.origins.get(reference.observation_id)
     review_status = context.extract_review.get(reference.source_id or "")
     experiment = context.experiments.get(reference.experiment_id)
