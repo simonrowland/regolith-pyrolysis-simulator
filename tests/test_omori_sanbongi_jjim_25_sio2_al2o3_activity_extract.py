@@ -285,6 +285,11 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
         assert values["composition_as_plotted"]["N_SiO2_percent_as_printed"] == n_sio2
         assert values["composition_as_plotted"]["MgO_mass_percent_as_series"] == mgo_wt
         assert values["N_CaO_plus_MgO_over_N_SiO2_as_plotted"] == FIG6_BASICITY[row_id]
+        if row_id in {"omori_fig5_02", "omori_fig5_04"}:
+            assert "secondary_figure_read" not in values
+            assert "fig6_secondary_locator" not in values
+            assert "secondary_locator" not in row
+            continue
         assert values["secondary_figure_read"]["x_coordinate_as_read"] == FIG6_BASICITY[row_id]
         fig6_activity = "-3.4290" if row_id == "omori_fig5_03" else activity
         assert Decimal(values["secondary_figure_read"]["y_coordinate_as_read"]).quantize(
@@ -293,6 +298,15 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
         assert row["locator"]["figure"] == "5"
         assert row["secondary_locator"]["figure"] == "6"
         assert row["secondary_locator"]["page"] == 3
+    audit_rows = {
+        (row["printed_table"], row["printed_row"]): row
+        for row in _figure_audit_rows(document)
+    }
+    for sample_id in ("33_6", "32_3"):
+        audit = audit_rows[("6", f"{sample_id} same sample as Fig. 5 point {2 if sample_id == '33_6' else 4}")]
+        assert "non-matching marker series" in audit["render_read"]
+        assert "filled MgO 10%" in audit["render_read"]
+        assert "no Fig. 6 marker read retained" in audit["audit"]
     for row_id, expected in {
         "omori_fig5_03": (
             "34.96174689",
@@ -378,6 +392,12 @@ def test_migration_preserves_temperatures_compositions_and_typed_activity_reques
         assert observation.point_conditions["T_C"].state.value == Decimal("1630")
         assert observation.point_conditions["temperature_K"].state.value == Decimal("1903.15")
         assert observation.point_conditions["T_C"].locator.page == 3
+        if formula == "Al2O3":
+            temperature_locator = source["point_conditions"]["T_C"]["locator"]
+            assert temperature_locator["published_page"] == 138
+            assert temperature_locator["paragraph"] == "Al2O3 activity reference discussion"
+            assert temperature_locator["line_range"] == "260-262"
+            assert "table" not in temperature_locator
         composition = observation.point_conditions["composition"]
         assert composition.locator.figure == source["locator"]["figure"]
         if row_id == UNCLOSED_COMPOSITION_ID:

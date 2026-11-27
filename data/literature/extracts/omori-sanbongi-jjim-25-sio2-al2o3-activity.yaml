@@ -11,7 +11,9 @@ source:
 extraction:
   method: Manual figure digitization from the 350 dpi rendered pages; all printed axis tick numerals were checked
     and at least two ticks per axis calibrated. Fig. 3 marker centers were reread by w1127omorireread with new tick calibration.
-    Fig. 5 and Fig. 6 are one scored Al2O3 observation per same sample; Fig. 6 is a secondary coordinate presentation.
+    Fig. 5 and Fig. 6 are one scored Al2O3 observation per sample. Fig. 6 basicity ratios are recalculated from Fig. 5
+    mass compositions, not independent marker reads; the non-matching MgO 10% candidates for labels 33.6 and 32.3
+    have no retained secondary locator.
     Comparison curves from other papers are excluded from scored observations.
   provenance_path: data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
   date: '2026-11-26'
@@ -4136,31 +4138,6 @@ fidelity_samples:
         y: '0.06'
         unit_x: mole fraction
         unit_y: log10 activity
-    secondary_figure_read:
-      calibration_audit: data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
-      crop_pixel_xy:
-      - 326.39
-      - 603.83
-      x_coordinate_as_read: '1.813971'
-      y_coordinate_as_read: '-3.612426'
-      series: MgO 20 mass percent
-      sample_id: omori_al2o3_02
-      read_uncertainty:
-        x: '0.05'
-        y: '0.06'
-        unit_x: ratio
-        unit_y: log10 activity
-    fig6_secondary_locator:
-      page: 3
-      pdf_page_index: 2
-      published_page: 138
-      figure: '6'
-      row: 33_6 same sample as Fig. 5 point 2
-      column: N_CaO+MgO/N_SiO2; log10 a(Al2O3)
-      source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-      line_range: 256-260
-      source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
-      note: 350 dpi page render crop; calibration and point pixels in data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
     fig6_shared_sample_note: Fig. 6 re-plots this Fig. 5 composition and log activity against N_CaO+MgO/N_SiO2;
       it is not a second observation.
     N_CaO_plus_MgO_over_N_SiO2_as_plotted: '1.813971'
@@ -4471,31 +4448,6 @@ fidelity_samples:
         y: '0.08'
         unit_x: mole fraction
         unit_y: log10 activity
-    secondary_figure_read:
-      calibration_audit: data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
-      crop_pixel_xy:
-      - 288.96
-      - 542.58
-      x_coordinate_as_read: '1.927380'
-      y_coordinate_as_read: '-3.236686'
-      series: MgO 20 mass percent
-      sample_id: omori_al2o3_04
-      read_uncertainty:
-        x: '0.05'
-        y: '0.06'
-        unit_x: ratio
-        unit_y: log10 activity
-    fig6_secondary_locator:
-      page: 3
-      pdf_page_index: 2
-      published_page: 138
-      figure: '6'
-      row: 32_3 same sample as Fig. 5 point 4
-      column: N_CaO+MgO/N_SiO2; log10 a(Al2O3)
-      source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-      line_range: 256-260
-      source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
-      note: 350 dpi page render crop; calibration and point pixels in data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
     fig6_shared_sample_note: Fig. 6 re-plots this Fig. 5 composition and log activity against N_CaO+MgO/N_SiO2;
       it is not a second observation.
     N_CaO_plus_MgO_over_N_SiO2_as_plotted: '1.927380'
@@ -10445,11 +10397,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -10492,17 +10443,6 @@ species:
         column: N_Al2O3; log10 a(Al2O3); adjacent N_SiO2 label
         source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
         line_range: 200-205
-        source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
-        note: 350 dpi page render crop; calibration and point pixels in data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
-      secondary_locator: &id036
-        page: 3
-        pdf_page_index: 2
-        published_page: 138
-        figure: '6'
-        row: 33_6 same sample as Fig. 5 point 2
-        column: N_CaO+MgO/N_SiO2; log10 a(Al2O3)
-        source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-        line_range: 256-260
         source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         note: 350 dpi page render crop; calibration and point pixels in data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
       standard_state:
@@ -10566,21 +10506,6 @@ species:
             y: '0.06'
             unit_x: mole fraction
             unit_y: log10 activity
-        secondary_figure_read:
-          calibration_audit: data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
-          crop_pixel_xy:
-          - 326.39
-          - 603.83
-          x_coordinate_as_read: '1.813971'
-          y_coordinate_as_read: '-3.612426'
-          series: MgO 20 mass percent
-          sample_id: omori_al2o3_02
-          read_uncertainty:
-            x: '0.05'
-            y: '0.06'
-            unit_x: ratio
-            unit_y: log10 activity
-        fig6_secondary_locator: *id036
         fig6_shared_sample_note: Fig. 6 re-plots this Fig. 5 composition and log activity against N_CaO+MgO/N_SiO2;
           it is not a second observation.
         N_CaO_plus_MgO_over_N_SiO2_as_plotted: '1.813971'
@@ -10593,11 +10518,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -10741,11 +10665,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -10788,17 +10711,6 @@ species:
         column: N_Al2O3; log10 a(Al2O3); adjacent N_SiO2 label
         source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
         line_range: 200-205
-        source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
-        note: 350 dpi page render crop; calibration and point pixels in data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
-      secondary_locator: &id040
-        page: 3
-        pdf_page_index: 2
-        published_page: 138
-        figure: '6'
-        row: 32_3 same sample as Fig. 5 point 4
-        column: N_CaO+MgO/N_SiO2; log10 a(Al2O3)
-        source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-        line_range: 256-260
         source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         note: 350 dpi page render crop; calibration and point pixels in data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
       standard_state:
@@ -10862,21 +10774,6 @@ species:
             y: '0.08'
             unit_x: mole fraction
             unit_y: log10 activity
-        secondary_figure_read:
-          calibration_audit: data/literature/extracts/audits/omori-sanbongi-jjim-25-sio2-al2o3-activity-figure-calibration.md
-          crop_pixel_xy:
-          - 288.96
-          - 542.58
-          x_coordinate_as_read: '1.927380'
-          y_coordinate_as_read: '-3.236686'
-          series: MgO 20 mass percent
-          sample_id: omori_al2o3_04
-          read_uncertainty:
-            x: '0.05'
-            y: '0.06'
-            unit_x: ratio
-            unit_y: log10 activity
-        fig6_secondary_locator: *id040
         fig6_shared_sample_note: Fig. 6 re-plots this Fig. 5 composition and log activity against N_CaO+MgO/N_SiO2;
           it is not a second observation.
         N_CaO_plus_MgO_over_N_SiO2_as_plotted: '1.927380'
@@ -10889,11 +10786,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -11037,11 +10933,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -11185,11 +11080,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -11333,11 +11227,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -11481,11 +11374,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -11629,11 +11521,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -11777,11 +11668,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -11925,11 +11815,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -12073,11 +11962,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -12221,11 +12109,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -12369,11 +12256,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -12517,11 +12403,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -12665,11 +12550,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -12813,11 +12697,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
@@ -12961,11 +12844,10 @@ species:
             page: 3
             pdf_page_index: 2
             published_page: 138
-            table: '1'
-            row: Authors column
-            column: measurement temperature (1630°)
+            paragraph: Al2O3 activity reference discussion
+            column: reference temperature (1630°)
             source_path: text/omori-sanbongi-jjim-25-sio2-al2o3-activity/pdftotext-layout.txt
-            line_range: 206-207
+            line_range: 260-262
             source_sha256: f95e2c416632203dd287ee1f1054ea839674e2f7b3075e5cce803cae808cce8b
         composition:
           state:
