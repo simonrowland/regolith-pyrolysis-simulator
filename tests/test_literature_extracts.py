@@ -6041,25 +6041,6 @@ def _assert_corpus_pins_open(documents, artifact_root=None) -> vle.CorpusMountTa
     return tally
 
 
-def _unattested_excess_message(documents, total: int) -> str:
-    """Name every source that still has unattested samples when the ceiling fails."""
-    rows: list[tuple[int, str]] = []
-    for label, doc in documents:
-        count = sum(
-            warning.count
-            for warning in vle.fidelity_source_warnings(doc, label=label)
-            if warning.kind == "unattested_sample"
-        )
-        if count:
-            rows.append((count, label))
-    rows.sort(reverse=True)
-    lines = [
-        f"unattested_samples={total} ceiling={_UNATTESTED_SAMPLES_CEILING}",
-        *(f"{label}={count}" for count, label in rows),
-    ]
-    return "\n".join(lines)
-
-
 def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property):
     """Source-fidelity holes are an upper bound, not a green bill of health.
 
@@ -6146,8 +6127,20 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
+    # Non-finite is checked before the sample ceiling. The non-finite probe
+    # calls this test and reads the first assertion message. An extract that
+    # is over the sample ceiling must not hide that probe.
+    assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
+    omori_unattested = sum(
+        warning.count
+        for label, doc in documents
+        if label == "omori-sanbongi-jjim-25-sio2-al2o3-activity"
+        for warning in vle.fidelity_source_warnings(doc, label=label)
+        if warning.kind == "unattested_sample"
+    )
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, (
-        _unattested_excess_message(documents, unattested_samples)
+        f"{unattested_samples} ceiling={_UNATTESTED_SAMPLES_CEILING} "
+        f"omori-sanbongi-jjim-25-sio2-al2o3-activity={omori_unattested}"
     )
     assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
@@ -6157,7 +6150,6 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ), f"source_blind_pin={source_blind_pins}; mount_dependent_pins={mount_dependent_pins}"
     assert ambiguous_ids <= _AMBIGUOUS_OBSERVATION_IDS_CEILING, ambiguous_ids
     assert missing_ids <= _MISSING_OBSERVATION_IDS_CEILING, missing_ids
-    assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
 
 
 def test_fidelity_corpus_pins_open(monkeypatch, record_property):
