@@ -349,7 +349,11 @@ def test_internal_analytical_unresolved_mgo_standard_state_is_typed_and_omitted(
 ):
     from simulator.reference_data import janaf
 
-    def missing_mgo_fusion_pair(*_args, **_kwargs):
+    original_fusion_energy = janaf.janaf_fusion_energy
+
+    def missing_mgo_fusion_pair(oxide, *args, **kwargs):
+        if oxide != "MgO":
+            return original_fusion_energy(oxide, *args, **kwargs)
         raise ValueError("MgO JANAF liquid/crystal pair is unavailable")
 
     monkeypatch.setattr(janaf, "janaf_fusion_energy", missing_mgo_fusion_pair)
