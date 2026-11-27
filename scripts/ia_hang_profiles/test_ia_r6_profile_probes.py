@@ -45,7 +45,7 @@ from _ia_rhs_profile_support import (
 )
 
 
-@pytest.mark.cpu_budget(seconds=21600)
+@pytest.mark.cpu_budget(21600)
 @pytest.mark.timeout(129600)
 @pytest.mark.engine_cache_off
 def test_r6_base_probe(monkeypatch, capsys):
@@ -182,7 +182,7 @@ def _run_base_probe(
     return json.loads(baseline_line)
 
 
-@pytest.mark.cpu_budget(seconds=21600)
+@pytest.mark.cpu_budget(21600)
 @pytest.mark.timeout(129600)
 @pytest.mark.engine_cache_off
 @pytest.mark.parametrize("label,source_id,expected_count", _STUDIES)
@@ -225,7 +225,7 @@ def test_r6_study_digest_matches_pure_b274_fold(
     assert candidate["residual_digest"] == base["residual_digest"]
 
 
-@pytest.mark.cpu_budget(seconds=21600)
+@pytest.mark.cpu_budget(21600)
 @pytest.mark.timeout(129600)
 @pytest.mark.engine_cache_off
 @pytest.mark.parametrize("label,observation_id", _GATE_ROWS)
