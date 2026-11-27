@@ -173,6 +173,18 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
     # melt on the Fe line, so Fe, Cr, Na, K and Mg capture change. The
     # oxide-Fe debit (f187184015) leaves oxygen in the melt; that oxygen
     # books the SiO oxidative wall leg, which was 0 under the old pin.
+    # 2026-11-27 receipt f34ef542 on assembly merge 5eecc17769. That pin
+    # predates 23c5bd4436, which restores one shared Fe(g) HKL ceiling.
+    # Premise: at the Fe line the pool and FeO share one p_Fe, so one
+    # ceiling C. Algebra: leftover = max(0, C - n_pool/dt). When the
+    # pool fills C, leftover is 0, oxide Fe(g) is 0, and the partner
+    # O2 that debit used to leave is not booked. Fe inlet falls by
+    # about a third (one ceiling, not a second oxide route). Melt
+    # oxygen moves with that missing O2, and Cr, Na, K, Mg, and the
+    # SiO stage-4/wall split move with pO2. Cr stage 1 matches the
+    # 5c3ea6c02b gate digits, so the vacuum-floor label narrow did
+    # not move this capture. Limit: pool vapour below C leaves a
+    # nonzero oxide residual and this shift does not apply.
     expected = json.loads(PINS.read_text())[name]
     # Collect every species before failing: stopping at the first mismatch
     # hid stale Cr/SiO pins behind an Fe miss through two repins.
