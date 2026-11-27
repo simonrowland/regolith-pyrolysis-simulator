@@ -511,15 +511,16 @@ def test_mass_balance_failure_discards_shard_without_seeding_target(tmp_path, mo
     emitted = []
     _patch_common(monkeypatch, emitted)
     target_db = tmp_path / "target.db"
-    non_strict_key = _strict_vapor_pt1_key("non-strict-existing-row")
-    non_strict_payload = _strict_vapor_pt1_payload(
-        fallback_provider_id="builtin-vapor-pressure",
-    )
-    _write_equilibrium_post_record_row(
+    _write_equilibrium_post_record_row_raw(
         target_db,
-        key=non_strict_key,
-        payload=non_strict_payload,
+        backend_name="InternalAnalyticalBackend",
+        provider_id="builtin-backend-equilibrium",
     )
+    [target_row] = driver._cache_payload_rows(target_db)
+    assert target_row["payload_codec_version"] == rrd._payload_codec_version(
+        "equilibrium_post_record"
+    )
+    assert driver._pt1_row_admission(target_row)
 
     def fake_run_case(*, db_path, mode, **kwargs):
         _write_magemin_row(db_path, "bad")
@@ -534,7 +535,7 @@ def test_mass_balance_failure_discards_shard_without_seeding_target(tmp_path, mo
     assert emitted[-1]["failed_reason"] == "mass_balance_gate_failed"
     assert emitted[-1]["live"][0]["cache_merge"]["discarded"] is True
     assert emitted[-1]["cache"]["rows"] == 1
-    assert emitted[-1]["cache"]["magemin_unique_keys"] == 1
+    assert emitted[-1]["cache"]["magemin_unique_keys"] == 0
 
 
 def test_validate_replay_discarded_capture_shard_ignores_superseded_magemin_rows(

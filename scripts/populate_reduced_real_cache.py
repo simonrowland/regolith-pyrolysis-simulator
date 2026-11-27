@@ -720,7 +720,6 @@ def _decoded_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
             f"PT-1 payload_codec_version storage type mismatch: {row['key_hash']}"
         )
     validate_repair_notices_json(repair_notices_json)
-    validate_reduced_real_equilibrium_record_key(artifact, key, payload)
     physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
     physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
     physics_bucket_hash = hashlib.sha256(physics_bucket_bytes).hexdigest()
@@ -742,10 +741,10 @@ def _decoded_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _admitted_cache_payload_rows(
+def _classified_cache_payload_rows(
     payload_rows: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], int, set[str]]:
-    """Decode codec-admitted rows and derive MAGEMin hashes from their keys."""
+    """Decode integrity- and codec-current rows for reporting or admission."""
 
     rows: list[dict[str, Any]] = []
     superseded_rows = 0
@@ -762,8 +761,23 @@ def _admitted_cache_payload_rows(
     return rows, superseded_rows, magemin_key_hashes
 
 
+def _admitted_cache_payload_rows(
+    payload_rows: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], int, set[str]]:
+    """Apply source policy after integrity and codec classification."""
+
+    rows, superseded_rows, magemin_key_hashes = _classified_cache_payload_rows(
+        payload_rows
+    )
+    for row in rows:
+        validate_reduced_real_equilibrium_record_key(
+            row["artifact"], row["key"], row["payload"]
+        )
+    return rows, superseded_rows, magemin_key_hashes
+
+
 def _cache_row_summary(db_path: Path) -> dict[str, Any]:
-    rows, superseded_rows, magemin_key_hashes = _admitted_cache_payload_rows(
+    rows, superseded_rows, magemin_key_hashes = _classified_cache_payload_rows(
         _cache_payload_rows(db_path)
     )
     summary_rows: list[dict[str, Any]] = []
@@ -832,7 +846,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
 def _discarded_cache_shard_summary(shard_path: Path, reason: str) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
     _, superseded_rows, magemin_key_hashes = (
-        _admitted_cache_payload_rows(rows)
+        _classified_cache_payload_rows(rows)
     )
     return {
         "merged": False,
@@ -1160,7 +1174,7 @@ def main(argv: list[str]) -> int:
                     }
                     _emit(result, args.json_out)
                     return 4
-                _, _, admitted_magemin_key_hashes = _admitted_cache_payload_rows(
+                _, _, admitted_magemin_key_hashes = _classified_cache_payload_rows(
                     _cache_payload_rows(shard_db)
                 )
                 run_magemin_key_hashes.update(admitted_magemin_key_hashes)
