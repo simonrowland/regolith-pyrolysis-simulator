@@ -1911,6 +1911,87 @@ def test_missing_transport_channel_is_unavailable_downstream(
 
 
 @pytest.mark.parametrize(
+    ("case", "species", "expected_reason"),
+    (
+        ("missing_molar_mass", "Unobtainium", "missing_molar_mass"),
+        (
+            "missing_stoichiometry",
+            "Si",
+            "missing_evaporation_stoichiometry",
+        ),
+    ),
+)
+def test_provider_omissions_remain_typed_unavailable_with_a_peer(
+    case,
+    species,
+    expected_reason,
+):
+    from types import SimpleNamespace
+
+    from simulator.evaporation import (
+        _record_unavailable_provider_flux_channels,
+    )
+    from simulator.state import EvaporationFlux
+
+    if case == "missing_molar_mass":
+        stoich = {
+            "Na": {"parent_oxide": "Na2O", "oxide_per_product_kg": 1.347},
+            "Unobtainium": {
+                "parent_oxide": "Na2O",
+                "oxide_per_product_kg": 1.0,
+            },
+        }
+        result = _w3_result_with_controls(
+            1.0,
+            vapour_batch_flux_pressures_Pa={
+                "Na": 100.0,
+                "Unobtainium": 100.0,
+            },
+            molar_mass_kg_mol={"Na": 0.023},
+            stoich_by_species=stoich,
+            available_oxide_kg={"Na": 10.0, "Unobtainium": 10.0},
+            alpha={"Na": 0.5, "Unobtainium": 0.5},
+        )
+    else:
+        stoich = {
+            "Na": {"parent_oxide": "Na2O", "oxide_per_product_kg": 1.347},
+        }
+        result = _w3_result_with_controls(
+            1.0,
+            vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
+            molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
+            stoich_by_species=stoich,
+            available_oxide_kg={"Na": 10.0, "Si": 10.0},
+            alpha={"Na": 0.5, "Si": 0.5},
+        )
+
+    flux = EvaporationFlux(
+        species_kg_hr=dict(result.diagnostic["evaporation_flux_kg_hr"])
+    )
+    overlay = {}
+    unavailable = _record_unavailable_provider_flux_channels(
+        SimpleNamespace(melt=SimpleNamespace(hour=5)),
+        result.diagnostic,
+        overlay,
+        expected_species=("Na", species),
+        stoich_by_species=stoich,
+        flux=flux,
+    )
+
+    assert result.status == "ok"
+    assert flux.species_kg_hr["Na"] > 0.0
+    assert species not in flux.species_kg_hr
+    assert unavailable == {species: expected_reason}
+    assert overlay["notices"] == [{
+        "kind": "vapour_batch_unresolved",
+        "species": species,
+        "hour": 5,
+        "reason": expected_reason,
+    }]
+    assert flux.carrier_authority_by_species[species]["is_refused"] is True
+
+
+@pytest.mark.parametrize(
     ("species_id", "parent_oxide", "molar_mass"),
     (
         ("FeO_association_gas", "FeO", 0.0718440),

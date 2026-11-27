@@ -7947,7 +7947,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             build_provider_account_view,
         )
         from simulator.chemistry.kernel.dto import IntentRequest
-        from simulator.evaporation import EvaporationFluxRefusal
+        from simulator.evaporation import (
+            EvaporationFluxRefusal,
+            _append_capacity_solve_exclusion_notice,
+            _provider_has_resolved_flux_channels,
+            _record_unavailable_provider_flux_channels,
+            _transport_only_unavailable_result,
+        )
         from simulator.reduced_real_cache_interpolation import (
             is_interpolated_equilibrium,
         )
@@ -8053,6 +8059,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if refusal is not None:
                 raise refusal
+            capacity_flux_overlay = copy.deepcopy(batch_flux_overlay)
+            capacity_bound_notice = _append_capacity_solve_exclusion_notice(
+                self,
+                capacity_flux_overlay,
+            )
+        else:
+            capacity_flux_overlay = {}
+            capacity_bound_notice = None
         controls, provider_molar_masses = self._evaporation_flux_control_inputs(
             equilibrium,
             overhead_partials_Pa=initial_partials,
@@ -8063,7 +8077,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else None
             ),
             vapour_batch_flux_overlay=(
-                batch_flux_overlay if batch_flux_pressures is not None else None
+                capacity_flux_overlay
+                if batch_flux_pressures is not None
+                else None
             ),
         )
         solver_molar_masses = dict(provider_molar_masses)
@@ -8119,6 +8135,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         trial_stoich_by_partials = {}
 
         def flux_at_partials(partials_Pa):
+            nonlocal capacity_bound_notice, capacity_flux_overlay
             cache_key = tuple(sorted(
                 (str(species), float(pressure))
                 for species, pressure in partials_Pa.items()
@@ -8169,6 +8186,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 owns_oxygen_drive = bool(
                     reclosed.applied and reclosed.surface_pO2_bar is not None
                 )
+            capacity_bound_notice = _append_capacity_solve_exclusion_notice(
+                self,
+                iteration_overlay,
+            )
             iteration_controls, _provider_masses = (
                 self._evaporation_flux_control_inputs(
                     equilibrium,
@@ -8198,12 +8219,49 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 control_inputs=iteration_controls,
             )
             result = provider.dispatch(request)
+            diagnostic = dict(result.diagnostic or {})
+            provider_unavailable = _record_unavailable_provider_flux_channels(
+                self,
+                diagnostic,
+                iteration_overlay,
+                expected_species=iteration_flux_pressures or {},
+                stoich_by_species=iteration_controls.get(
+                    'stoich_by_species', {}
+                ),
+            )
+            capacity_bound_notice = _append_capacity_solve_exclusion_notice(
+                self,
+                iteration_overlay,
+            )
+            diagnostic['vapour_batch_flux_overlay'] = iteration_overlay
+            capacity_flux_overlay = copy.deepcopy(iteration_overlay)
+            self._last_vapour_batch_flux_overlay = copy.deepcopy(
+                capacity_flux_overlay
+            )
+            transport_only_unavailable = _transport_only_unavailable_result(
+                result.status,
+                diagnostic,
+            )
             if str(result.status) != 'ok':
-                diagnostic = dict(result.diagnostic or {})
-                raise EvaporationFluxRefusal(
-                    str(diagnostic.get('reason') or result.status),
-                    diagnostic,
+                if not transport_only_unavailable:
+                    raise EvaporationFluxRefusal(
+                        str(diagnostic.get('reason') or result.status),
+                        diagnostic,
+                    )
+            if provider_unavailable and not _provider_has_resolved_flux_channels(
+                diagnostic
+            ):
+                refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+                    self,
+                    {
+                        **diagnostic,
+                        'reason': 'vapour_batch_no_debiting_pressure_outcome',
+                    },
+                    iteration_overlay,
+                    selector_overlay=selection_flux_overlay,
                 )
+                assert refusal is not None
+                raise refusal
             # Debit vector only. Rates at or below the 1e-12 kg/h floor
             # stay out of this solve so the partials stay on the published
             # flux closure. Wall supply reads the live publisher diagnostic
@@ -8310,6 +8368,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         finally:
             assert self.atom_ledger.mol_by_account() == ledger_before
             assert len(self.atom_ledger.transitions) == transition_count_before
+        if capacity_bound_notice is not None:
+            self._last_vapour_batch_flux_overlay = copy.deepcopy(
+                capacity_flux_overlay
+            )
         return result
 
     def _compute_intrinsic_melt_fO2(
@@ -16913,11 +16975,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if isinstance(capacity_result, CapacityShadowRefusal):
                         raise CapacityCouplingRefusalError(capacity_result)
             if capacity_result is not None:
+                capacity_bound_notice = next(
+                    (
+                        notice
+                        for notice in (
+                            getattr(
+                                self,
+                                '_last_vapour_batch_flux_overlay',
+                                {},
+                            ).get('notices', ())
+                            or ()
+                        )
+                        if isinstance(notice, Mapping)
+                        and notice.get('kind')
+                        == 'capacity_solve_excludes_unavailable_species'
+                    ),
+                    None,
+                )
                 live_raw_flux = self._calculate_evaporation(
                     equilibrium,
                     overhead_partials_override_Pa=(
                         capacity_result.partial_pressures_Pa
                     ),
+                    capacity_bound_notice=capacity_bound_notice,
                 )
                 live_effective_flux = (
                     self._apply_analytic_evaporation_depletion(live_raw_flux)

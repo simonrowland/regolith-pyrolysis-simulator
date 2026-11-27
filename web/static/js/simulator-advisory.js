@@ -902,6 +902,16 @@ function renderVapourRailInstrumentationPanel(payload) {
         'Unavailable vapour flux',
         unresolvedNoticeSummary
     );
+    appendCeramicLine(
+        content,
+        'Capacity coupling bound',
+        globalThis.ReportLabels.capacitySolveBoundSummary(
+            overlay.notices,
+            payload.tick_view === 'compact'
+                ? 'available in full records'
+                : 'not reported'
+        )
+    );
     if (Object.prototype.hasOwnProperty.call(payload, 'refusals_by_species')) {
         const refused = advisoryObject(payload.refusals_by_species) || {};
         const refusedNames = Object.keys(refused).sort();

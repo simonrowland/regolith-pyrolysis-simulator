@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import math
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from numbers import Real
 from typing import TYPE_CHECKING, Any, NamedTuple
 
@@ -1393,6 +1393,198 @@ def _append_vapour_batch_unresolved_notice(
         notices.append(notice)
 
 
+def _record_unavailable_provider_flux_channels(
+    host: Any,
+    diagnostic: Mapping[str, Any],
+    overlay: dict[str, Any],
+    *,
+    expected_species: Iterable[str],
+    stoich_by_species: Mapping[str, Any] | None = None,
+    flux: Any = None,
+) -> dict[str, str]:
+    """Keep every omitted provider channel typed as unavailable."""
+    missing_transport = diagnostic.get('missing_transport_parameters', {})
+    missing_molar_mass = diagnostic.get('missing_molar_mass', {})
+    missing_alpha = diagnostic.get('missing_alpha', {})
+    missing_transport = (
+        missing_transport if isinstance(missing_transport, Mapping) else {}
+    )
+    missing_molar_mass = (
+        missing_molar_mass if isinstance(missing_molar_mass, Mapping) else {}
+    )
+    missing_alpha = missing_alpha if isinstance(missing_alpha, Mapping) else {}
+    stoich_by_species = (
+        stoich_by_species if isinstance(stoich_by_species, Mapping) else {}
+    )
+    below = diagnostic.get('below_threshold_evaporation_flux', {})
+    below_rates = below.get('fluxes_kg_hr', {}) if isinstance(below, Mapping) else {}
+    computed_species: set[str] = set()
+    for key in (
+        'evaporation_flux_kg_hr',
+        'zero_net_evaporation_flux',
+        'evaporation_series_resistance',
+    ):
+        channels = diagnostic.get(key, {})
+        if isinstance(channels, Mapping):
+            computed_species.update(str(species) for species in channels)
+    if isinstance(below_rates, Mapping):
+        computed_species.update(str(species) for species in below_rates)
+
+    unavailable: dict[str, str] = {}
+    candidates = {str(species) for species in expected_species}
+    candidates.update(
+        str(species)
+        for species, record in missing_transport.items()
+        if isinstance(record, Mapping)
+        and record.get('status') == 'unavailable'
+    )
+    for species_id in sorted(candidates - computed_species):
+        refusal = missing_transport.get(species_id)
+        mass_failure = missing_molar_mass.get(species_id)
+        alpha_failure = missing_alpha.get(species_id)
+        if isinstance(refusal, Mapping) and refusal.get('status') == 'unavailable':
+            reason = str(refusal.get('reason') or 'transport input unavailable')
+            refusal_code = str(
+                refusal.get('refusal_type') or 'transport input unavailable'
+            )
+            extra = dict(refusal)
+        elif isinstance(mass_failure, Mapping):
+            reason = 'missing_molar_mass'
+            refusal_code = reason
+            extra = dict(mass_failure)
+        elif isinstance(alpha_failure, Mapping):
+            reason = str(alpha_failure.get('reason') or 'missing_alpha')
+            refusal_code = reason
+            extra = dict(alpha_failure)
+        elif species_id not in stoich_by_species:
+            reason = 'missing_evaporation_stoichiometry'
+            refusal_code = reason
+            extra = {'stoich_by_species': 'species entry is absent'}
+        else:
+            reason = 'provider_flux_outcome_unavailable'
+            refusal_code = reason
+            extra = {}
+        unavailable[species_id] = reason
+        if flux is not None:
+            authorities = getattr(flux, 'carrier_authority_by_species', None)
+            if isinstance(authorities, dict):
+                channel = dict(authorities.get(species_id, {}) or {})
+                existing_extra = channel.get('extra')
+                channel_extra = (
+                    dict(existing_extra)
+                    if isinstance(existing_extra, Mapping)
+                    else {}
+                )
+                channel_extra.update(extra)
+                channel.update({
+                    'species_id': species_id,
+                    'flux': {
+                        'kind': 'refusal',
+                        'code': refusal_code,
+                        'detail': reason,
+                    },
+                    'refusal_code': refusal_code,
+                    'is_refused': True,
+                    'reason': reason,
+                    'authority_level': 'unavailable',
+                    'extra': channel_extra,
+                })
+                authorities[species_id] = channel
+        _append_vapour_batch_unresolved_notice(
+            host,
+            overlay,
+            species=species_id,
+            reason=reason,
+        )
+    return unavailable
+
+
+def _transport_only_unavailable_result(
+    status: Any,
+    diagnostic: Mapping[str, Any],
+) -> bool:
+    """Recognize the provider's species-local transport-only outcome."""
+    missing = diagnostic.get('missing_transport_parameters', {})
+    return (
+        str(status) == 'unavailable'
+        and isinstance(missing, Mapping)
+        and bool(missing)
+        and not any(
+            key in diagnostic
+            for key in ('missing_alpha', 'missing_molar_mass', 'reason')
+        )
+        and all(
+            isinstance(refusal, Mapping)
+            and refusal.get('policy') == 'fail_loud_missing_transport_parameters'
+            and refusal.get('status') == 'unavailable'
+            and bool(refusal.get('refusal_type'))
+            for refusal in missing.values()
+        )
+    )
+
+
+def _provider_has_resolved_flux_channels(
+    diagnostic: Mapping[str, Any],
+) -> bool:
+    """Whether the provider computed any channel, including a typed zero."""
+    below = diagnostic.get('below_threshold_evaporation_flux', {})
+    below_rates = below.get('fluxes_kg_hr', {}) if isinstance(below, Mapping) else {}
+    return any(
+        isinstance(channels, Mapping) and bool(channels)
+        for channels in (
+            diagnostic.get('evaporation_flux_kg_hr'),
+            diagnostic.get('zero_net_evaporation_flux'),
+            diagnostic.get('evaporation_series_resistance'),
+            below_rates,
+        )
+    )
+
+
+def _append_capacity_solve_exclusion_notice(
+    host: Any,
+    overlay: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Disclose excluded species and the finite-capacity bound directions."""
+    unavailable = sorted(
+        {
+            (str(notice.get('species')), str(notice.get('reason') or 'unavailable'))
+            for notice in overlay.get('notices', ()) or ()
+            if isinstance(notice, Mapping)
+            and notice.get('kind') == 'vapour_batch_unresolved'
+            and notice.get('species') is not None
+        }
+    )
+    if not unavailable:
+        return None
+    raw_hour = getattr(getattr(host, 'melt', None), 'hour', None)
+    try:
+        hour = int(raw_hour)
+    except (TypeError, ValueError, OverflowError):
+        hour = None
+    flag = {
+        'kind': 'capacity_solve_excludes_unavailable_species',
+        'hour': hour,
+        'excluded_species': [
+            {'species': species, 'reason': reason}
+            for species, reason in unavailable
+        ],
+        'bound_direction': {
+            'resolved_fluxes': 'upper',
+            'headspace_pressure': 'lower',
+        },
+    }
+    notices = overlay.setdefault('notices', [])
+    notices[:] = [
+        notice for notice in notices
+        if not (
+            isinstance(notice, Mapping)
+            and notice.get('kind') == 'capacity_solve_excludes_unavailable_species'
+        )
+    ]
+    notices.append(flag)
+    return flag
+
+
 def _load_evaporation_alpha_envelope_by_species(
     vapor_pressure_data: dict,
 ) -> dict[str, tuple[float, float]]:
@@ -1870,7 +2062,15 @@ class EvaporationMixin:
             resolved_species = {
                 str(species)
                 for species, state in states.items()
-                if state == 'eligible' and species in pressures
+                if state == 'zero_by_physics'
+                or (
+                    state == 'eligible'
+                    and species in pressures
+                    and isinstance(pressures[species], Real)
+                    and not isinstance(pressures[species], bool)
+                    and math.isfinite(float(pressures[species]))
+                    and float(pressures[species]) > 0.0
+                )
             } if isinstance(states, Mapping) else set()
             if not notices or resolved_species:
                 return None
@@ -2427,6 +2627,7 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
+        capacity_bound_notice: Mapping[str, Any] | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -2544,6 +2745,15 @@ class EvaporationMixin:
             temperature_K=T_K,
             overhead_partials_Pa=overhead_partials_override_Pa,
         )
+        if (
+            isinstance(capacity_bound_notice, Mapping)
+            and capacity_bound_notice.get('kind')
+            == 'capacity_solve_excludes_unavailable_species'
+        ):
+            notices = flux_overlay_report.setdefault('notices', [])
+            notice = dict(capacity_bound_notice)
+            if notice not in notices:
+                notices.append(notice)
         batch_report = serialize_vapour_batch(vapour_batch)
         if isinstance(batch_report, Mapping):
             channels = batch_report.get('channels_by_species')
@@ -2599,7 +2809,12 @@ class EvaporationMixin:
             flux_pressures=vapor_pressures,
             include_unresolved_notices=True,
         )
-        if refusal is not None:
+        pre_rg_empty_source_with_catalog_answer = (
+            refusal is not None
+            and effective_pressure_source.physical_zero_reason is not None
+            and bool(flux_overlay_report.get('batch_pa_by_species'))
+        )
+        if refusal is not None and not pre_rg_empty_source_with_catalog_answer:
             self._last_evaporation_flux_diagnostic = refusal.diagnostic
             raise refusal
         channel_states = dict(
@@ -2746,6 +2961,20 @@ class EvaporationMixin:
                     pass
             if regime_diagnostic:
                 self._last_evaporation_flux_diagnostic = regime_diagnostic
+            if (
+                any(state == 'zero_by_physics' for state in channel_states.values())
+                and any(
+                    isinstance(notice, Mapping)
+                    and notice.get('kind') == 'vapour_batch_unresolved'
+                    for notice in flux_overlay_report.get('notices', ()) or ()
+                )
+            ):
+                self._last_evaporation_flux_diagnostic = {
+                    **regime_diagnostic,
+                    'evaporation_flux_kg_hr': {},
+                    'vapour_batch_flux_overlay': flux_overlay_report,
+                }
+                return flux
             # When every channel is a typed non-debit outcome (genuine bound,
             # zero, dormant) and none is refused / eligible / missing-seam,
             # empty flux is authorized, not an empty-provider false zero.
@@ -2934,47 +3163,15 @@ class EvaporationMixin:
         if isinstance(langmuir_notice, dict):
             diagnostic["langmuir_surface_oxygen"] = langmuir_notice
         self._last_evaporation_flux_diagnostic = diagnostic
-        missing_transport = diagnostic.get('missing_transport_parameters', {})
-        if isinstance(missing_transport, Mapping):
-            for species, refusal in missing_transport.items():
-                if not isinstance(refusal, Mapping):
-                    continue
-                refusal_type = refusal.get('refusal_type')
-                if not refusal_type or refusal.get('status') != 'unavailable':
-                    continue
-                channel = dict(
-                    flux.carrier_authority_by_species.get(str(species), {}) or {}
-                )
-                existing_extra = channel.get('extra')
-                extra = (
-                    dict(existing_extra)
-                    if isinstance(existing_extra, Mapping)
-                    else {}
-                )
-                extra.update(refusal)
-                reason = str(refusal.get('reason') or 'transport input unavailable')
-                channel.update({
-                    'species_id': str(species),
-                    'flux': {
-                        'kind': 'refusal',
-                        'code': str(refusal_type),
-                        'detail': reason,
-                    },
-                    'refusal_code': str(refusal_type),
-                    'is_refused': True,
-                    'reason': reason,
-                    'authority_level': str(
-                        refusal.get('authority_level') or 'unavailable'
-                    ),
-                    'extra': extra,
-                })
-                flux.carrier_authority_by_species[str(species)] = channel
-                _append_vapour_batch_unresolved_notice(
-                    self,
-                    flux_overlay_report,
-                    species=str(species),
-                    reason=reason,
-                )
+        provider_unavailable = _record_unavailable_provider_flux_channels(
+            self,
+            diagnostic,
+            flux_overlay_report,
+            expected_species=vapor_pressures,
+            stoich_by_species=control_inputs.get('stoich_by_species', {}),
+            flux=flux,
+        )
+        diagnostic['vapour_batch_flux_overlay'] = flux_overlay_report
         continuum_notice = diagnostic.get('continuum_extrapolation_notice')
         condensation_model = getattr(self, 'condensation_model', None)
         if continuum_notice and condensation_model is not None:
@@ -3019,21 +3216,9 @@ class EvaporationMixin:
         # A typed missing-transport channel remains local to that species; keep
         # the rest of the run available even when every requested channel is
         # excluded. Other non-OK flux outcomes still fail as a run-level refusal.
-        transport_only_unavailable = (
-            str(kernel_result.status) == 'unavailable'
-            and isinstance(missing_transport, Mapping)
-            and bool(missing_transport)
-            and not any(
-                key in diagnostic
-                for key in ('missing_alpha', 'missing_molar_mass', 'reason')
-            )
-            and all(
-                isinstance(refusal, Mapping)
-                and refusal.get('policy') == 'fail_loud_missing_transport_parameters'
-                and refusal.get('status') == 'unavailable'
-                and bool(refusal.get('refusal_type'))
-                for refusal in missing_transport.values()
-            )
+        transport_only_unavailable = _transport_only_unavailable_result(
+            kernel_result.status,
+            diagnostic,
         )
         if str(kernel_result.status) != 'ok' and not transport_only_unavailable:
             reason = str(diagnostic.get('reason') or '').strip()
@@ -3054,6 +3239,21 @@ class EvaporationMixin:
                 )
             raise EvaporationFluxRefusal(reason, diagnostic)
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
+        if provider_unavailable and not _provider_has_resolved_flux_channels(
+            diagnostic
+        ):
+            refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+                self,
+                {
+                    **diagnostic,
+                    'reason': _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME,
+                },
+                flux_overlay_report,
+                selector_overlay=selector_flux_overlay,
+            )
+            assert refusal is not None
+            self._last_evaporation_flux_diagnostic = refusal.diagnostic
+            raise refusal
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():
             if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:

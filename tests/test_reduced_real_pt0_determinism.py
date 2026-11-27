@@ -104,6 +104,16 @@ def _install_interpolation_test_binding_receipt(
             "magemin-ig-r1",
             "subprocess",
         ),
+        provenance_override={
+            "binding_provenance_verifiable": True,
+            "test_fixture": (
+                "binding_admission_synthetic/synthetic-fake.json"
+            ),
+            "runtime_version": {
+                "tag": "value",
+                "value": "magemin-deterministic-test-stub",
+            },
+        },
     )
 
 

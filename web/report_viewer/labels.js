@@ -175,6 +175,23 @@
     return unresolved.length ? unresolved.join("; ") : "none";
   }
 
+  function capacitySolveBoundSummary(notices, missing = "not reported") {
+    if (!Array.isArray(notices)) return missing;
+    const flags = notices
+      .filter((notice) => notice && notice.kind === "capacity_solve_excludes_unavailable_species")
+      .map((notice) => {
+        const excluded = Array.isArray(notice.excluded_species)
+          ? notice.excluded_species
+              .filter((item) => item && typeof item.species === "string")
+              .map((item) => `${item.species}: ${item.reason || "unavailable"}`)
+              .join(", ")
+          : "species not reported";
+        const direction = notice.bound_direction || {};
+        return `${excluded}; resolved fluxes ${direction.resolved_fluxes || "bound not reported"}; headspace pressure ${direction.headspace_pressure || "bound not reported"}`;
+      });
+    return flags.length ? flags.join("; ") : "none";
+  }
+
   // One stable species colour grammar for every panel (bars, ribbons, chips, stage fills).
   // Keyed by the token's LEAD element so a family shares a hue (Fe/FeO/FeSi, Si/SiO/SiO2, Na/Na2O…);
   // mid-lightness hues chosen to stay legible on both themes. Unlisted species get a deterministic
@@ -210,6 +227,6 @@
     scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock,
     prettyChemText, speciesColor, hasNumber, exactValue, isHashLike,
     priceAuthority, priceAuthorityNote, stageMassQualifier,
-    unresolvedVapourNoticeSummary, esc
+    unresolvedVapourNoticeSummary, capacitySolveBoundSummary, esc
   });
 }(globalThis));
