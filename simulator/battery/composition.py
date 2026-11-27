@@ -12,6 +12,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
+from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     atoms_parse_formula_else_janaf,
@@ -649,6 +650,53 @@ def _formula_molar_mass(formula: str) -> Decimal:
     for element, count in parsed:
         total += _atomic_weight(element) * Decimal(str(count))
     return total
+
+
+def _by_difference_masses(
+    mole_fraction: Decimal,
+    mole_component: str,
+    closure_component: str,
+    fixed: tuple[tuple[str, Decimal], ...],
+) -> dict[str, Decimal] | None:
+    """Mass percentages for one closed composition with one mole fraction.
+
+    ``N = n_mole / (n_mole + n_closure + sum n_fixed)`` with
+    ``n_i = w_i / M_i`` and ``w_closure = 100 - w_mole - sum w_fixed``.
+    Solving for the two unknown masses gives
+
+    ``K = (100 - W_fixed) / M_closure + sum(w_fixed / M_fixed)``
+    ``denom = (1 - N) / M_mole + N / M_closure``
+    ``w_mole = N * K / denom``.
+
+    None means a molar mass is missing or the denominator is zero.
+    """
+    names = [mole_component, closure_component]
+    names.extend(name for name, _mass in fixed)
+    molar: dict[str, Decimal] = {}
+    for name in names:
+        if name in molar:
+            continue
+        try:
+            mass = _formula_molar_mass(name)
+        except (KeyError, AccountingError, UnknownSpeciesError):
+            return None
+        if not isinstance(mass, Decimal) or not mass.is_finite() or mass <= 0:
+            return None
+        molar[name] = mass
+    fixed_total = sum((mass for _name, mass in fixed), Decimal(0))
+    fixed_moles = sum((mass / molar[name] for name, mass in fixed), Decimal(0))
+    closure_mass = molar[closure_component]
+    mole_mass = molar[mole_component]
+    k = (Decimal(100) - fixed_total) / closure_mass + fixed_moles
+    denominator = (Decimal(1) - mole_fraction) / mole_mass + mole_fraction / closure_mass
+    if denominator == 0:
+        return None
+    solved_mole = mole_fraction * k / denominator
+    solved_closure = Decimal(100) - solved_mole - fixed_total
+    masses = {name: mass for name, mass in fixed}
+    masses[mole_component] = solved_mole
+    masses[closure_component] = solved_closure
+    return masses
 
 
 def _oxide_formula_for_valence(element: str, valence: int) -> tuple[str, int]:

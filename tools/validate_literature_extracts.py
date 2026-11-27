@@ -247,8 +247,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
-from simulator.battery.composition import _formula_molar_mass
+from simulator.battery.composition import _by_difference_masses
 from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
@@ -4239,67 +4238,6 @@ def _decimal_spelling(value: Any) -> str | None:
             return None
         return text
     return None
-
-
-def _derivation_molar_mass(formula: str) -> Decimal | None:
-    """Decimal g/mol from the composition molar-mass owner.
-
-    ``composition._formula_molar_mass`` sums ``Decimal(str(weight))`` times
-    the parsed count. The float oxide-mass helper stringifies a binary sum,
-    and CaO's float sum is ``56.077000000000005``, which moves an 8-decimal
-    closure. A missing formula is None, not a zero.
-    """
-    try:
-        mass = _formula_molar_mass(formula)
-    except (KeyError, AccountingError, UnknownSpeciesError):
-        return None
-    if not isinstance(mass, Decimal) or not mass.is_finite() or mass <= 0:
-        return None
-    return mass
-
-
-def _by_difference_masses(
-    mole_fraction: Decimal,
-    mole_component: str,
-    closure_component: str,
-    fixed: tuple[tuple[str, Decimal], ...],
-) -> dict[str, Decimal] | None:
-    """Mass percent of each oxide from one mole fraction and the fixed masses.
-
-    ``N = n_mole / (n_mole + n_closure + sum n_fixed)`` with
-    ``n_i = w_i / M_i`` and ``w_closure = 100 - w_mole - sum w_fixed``.
-    Solving for the two unknown masses gives
-
-    ``K = (100 - W_fixed) / M_closure + sum(w_fixed / M_fixed)``
-    ``denom = (1 - N) / M_mole + N / M_closure``
-    ``w_mole = N * K / denom``.
-
-    None means a molar mass is missing or the denominator is zero.
-    """
-    names = [mole_component, closure_component]
-    names.extend(name for name, _mass in fixed)
-    molar: dict[str, Decimal] = {}
-    for name in names:
-        if name in molar:
-            continue
-        mass = _derivation_molar_mass(name)
-        if mass is None:
-            return None
-        molar[name] = mass
-    fixed_total = sum((mass for _name, mass in fixed), Decimal(0))
-    fixed_moles = sum((mass / molar[name] for name, mass in fixed), Decimal(0))
-    closure_mass = molar[closure_component]
-    mole_mass = molar[mole_component]
-    k = (Decimal(100) - fixed_total) / closure_mass + fixed_moles
-    denominator = (Decimal(1) - mole_fraction) / mole_mass + mole_fraction / closure_mass
-    if denominator == 0:
-        return None
-    solved_mole = mole_fraction * k / denominator
-    solved_closure = Decimal(100) - solved_mole - fixed_total
-    masses = {name: mass for name, mass in fixed}
-    masses[mole_component] = solved_mole
-    masses[closure_component] = solved_closure
-    return masses
 
 
 def _value_at_address(value: Any, address: tuple[Any, ...]) -> Any:
