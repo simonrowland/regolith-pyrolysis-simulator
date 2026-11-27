@@ -20,6 +20,7 @@ from simulator.process_timestep import step_end_sample_h
 
 LAB_SCHEDULE_OVERRIDE_KEY = "lab_schedule"
 LAB_SCHEDULE_PO2_SETPOINT_KEY = "lab_schedule_pO2_setpoint_mbar"
+LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY = "vacuum_free_molecular"
 # The lower edge of the current certified pressure band. Lower positive
 # pressures remain executable and receive an extrapolation notice.
 LAB_SCHEDULE_PRESSURE_FLOOR_MBAR = 1.0e-3
@@ -109,8 +110,19 @@ def normalize_lab_schedule(
                 "lab_schedule_temperature_exceeds_furnace_ceiling: "
                 f"{point['value']:g} C > {furnace_ceiling_C:g} C"
             )
+    raw_chamber_pressure_mbar = schedule.get("chamber_pressure_mbar")
+    raw_gas_boundary = schedule.get("gas_boundary")
+    if (
+        (
+            not isinstance(raw_chamber_pressure_mbar, Sequence)
+            or isinstance(raw_chamber_pressure_mbar, (str, bytes))
+            or not raw_chamber_pressure_mbar
+        )
+        and not isinstance(raw_gas_boundary, Mapping)
+    ):
+        _normalize_gas_boundary(raw_gas_boundary, chamber_pressure_mbar=())
     chamber_pressure_mbar = _normalize_points(
-        schedule.get("chamber_pressure_mbar"),
+        raw_chamber_pressure_mbar,
         duration_h=duration_h,
         field="chamber_pressure_mbar",
     )
@@ -123,7 +135,10 @@ def normalize_lab_schedule(
         if notice is not None:
             pressure_domain_notices_list.append(notice)
     pressure_domain_notices = tuple(pressure_domain_notices_list)
-    gas_boundary = _normalize_gas_boundary(schedule.get("gas_boundary"))
+    gas_boundary, gas_boundary_notices = _normalize_gas_boundary(
+        raw_gas_boundary,
+        chamber_pressure_mbar=chamber_pressure_mbar,
+    )
     surface_temperature_C = _normalize_surface_temperatures(
         schedule.get("surface_temperature_C", {}),
         duration_h=duration_h,
@@ -144,6 +159,7 @@ def normalize_lab_schedule(
         "chamber_pressure_mbar": chamber_pressure_mbar,
         "pressure_domain_notices": pressure_domain_notices,
         "gas_boundary": gas_boundary,
+        "gas_boundary_notices": gas_boundary_notices,
         "surface_temperature_C": surface_temperature_C,
         "window_semantics": window_semantics,
     }
@@ -264,6 +280,11 @@ def pO2_enforcement_row(
     if notices:
         row["pressure_domain_notices"] = tuple(
             dict(notice) for notice in notices
+        )
+    gas_boundary_notices = schedule.get("gas_boundary_notices", ())
+    if gas_boundary_notices:
+        row["gas_boundary_notices"] = tuple(
+            dict(notice) for notice in gas_boundary_notices
         )
     return MappingProxyType(row)
 
@@ -569,9 +590,69 @@ def _normalize_window_semantics(
     )
 
 
-def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
+def _normalize_gas_boundary(
+    raw: Any,
+    *,
+    chamber_pressure_mbar: Sequence[Mapping[str, Any]],
+) -> tuple[Mapping[str, Any], tuple[Mapping[str, Any], ...]]:
     if not isinstance(raw, Mapping):
-        raise LabScheduleValidationError("lab_schedule_missing_gas_boundary")
+        if not chamber_pressure_mbar:
+            raise LabScheduleValidationError("lab_schedule_missing_gas_boundary")
+
+        # Sauerborn's blank-chamber point is 500 C (773.15 K) at
+        # 1.7e-4 mbar (0.017 Pa). Using the model's 0.12 m transport-pipe
+        # diameter as the characteristic length and N2 sigma=3.798e-10 m,
+        # lambda = k_B*T/(sqrt(2)*pi*sigma^2*P) = 0.98 m, so Kn=lambda/L=8.2>1.
+        # Units: J/(m^2*Pa)=m. At the 1e-3 mbar floor lambda is 0.17 m and
+        # Kn is still 1.4; as P tends to zero, lambda and Kn tend to infinity.
+        # This supports the stated vacuum/free-molecular default while keeping
+        # the observed pressure as the boundary condition.
+        provenance = {
+            "reported_status": "not_reported",
+            "source_class": ASSUMED_WITH_SENSITIVITY,
+            "citation_id": "d-460",
+            "reason": (
+                "gas composition and imposed flow are unprinted; use the "
+                "vacuum/free-molecular boundary at the printed pressure"
+            ),
+        }
+        normalized = {
+            "background_gas": _normalize_gas_boundary_field(
+                provenance,
+                field="background_gas",
+                required=("species",),
+            ),
+            "imposed_flow": _normalize_gas_boundary_field(
+                provenance,
+                field="imposed_flow",
+                required=("value", "unit"),
+            ),
+            "pressure_control": _normalize_gas_boundary_field(
+                {
+                    "mode": LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY,
+                    "pressure_driver": "imposed",
+                    "source_class": ASSUMED_WITH_SENSITIVITY,
+                    "source_ref": "d-460",
+                },
+                field="pressure_control",
+                required=("mode",),
+            ),
+            "default_boundary": LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY,
+        }
+        notices = tuple(
+            MappingProxyType(
+                {
+                    "kind": "lab_schedule_gas_boundary_notice",
+                    "reason": "lab_schedule_gas_boundary_default_unprinted",
+                    "authority": "assumed",
+                    "pressure_mbar": float(point["value"]),
+                    "t_h": float(point["t_h"]),
+                    "default_boundary": LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY,
+                }
+            )
+            for point in chamber_pressure_mbar
+        )
+        return MappingProxyType(normalized), notices
     normalized: dict[str, Any] = {}
     normalized["background_gas"] = _normalize_gas_boundary_field(
         raw.get("background_gas"),
@@ -588,7 +669,7 @@ def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
         field="pressure_control",
         required=("mode",),
     )
-    return MappingProxyType(normalized)
+    return MappingProxyType(normalized), ()
 
 
 def _normalize_gas_boundary_field(

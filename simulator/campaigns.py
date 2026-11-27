@@ -29,6 +29,7 @@ from simulator import mre_ladder
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
 from simulator.backend_names import C0_FORECAST_ENGINE_NAMES
 from simulator.lab_schedule import (
+    LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY,
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
     interpolate_schedule_points,
@@ -2761,6 +2762,8 @@ class CampaignManager:
         )
         background_gas = lab_schedule.get('gas_boundary', {}).get(
             'background_gas', {})
+        default_boundary = lab_schedule.get('gas_boundary', {}).get(
+            'default_boundary')
         background_species = ''
         background_fraction = 0.0
         if (
@@ -2788,6 +2791,8 @@ class CampaignManager:
         melt.background_gas_mole_fraction = background_fraction
         if melt.pO2_mbar > 0.0:
             melt.atmosphere = Atmosphere.CONTROLLED_O2
+        elif default_boundary == LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY:
+            melt.atmosphere = Atmosphere.HARD_VACUUM
         elif background_species and background_species.upper() not in {'N2', 'O2'}:
             # F-080: a positive-pressure zero-O2 inert schedule is a measured
             # background cover, not a nitrogen sweep. Keep it on the controlled
