@@ -70,6 +70,9 @@ from simulator.battery.migrate import (
     MigrationResult,
     QueueEntry,
     Migrator,
+    _InvalidDecimalValue,
+    _prune_carried_doi_aliases_to_live_works,
+    discover_extracts,
     UnknownRailSpellingError,
     UnresolvedEquipmentContextError,
     canonicalize_doi,
@@ -23114,3 +23117,177 @@ def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
         assert {
             observation.evidence.attribution for observation in observations
         } == {expected_attribution}
+
+
+_T1795_FOLD3_COMPILATION_ROOT = REPO_ROOT / "data" / "literature" / "compilations"
+_T1795_FOLD3_COMPILATION_PATHS = tuple(
+    path
+    for path in sorted(_T1795_FOLD3_COMPILATION_ROOT.rglob("*"))
+    if path.is_file()
+    and path.suffix in {".yaml", ".yml", ".json"}
+    and path.name != "README.md"
+    and "__pycache__" not in path.parts
+)
+_T1795_FOLD3_COMPILATION_CHUNKS = tuple(
+    _T1795_FOLD3_COMPILATION_PATHS[index : index + 100]
+    for index in range(0, len(_T1795_FOLD3_COMPILATION_PATHS), 100)
+)
+_T1795_FOLD3_EXTRACT_PATHS = tuple(
+    discover_extracts(REPO_ROOT / "data" / "literature" / "extracts")
+)
+
+
+@pytest.fixture(scope="module")
+def _t1795_fold3_migrator() -> Migrator:
+    return Migrator(REPO_ROOT)
+
+
+def test_t1795_fold3_fresh_migrate_index(_t1795_fold3_migrator: Migrator) -> None:
+    _t1795_fold3_migrator.migrate_index_only_sources()
+
+
+@pytest.mark.parametrize(
+    "path", _T1795_FOLD3_EXTRACT_PATHS, ids=lambda path: path.stem
+)
+def test_t1795_fold3_fresh_migrate_extract(
+    _t1795_fold3_migrator: Migrator, path: Path
+) -> None:
+    relative = path.relative_to(REPO_ROOT).as_posix()
+    try:
+        _t1795_fold3_migrator._migrate_extract(path)
+    except _InvalidDecimalValue as exc:
+        _t1795_fold3_migrator._record_invalid_decimal_source(
+            f"extract[{relative}].numeric", exc
+        )
+
+
+@pytest.mark.parametrize(
+    ("method", "filename"),
+    (
+        ("_migrate_kems", "kems_measurements.yaml"),
+        ("_migrate_mre", "mre_measurements.yaml"),
+        ("_migrate_langmuir", "langmuir_knudsen_flux_validation.yaml"),
+        ("_migrate_refractory", "refractory_vaporization_validation.yaml"),
+        ("_migrate_vacuum_pyrolysis", "vacuum_pyrolysis_measurements.yaml"),
+        ("_migrate_ledger", "gibbs_battery_residual_ledger.yaml"),
+        ("_migrate_ledger", "species_rail_differential_ledger.yaml"),
+    ),
+)
+def test_t1795_fold3_fresh_migrate_named_source(
+    _t1795_fold3_migrator: Migrator, method: str, filename: str
+) -> None:
+    getattr(_t1795_fold3_migrator, method)(
+        _t1795_fold3_migrator.literature / filename
+    )
+
+
+@pytest.mark.parametrize(
+    "paths",
+    _T1795_FOLD3_COMPILATION_CHUNKS,
+    ids=lambda paths: f"{paths[0].stem}-{paths[-1].stem}",
+)
+def test_t1795_fold3_fresh_migrate_compilations(
+    _t1795_fold3_migrator: Migrator, paths: tuple[Path, ...]
+) -> None:
+    for path in paths:
+        _t1795_fold3_migrator._migrate_compilation_file(path)
+
+
+def test_t1795_fold3_fresh_migrate_finalize(
+    _t1795_fold3_migrator: Migrator,
+) -> None:
+    _prune_carried_doi_aliases_to_live_works(
+        _t1795_fold3_migrator.result, _t1795_fold3_migrator._carried_aliases
+    )
+    _t1795_fold3_migrator.aliases = dict(_t1795_fold3_migrator.result.aliases)
+    _t1795_fold3_migrator.finalize()
+    assert _t1795_fold3_migrator.result.validation is not None
+
+
+def test_t1795_fold3_report_parseable_rejected_polymorphs(
+    _t1795_fold3_migrator: Migrator,
+) -> None:
+    import json
+    import warnings
+    from collections import Counter, defaultdict
+
+    from simulator.battery.enums import PolymorphRejectionKind, Quantity
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.score import parse_species_formula
+
+    by_source_and_reason: dict[tuple[str, str], Counter[str]] = defaultdict(Counter)
+    by_formula_gate: dict[tuple[str, str], Counter[str]] = defaultdict(Counter)
+    contradiction_rows: Counter[tuple[str, str]] = Counter()
+    result = _t1795_fold3_migrator.result
+    for observation in result.observations.values():
+        identity = observation.identity
+        species = identity.species
+        if species is None:
+            continue
+        polymorph = species.polymorph
+        if (
+            polymorph is None
+            or not polymorph.is_unknown
+            or polymorph.rejection_kind
+            not in {
+                PolymorphRejectionKind.UNRECOGNISED,
+                PolymorphRejectionKind.CONTRADICTS_FORMULA,
+            }
+        ):
+            continue
+        if parse_species_formula(species.formula, species=species) is None:
+            continue
+        source_id = observation.source_id or "unattributed"
+        reason = polymorph.reason or "unknown polymorph reason"
+        quantity = quantity_token(identity)
+        quantity_name = quantity.value if quantity is not None else "unknown"
+        group = (source_id, reason)
+        by_source_and_reason[group][quantity_name] += 1
+        if polymorph.rejection_kind is PolymorphRejectionKind.UNRECOGNISED:
+            gate = (
+                "formula-independent"
+                if quantity is Quantity.MASS_LOSS_FRACTION
+                else "formula-gated"
+            )
+            by_formula_gate[(source_id, gate)][quantity_name] += 1
+        else:
+            contradiction_rows[(source_id, reason)] += 1
+
+    warnings.warn(
+        "T1795_FOLD3_POLYMORPH_CENSUS\t"
+        + json.dumps(
+            {
+                "fresh_observation_count": len(result.observations),
+                "unrecognised_parseable_by_source_and_cause": [
+                    {
+                        "source_id": source_id,
+                        "cause": cause,
+                        "quantity_counts": dict(sorted(counts.items())),
+                        "unique_observations": sum(counts.values()),
+                    }
+                    for (source_id, cause), counts in sorted(
+                        by_source_and_reason.items()
+                    )
+                    if "unrecognised polymorph" in cause
+                ],
+                "unrecognised_formula_gate_counts": [
+                    {
+                        "source_id": source_id,
+                        "scoring_path": gate,
+                        "quantity_counts": dict(sorted(counts.items())),
+                        "unique_observations": sum(counts.values()),
+                    }
+                    for (source_id, gate), counts in sorted(by_formula_gate.items())
+                ],
+                "contradicts_formula_parseable_by_source_and_cause": [
+                    {
+                        "source_id": source_id,
+                        "cause": cause,
+                        "unique_observations": count,
+                    }
+                    for (source_id, cause), count in sorted(contradiction_rows.items())
+                ],
+            },
+            sort_keys=True,
+        )
+    )
