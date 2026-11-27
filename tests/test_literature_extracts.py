@@ -2851,16 +2851,60 @@ def test_render_stamp_does_not_attest_unverified_descendants_without_artifact():
     assert vle.certify_extract_source_fidelity(doc, label="figure-read")
 
 
-def test_render_stamp_rejects_page_or_figure_mismatch():
+@pytest.mark.parametrize(
+    ("key", "value", "reason"),
+    [("page", 3, "page"), ("figure", "2", "figure")],
+)
+def test_render_stamp_rejects_page_or_figure_mismatch(key, value, reason):
     doc = _figure_read_extract()
     verification = doc["fidelity_samples"][0]["verification"]
-    verification["page"] = 3
+    verification[key] = value
 
     warnings = vle.fidelity_source_warnings(doc, label="mislabeled-render")
     by_kind = {warning.kind: warning for warning in warnings}
 
     assert by_kind["unattested_sample"].count == 1
-    assert "page" in by_kind["unattested_sample"].detail
+    assert reason in by_kind["unattested_sample"].detail
+
+
+def test_render_cover_cannot_attest_a_different_observation():
+    doc = _figure_read_extract()
+    verification = doc["fidelity_samples"][0]["verification"]
+    verification["covers"][0] = (
+        "species.Fe.observations[fe_alpha_2].values.alpha"
+    )
+
+    warnings = vle.fidelity_source_warnings(doc, label="cross-row-render-cover")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert by_kind["unattested_sample"].count == 1
+    assert "different observation" in by_kind["unattested_sample"].detail
+
+
+def test_legacy_render_descendant_coverage_would_fail_regression(monkeypatch):
+    doc = _figure_read_extract()
+    values = doc["species"]["Fe"]["observations"][0]["values"]
+    values["T_C"] = "1630"
+    doc["fidelity_samples"][0]["value"]["T_C"] = "1630"
+
+    def legacy_descendant_cover(document, sample):
+        value = vle.resolve_fidelity_sample(document, sample)
+        address = vle._sample_evidence_address(document, sample)
+        assert address is not None
+        return (
+            [
+                address + leaf
+                for leaf in vle._measured_leaf_addresses(value)
+            ],
+            [],
+        )
+
+    monkeypatch.setattr(vle, "_figure_render_cover_addresses", legacy_descendant_cover)
+    warnings = vle.fidelity_source_warnings(doc, label="legacy-render-coverage")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+
+    with pytest.raises(AssertionError, match="legacy root coverage"):
+        assert by_kind.get("uncovered_observation") == 1, "legacy root coverage"
 
 
 def test_figure_read_rejects_extractor_as_reviewer():

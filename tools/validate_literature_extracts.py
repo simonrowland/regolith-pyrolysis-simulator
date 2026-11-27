@@ -2722,12 +2722,55 @@ def _is_figure_read_leaf(value: Any) -> bool:
     )
 
 
+def _figure_render_cover_addresses(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[list[tuple[Any, ...]], list[str]]:
+    """Resolve explicit render-covered leaves under this sample's destination."""
+    verification = sample.get("verification")
+    covers = verification.get("covers") if isinstance(verification, Mapping) else None
+    if not isinstance(covers, list) or not covers:
+        return [], ["figure-read attestation requires a non-empty covers list"]
+    if any(not isinstance(path, str) or not path.strip() for path in covers):
+        return [], ["figure-read covers must be non-empty absolute leaf paths"]
+    if len(covers) != len(set(covers)):
+        return [], ["figure-read covers must not repeat a leaf path"]
+
+    sample_key = _fidelity_sample_observation_key(doc, sample)
+    sample_address = _sample_evidence_address(doc, sample)
+    try:
+        sample_value = resolve_fidelity_sample(doc, sample)
+    except KeyError:
+        sample_value = None
+    if sample_key is None or sample_address is None or sample_value is None:
+        return [], ["figure-read covers do not resolve from a scored sample"]
+    measured_addresses = {
+        sample_address + leaf for leaf in _measured_leaf_addresses(sample_value)
+    }
+    addresses: list[tuple[Any, ...]] = []
+    defects: list[str] = []
+    for path in covers:
+        key = _fidelity_sample_observation_key(doc, {"path": path})
+        address = _path_evidence_address(doc, path)
+        if key != sample_key:
+            defects.append(
+                f"figure-read covered leaf belongs to a different observation: {path}"
+            )
+        elif address is None or address not in measured_addresses:
+            defects.append(
+                f"figure-read cover is not a leaf under the sample destination: {path}"
+            )
+        else:
+            addresses.append(address)
+    return addresses, defects
+
+
 def _sample_attestation_defects(
     sample: Mapping[str, Any],
     *,
     figure_read_sample: bool = False,
     figure_read: Any = None,
     extractor_id: Any = None,
+    doc: Mapping[str, Any] | None = None,
 ) -> list[str]:
     """Missing reviewer/date or the evidence required for this sample class."""
     defects: list[str] = []
@@ -2804,6 +2847,16 @@ def _sample_attestation_defects(
 
         verification = sample.get("verification")
         dpi = verification.get("dpi") if isinstance(verification, Mapping) else None
+        render_page = (
+            verification.get("page")
+            if isinstance(verification, Mapping)
+            else None
+        )
+        render_figure = (
+            verification.get("figure")
+            if isinstance(verification, Mapping)
+            else None
+        )
         if (
             not isinstance(verification, Mapping)
             or verification.get("method") != "render"
@@ -2815,6 +2868,30 @@ def _sample_attestation_defects(
                 "figure-read attestation requires verification method render "
                 "and positive dpi"
             )
+        if (
+            not isinstance(render_page, int)
+            or isinstance(render_page, bool)
+            or render_page <= 0
+        ):
+            defects.append("figure-read verification requires a positive page")
+        has_render_figure = (
+            isinstance(render_figure, str) and bool(render_figure.strip())
+        ) or (
+            isinstance(render_figure, int)
+            and not isinstance(render_figure, bool)
+            and render_figure > 0
+        )
+        if not has_render_figure:
+            defects.append("figure-read verification requires a figure")
+        if isinstance(locator, Mapping) and render_page != locator.get("page"):
+            defects.append("figure-read verification page disagrees with its locator")
+        if isinstance(locator, Mapping) and str(render_figure) != str(
+            locator.get("figure")
+        ):
+            defects.append("figure-read verification figure disagrees with its locator")
+        if doc is not None:
+            _addresses, cover_defects = _figure_render_cover_addresses(doc, sample)
+            defects.extend(cover_defects)
     elif len(locator_keys) != 1 or (
         not _locator_ok(locator) and not malformed_locator_keys
     ):
@@ -4755,6 +4832,24 @@ def _sample_cover(
     return key, address
 
 
+def _sample_covers(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> list[tuple[tuple[str, str], tuple[Any, ...]]]:
+    """Evidence addresses a base sample is allowed to attest as a parent."""
+    try:
+        value = resolve_fidelity_sample(doc, sample)
+    except KeyError:
+        value = None
+    if _is_figure_read_leaf(value):
+        key = _fidelity_sample_observation_key(doc, sample)
+        addresses, defects = _figure_render_cover_addresses(doc, sample)
+        if key is None or defects:
+            return []
+        return [(key, address) for address in addresses]
+    cover = _sample_cover(doc, sample)
+    return [cover] if cover is not None else []
+
+
 def _derivation_parent_status(
     doc: Mapping[str, Any],
     path: str,
@@ -4837,17 +4932,15 @@ def _derivation_pass_defects(
         sample = samples[index]
         if not isinstance(sample, Mapping):
             continue
-        cover = _sample_cover(doc, sample)
-        if cover is not None:
-            base_covers.append(cover)
+        base_covers.extend(_sample_covers(doc, sample))
     derivation_covers: list[tuple[int, tuple[str, str], tuple[Any, ...]]] = []
     for index in derivation_indexes:
         sample = samples[index]
         if not isinstance(sample, Mapping):
             continue
-        cover = _sample_cover(doc, sample)
-        if cover is not None:
-            derivation_covers.append((index, cover[0], cover[1]))
+        derivation_covers.extend(
+            (index, key, address) for key, address in _sample_covers(doc, sample)
+        )
 
     graph: dict[int, set[int]] = {index: set() for index in derivation_indexes}
     groups: dict[int, list[set[int]]] = {index: [] for index in derivation_indexes}
@@ -5100,7 +5193,10 @@ def fidelity_source_warnings(
 
     Every measured leaf of a scored observation's evidence is covered only
     by a matching sample that names that observation and whose address is
-    that leaf or an ancestor of it. Evidence is ``values`` plus each
+    that leaf or an ancestor of it. A figure-read sample instead covers
+    exactly the same-observation leaf paths listed in its render
+    verification; its sample address never covers descendants. Evidence is
+    ``values`` plus each
     present scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``): the
     fields the scored temperature payload copies beside ``values``. A
     locator inside a condition is provenance, not a leaf. Digit-bearing
@@ -5140,7 +5236,8 @@ def fidelity_source_warnings(
     that token). A pinned value marked ``evidence_class: figure_only`` with
     a ``figure_read`` record instead needs an independent reviewer, a
     page-and-figure locator, stated digitization uncertainty, and render
-    verification with DPI. A sample whose verification method is
+    verification with matching page, figure, DPI, and explicit measured
+    leaf paths in ``covers``. A sample whose verification method is
     ``derivation`` is attested only when its named parents are attested,
     the parent graph has no cycle, and the stored composition equals the
     by-difference recompute from those parents within a tolerance derived
@@ -5247,6 +5344,7 @@ def fidelity_source_warnings(
                 figure_read_sample=figure_read_sample,
                 figure_read=figure_read,
                 extractor_id=extractor_id,
+                doc=doc,
             )
             if defects:
                 unattested += 1
@@ -5293,9 +5391,16 @@ def fidelity_source_warnings(
             pin_address = _sample_evidence_address(doc, sample)
             if pin_address is None:
                 continue
-            for leaf in needed_addresses[observation_key]:
-                if leaf[: len(pin_address)] == pin_address:
-                    covered_addresses[observation_key].add(leaf)
+            if figure_read_sample:
+                render_addresses, render_defects = _figure_render_cover_addresses(
+                    doc, sample
+                )
+                if not defects and not render_defects:
+                    covered_addresses[observation_key].update(render_addresses)
+            else:
+                for leaf in needed_addresses[observation_key]:
+                    if leaf[: len(pin_address)] == pin_address:
+                        covered_addresses[observation_key].add(leaf)
 
     for sample_index, derivation_defects in _derivation_pass_defects(
         doc,
@@ -5515,9 +5620,10 @@ def certify_extract_source_fidelity(
     value (NaN, +Inf, -Inf) refuses that observation. It is not omitted
     and a finite sibling pin does not clear it. Every measured leaf of
     a scored observation's evidence (``values`` and each scored numeric
-    condition) must be covered by a matching, non-pilot, attested sample
-    whose address is that leaf or an ancestor, and whose source artifact
-    was opened and contains each resolved number. A measured string is
+    condition) must be covered by a matching, non-pilot, attested sample.
+    Text samples cover their addressed leaf and descendants only after
+    opening the cited source; figure-read samples cover only the explicit
+    leaf paths in their render verification. A measured string is
     every non-annotation string that contains a digit [0-9]. A label with
     no digit is not a leaf. A digit-bearing string outside
     ``ANNOTATION_KEYS`` that the numeric parser cannot read is uncovered
