@@ -707,7 +707,7 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "physics_bucket_key": entry["physics_bucket_key"],
         "physics_bucket_bytes": entry["physics_bucket_bytes"],
         "physics_bucket_hash": entry["physics_bucket_hash"],
-        "data_digests_json": str(stored_columns["data_digests_json"]),
+        "data_digests_json": stored_columns["data_digests_json"],
         "repair_notices_json": repair_notices_json,
         "payload_codec_version": payload_codec_version,
         "ladder_values": admitted.physics_ladder_values,

@@ -735,28 +735,42 @@ def test_interpolation_candidates_refuse_corrupt_replay_scope(
     (None, rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION - 1),
     ids=("missing-codec", "old-codec"),
 )
-def test_stale_codec_malformed_payload_misses_physics_readers(
+@pytest.mark.parametrize(
+    "corrupt_payload",
+    (False, True),
+    ids=("intact", "corrupt"),
+)
+def test_stale_codec_integrity_precedes_admission_on_physics_readers(
     tmp_path: Path,
     reader: str,
     row_version: int | None,
+    corrupt_payload: bool,
 ) -> None:
     key = _interpolation_key("stale", feo_fraction=0.20, temperature_K=1500.0)
     db_path = tmp_path / f"stale-codec-{reader}-{row_version}.sqlite"
     _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
     key_hash = hashlib.sha256(canonical_json_bytes(key)).hexdigest()
-    malformed_payload = sqlite3.Binary(b"{")
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(
-            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ? "
-            "WHERE key_hash = ?",
-            (
-                malformed_payload,
-                hashlib.sha256(bytes(malformed_payload)).hexdigest(),
-                row_version,
-                key_hash,
-            ),
-        )
+    if corrupt_payload:
+        malformed_payload = sqlite3.Binary(b"{")
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ? "
+                "WHERE key_hash = ?",
+                (
+                    malformed_payload,
+                    hashlib.sha256(bytes(malformed_payload)).hexdigest(),
+                    row_version,
+                    key_hash,
+                ),
+            )
+    else:
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_codec_version = ? WHERE key_hash = ?",
+                (row_version, key_hash),
+            )
 
     store = rrd.PT1PersistentEquilibriumStore(db_path)
     bucket_key = canonical_physics_bucket_key_from_replay_key(key)
@@ -768,31 +782,105 @@ def test_stale_codec_malformed_payload_misses_physics_readers(
         rung_tag,
     )
     rung_hash = hashlib.sha256(canonical_json_bytes(rung_key)).hexdigest()
-    if reader == "bucket":
-        observed = store._get_by_physics_bucket(
-            artifact="equilibrium_post_record",
-            physics_bucket_key=bucket_key,
-            physics_bucket_bytes=bucket_bytes,
-            physics_bucket_hash=bucket_hash,
-            query_key=key,
-        )
-        assert observed is None
-    elif reader == "ladder":
-        observed = store._get_by_physics_ladder_bucket(
-            artifact="equilibrium_post_record",
-            rung_tag=rung_tag,
-            rung_key=rung_key,
-            rung_hash=rung_hash,
-            query_key=key,
-        )
-        assert observed is None
-    else:
-        observed = store._list_interpolation_candidates(
+
+    def read_row():
+        if reader == "bucket":
+            return store._get_by_physics_bucket(
+                artifact="equilibrium_post_record",
+                physics_bucket_key=bucket_key,
+                physics_bucket_bytes=bucket_bytes,
+                physics_bucket_hash=bucket_hash,
+                query_key=key,
+            )
+        if reader == "ladder":
+            return store._get_by_physics_ladder_bucket(
+                artifact="equilibrium_post_record",
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rung_hash,
+                query_key=key,
+            )
+        return store._list_interpolation_candidates(
             artifact="equilibrium_post_record",
             replay_scope_sha256=rci.replay_scope_for_interpolation(key),
             query_key=key,
         )
-        assert observed == []
+
+    if corrupt_payload:
+        with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+            read_row()
+    else:
+        observed = read_row()
+        assert observed == ([] if reader == "interpolation" else None)
+
+
+@pytest.mark.parametrize(
+    ("column", "value"),
+    (
+        ("git_dirty", "bad"),
+        ("created_at", "not-a-timestamp"),
+        ("code_version", sqlite3.Binary(b"invalid")),
+        ("request_schema_version", sqlite3.Binary(b"invalid")),
+        ("data_digests_json", sqlite3.Binary(b"invalid")),
+        ("corpus_version", sqlite3.Binary(b"invalid")),
+        ("engine_version", sqlite3.Binary(b"invalid")),
+    ),
+    ids=(
+        "git-dirty",
+        "created-at",
+        "code-version",
+        "request-schema-version",
+        "data-digests-json",
+        "corpus-version",
+        "engine-version",
+    ),
+)
+def test_pt1_attached_recapture_rejects_invalid_provenance_before_copy(
+    tmp_path: Path,
+    column: str,
+    value: object,
+) -> None:
+    key = _interpolation_key(
+        "provenance", feo_fraction=0.20, temperature_K=1500.0
+    )
+    payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+    base_db = tmp_path / f"bad-provenance-{column}-base.sqlite"
+    local_db = tmp_path / f"bad-provenance-{column}-local.sqlite"
+    _put_interpolation_row(base_db, key, liquid_fraction=0.7, sio_pa=7.0)
+    key_hash = hashlib.sha256(canonical_json_bytes(key)).hexdigest()
+    with sqlite3.connect(base_db) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            f"SET {column} = ?, law_disclosures_json = NULL "
+            "WHERE key_hash = ?",
+            (value, key_hash),
+        )
+
+    recapture = rrd.PT1PersistentEquilibriumStore(
+        local_db,
+        read_only_base_db_path=base_db,
+    )
+    payload_bytes = canonical_json_bytes(payload)
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+        recapture.put(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=canonical_json_bytes(key),
+            key_hash=key_hash,
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+            repair_notices_json=rrd.encode_repair_notices_json(
+                [{"kind": "recapture_notice"}]
+            ),
+            law_disclosures=[],
+        )
+
+    with sqlite3.connect(local_db) as conn:
+        assert conn.execute(
+            f"SELECT 1 FROM {rrd.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone() is None
 
 
 def test_interpolation_refuses_attached_base_dependency_vector_mismatch(
