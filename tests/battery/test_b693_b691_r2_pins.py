@@ -641,8 +641,17 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
     )
     reactive_outcome = _oxygen_outcome(on_reactive_knudsen, seen)
     seen.clear()
+    general_experiment = F.tabulation_experiment()
+    general_observation = replace(
+        observation,
+        observation_id=f"{observation.observation_id}-tabulation",
+        experiment_id=general_experiment.experiment_id,
+    )
     general = predict_with_engine(
-        OPENIMCC, observation, experiment=F.tabulation_experiment(), isolated=False
+        OPENIMCC,
+        general_observation,
+        experiment=general_experiment,
+        isolated=False,
     )
     general_outcome = _oxygen_outcome(general, seen)
     assert any(
@@ -676,12 +685,12 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         assert any(
             notice.reason == (
                 "fo2_tier=1; physics_rung=1:printed_fO2_or_buffer; "
-                "route=identity_fO2_Pa"
+                "route=observation_fO2_Pa_to_log_fO2"
             )
             for notice in on_reactive_knudsen.notices
         )
         assert any(
-            notice.reason == "fo2_tier=1; route=identity_fO2_Pa"
+            notice.reason == "fo2_tier=1; route=observation_fO2_Pa_to_log_fO2"
             for notice in general.notices
         )
     expected = {
