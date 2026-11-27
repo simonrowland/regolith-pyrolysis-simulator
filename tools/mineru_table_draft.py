@@ -624,6 +624,7 @@ def _sid_from_path(path: Path) -> str:
 
 
 def _chunk_start_page(path: Path) -> int:
+    """Resolve the chunk origin, including tokenless full-document layouts."""
     for part in reversed(path.parts):
         match = _CHUNK_START.search(part)
         if match:
@@ -633,6 +634,13 @@ def _chunk_start_page(path: Path) -> int:
             return int(match.group(1))
     if "mineru" in path.parts:
         return 1
+    if "ocr-mineru" in path.parts:
+        ocr_mineru_index = path.parts.index("ocr-mineru")
+        if path.parts[ocr_mineru_index + 1 : ocr_mineru_index + 3] == (
+            "full",
+            "vlm",
+        ):
+            return 1
     raise ValueError(f"cannot determine chunk start page from {path}")
 
 
