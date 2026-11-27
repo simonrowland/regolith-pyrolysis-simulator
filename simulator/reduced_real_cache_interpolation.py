@@ -61,18 +61,12 @@ def interpolation_feature_spec(key: Mapping[str, Any]) -> tuple[list[str], list[
 
 def interpolation_key_domain_violation(
     key: Mapping[str, Any],
-    *,
-    query_keys: Sequence[Mapping[str, Any]] = (),
 ) -> str | None:
-    """Validate stored coordinates that interpolation or its query consumes."""
+    """Validate a stored key's own coordinates before it can be a neighbor."""
 
     composition_present = "composition_mol_fraction" in key
     composition = key.get("composition_mol_fraction")
     if composition_present and not isinstance(composition, (list, tuple)):
-        return "composition_mol_fraction"
-    if not composition_present and any(
-        "composition_mol_fraction" in query_key for query_key in query_keys
-    ):
         return "composition_mol_fraction"
     for component in composition or ():
         if isinstance(component, Mapping):
@@ -91,16 +85,16 @@ def interpolation_key_domain_violation(
             numeric_fraction = float(fraction)
         except (OverflowError, TypeError, ValueError):
             return "composition_mol_fraction"
-        if not math.isfinite(numeric_fraction) or numeric_fraction < 0.0:
+        if (
+            not math.isfinite(numeric_fraction)
+            or numeric_fraction < 0.0
+            or numeric_fraction > 1.0
+        ):
             return "composition_mol_fraction"
 
     controls_present = "controls" in key
     controls = key.get("controls")
     if controls_present and not isinstance(controls, Mapping):
-        return "controls"
-    if not controls_present and any(
-        "controls" in query_key for query_key in query_keys
-    ):
         return "controls"
     if not isinstance(controls, Mapping):
         controls = {}
@@ -119,13 +113,6 @@ def interpolation_key_domain_violation(
         if not math.isfinite(numeric_value):
             return control_path
 
-    control_names = set(_interpolation_control_names(key))
-    for query_key in query_keys:
-        control_names.update(_interpolation_control_names(query_key))
-
-    for control_name in sorted(control_names):
-        if control_name not in controls:
-            return f"controls.{control_name}"
     return None
 
 
@@ -181,10 +168,14 @@ def greedy_nearest_neighbors(
             candidate_key,
         ):
             continue
-        if interpolation_key_domain_violation(
-            candidate_key,
-            query_keys=(query_key,),
-        ) is not None:
+        if interpolation_key_domain_violation(candidate_key) is not None:
+            continue
+        candidate_controls = candidate_key.get("controls", {})
+        if not isinstance(candidate_controls, Mapping) or any(
+            control_name not in candidate_controls
+            or candidate_controls[control_name] is None
+            for control_name in control_names
+        ):
             continue
         candidate_vector = interpolation_coordinate_vector(
             candidate_key,

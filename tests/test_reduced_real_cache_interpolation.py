@@ -253,10 +253,7 @@ def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> 
         _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0),
     )
 
-    assert rci.interpolation_key_domain_violation(
-        candidate_key,
-        query_keys=(query,),
-    ) is None
+    assert rci.interpolation_key_domain_violation(candidate_key) is None
     assert rci.greedy_nearest_neighbors(
         query,
         [candidate],
@@ -266,6 +263,55 @@ def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> 
     assert uncertainty["components"]["cache_distance"]["status"] == (
         "insufficient_neighbors"
     )
+
+
+def test_exact_only_row_stays_valid_and_is_skipped_for_temperature_interpolation(
+    tmp_path: Path,
+) -> None:
+    artifact = "equilibrium_post_record"
+    exact_key = _interpolation_key(
+        "exact-only",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    exact_key.pop("controls")
+    payload = _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0)
+    db_path = tmp_path / "exact-only-interpolation.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture._store(artifact, exact_key, payload, law_disclosures=[])
+
+    exact_key_bytes = canonical_json_bytes(exact_key)
+    persistent = capture.persistent_store
+    assert persistent is not None
+    assert persistent.get(
+        artifact=artifact,
+        key=exact_key,
+        key_bytes=exact_key_bytes,
+        key_hash=hashlib.sha256(exact_key_bytes).hexdigest(),
+    ) is not None
+
+    query_key = _interpolation_key(
+        "temperature-query",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    candidates = persistent._list_interpolation_candidates(
+        artifact=artifact,
+        replay_scope_sha256=rci.replay_scope_for_interpolation(query_key),
+        query_key=query_key,
+    )
+    assert len(candidates) == 1
+    assert rci.greedy_nearest_neighbors(query_key, candidates) == []
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    assert replay._lookup_optional(
+        artifact,
+        query_key,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(
+            query_key
+        ),
+        return_decoded=True,
+    ) is None
 
 
 def test_greedy_nn_accepts_temperature_above_old_domain_cap(
@@ -320,10 +366,7 @@ def test_large_finite_composition_is_admitted_but_not_a_neighbor(
         sio_pa=8.0,
     )
 
-    assert rci.interpolation_key_domain_violation(
-        candidate_key,
-        query_keys=(query,),
-    ) is None
+    assert rci.interpolation_key_domain_violation(candidate_key) is None
     store = rrd.PT1PersistentEquilibriumStore(db_path)
     candidates = store._list_interpolation_candidates(
         artifact="equilibrium_post_record",
@@ -1000,7 +1043,6 @@ def test_interpolation_admission_rejects_out_of_range_composition_fraction(
     # value is shape-valid, and only its overflowing distance excludes it.
     assert rci.interpolation_key_domain_violation(
         malformed_key,
-        query_keys=(query,),
     ) is None
     store = rrd.PT1PersistentEquilibriumStore(db_path)
     candidates = store._list_interpolation_candidates(

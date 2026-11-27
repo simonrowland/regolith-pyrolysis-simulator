@@ -988,6 +988,18 @@ class UncacheableKey(ValueError):
         super().__init__(self.reason)
 
 
+class UncacheablePayload(ValueError):
+    """A fresh cache payload cannot be replayed by the exact reader."""
+
+    category = "invalid-payload"
+
+    def __init__(self, artifact: str, key_hash: str) -> None:
+        self.reason = (
+            f"{artifact} payload is not replayable for cache key {key_hash}"
+        )
+        super().__init__(self.reason)
+
+
 def _authoritative_melt_fO2_log(sim: Any) -> float:
     reader = getattr(sim, "_current_melt_redox_fO2_log", None)
     if callable(reader):
@@ -1361,7 +1373,7 @@ class PT0DeterminismStore:
                 engine_version_provenance=_engine_version_provenance(sim, intent),
                 repair_notices=_repair_notices_for_capture(sim, repair_notices),
             )
-        except UncacheableKey as exc:
+        except (UncacheableKey, UncacheablePayload) as exc:
             self._mark_uncacheable_capture(sim, reason=exc)
             return
         sim._last_reduced_real_cache_state = self.last_cache_state
@@ -1629,7 +1641,7 @@ class PT0DeterminismStore:
                 repair_notices=_repair_notices_for_capture(sim, repair_notices),
                 law_disclosures=law_disclosures,
             )
-        except UncacheableKey as exc:
+        except (UncacheableKey, UncacheablePayload) as exc:
             self._mark_uncacheable_capture(sim, reason=exc)
             return
         sim._last_reduced_real_cache_state = self.last_cache_state
@@ -1638,7 +1650,7 @@ class PT0DeterminismStore:
         self,
         sim: Any,
         *,
-        reason: UncacheableKey | None = None,
+        reason: UncacheableKey | UncacheablePayload | None = None,
     ) -> None:
         self.last_cache_state = None
         sim._last_reduced_real_cache_state = None
@@ -1839,9 +1851,10 @@ class PT0DeterminismStore:
         repair_notices: Sequence[Mapping[str, Any]] = (),
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
+        indexability_error = _ladder_indexability(key)
+        if indexability_error is not None:
+            raise indexability_error
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
-        if self.persistent_store is None:
-            _require_cacheable_ladder_values(key)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
@@ -1934,7 +1947,7 @@ class PT0DeterminismStore:
             self._entries[key_hash] = existing
             self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
             return
-        self._entries[key_hash] = {
+        entry = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),
             "key_hash": key_hash,
@@ -1948,6 +1961,16 @@ class PT0DeterminismStore:
             "physics_bucket_hash": physics_bucket_hash,
             "cache_state": "live_fill",
         }
+        if self.persistent_store is None:
+            _require_write_candidate_admission(
+                entry,
+                store_kind="pt0",
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            )
+        self._entries[key_hash] = entry
         self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
         self.live_fills += 1
         self.last_cache_state = "live_fill"
@@ -1978,6 +2001,11 @@ class PT0DeterminismStore:
     ) -> Any:
         if not keys:
             raise PT0CacheMiss(f"PT-0 cached replay miss: no keys for {artifact}")
+        if any(_ladder_indexability(key) is not None for key in keys):
+            self.last_cache_state = None
+            raise PT0CacheMiss(
+                f"PT-0 cached replay miss: unindexable query for {artifact}"
+            )
 
         checked: list[tuple[Mapping[str, Any], bytes, str]] = []
         for key in _expand_compatible_replay_keys(keys):
@@ -2061,6 +2089,9 @@ class PT0DeterminismStore:
         sim: Any | None = None,
         return_decoded: bool = False,
     ) -> Any | None:
+        if _ladder_indexability(key) is not None:
+            self.last_cache_state = None
+            return None
         tier_ceiling = str(
             getattr(self, "cache_tier_ceiling", "cached_interpolated")
         )
@@ -2378,6 +2409,8 @@ class PT0DeterminismStore:
             replay_scope_for_interpolation,
         )
 
+        if _ladder_indexability(key) is not None:
+            return None
         if self.persistent_store is None:
             return None
         key_bytes = canonical_json_bytes(key)
@@ -2670,10 +2703,6 @@ def _admit_stored_row(
 
                 if interpolation_key_domain_violation(
                     stored_key,
-                    query_keys=(
-                        tuple(admission_keys or ())
-                        + ((key,) if key is not None else ())
-                    ),
                 ) is not None:
                     return None
             stored_ladder_values = _physics_ladder_values_from_replay_key(
@@ -2997,10 +3026,6 @@ def _admit_stored_row(
 
             domain_violation = interpolation_key_domain_violation(
                 row_key,
-                query_keys=(
-                    tuple(admission_keys or ())
-                    + ((key,) if key is not None else ())
-                ),
             )
             if domain_violation is not None:
                 section = (
@@ -3223,6 +3248,29 @@ def _admit_stored_row(
         ) from exc
 
 
+def _require_write_candidate_admission(
+    row: Mapping[str, Any],
+    *,
+    store_kind: str,
+    artifact: str,
+    key: Mapping[str, Any],
+    key_bytes: bytes,
+    key_hash: str,
+) -> _AdmittedStoredRow:
+    admitted = _admit_stored_row(
+        row,
+        store_kind=store_kind,
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        validate_interpolation_domain=True,
+    )
+    if admitted is None or admitted.decoded_payload is None:
+        raise UncacheablePayload(artifact, key_hash)
+    return admitted
+
+
 class PT1PersistentEquilibriumStore:
     """Content-addressed SQLite store for PT-0 exact reduced-real payloads."""
 
@@ -3274,6 +3322,9 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str | None = None,
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
+        indexability_error = _ladder_indexability(key)
+        if indexability_error is not None:
+            raise indexability_error
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         payload_codec_version = _payload_codec_version(artifact)
         validate_repair_notices_json(repair_notices_json)
@@ -3291,7 +3342,7 @@ class PT1PersistentEquilibriumStore:
         if physics_bucket_hash is None:
             physics_bucket_hash = _sha256(physics_bucket_bytes)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
-        ladder_values = _require_cacheable_ladder_values(key)
+        ladder_values = _physics_ladder_values_from_replay_key(key)
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
@@ -3331,6 +3382,51 @@ class PT1PersistentEquilibriumStore:
                     (key_hash,),
                 ).fetchone()
                 if local_row is not None:
+                    write_disclosures = (
+                        incoming_disclosures
+                        if stale_payload
+                        else _prefer_law_disclosures(
+                            entry["law_disclosures"],
+                            incoming_disclosures,
+                        )
+                    )
+                    candidate_row = dict(existing_fields)
+                    candidate_row["repair_notices_json"] = effective_notices_json
+                    if stale_payload:
+                        candidate_row["payload_sha256"] = payload_hash
+                        candidate_row["payload_bytes"] = payload_bytes
+                        candidate_row["payload_codec_version"] = payload_codec_version
+                    if existing_fields.get("physics_bucket_sha256") is None or any(
+                        existing_fields.get(_physics_ladder_hash_column(rung_tag))
+                        is None
+                        for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                    ):
+                        candidate_row["physics_bucket_schema_version"] = (
+                            PHYSICS_BUCKET_SCHEMA_VERSION
+                        )
+                        candidate_row["physics_bucket_sha256"] = physics_bucket_hash
+                        candidate_row["replay_scope_sha256"] = _replay_scope_hash(
+                            physics_bucket_key
+                        )
+                        candidate_row["physics_key_bytes"] = physics_bucket_bytes
+                        for rung_tag, values in ladder_values.items():
+                            candidate_row[_physics_ladder_hash_column(rung_tag)] = (
+                                values["sha256"]
+                            )
+                            candidate_row[_physics_ladder_distance_column(rung_tag)] = (
+                                values["distance"]
+                            )
+                    candidate_row["law_disclosures_json"] = _law_disclosures_json(
+                        write_disclosures
+                    )
+                    _require_write_candidate_admission(
+                        candidate_row,
+                        store_kind="pt1",
+                        artifact=artifact,
+                        key=key,
+                        key_bytes=key_bytes,
+                        key_hash=key_hash,
+                    )
                     if stale_payload:
                         conn.execute(
                             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
@@ -3359,16 +3455,7 @@ class PT1PersistentEquilibriumStore:
                         physics_bucket_hash=physics_bucket_hash,
                         ladder_values=ladder_values,
                     )
-                    self._write_law_disclosures(
-                        conn,
-                        key_hash,
-                        incoming_disclosures
-                        if stale_payload
-                        else _prefer_law_disclosures(
-                            entry["law_disclosures"],
-                            incoming_disclosures,
-                        ),
-                    )
+                    self._write_law_disclosures(conn, key_hash, write_disclosures)
                     return
                 if stale_payload:
                     insert_source = None
@@ -3412,83 +3499,95 @@ class PT1PersistentEquilibriumStore:
                 source_data_digests_json = source["data_digests_json"]
                 source_created_at = source["created_at"]
                 source_git_dirty = source["git_dirty"]
-            conn.execute(
-                f"""
-                INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
-                    key_hash,
-                    artifact,
-                    store_schema_version,
-                    request_schema_version,
-                    key_sha256,
-                    payload_sha256,
-                    payload_codec_version,
-                    key_bytes,
-                    payload_bytes,
-                    code_version,
-                    corpus_version,
-                    engine_version,
-                    data_digests_json,
-                    repair_notices_json,
-                    physics_bucket_schema_version,
-                    physics_bucket_sha256,
-                    replay_scope_sha256,
-                    physics_key_bytes,
-                    physics_bucket_h40_sha256,
-                    physics_bucket_h40_distance,
-                    physics_bucket_h30_sha256,
-                    physics_bucket_h30_distance,
-                    physics_bucket_h40c_sha256,
-                    physics_bucket_h40c_distance,
-                    physics_bucket_h30c_sha256,
-                    physics_bucket_h30c_distance,
-                    created_at,
-                    git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    key_hash,
-                    artifact,
-                    PT1_STORE_SCHEMA_VERSION,
-                    source_request_schema,
-                    key_hash,
-                    source_payload_hash,
-                    payload_codec_version,
-                    sqlite3.Binary(source_key_bytes),
-                    sqlite3.Binary(source_payload_bytes),
-                    source_code_version,
-                    source_corpus_version,
-                    source_engine_version,
-                    source_data_digests_json,
-                    effective_notices_json,
-                    PHYSICS_BUCKET_SCHEMA_VERSION,
-                    physics_bucket_hash,
-                    _replay_scope_hash(physics_bucket_key),
-                    sqlite3.Binary(physics_bucket_bytes),
-                    ladder_values["h40"]["sha256"],
-                    ladder_values["h40"]["distance"],
-                    ladder_values["h30"]["sha256"],
-                    ladder_values["h30"]["distance"],
-                    ladder_values["h40c"]["sha256"],
-                    ladder_values["h40c"]["distance"],
-                    ladder_values["h30c"]["sha256"],
-                    ladder_values["h30c"]["distance"],
-                    source_created_at,
-                    source_git_dirty,
-                ),
+            insert_columns = (
+                "key_hash",
+                "artifact",
+                "store_schema_version",
+                "request_schema_version",
+                "key_sha256",
+                "payload_sha256",
+                "payload_codec_version",
+                "key_bytes",
+                "payload_bytes",
+                "code_version",
+                "corpus_version",
+                "engine_version",
+                "data_digests_json",
+                "repair_notices_json",
+                "physics_bucket_schema_version",
+                "physics_bucket_sha256",
+                "replay_scope_sha256",
+                "physics_key_bytes",
+                "physics_bucket_h40_sha256",
+                "physics_bucket_h40_distance",
+                "physics_bucket_h30_sha256",
+                "physics_bucket_h30_distance",
+                "physics_bucket_h40c_sha256",
+                "physics_bucket_h40c_distance",
+                "physics_bucket_h30c_sha256",
+                "physics_bucket_h30c_distance",
+                "created_at",
+                "git_dirty",
+            )
+            insert_values = (
+                key_hash,
+                artifact,
+                PT1_STORE_SCHEMA_VERSION,
+                source_request_schema,
+                key_hash,
+                source_payload_hash,
+                payload_codec_version,
+                sqlite3.Binary(source_key_bytes),
+                sqlite3.Binary(source_payload_bytes),
+                source_code_version,
+                source_corpus_version,
+                source_engine_version,
+                source_data_digests_json,
+                effective_notices_json,
+                PHYSICS_BUCKET_SCHEMA_VERSION,
+                physics_bucket_hash,
+                _replay_scope_hash(physics_bucket_key),
+                sqlite3.Binary(physics_bucket_bytes),
+                ladder_values["h40"]["sha256"],
+                ladder_values["h40"]["distance"],
+                ladder_values["h30"]["sha256"],
+                ladder_values["h30"]["distance"],
+                ladder_values["h40c"]["sha256"],
+                ladder_values["h40c"]["distance"],
+                ladder_values["h30c"]["sha256"],
+                ladder_values["h30c"]["distance"],
+                source_created_at,
+                source_git_dirty,
             )
             stored = (
                 entry["law_disclosures"]
                 if existing is not None and not stale_payload
                 else None
             )
-            self._write_law_disclosures(
-                conn,
-                key_hash,
-                _prefer_law_disclosures(
-                    stored,
-                    incoming_disclosures,
-                ),
+            write_disclosures = _prefer_law_disclosures(
+                stored,
+                incoming_disclosures,
             )
+            candidate_row = dict(zip(insert_columns, insert_values))
+            candidate_row["law_disclosures_json"] = _law_disclosures_json(
+                write_disclosures
+            )
+            _require_write_candidate_admission(
+                candidate_row,
+                store_kind="pt1",
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            )
+            columns_sql = ", ".join(insert_columns)
+            values_sql = ", ".join("?" for _ in insert_columns)
+            conn.execute(
+                f"INSERT INTO {PT1_EQUILIBRIUM_TABLE} ({columns_sql}) "
+                f"VALUES ({values_sql})",
+                insert_values,
+            )
+            self._write_law_disclosures(conn, key_hash, write_disclosures)
 
     def _write_law_disclosures(
         self,
@@ -3531,6 +3630,8 @@ class PT1PersistentEquilibriumStore:
         key_bytes: bytes,
         key_hash: str,
     ) -> tuple[dict[str, Any], Any] | None:
+        if _ladder_indexability(key) is not None:
+            return None
         with self._connect() as conn:
             self._initialize(conn)
             for row in self._fetch_candidates(conn, key_hash):
@@ -3574,6 +3675,8 @@ class PT1PersistentEquilibriumStore:
         query_key: Mapping[str, Any] | None = None,
         return_decoded: bool = False,
     ) -> Any | None:
+        if query_key is not None and _ladder_indexability(query_key) is not None:
+            return None
         query = f"""
             SELECT *
             FROM {{table}}
@@ -3631,6 +3734,8 @@ class PT1PersistentEquilibriumStore:
         exclude_key_hash: str | None = None,
         query_key: Mapping[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
+        if query_key is not None and _ladder_indexability(query_key) is not None:
+            return []
         query = f"""
             SELECT *
             FROM {{table}}
@@ -3719,6 +3824,8 @@ class PT1PersistentEquilibriumStore:
         query_key: Mapping[str, Any] | None = None,
         return_decoded: bool = False,
     ) -> Any | None:
+        if query_key is not None and _ladder_indexability(query_key) is not None:
+            return None
         hash_column = _physics_ladder_hash_column(rung_tag)
         distance_column = _physics_ladder_distance_column(rung_tag)
         query = f"""
@@ -4318,7 +4425,11 @@ def _copy_pt1_equilibrium_rows(
                     incoming_admission is not None
                     and incoming_admission.stored_columns is not None
                 )
-                _require_cacheable_ladder_values(incoming_admission.entry["key"])
+                indexability_error = _ladder_indexability(
+                    incoming_admission.entry["key"]
+                )
+                if indexability_error is not None:
+                    raise indexability_error
                 incoming_row = incoming_admission.stored_columns
                 key_hash = str(incoming_admission.entry["key_hash"])
                 incoming_admitted = incoming_admission.decoded_payload is not None
@@ -5670,6 +5781,11 @@ def physics_control_rung_error_budget(
     source_pO2 = _control_float(source_key, "pO2_bar")
     result["query_pO2_bar"] = query_pO2
     result["source_pO2_bar"] = source_pO2
+    if query_pO2 is not None and query_pO2 == source_pO2 and query_pO2 >= 0.0:
+        # A ladder hit at the same nonnegative pO2 has no approximation error,
+        # even when its rounded bucket touches the SiO knee.
+        result["relative_error"] = 0.0
+        return result
     if query_pO2 is None or source_pO2 is None or query_pO2 <= 0.0 or source_pO2 <= 0.0:
         result["accepted"] = False
         result["refusal_reason"] = "pO2_missing_or_nonpositive"
@@ -7073,61 +7189,101 @@ def _physics_ladder_values_from_replay_key(
     return values
 
 
-def _nonfinite_ladder_distance_field(
+def _ladder_indexability(
     key: Mapping[str, Any],
-    rung_tag: str,
-) -> str:
-    sig_figs = _physics_ladder_sig_figs(rung_tag)
-    for species, fraction in _composition_items(
-        key.get("composition_mol_fraction", [])
-    ):
-        try:
-            if _sigfig_snap(fraction, sig_figs) is None:
-                return f"composition_mol_fraction.{species}"
-        except (OverflowError, TypeError, ValueError):
-            return f"composition_mol_fraction.{species}"
-
-    controls = key.get("controls", {})
-    if not isinstance(controls, Mapping):
-        controls = {}
-    rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-        key,
-        rung_tag,
-    )
-    rung_bucket = rung_key.get("physics_bucket", {})
-    rung_controls = (
-        rung_bucket.get("controls", {})
-        if isinstance(rung_bucket, Mapping)
-        else {}
-    )
-    control_names = ["T_K"]
-    if _physics_ladder_coarsens_controls(rung_tag):
-        control_names.extend(("pressure_bar", "pO2_bar"))
-    for control_name in control_names:
-        if control_name not in controls or controls[control_name] is None:
-            continue
-        if control_name != "T_K" and control_name not in rung_controls:
-            continue
-        try:
-            if _sigfig_snap(controls[control_name], sig_figs) is None:
-                return f"controls.{control_name}"
-        except (OverflowError, TypeError, ValueError):
-            return f"controls.{control_name}"
-    return "distance"
-
-
-def _require_cacheable_ladder_values(
-    key: Mapping[str, Any],
-) -> dict[str, dict[str, float | str]]:
-    values = _physics_ladder_values_from_replay_key(key)
-    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
-        distance = values[rung_tag]["distance"]
-        if not isinstance(distance, (int, float)) or not math.isfinite(distance):
-            raise UncacheableKey(
-                rung_tag,
-                _nonfinite_ladder_distance_field(key, rung_tag),
+) -> UncacheableKey | None:
+    raw_composition = key.get("composition_mol_fraction", [])
+    if not isinstance(raw_composition, (list, tuple)):
+        return UncacheableKey(
+            PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+            "composition_mol_fraction",
+        )
+    composition: list[tuple[str, float]] = []
+    for component in raw_composition:
+        if isinstance(component, Mapping):
+            species = component.get("species")
+            raw_fraction = component.get("mol_fraction")
+        elif isinstance(component, (list, tuple)) and len(component) == 2:
+            species, raw_fraction = component
+        else:
+            return UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "composition_mol_fraction",
             )
-    return values
+        if not isinstance(species, str) or not species or not is_declared_real_scalar(
+            raw_fraction
+        ):
+            return UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                f"composition_mol_fraction.{species}",
+            )
+        try:
+            fraction = float(raw_fraction)
+        except (OverflowError, TypeError, ValueError):
+            return UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                f"composition_mol_fraction.{species}",
+            )
+        if not math.isfinite(fraction) or fraction < 0.0 or fraction > 1.0:
+            return UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                f"composition_mol_fraction.{species}",
+            )
+        composition.append((species, fraction))
+
+    raw_controls = key.get("controls", {})
+    if not isinstance(raw_controls, Mapping):
+        return UncacheableKey(PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0], "controls")
+    controls: dict[str, float] = {}
+    for name, value in raw_controls.items():
+        if not isinstance(name, str) or not is_declared_real_scalar(value):
+            return UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                f"controls.{name}",
+            )
+        try:
+            number = float(value)
+        except (OverflowError, TypeError, ValueError):
+            return UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                f"controls.{name}",
+            )
+        if not math.isfinite(number):
+            return UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                f"controls.{name}",
+            )
+        controls[name] = number
+
+    for rung_tag, sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        for species, fraction in composition:
+            if _sigfig_snap(fraction, sig_figs) is None:
+                return UncacheableKey(
+                    rung_tag,
+                    f"composition_mol_fraction.{species}",
+                )
+        snapped_controls = ["T_K"] if "T_K" in controls else []
+        if _physics_ladder_coarsens_controls(rung_tag):
+            if "pressure_bar" in controls:
+                snapped_controls.append("pressure_bar")
+            if (
+                "pO2_bar" in controls
+                and _physics_bucket_consumes_pO2_bar(key)
+            ):
+                snapped_controls.append("pO2_bar")
+        for name in snapped_controls:
+            if _sigfig_snap(controls[name], sig_figs) is None:
+                return UncacheableKey(rung_tag, f"controls.{name}")
+        try:
+            distance = physics_ladder_bucket_distance_from_replay_key(
+                key,
+                rung_tag,
+            )
+        except (OverflowError, TypeError, ValueError, ZeroDivisionError):
+            return UncacheableKey(rung_tag, "distance")
+        if not math.isfinite(distance):
+            return UncacheableKey(rung_tag, "distance")
+    return None
 
 
 def _physics_ladder_sig_figs(rung_tag: str) -> float:

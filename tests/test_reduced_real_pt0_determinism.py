@@ -3276,6 +3276,20 @@ def test_pt2_control_ladder_hit_records_error_budget(tmp_path: Path) -> None:
 
 
 def test_pt2_control_ladder_refuses_po2_knee_crossing(tmp_path: Path) -> None:
+    same_key = _c3a_ladder_key(
+        "same-knee-key",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    same_key["controls"]["pO2_bar"] = rrd.CONTROL_RUNG_SIO_PO2_KNEE_BAR
+    same_pO2_budget = rrd.physics_control_rung_error_budget(
+        same_key,
+        same_key,
+        "h30c",
+    )
+    assert same_pO2_budget["accepted"] is True
+    assert same_pO2_budget["relative_error"] == 0.0
+
     query_key = _c3a_ladder_key(
         "query-knee",
         feo_fraction=0.123456,
@@ -4577,8 +4591,15 @@ def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
     key = _freeze_gate_key()
     if control_shape == "exact-only-without-controls":
         key.pop("controls")
+        key["vapor_pressure_provider_selection"] = None
     elif control_shape == "pressure-only":
         key["controls"] = {"pressure_bar": 1.0}
+        key["vapor_pressure_provider_selection"] = None
+    else:
+        # The fixture's default hard-vacuum pO2 sits on the SiO knee. Use a
+        # safe measured pO2 here so this pin tests index agreement, not the
+        # separate cross-knee approximation refusal.
+        key["controls"]["pO2_bar"] = 1.0e-8
     payload = _valid_test_gate_payload()
 
     capture = PT0DeterminismStore("capture", db_path=source_db)
@@ -4631,7 +4652,8 @@ def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
                 if reference != 0.0
                 else 10.0 ** (1.0 - sig_figs)
             )
-            return ((exact - center) / quantum) ** 2
+            delta = (exact - center) / quantum
+            return delta * delta
 
         # Green's documented index distance is the ordered sum of squared
         # offsets from each raw coordinate to its significant-figure center,
@@ -4687,11 +4709,12 @@ def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
                 rung_tag,
             )
             rung_bytes = canonical_json_bytes(rung_key)
+            rung_hash = rrd._sha256(rung_bytes)
             assert persistent.get_by_physics_ladder_bucket(
                 artifact="freeze_gate_curve",
                 rung_tag=rung_tag,
                 rung_key=rung_key,
-                rung_hash=rrd._sha256(rung_bytes),
+                rung_hash=rung_hash,
                 query_key=key,
             ) is not None
         with sqlite3.connect(db_path) as conn:
@@ -4707,6 +4730,28 @@ def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
         assert indexed_distances is not None
         assert tuple(indexed_distances) == tuple(
             independent_expected_distance(rung_tag)
+            for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+        )
+        with sqlite3.connect(db_path) as conn:
+            indexed_hashes = conn.execute(
+                "SELECT "
+                + ", ".join(
+                    rrd._physics_ladder_hash_column(rung_tag)
+                    for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                )
+                + f" FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                (key_hash,),
+            ).fetchone()
+        assert indexed_hashes is not None
+        assert tuple(indexed_hashes) == tuple(
+            rrd._sha256(
+                canonical_json_bytes(
+                    rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+                        key,
+                        rung_tag,
+                    )
+                )
+            )
             for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
         )
 
@@ -4799,6 +4844,286 @@ def test_unsnappable_pressure_is_not_written_or_a_coarsened_ladder_neighbor(
             rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
             query_key=with_pt1_indexes,
         ) is None
+
+
+_LADDER_SPECIAL_FLOATS = (
+    0.0,
+    -0.0,
+    5e-324,
+    2.2250738585072014e-308,
+    1.0,
+    1e300,
+    float.fromhex("0x1.fffffffffffffp+1023"),
+)
+_FULL_GATE_CONTROL_FIELDS = (
+    "T_K",
+    "log_fO2",
+    "pressure_bar",
+    "pO2_bar",
+    "vapor_transport_pO2_bar",
+)
+
+
+def _ladder_special_float_cases() -> tuple[Any, ...]:
+    cases = []
+    key_shapes = ("with-controls", "pressure-only", "without-controls")
+    for value_index, value in enumerate(_LADDER_SPECIAL_FLOATS):
+        for shape in key_shapes:
+            for field in (*_FULL_GATE_CONTROL_FIELDS, "composition.FeO"):
+                cases.append(
+                    pytest.param(
+                        shape,
+                        field,
+                        value,
+                        id=f"{shape}-{field.replace('.', '-')}-float-{value_index}",
+                    )
+                )
+    return tuple(cases)
+
+
+@pytest.mark.parametrize(
+    ("key_shape", "field", "value"),
+    _ladder_special_float_cases(),
+)
+def test_ladder_indexability_special_float_class(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    key_shape: str,
+    field: str,
+    value: float,
+) -> None:
+    artifact = "freeze_gate_curve"
+    key = _freeze_gate_key()
+    if key_shape == "without-controls":
+        key.pop("controls", None)
+        key["vapor_pressure_provider_selection"] = None
+    elif key_shape == "pressure-only":
+        key["controls"] = {"pressure_bar": 1.0}
+        key["vapor_pressure_provider_selection"] = None
+    if field == "composition.FeO":
+        components = key["composition_mol_fraction"]
+        for component in components:
+            if component[0] == "FeO":
+                component[1] = value
+                break
+        else:
+            pytest.fail("the gate key has no FeO composition coordinate")
+    else:
+        key.setdefault("controls", {})[field] = value
+        if field == "pO2_bar":
+            key["vapor_pressure_provider_selection"] = "builtin-vapor-pressure"
+
+    payload = _valid_test_gate_payload()
+    memory_capture = PT0DeterminismStore("capture")
+    db_path = tmp_path / "special-float-ladder.sqlite"
+    persistent_capture = PT0DeterminismStore("capture", db_path=db_path)
+
+    def write(store: PT0DeterminismStore) -> rrd.UncacheableKey | None:
+        try:
+            store._store(artifact, key, payload, law_disclosures=[])
+        except rrd.UncacheableKey as exc:
+            return exc
+        return None
+
+    memory_error = write(memory_capture)
+    persistent_error = write(persistent_capture)
+    assert (memory_error is None) is (persistent_error is None)
+    if field == "T_K" and value == _LADDER_SPECIAL_FLOATS[-1]:
+        assert memory_error is not None
+        assert memory_error.rung_tag == "h40"
+        assert memory_error.field == "controls.T_K"
+
+    key_bytes = canonical_json_bytes(key)
+    key_hash = rrd._sha256(key_bytes)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    pt1 = persistent_capture.persistent_store
+    assert pt1 is not None
+
+    if memory_error is not None:
+        assert memory_error.rung_tag == persistent_error.rung_tag
+        assert memory_error.field == persistent_error.field
+        assert _persistent_artifact_count(db_path, artifact) == 0
+
+        memory_reader = PT0DeterminismStore("replay")
+        memory_reader._entries = copy.deepcopy(memory_capture._entries)
+
+        def unexpected_memory_read(*_args: Any, **_kwargs: Any) -> Any:
+            pytest.fail("an unindexable PT-0 query reached memory lookup")
+
+        with monkeypatch.context() as patch:
+            patch.setattr(memory_reader, "_entry_for_key", unexpected_memory_read)
+            assert memory_reader._lookup_optional(artifact, key) is None
+            with pytest.raises(PT0CacheMiss):
+                memory_reader._lookup(artifact, key)
+
+            def unexpected_pt1_read(*_args: Any, **_kwargs: Any) -> Any:
+                pytest.fail("an unindexable query opened the PT-1 database")
+
+            patch.setattr(pt1, "_connect", unexpected_pt1_read)
+            assert pt1.get(
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            ) is None
+            assert pt1.get_by_physics_bucket(
+                artifact=artifact,
+                physics_bucket_key=bucket_key,
+                physics_bucket_bytes=bucket_bytes,
+                physics_bucket_hash=rrd._sha256(bucket_bytes),
+                query_key=key,
+            ) is None
+            for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+                rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+                    key,
+                    rung_tag,
+                )
+                assert pt1.get_by_physics_ladder_bucket(
+                    artifact=artifact,
+                    rung_tag=rung_tag,
+                    rung_key=rung_key,
+                    rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+                    query_key=key,
+                ) is None
+            assert pt1._list_interpolation_candidates(
+                artifact=artifact,
+                replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
+                query_key=key,
+            ) == []
+
+        persistent_reader = PT0DeterminismStore("replay", db_path=db_path)
+        assert persistent_reader.persistent_store is not None
+        with monkeypatch.context() as patch:
+            patch.setattr(
+                persistent_reader.persistent_store,
+                "_connect",
+                unexpected_pt1_read,
+            )
+            assert persistent_reader._lookup_optional(
+                artifact,
+                key,
+                physics_bucket_key=bucket_key,
+            ) is None
+            assert persistent_reader._lookup_interpolated(artifact, key) is None
+            with pytest.raises(PT0CacheMiss):
+                persistent_reader._lookup(artifact, key)
+        return
+
+    memory_reader = PT0DeterminismStore("replay")
+    memory_reader._entries = copy.deepcopy(memory_capture._entries)
+    memory_reader.physics_bucket_entries = dict(
+        memory_capture.physics_bucket_entries
+    )
+    assert memory_reader._lookup(artifact, key) == payload
+    assert memory_reader._entry_for_physics_bucket(
+        artifact,
+        bucket_key,
+        query_key=key,
+    ) is not None
+
+    persistent_reader = PT0DeterminismStore("replay", db_path=db_path)
+    assert persistent_reader._lookup(artifact, key) == payload
+    assert persistent_reader.hits == 1
+    assert pt1.get(
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+    ) is not None
+    assert pt1.get_by_physics_bucket(
+        artifact=artifact,
+        physics_bucket_key=bucket_key,
+        physics_bucket_bytes=bucket_bytes,
+        physics_bucket_hash=rrd._sha256(bucket_bytes),
+        query_key=key,
+    ) is not None
+    for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+            key,
+            rung_tag,
+        )
+        assert pt1.get_by_physics_ladder_bucket(
+            artifact=artifact,
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+            query_key=key,
+        ) is not None
+    interpolation_candidates = pt1._list_interpolation_candidates(
+        artifact=artifact,
+        replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
+        query_key=key,
+    )
+    assert [candidate["key_hash"] for candidate in interpolation_candidates] == [
+        key_hash
+    ]
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_subnormal_temperature_query_misses_pressure_only_row_before_read(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    persistent: bool,
+) -> None:
+    artifact = "freeze_gate_curve"
+    stored_key = _freeze_gate_key()
+    stored_key["controls"] = {"pressure_bar": 1.0}
+    stored_key["vapor_pressure_provider_selection"] = None
+    query_key = copy.deepcopy(stored_key)
+    query_key["controls"]["T_K"] = 5e-324
+
+    stored_h40_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        stored_key,
+        "h40",
+    )
+    query_h40_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        query_key,
+        "h40",
+    )
+    assert stored_h40_key == query_h40_key
+    uncacheable = rrd._ladder_indexability(query_key)
+    assert isinstance(uncacheable, rrd.UncacheableKey)
+    assert uncacheable.rung_tag == "h40"
+    assert uncacheable.field == "controls.T_K"
+
+    db_path = tmp_path / "subnormal-temperature-query.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture._store(
+        artifact,
+        stored_key,
+        _valid_test_gate_payload(),
+        law_disclosures=[],
+    )
+    if persistent:
+        assert _persistent_artifact_count(db_path, artifact) == 1
+        reader = PT0DeterminismStore("replay", db_path=db_path)
+        assert reader.persistent_store is not None
+
+        def unexpected_pt1_read(*_args: Any, **_kwargs: Any) -> Any:
+            pytest.fail("unindexable query opened the PT-1 database")
+
+        with monkeypatch.context() as patch:
+            patch.setattr(
+                reader.persistent_store,
+                "_connect",
+                unexpected_pt1_read,
+            )
+            with pytest.raises(PT0CacheMiss):
+                reader._lookup(artifact, query_key)
+        return
+
+    reader = PT0DeterminismStore("replay")
+    reader._entries = copy.deepcopy(capture._entries)
+    reader.physics_bucket_entries = dict(capture.physics_bucket_entries)
+
+    def unexpected_memory_read(*_args: Any, **_kwargs: Any) -> Any:
+        pytest.fail("unindexable query reached the PT-0 memory entry")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(reader, "_entry_for_key", unexpected_memory_read)
+        with pytest.raises(PT0CacheMiss):
+            reader._lookup(artifact, query_key)
 
 
 @pytest.mark.parametrize(
@@ -7055,6 +7380,43 @@ def test_empty_gate_curve_path_misses_and_is_replaceable(
         db_path=db_path,
         monkeypatch=monkeypatch,
     )
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_empty_gate_curve_capture_skips_write_with_notice(
+    tmp_path: Path,
+    persistent: bool,
+) -> None:
+    db_path = tmp_path / "empty-gate-capture.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(sim)
+    curve = {
+        "source": "unit-test:empty-measured-path",
+        "solidus_T_C": 1200.0,
+        "liquidus_T_C": 1300.0,
+        "path": (),
+    }
+    seed_gate_curve_memo_record(sim, curve)
+
+    capture.capture_gate_curve(
+        sim,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        curve=curve,
+        repair_notices=[],
+        law_disclosures=[],
+    )
+
+    if persistent:
+        assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
+    assert capture._entries == {}
+    assert capture.last_cache_state is None
+    notices = getattr(sim, rrd.REPAIR_NOTICE_COLLECTOR_ATTRIBUTE)
+    assert len(notices) == 1
+    assert notices[0]["kind"] == "reduced_real_cache_write_skipped"
+    assert notices[0]["category"] == "invalid-payload"
+    assert "freeze_gate_curve payload is not replayable" in notices[0]["reason"]
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
