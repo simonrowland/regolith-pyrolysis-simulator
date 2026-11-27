@@ -459,6 +459,24 @@ def test_populate_merge_preserves_repair_notice_values(
     assert stored == repair_notices_json
 
 
+def test_populate_row_admission_wraps_deep_repair_notices(tmp_path):
+    driver = _load_driver()
+    shard_db = tmp_path / "deep-notice-shard.db"
+    target_db = tmp_path / "deep-notice-target.db"
+    key_hash = _write_pt1_row(shard_db, _pt1_key("deep-notice"))
+    deep_notice = "[" * 10_000 + "0" + "]" * 10_000
+    with sqlite3.connect(shard_db) as conn:
+        conn.execute(
+            f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE key_hash = ?",
+            (deep_notice, key_hash),
+        )
+
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt) as raised:
+        driver._merge_cache_shard(shard_db, target_db)
+    assert isinstance(raised.value.__cause__, RecursionError)
+
+
 def test_populate_accepts_v2_source_and_copies_missing_notices_as_null(
     tmp_path: Path,
 ) -> None:

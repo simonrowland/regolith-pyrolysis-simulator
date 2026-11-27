@@ -4,44 +4,29 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
 import sys
-from collections.abc import Iterable, Mapping
-from datetime import datetime
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from simulator.grind_preflight import assert_strict_vapor_pt1_row  # noqa: E402
 from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_EQUILIBRIUM_TABLE,
     PT1_METADATA_TABLE,
     PT1_STORE_SCHEMA_VERSION,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
+    PT1PersistentStoreCorrupt,
     _PT1CacheMergeCollision,
-    canonical_json_bytes,
+    _admit_stored_row,
     _copy_pt1_equilibrium_rows,
-    validate_reduced_real_equilibrium_record_key,
-    validate_repair_notices_json,
 )
 
 
 PAYLOAD_TABLE = PT1_EQUILIBRIUM_TABLE
-_REQUIRED_TEXT_FIELDS = (
-    "key_hash",
-    "artifact",
-    "store_schema_version",
-    "request_schema_version",
-    "key_sha256",
-    "payload_sha256",
-    "code_version",
-    "data_digests_json",
-    "created_at",
-)
 
 
 class CacheSourceSchemaMismatch(ValueError):
@@ -142,7 +127,7 @@ def payload_count(db_path: Path) -> int:
         con.close()
 
 
-def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
+def _source_payload_rows(source: Path) -> list[sqlite3.Row]:
     con = open_cache_source_readonly(source)
     try:
         exists = con.execute(
@@ -151,12 +136,7 @@ def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
         ).fetchone()
         if exists is None:
             return []
-        rows = [dict(row) for row in con.execute(f"SELECT * FROM {PAYLOAD_TABLE}")]
-        for row in rows:
-            row.setdefault("corpus_version", None)
-            row.setdefault("repair_notices_json", None)
-            row.setdefault("payload_codec_version", None)
-        return rows
+        return list(con.execute(f"SELECT * FROM {PAYLOAD_TABLE}"))
     finally:
         con.close()
 
@@ -164,103 +144,53 @@ def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
 def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
     validate_source_schema(source)
     rows = _source_payload_rows(source)
-    for row in rows:
-        invalid_types = [
-            field for field in _REQUIRED_TEXT_FIELDS if not isinstance(row[field], str)
-        ]
-        if not isinstance(row["key_bytes"], bytes):
-            invalid_types.append("key_bytes")
-        if not isinstance(row["payload_bytes"], bytes):
-            invalid_types.append("payload_bytes")
-        for field in ("corpus_version", "engine_version"):
-            if row[field] is not None and not isinstance(row[field], str):
-                invalid_types.append(field)
-        if row["payload_codec_version"] is not None and type(
-            row["payload_codec_version"]
-        ) is not int:
-            invalid_types.append("payload_codec_version")
-        if row["repair_notices_json"] is not None and not isinstance(
-            row["repair_notices_json"], str
-        ):
-            invalid_types.append("repair_notices_json")
-        if type(row["git_dirty"]) is not int:
-            invalid_types.append("git_dirty")
-        if invalid_types:
-            raise CacheSourceRowInvalid(
-                "PT-1 cache source row invalid storage types: "
-                f"{source} fields={','.join(invalid_types)}"
-            )
+    validated_rows: list[dict[str, Any]] = []
+    for raw_row in rows:
         try:
-            validate_repair_notices_json(row["repair_notices_json"])
-        except RuntimeError as exc:
+            admitted = _admit_stored_row(
+                raw_row,
+                store_kind="pt1",
+                strict_source_validation=True,
+                validate_source_provenance=True,
+            )
+        except PT1PersistentStoreCorrupt as exc:
+            message = str(exc)
+            if (
+                isinstance(exc.__cause__, RuntimeError)
+                and str(exc.__cause__).startswith("PT-1 reduced-real ")
+            ):
+                raise
+            field = (
+                "payload_sha256"
+                if "payload hash mismatch" in message
+                else "repair_notices_json"
+                if "repair_notices_json" in message
+                else "key_hash"
+                if "key bytes hash mismatch" in message
+                else "key_sha256"
+                if "key hash mismatch" in message
+                else "stored row"
+            )
             raise CacheSourceRowInvalid(
-                "PT-1 cache source row has invalid repair notices: "
-                f"{source}:{row['key_hash']}"
+                "PT-1 cache source row invalid stored fields: "
+                f"{source}:{field}: {message}"
             ) from exc
-        artifact = str(row["artifact"])
-        key_hash = str(row["key_hash"])
-        key_bytes = bytes(row["key_bytes"])
-        payload_bytes = bytes(row["payload_bytes"])
-        try:
-            key = json.loads(key_bytes.decode("utf-8"))
-        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-            raise RuntimeError(
-                f"PT-1 cache source row has invalid key bytes: {source}:{key_hash}"
-            ) from exc
-        if not isinstance(key, Mapping):
-            raise RuntimeError(
-                f"PT-1 cache source row key must be a mapping: {source}:{key_hash}"
-            )
-        try:
-            payload = json.loads(payload_bytes.decode("utf-8"))
-        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-            raise RuntimeError(
-                f"PT-1 cache source row has invalid payload bytes: {source}:{key_hash}"
-            ) from exc
-        if not isinstance(payload, Mapping):
-            raise CacheSourceRowInvalid(
-                f"PT-1 cache source row payload must be a mapping: {source}:{key_hash}"
-            )
-        canonical_key_bytes = canonical_json_bytes(key)
-        canonical_payload_bytes = canonical_json_bytes(payload)
-        key_digest = hashlib.sha256(canonical_key_bytes).hexdigest()
-        payload_digest = hashlib.sha256(canonical_payload_bytes).hexdigest()
-        mismatches: list[str] = []
-        if "artifact" in key and key["artifact"] != artifact:
-            mismatches.append("artifact")
-        if key_bytes != canonical_key_bytes:
-            mismatches.append("key_bytes")
-        if payload_bytes != canonical_payload_bytes:
-            mismatches.append("payload_bytes")
-        if key_hash != key_digest:
-            mismatches.append("key_hash")
-        if str(row["key_sha256"]) != key_digest:
-            mismatches.append("key_sha256")
-        if str(row["payload_sha256"]) != payload_digest:
-            mismatches.append("payload_sha256")
-        try:
-            datetime.fromisoformat(str(row["created_at"]).replace("Z", "+00:00"))
-        except ValueError:
-            mismatches.append("created_at")
-        if type(row["git_dirty"]) is not int or row["git_dirty"] not in (0, 1):
-            mismatches.append("git_dirty")
-        if mismatches:
-            raise CacheSourceRowInvalid(
-                "PT-1 cache source row canonical/provenance mismatch: "
-                f"{source}:{key_hash} fields={','.join(mismatches)}"
-            )
-        validate_reduced_real_equilibrium_record_key(artifact, key, payload)
-        assert_strict_vapor_pt1_row(
-            artifact=artifact,
-            key=key,
-            key_hash=key_hash,
-            payload=payload,
-            context=f"PT-1 cache source {source}:{artifact}:{key_hash}",
-        )
+        assert admitted is not None and admitted.stored_columns is not None
+        row = admitted.stored_columns
+        row.setdefault("corpus_version", None)
+        row.setdefault("repair_notices_json", None)
+        row.setdefault("payload_codec_version", None)
+        if admitted.stale_payload_codec:
+            row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+            validated_rows.append(row)
+            continue
+        key = admitted.entry["key"]
+        payload = admitted.entry["payload"]
         row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
         row["validated_key"] = key
         row["validated_payload"] = payload
-    return rows
+        validated_rows.append(row)
+    return validated_rows
 
 
 def merge_cache_source(

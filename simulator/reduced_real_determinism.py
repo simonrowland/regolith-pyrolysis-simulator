@@ -16,7 +16,7 @@ import os
 import sqlite3
 import subprocess
 from collections import Counter
-from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
@@ -39,6 +39,7 @@ from simulator.config import (
     resolve_alphamelts_subprocess_model,
 )
 from simulator.grind_preflight import (
+    GrindSourceGateError,
     assert_strict_vapor_pt1_row,
 )
 from simulator.fe_redox import (
@@ -78,6 +79,17 @@ PT1_SUPPORTED_STORE_SCHEMA_VERSIONS = (
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
 PT1_READ_ONLY_BASE_ALIAS = "pt1_read_only_base"
+_PT1_SOURCE_REQUIRED_TEXT_FIELDS = (
+    "key_hash",
+    "artifact",
+    "store_schema_version",
+    "request_schema_version",
+    "key_sha256",
+    "payload_sha256",
+    "code_version",
+    "data_digests_json",
+    "created_at",
+)
 REPAIR_NOTICE_COLLECTOR_ATTRIBUTE = "_reduced_real_repair_notices"
 REPAIR_NOTICES_UNAVAILABLE_NOTICE = {
     "kind": "repair_notices_unavailable_for_legacy_row"
@@ -198,6 +210,15 @@ class _DecodedEquilibriumReplayPayload:
     vapor_pressure_diagnostic: dict[str, Any]
 
 
+@dataclasses.dataclass(frozen=True)
+class _AdmittedStoredRow:
+    entry: dict[str, Any]
+    decoded_payload: Any
+    stored_columns: dict[str, Any] | None = None
+    physics_ladder_values: dict[str, dict[str, float | str]] | None = None
+    stale_payload_codec: bool = False
+
+
 _MAGEMIN_SHADOW_PROVIDER_ID = "magemin-shadow"
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
@@ -245,6 +266,15 @@ def _payload_codec_version(artifact: str) -> int | None:
     return None
 
 
+def _payload_codec_stamp_matches(
+    expected_version: int | None,
+    stored_version: Any,
+) -> bool:
+    return expected_version is None or (
+        type(stored_version) is int and stored_version == expected_version
+    )
+
+
 def _is_finite_cache_number(value: Any) -> bool:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return False
@@ -265,10 +295,7 @@ def _admission_rejection(
     expected_version = _payload_codec_version(artifact)
     if expected_version is None:
         return None
-    if (
-        type(payload_codec_version) is not int
-        or payload_codec_version != expected_version
-    ):
+    if not _payload_codec_stamp_matches(expected_version, payload_codec_version):
         return "payload.codec_version"
     if not isinstance(payload, Mapping):
         return "payload.type"
@@ -915,20 +942,6 @@ class PT0CacheCollision(RuntimeError):
 
 class PT1PersistentStoreCorrupt(PT0CacheCollision):
     """Persistent PT-1 row failed verify-on-hit integrity checks."""
-
-
-def _pt1_stored_fields_or_corrupt(
-    key_hash: str,
-    read_fields: Callable[[], Any],
-) -> Any:
-    try:
-        return read_fields()
-    except (sqlite3.Error, PT1PersistentStoreCorrupt):
-        raise
-    except Exception as exc:
-        raise PT1PersistentStoreCorrupt(
-            f"PT-1 row contains invalid stored fields: {key_hash}"
-        ) from exc
 
 
 class _PT1CacheMergeCollision(RuntimeError):
@@ -1810,13 +1823,22 @@ class PT0DeterminismStore:
         existing = self._entries.get(key_hash)
         existing_decoded = None
         if existing is not None:
-            existing_decoded = self._verify_entry(
-                artifact,
-                key,
-                key_bytes,
-                key_hash,
+            existing_admission = _admit_stored_row(
                 existing,
+                store_kind="pt0",
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
             )
+            if (
+                existing_admission is None
+                or existing_admission.stale_payload_codec
+            ):
+                existing = None
+            else:
+                existing = existing_admission.entry
+                existing_decoded = existing_admission.decoded_payload
         stale_payload = existing is not None and existing_decoded is None
         if existing is not None:
             if not stale_payload and existing["payload_hash"] != payload_hash:
@@ -2167,9 +2189,19 @@ class PT0DeterminismStore:
             if entry is not None:
                 self._entries[key_hash] = copy.deepcopy(entry)
         if entry is not None and not checked_by_persistent_store:
-            decoded = self._verify_entry(artifact, key, key_bytes, key_hash, entry)
+            admitted = _admit_stored_row(
+                entry,
+                store_kind="pt0",
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            )
+            decoded = None if admitted is None else admitted.decoded_payload
             if decoded is None:
                 entry = None
+            else:
+                entry = admitted.entry
         return (entry, decoded) if return_decoded else entry
 
     def _entry_for_physics_bucket(
@@ -2184,64 +2216,39 @@ class PT0DeterminismStore:
         key_hash = self.physics_bucket_entries.get(physics_bucket_hash)
         entry = self._entries.get(key_hash) if key_hash is not None else None
         checked_hashes: set[str] = set()
-        if (
-            entry is not None
-            and entry.get("artifact") == artifact
-            and entry.get("physics_bucket_hash") == physics_bucket_hash
-        ):
+        if entry is not None:
             checked_hashes.add(str(key_hash))
-            entry_key = entry.get("key")
-            if not isinstance(entry_key, Mapping):
-                raise PT0CacheCollision(
-                    f"PT-0 stored key is not a mapping for {artifact}: {key_hash}"
-                )
-            decoded = self._verify_entry(
-                artifact,
-                entry_key,
-                None,
-                str(key_hash),
+            admitted = _admit_stored_row(
                 entry,
+                store_kind="pt0",
+                artifact=artifact,
+                key_hash=str(key_hash),
                 admission_keys=(
-                    (entry_key, query_key)
-                    if query_key is not None
-                    else (entry_key,)
+                    (query_key,) if query_key is not None else ()
                 ),
+                physics_bucket_key=physics_bucket_key,
+                physics_bucket_bytes=physics_bucket_bytes,
+                physics_bucket_hash=physics_bucket_hash,
             )
-            if decoded is not None:
-                return entry, decoded
-        elif entry is not None:
-            checked_hashes.add(str(key_hash))
+            if admitted is not None and admitted.decoded_payload is not None:
+                return admitted.entry, admitted.decoded_payload
         entry = None
-        for candidate in self._entries.values():
-            if (
-                candidate.get("artifact") == artifact
-                and candidate.get("physics_bucket_hash") == physics_bucket_hash
-            ):
-                candidate_hash = str(candidate.get("key_hash", ""))
-                if candidate_hash in checked_hashes:
-                    continue
-                checked_hashes.add(candidate_hash)
-                candidate_key = candidate.get("key")
-                if not isinstance(candidate_key, Mapping):
-                    raise PT0CacheCollision(
-                        f"PT-0 stored key is not a mapping for {artifact}: "
-                        f"{candidate_hash}"
-                    )
-                decoded = self._verify_entry(
-                    artifact,
-                    candidate_key,
-                    None,
-                    candidate_hash,
-                    candidate,
-                    admission_keys=(
-                        (candidate_key, query_key)
-                        if query_key is not None
-                        else (candidate_key,)
-                    ),
-                )
-                if decoded is not None:
-                    return candidate, decoded
-        if entry is None and self.persistent_store is not None:
+        for candidate_hash, candidate in self._entries.items():
+            if candidate_hash in checked_hashes:
+                continue
+            admitted = _admit_stored_row(
+                candidate,
+                store_kind="pt0",
+                artifact=artifact,
+                key_hash=candidate_hash,
+                admission_keys=(query_key,) if query_key is not None else (),
+                physics_bucket_key=physics_bucket_key,
+                physics_bucket_bytes=physics_bucket_bytes,
+                physics_bucket_hash=physics_bucket_hash,
+            )
+            if admitted is not None and admitted.decoded_payload is not None:
+                return admitted.entry, admitted.decoded_payload
+        if self.persistent_store is not None:
             bucket_hit = self.persistent_store._get_by_physics_bucket(
                 artifact=artifact,
                 physics_bucket_key=physics_bucket_key,
@@ -2425,68 +2432,29 @@ class PT0DeterminismStore:
     def _verify_entry(
         self,
         artifact: str,
-        key: Mapping[str, Any],
+        key: Mapping[str, Any] | None,
         key_bytes: bytes | None,
         key_hash: str,
         entry: Mapping[str, Any],
         *,
         admission_keys: Sequence[Mapping[str, Any]] | None = None,
+        physics_bucket_key: Mapping[str, Any] | None = None,
+        physics_bucket_bytes: bytes | None = None,
+        physics_bucket_hash: str | None = None,
     ) -> Any | None:
-        try:
-            expected_key_bytes = canonical_json_bytes(key)
-            if entry.get("artifact") != artifact:
-                raise PT0CacheCollision(
-                    f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
-                )
-            stored_key_hash = entry.get("key_hash")
-            if stored_key_hash is not None and stored_key_hash != key_hash:
-                raise PT0CacheCollision(
-                    f"PT-0 stored key hash mismatch for {artifact}: {key_hash}"
-                )
-            stored_key_bytes = entry.get("key_bytes")
-            if isinstance(stored_key_bytes, str):
-                stored_key_bytes = stored_key_bytes.encode("utf-8")
-            canonical_entry_key_bytes = canonical_json_bytes(entry["key"])
-            if stored_key_bytes is None:
-                stored_key_bytes = canonical_entry_key_bytes
-            if (
-                stored_key_bytes != canonical_entry_key_bytes
-                or (
-                    key_bytes is not None
-                    and (
-                        key_bytes != canonical_entry_key_bytes
-                        or expected_key_bytes != key_bytes
-                    )
-                )
-            ):
-                raise PT0CacheCollision(
-                    f"PT-0 stored key bytes mismatch for {artifact}: {key_hash}"
-                )
-            payload_bytes = _payload_integrity_bytes(entry["payload"])
-            if entry.get("payload_hash") != _sha256(payload_bytes):
-                raise PT0CacheCollision(
-                    f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
-                )
-            decoded = _decode_payload_for_admission(
-                artifact,
-                entry.get("payload"),
-                payload_codec_version=entry.get("payload_codec_version"),
-                keys=(
-                    tuple(admission_keys)
-                    if admission_keys is not None
-                    else (key,)
-                ),
-            )
-            if decoded is None:
-                return None
-            decode_repair_notices_json(entry.get("repair_notices_json"))
-            if not _disclosures_known(entry):
-                return None
-            return decoded
-        except PT0CacheCollision:
-            raise
-        except Exception:
-            return None
+        admitted = _admit_stored_row(
+            entry,
+            store_kind="pt0",
+            artifact=artifact,
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+            admission_keys=admission_keys,
+            physics_bucket_key=physics_bucket_key,
+            physics_bucket_bytes=physics_bucket_bytes,
+            physics_bucket_hash=physics_bucket_hash,
+        )
+        return None if admitted is None else admitted.decoded_payload
 
     def _drift_fields_for_latest_replay(self) -> list[str]:
         index = len(self.replay_sequence) - 1
@@ -2538,6 +2506,495 @@ def _pt1_row_key(raw: bytes, *, key_hash: str) -> Mapping[str, Any]:
             f"PT-1 row request key is not a mapping: {key_hash}"
         )
     return value
+
+
+def _admit_stored_row(
+    raw_row: Mapping[str, Any],
+    *,
+    store_kind: str,
+    artifact: str | None = None,
+    key: Mapping[str, Any] | None = None,
+    key_bytes: bytes | None = None,
+    key_hash: str | None = None,
+    admission_keys: Sequence[Mapping[str, Any]] | None = None,
+    expected_replay_scope_sha256: str | None = None,
+    physics_bucket_key: Mapping[str, Any] | None = None,
+    physics_bucket_bytes: bytes | None = None,
+    physics_bucket_hash: str | None = None,
+    rung_tag: str | None = None,
+    rung_key: Mapping[str, Any] | None = None,
+    rung_hash: str | None = None,
+    output_columns: Sequence[str] | None = None,
+    strict_source_validation: bool = False,
+    validate_source_provenance: bool = False,
+) -> _AdmittedStoredRow | None:
+    """Validate one complete stored row inside its store's error boundary."""
+
+    if store_kind not in {"pt0", "pt1"}:
+        raise ValueError(f"unknown reduced-real stored-row kind: {store_kind!r}")
+
+    if store_kind == "pt0":
+        try:
+            stored_artifact = raw_row.get("artifact")
+            expected_codec_version = (
+                _payload_codec_version(stored_artifact)
+                if isinstance(stored_artifact, str)
+                else None
+            )
+            if not _payload_codec_stamp_matches(
+                expected_codec_version,
+                raw_row.get("payload_codec_version"),
+            ):
+                return _AdmittedStoredRow(
+                    dict(raw_row), None, stale_payload_codec=True
+                )
+            if artifact is not None and stored_artifact != artifact:
+                if physics_bucket_hash is not None or rung_tag is not None:
+                    return None
+                raise PT0CacheCollision(
+                    f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
+                )
+            stored_key_hash = raw_row.get("key_hash")
+            if stored_key_hash is not None and key_hash is not None and (
+                stored_key_hash != key_hash
+            ):
+                raise PT0CacheCollision(
+                    f"PT-0 stored key hash mismatch for {artifact}: {key_hash}"
+                )
+            stored_key = raw_row["key"]
+            if not isinstance(stored_key, Mapping):
+                raise PT0CacheCollision(
+                    f"PT-0 stored key is not a mapping for {artifact}: {key_hash}"
+                )
+            stored_key_bytes = raw_row.get("key_bytes")
+            if isinstance(stored_key_bytes, str):
+                stored_key_bytes = stored_key_bytes.encode("utf-8")
+            canonical_key_bytes = canonical_json_bytes(stored_key)
+            if stored_key_bytes is None:
+                stored_key_bytes = canonical_key_bytes
+            expected_key_bytes = (
+                canonical_json_bytes(key) if key is not None else canonical_key_bytes
+            )
+            if (
+                stored_key_bytes != canonical_key_bytes
+                or (
+                    key_bytes is not None
+                    and (key_bytes != canonical_key_bytes or expected_key_bytes != key_bytes)
+                )
+            ):
+                raise PT0CacheCollision(
+                    f"PT-0 stored key bytes mismatch for {artifact}: {key_hash}"
+                )
+            stored_bucket = canonical_physics_bucket_key_from_replay_key(stored_key)
+            stored_bucket_bytes = canonical_json_bytes(stored_bucket)
+            stored_bucket_hash = _sha256(stored_bucket_bytes)
+            stored_ladder_values = _physics_ladder_values_from_replay_key(
+                stored_key
+            )
+            if (
+                raw_row.get("physics_bucket_hash") is not None
+                and raw_row["physics_bucket_hash"] != stored_bucket_hash
+            ):
+                raise PT0CacheCollision(
+                    f"PT-0 stored physics bucket hash mismatch for {artifact}: {key_hash}"
+                )
+            payload = raw_row["payload"]
+            payload_bytes = _payload_integrity_bytes(payload)
+            if raw_row.get("payload_hash") != _sha256(payload_bytes):
+                raise PT0CacheCollision(
+                    f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
+                )
+            if physics_bucket_hash is not None:
+                if raw_row.get("artifact") != artifact:
+                    return None
+                stored_bucket_hash = raw_row.get("physics_bucket_hash")
+                if stored_bucket_hash != physics_bucket_hash:
+                    return None
+                if (
+                    stored_bucket != _json_ready(physics_bucket_key)
+                    or stored_bucket_bytes != physics_bucket_bytes
+                    or _sha256(stored_bucket_bytes) != physics_bucket_hash
+                ):
+                    return None
+            if rung_tag is not None:
+                stored_rung = canonical_physics_ladder_bucket_key_from_replay_key(
+                    stored_key, rung_tag
+                )
+                if (
+                    rung_key is None
+                    or stored_rung != _json_ready(rung_key)
+                    or _sha256(canonical_json_bytes(stored_rung)) != rung_hash
+                ):
+                    return None
+            decoded = _decode_payload_for_admission(
+                str(stored_artifact),
+                payload,
+                payload_codec_version=raw_row.get("payload_codec_version"),
+                keys=tuple(
+                    [stored_key]
+                    + [
+                        candidate
+                        for candidate in (admission_keys or ())
+                        if candidate != stored_key
+                    ]
+                ),
+            )
+            if decoded is not None:
+                decode_repair_notices_json(raw_row.get("repair_notices_json"))
+                if not _disclosures_known(raw_row):
+                    decoded = None
+            return _AdmittedStoredRow(
+                dict(raw_row), decoded, physics_ladder_values=stored_ladder_values
+            )
+        except PT1PersistentStoreCorrupt:
+            # A memory row's malformed sidecar is a miss; the same bytes in
+            # SQLite are an integrity failure with a distinct typed outcome.
+            return None
+        except PT0CacheCollision:
+            raise
+        except Exception:
+            return None
+
+    try:
+        row = dict(raw_row)
+        row_keys = set(row)
+        if output_columns is not None:
+            row = {
+                column: row[column] if column in row_keys else None
+                for column in output_columns
+            }
+            row_keys = set(row)
+        row_hash = str(row["key_hash"])
+        row_artifact = str(row["artifact"])
+        row_key_bytes = _pt1_row_bytes(
+            row["key_bytes"], field="key", key_hash=row_hash
+        )
+        row_payload_bytes = _pt1_row_bytes(
+            row["payload_bytes"], field="payload", key_hash=row_hash
+        )
+        store_schema_version = row["store_schema_version"]
+        if store_schema_version not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row store schema version drift: "
+                f"{store_schema_version} != {PT1_STORE_SCHEMA_VERSION}"
+            )
+        if artifact is not None and row_artifact != artifact:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row artifact mismatch for {artifact}: {row_hash}"
+            )
+        if row["key_hash"] != row["key_sha256"] or row["key_sha256"] != row_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row key hash mismatch for {row_artifact}: {row_hash}"
+            )
+        if _sha256(row_key_bytes) != row_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row key bytes hash mismatch for {row_artifact}: {row_hash}"
+            )
+        if _sha256(row_payload_bytes) != row["payload_sha256"]:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row payload hash mismatch (stored payload bytes): "
+                f"{row_artifact}: {row_hash}"
+            )
+
+        # Checks against the indexed query happen before JSON decoding. This
+        # preserves the PT1 integrity ordering for compound corruptions.
+        if physics_bucket_hash is not None:
+            if row["physics_bucket_schema_version"] != PHYSICS_BUCKET_SCHEMA_VERSION:
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 row physics bucket schema drift: "
+                    f"{row['physics_bucket_schema_version']} != "
+                    f"{PHYSICS_BUCKET_SCHEMA_VERSION}"
+                )
+            if row["physics_bucket_sha256"] != physics_bucket_hash:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row physics bucket hash mismatch: {physics_bucket_hash}"
+                )
+            if row["replay_scope_sha256"] != _replay_scope_hash(physics_bucket_key):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row replay scope hash mismatch: {physics_bucket_hash}"
+                )
+            stored_bucket_bytes = _pt1_row_bytes(
+                row["physics_key_bytes"],
+                field="physics bucket key",
+                key_hash=row_hash,
+            )
+            if stored_bucket_bytes != physics_bucket_bytes:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row physics bucket bytes mismatch: {physics_bucket_hash}"
+                )
+        if rung_tag is not None:
+            expected_rung_scope = _replay_scope_hash(rung_key)
+            if row[_physics_ladder_hash_column(rung_tag)] != rung_hash:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
+                )
+            if row["replay_scope_sha256"] != expected_rung_scope:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
+                )
+            indexed_distance = row[_physics_ladder_distance_column(rung_tag)]
+            if isinstance(indexed_distance, bool) or indexed_distance is None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+                )
+            indexed_distance = float(indexed_distance)
+            if not math.isfinite(indexed_distance):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+                )
+        if expected_replay_scope_sha256 is not None and (
+            row["replay_scope_sha256"] != expected_replay_scope_sha256
+        ):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row replay scope hash mismatch: {row_hash}"
+            )
+
+        payload_codec_version = row.get("payload_codec_version")
+        expected_codec_version = _payload_codec_version(row_artifact)
+        if not _payload_codec_stamp_matches(
+            expected_codec_version,
+            payload_codec_version,
+        ):
+            return _AdmittedStoredRow(
+                {"artifact": row_artifact, "key_hash": row_hash},
+                None,
+                stored_columns=row,
+                stale_payload_codec=True,
+            )
+        if row["key_bytes"] != row_key_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row key bytes changed while reading: {row_hash}"
+            )
+        row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
+        canonical_key_bytes = canonical_json_bytes(row_key)
+        if canonical_key_bytes != row_key_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row non-canonical request bytes: {row_hash}"
+            )
+        if key_hash is not None and row_hash != key_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row key hash mismatch for {row_artifact}: {key_hash}"
+            )
+        if key_bytes is not None and row_key_bytes != key_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row canonical request bytes mismatch: {row_hash}"
+            )
+        if key is not None and row_key != _json_ready(key):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row canonical request mismatch: {row_hash}"
+            )
+
+        derived_bucket_key = canonical_physics_bucket_key_from_replay_key(row_key)
+        derived_bucket_bytes = canonical_json_bytes(derived_bucket_key)
+        derived_bucket_hash = _sha256(derived_bucket_bytes)
+        stored_bucket_schema = row.get("physics_bucket_schema_version")
+        if stored_bucket_schema is not None:
+            stored_bucket_bytes = _pt1_row_bytes(
+                row["physics_key_bytes"],
+                field="physics bucket key",
+                key_hash=row_hash,
+            )
+            if (
+                stored_bucket_schema != PHYSICS_BUCKET_SCHEMA_VERSION
+                or row["physics_bucket_sha256"] != derived_bucket_hash
+                or stored_bucket_bytes != derived_bucket_bytes
+            ):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row exact key does not reproduce physics bucket: {row_hash}"
+                )
+            if row["replay_scope_sha256"] != _replay_scope_hash(derived_bucket_key):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row exact key replay scope mismatch: {row_hash}"
+                )
+        if physics_bucket_hash is not None and (
+            derived_bucket_hash != physics_bucket_hash
+            or derived_bucket_bytes != physics_bucket_bytes
+        ):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key does not reproduce physics bucket: {physics_bucket_hash}"
+            )
+
+        ladder_values = _physics_ladder_values_from_replay_key(row_key)
+        for stored_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+            hash_column = _physics_ladder_hash_column(stored_rung_tag)
+            distance_column = _physics_ladder_distance_column(stored_rung_tag)
+            if row.get(hash_column) is not None and (
+                row[hash_column] != ladder_values[stored_rung_tag]["sha256"]
+            ):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row exact key does not reproduce {stored_rung_tag} hash: {row_hash}"
+                )
+            if row.get(distance_column) is not None:
+                row_distance = row[distance_column]
+                if isinstance(row_distance, bool):
+                    raise PT1PersistentStoreCorrupt(
+                        f"PT-1 row {stored_rung_tag} distance is invalid: {row_hash}"
+                    )
+                row_distance = float(row_distance)
+                if not math.isfinite(row_distance) or row_distance != ladder_values[
+                    stored_rung_tag
+                ]["distance"]:
+                    raise PT1PersistentStoreCorrupt(
+                        f"PT-1 row {stored_rung_tag} distance mismatch: {row_hash}"
+                    )
+        if rung_tag is not None:
+            derived_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                row_key,
+                rung_tag,
+            )
+            if (
+                derived_rung_key != _json_ready(rung_key)
+                or ladder_values[rung_tag]["sha256"] != rung_hash
+                or ladder_values[rung_tag]["distance"] != indexed_distance
+            ):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
+                )
+
+        all_index_columns = (
+            "physics_bucket_schema_version",
+            "physics_bucket_sha256",
+            "replay_scope_sha256",
+            "physics_key_bytes",
+            *(
+                column
+                for derived_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                for column in (
+                    _physics_ladder_hash_column(derived_rung_tag),
+                    _physics_ladder_distance_column(derived_rung_tag),
+                )
+            ),
+        )
+        if output_columns is not None and (
+            store_schema_version != PT1_STORE_SCHEMA_VERSION
+            or any(row.get(column) is None for column in all_index_columns)
+        ):
+            row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+            row["physics_bucket_schema_version"] = PHYSICS_BUCKET_SCHEMA_VERSION
+            row["physics_bucket_sha256"] = derived_bucket_hash
+            row["replay_scope_sha256"] = _replay_scope_hash(derived_bucket_key)
+            row["physics_key_bytes"] = sqlite3.Binary(derived_bucket_bytes)
+            for derived_rung_tag, values in ladder_values.items():
+                row[_physics_ladder_hash_column(derived_rung_tag)] = values[
+                    "sha256"
+                ]
+                row[_physics_ladder_distance_column(derived_rung_tag)] = values[
+                    "distance"
+                ]
+
+        row_payload = _pt1_row_json(
+            row_payload_bytes, field="payload", key_hash=row_hash
+        )
+        if not isinstance(row_payload, Mapping):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row payload is not a mapping: {row_hash}"
+            )
+        if _payload_integrity_bytes(row_payload) != row_payload_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row non-canonical payload bytes: {row_hash}"
+            )
+        repair_notices_json = _row_repair_notices(row)
+        validate_repair_notices_json(repair_notices_json)
+        law_disclosures = _law_disclosures_from_json(
+            row.get("law_disclosures_json")
+        )
+        if strict_source_validation:
+            invalid_types = [
+                field
+                for field in _PT1_SOURCE_REQUIRED_TEXT_FIELDS
+                if not isinstance(row.get(field), str)
+            ]
+            if not isinstance(row["key_bytes"], bytes):
+                invalid_types.append("key_bytes")
+            if not isinstance(row["payload_bytes"], bytes):
+                invalid_types.append("payload_bytes")
+            for field in ("corpus_version", "engine_version"):
+                if row.get(field) is not None and not isinstance(row[field], str):
+                    invalid_types.append(field)
+            if row.get("payload_codec_version") is not None and type(
+                row["payload_codec_version"]
+            ) is not int:
+                invalid_types.append("payload_codec_version")
+            if row.get("repair_notices_json") is not None and not isinstance(
+                row["repair_notices_json"], str
+            ):
+                invalid_types.append("repair_notices_json")
+            if type(row.get("git_dirty")) is not int:
+                invalid_types.append("git_dirty")
+            if invalid_types:
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 cache source row invalid storage types: "
+                    f"fields={','.join(invalid_types)}"
+                )
+            if validate_source_provenance:
+                source_mismatches: list[str] = []
+                if "artifact" in row_key and row_key["artifact"] != row_artifact:
+                    source_mismatches.append("artifact")
+                try:
+                    datetime.fromisoformat(
+                        row["created_at"].replace("Z", "+00:00")
+                    )
+                except ValueError:
+                    source_mismatches.append("created_at")
+                if row["git_dirty"] not in (0, 1):
+                    source_mismatches.append("git_dirty")
+                if source_mismatches:
+                    raise PT1PersistentStoreCorrupt(
+                        "PT-1 cache source row canonical/provenance mismatch: "
+                        f"fields={','.join(source_mismatches)}"
+                    )
+            validate_reduced_real_equilibrium_record_key(
+                row_artifact,
+                row_key,
+                row_payload,
+            )
+            assert_strict_vapor_pt1_row(
+                artifact=row_artifact,
+                key=row_key,
+                key_hash=row_hash,
+                payload=row_payload,
+                context=f"PT-1 cache shard {row_artifact}:{row_hash}",
+            )
+        decode_keys = [row_key]
+        if key is not None and _json_ready(key) != row_key:
+            decode_keys.append(_json_ready(key))
+        for admission_key in admission_keys or ():
+            normalized_key = _json_ready(admission_key)
+            if normalized_key not in decode_keys:
+                decode_keys.append(normalized_key)
+        decoded = _decode_payload_for_admission(
+            row_artifact,
+            row_payload,
+            payload_codec_version=payload_codec_version,
+            keys=tuple(decode_keys),
+        )
+        entry = {
+            "artifact": row_artifact,
+            "key": copy.deepcopy(dict(row_key)),
+            "key_hash": row_hash,
+            "key_bytes": row_key_bytes.decode("utf-8"),
+            "payload": copy.deepcopy(dict(row_payload)),
+            "payload_hash": row["payload_sha256"],
+            "payload_codec_version": payload_codec_version,
+            "repair_notices_json": repair_notices_json,
+            "law_disclosures": law_disclosures,
+            "cache_state": "live_fill",
+            "physics_bucket_key": derived_bucket_key,
+            "physics_bucket_bytes": derived_bucket_bytes,
+            "physics_bucket_hash": derived_bucket_hash,
+        }
+        return _AdmittedStoredRow(entry, decoded, row, ladder_values)
+    except (sqlite3.Error, PT1PersistentStoreCorrupt, GrindSourceGateError):
+        raise
+    except Exception as exc:
+        row_hash = key_hash
+        try:
+            row_hash = str(raw_row.get("key_hash", row_hash))
+        except Exception:
+            pass
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row contains invalid stored fields: {row_hash}: {exc}"
+        ) from exc
 
 
 class PT1PersistentEquilibriumStore:
@@ -2614,15 +3071,35 @@ class PT1PersistentEquilibriumStore:
             existing = self._fetch(conn, key_hash)
             insert_source = None
             effective_notices_json = repair_notices_json
+            existing_admission = None
             if existing is not None:
-                entry, existing_decoded = self._entry_from_row(
+                existing_admission = _admit_stored_row(
                     existing,
+                    store_kind="pt1",
                     artifact=artifact,
                     key=key,
                     key_bytes=key_bytes,
                     key_hash=key_hash,
-                    return_decoded=True,
                 )
+                if existing_admission.stale_payload_codec:
+                    local_row = conn.execute(
+                        f"SELECT 1 FROM {PT1_EQUILIBRIUM_TABLE} "
+                        "WHERE key_hash = ?",
+                        (key_hash,),
+                    ).fetchone()
+                    if local_row is not None:
+                        conn.execute(
+                            f"DELETE FROM {PT1_EQUILIBRIUM_TABLE} "
+                            "WHERE key_hash = ?",
+                            (key_hash,),
+                        )
+                    existing = None
+            if existing is not None:
+                assert existing_admission is not None
+                entry = existing_admission.entry
+                existing_decoded = existing_admission.decoded_payload
+                existing_fields = existing_admission.stored_columns
+                assert existing_fields is not None
                 stale_payload = existing_decoded is None
                 if not stale_payload and (
                     entry["payload_hash"] != payload_hash
@@ -2692,9 +3169,9 @@ class PT1PersistentEquilibriumStore:
                     )
                     if base_disclosures is not None or preferred is None:
                         return
-                    insert_source = existing
+                    insert_source = existing_fields
                 else:
-                    insert_source = existing
+                    insert_source = existing_fields
             source = insert_source
             if source is None:
                 source_key_bytes = key_bytes
@@ -2712,32 +3189,16 @@ class PT1PersistentEquilibriumStore:
                 )
                 source_git_dirty = self._epoch_git_dirty
             else:
-                def source_metadata() -> tuple[Any, ...]:
-                    return (
-                        _sqlite_bytes(source["key_bytes"]),
-                        _sqlite_bytes(source["payload_bytes"]),
-                        str(source["payload_sha256"]),
-                        str(source["request_schema_version"]),
-                        str(source["code_version"]),
-                        source["corpus_version"],
-                        source["engine_version"],
-                        str(source["data_digests_json"]),
-                        str(source["created_at"]),
-                        int(source["git_dirty"]),
-                    )
-
-                (
-                    source_key_bytes,
-                    source_payload_bytes,
-                    source_payload_hash,
-                    source_request_schema,
-                    source_code_version,
-                    source_corpus_version,
-                    source_engine_version,
-                    source_data_digests_json,
-                    source_created_at,
-                    source_git_dirty,
-                ) = _pt1_stored_fields_or_corrupt(key_hash, source_metadata)
+                source_key_bytes = _sqlite_bytes(source["key_bytes"])
+                source_payload_bytes = _sqlite_bytes(source["payload_bytes"])
+                source_payload_hash = str(source["payload_sha256"])
+                source_request_schema = str(source["request_schema_version"])
+                source_code_version = str(source["code_version"])
+                source_corpus_version = source["corpus_version"]
+                source_engine_version = source["engine_version"]
+                source_data_digests_json = str(source["data_digests_json"])
+                source_created_at = str(source["created_at"])
+                source_git_dirty = int(source["git_dirty"])
             conn.execute(
                 f"""
                 INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
@@ -2976,37 +3437,24 @@ class PT1PersistentEquilibriumStore:
             for table in tables:
                 rows = conn.execute(query.format(table=table), params)
                 for row in rows:
-                    row_hash = str(row["key_hash"])
+                    admitted = _admit_stored_row(
+                        row,
+                        store_kind="pt1",
+                        artifact=artifact,
+                        expected_replay_scope_sha256=replay_scope_sha256,
+                        admission_keys=(query_key,) if query_key is not None else (),
+                    )
+                    assert admitted is not None
+                    if admitted.stale_payload_codec:
+                        continue
+                    entry = admitted.entry
+                    decoded = admitted.decoded_payload
+                    row_hash = str(entry["key_hash"])
                     if exclude_key_hash is not None and row_hash == exclude_key_hash:
                         continue
                     if row_hash in seen_hashes:
                         continue
                     seen_hashes.add(row_hash)
-                    if row["replay_scope_sha256"] != replay_scope_sha256:
-                        raise PT1PersistentStoreCorrupt(
-                            f"PT-1 row replay scope hash mismatch: {row_hash}"
-                        )
-                    row_key_bytes = _pt1_row_bytes(
-                        row["key_bytes"],
-                        field="key",
-                        key_hash=row_hash,
-                    )
-                    row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
-                    entry, decoded = self._entry_from_row(
-                        row,
-                        artifact=artifact,
-                        key=row_key,
-                        key_bytes=row_key_bytes,
-                        key_hash=row_hash,
-                        return_decoded=True,
-                        expected_replay_scope_sha256=replay_scope_sha256,
-                        decoded_row_key=row_key,
-                        admission_keys=(
-                            (row_key, query_key)
-                            if query_key is not None
-                            else (row_key,)
-                        ),
-                    )
                     if decoded is None:
                         continue
                     candidates.append(
@@ -3084,14 +3532,17 @@ class PT1PersistentEquilibriumStore:
             for table in tables:
                 rows = conn.execute(query.format(table=table), params)
                 for row in rows:
-                    entry, decoded = self._entry_from_physics_ladder_bucket_row(
+                    admitted = _admit_stored_row(
                         row,
+                        store_kind="pt1",
                         artifact=artifact,
                         rung_tag=rung_tag,
                         rung_key=rung_key,
                         rung_hash=rung_hash,
-                        query_key=query_key,
+                        admission_keys=(query_key,) if query_key is not None else (),
                     )
+                    assert admitted is not None
+                    entry, decoded = admitted.entry, admitted.decoded_payload
                     if decoded is None:
                         continue
                     if query_key is not None and _physics_ladder_coarsens_controls(
@@ -3105,8 +3556,9 @@ class PT1PersistentEquilibriumStore:
                         )
                         if not bool(budget["accepted"]):
                             continue
+                    assert admitted.physics_ladder_values is not None
                     row_distance = float(
-                        row[_physics_ladder_distance_column(rung_tag)]
+                        admitted.physics_ladder_values[rung_tag]["distance"]
                     )
                     sort_key = (row_distance, str(entry["key_hash"]))
                     if best_sort is None or sort_key < best_sort:
@@ -3406,6 +3858,26 @@ class PT1PersistentEquilibriumStore:
                 if self._table_has_column(conn, table, "payload_codec_version")
                 else "NULL"
             )
+            physics_index_columns = (
+                "physics_bucket_schema_version",
+                "physics_bucket_sha256",
+                "replay_scope_sha256",
+                "physics_key_bytes",
+                *(
+                    column
+                    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                    for column in (
+                        _physics_ladder_hash_column(rung_tag),
+                        _physics_ladder_distance_column(rung_tag),
+                    )
+                ),
+            )
+            physics_index_projection = ",\n                    ".join(
+                column
+                if self._table_has_column(conn, table, column)
+                else f"NULL AS {column}"
+                for column in physics_index_columns
+            )
             row = conn.execute(
                 f"""
                 SELECT
@@ -3425,7 +3897,8 @@ class PT1PersistentEquilibriumStore:
                     created_at,
                     git_dirty,
                     {repair_column} AS repair_notices_json,
-                    {law_column} AS law_disclosures_json
+                    {law_column} AS law_disclosures_json,
+                    {physics_index_projection}
                 FROM {table}
                 WHERE key_hash = ?
                 """,
@@ -3449,157 +3922,36 @@ class PT1PersistentEquilibriumStore:
 
     def _entry_from_row(
         self,
-        row: sqlite3.Row,
+        row: sqlite3.Row | Mapping[str, Any],
         *,
         artifact: str,
-        key: Mapping[str, Any],
-        key_bytes: bytes,
-        key_hash: str,
+        key: Mapping[str, Any] | None = None,
+        key_bytes: bytes | None = None,
+        key_hash: str | None = None,
         return_decoded: bool = False,
         admission_keys: Sequence[Mapping[str, Any]] | None = None,
         expected_replay_scope_sha256: str | None = None,
-        decoded_row_key: Mapping[str, Any] | None = None,
     ) -> Any:
-        def decode_row() -> Any:
-            return self._decode_entry_from_row_fields(
-                row,
-                artifact=artifact,
-                key=key,
-                key_bytes=key_bytes,
-                key_hash=key_hash,
-                return_decoded=return_decoded,
-                admission_keys=admission_keys,
-                expected_replay_scope_sha256=expected_replay_scope_sha256,
-                decoded_row_key=decoded_row_key,
-            )
-
-        return _pt1_stored_fields_or_corrupt(key_hash, decode_row)
-
-    def _decode_entry_from_row_fields(
-        self,
-        row: sqlite3.Row,
-        *,
-        artifact: str,
-        key: Mapping[str, Any],
-        key_bytes: bytes,
-        key_hash: str,
-        return_decoded: bool = False,
-        admission_keys: Sequence[Mapping[str, Any]] | None = None,
-        expected_replay_scope_sha256: str | None = None,
-        decoded_row_key: Mapping[str, Any] | None = None,
-    ) -> Any:
-        row_key_bytes = _pt1_row_bytes(
-            row["key_bytes"],
-            field="key",
+        admitted = _admit_stored_row(
+            row,
+            store_kind="pt1",
+            artifact=artifact,
+            key=key,
+            key_bytes=key_bytes,
             key_hash=key_hash,
+            admission_keys=admission_keys,
+            expected_replay_scope_sha256=expected_replay_scope_sha256,
         )
-        row_payload_bytes = _pt1_row_bytes(
-            row["payload_bytes"],
-            field="payload",
-            key_hash=key_hash,
+        assert admitted is not None
+        return (
+            (admitted.entry, admitted.decoded_payload)
+            if return_decoded
+            else admitted.entry
         )
-        payload_codec_version = (
-            row["payload_codec_version"]
-            if "payload_codec_version" in row.keys()
-            else None
-        )
-        if row["store_schema_version"] not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row store schema version drift: "
-                f"{row['store_schema_version']} != {PT1_STORE_SCHEMA_VERSION}"
-            )
-        if row["artifact"] != artifact:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row artifact mismatch for {artifact}: {key_hash}"
-            )
-        if row["key_hash"] != key_hash or row["key_sha256"] != key_hash:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row key hash mismatch for {artifact}: {key_hash}"
-            )
-        if _sha256(row_key_bytes) != key_hash:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row key bytes hash mismatch for {artifact}: {key_hash}"
-            )
-        if row_key_bytes != key_bytes:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row canonical request bytes mismatch: {key_hash}"
-            )
-        if _sha256(row_payload_bytes) != row["payload_sha256"]:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row payload bytes mismatch: {key_hash}"
-            )
-        row_key = (
-            decoded_row_key
-            if decoded_row_key is not None
-            else _pt1_row_key(row_key_bytes, key_hash=key_hash)
-        )
-        canonical_key_bytes = canonical_json_bytes(row_key)
-        if canonical_key_bytes != row_key_bytes:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row non-canonical request bytes: {key_hash}"
-            )
-        expected_key = _json_ready(key)
-        if row_key != expected_key:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row canonical request mismatch: {key_hash}"
-            )
-        if expected_replay_scope_sha256 is not None:
-            row_replay_scope = _replay_scope_hash(
-                canonical_physics_bucket_key_from_replay_key(row_key)
-            )
-            if row_replay_scope != expected_replay_scope_sha256:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row exact key replay scope mismatch: {key_hash}"
-                )
-        row_payload = _pt1_row_json(
-            row_payload_bytes,
-            field="payload",
-            key_hash=key_hash,
-        )
-        canonical_payload_bytes = _payload_integrity_bytes(row_payload)
-        if canonical_payload_bytes != row_payload_bytes:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row non-canonical payload bytes: {key_hash}"
-            )
-        admission = _decode_payload_for_admission(
-            artifact,
-            row_payload,
-            payload_codec_version=payload_codec_version,
-            keys=(
-                tuple(admission_keys)
-                if admission_keys is not None
-                else (key,)
-            ),
-        )
-        admitted_payload = (
-            copy.deepcopy(row_payload)
-            if admission is None
-            else copy.deepcopy(dict(row_payload))
-        )
-        repair_notices_json = _row_repair_notices(row)
-        validate_repair_notices_json(repair_notices_json)
-        law_disclosures = _law_disclosures_from_json(
-            row["law_disclosures_json"]
-            if "law_disclosures_json" in row.keys()
-            else None
-        )
-        entry = {
-            "artifact": artifact,
-            "key": copy.deepcopy(dict(row_key)),
-            "key_hash": key_hash,
-            "key_bytes": row_key_bytes.decode("utf-8"),
-            "payload": admitted_payload,
-            "payload_hash": row["payload_sha256"],
-            "payload_codec_version": payload_codec_version,
-            "repair_notices_json": repair_notices_json,
-            "law_disclosures": law_disclosures,
-            "cache_state": "live_fill",
-        }
-        return (entry, admission) if return_decoded else entry
 
     def _entry_from_physics_bucket_row(
         self,
-        row: sqlite3.Row,
+        row: sqlite3.Row | Mapping[str, Any],
         *,
         artifact: str,
         physics_bucket_key: Mapping[str, Any],
@@ -3607,195 +3959,27 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str,
         query_key: Mapping[str, Any] | None = None,
     ) -> tuple[dict[str, Any], Any]:
-        row_physics_bytes = _pt1_row_bytes(
-            row["physics_key_bytes"],
-            field="physics bucket key",
-            key_hash=str(row["key_hash"]),
-        )
-        if row["physics_bucket_schema_version"] != PHYSICS_BUCKET_SCHEMA_VERSION:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row physics bucket schema drift: "
-                f"{row['physics_bucket_schema_version']} != "
-                f"{PHYSICS_BUCKET_SCHEMA_VERSION}"
-            )
-        if row["physics_bucket_sha256"] != physics_bucket_hash:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row physics bucket hash mismatch: {physics_bucket_hash}"
-            )
-        if row["replay_scope_sha256"] != _replay_scope_hash(physics_bucket_key):
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row replay scope hash mismatch: {physics_bucket_hash}"
-            )
-        if row_physics_bytes != physics_bucket_bytes:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row physics bucket bytes mismatch: {physics_bucket_hash}"
-            )
-        row_key_hash = str(row["key_hash"])
-        row_key_bytes = _pt1_row_bytes(
-            row["key_bytes"],
-            field="key",
-            key_hash=row_key_hash,
-        )
-        row_key = _pt1_row_key(row_key_bytes, key_hash=row_key_hash)
-        try:
-            exact_physics_key = canonical_physics_bucket_key_from_replay_key(
-                row_key
-            )
-            exact_physics_bytes = canonical_json_bytes(exact_physics_key)
-        except (
-            AttributeError,
-            KeyError,
-            TypeError,
-            ValueError,
-            OverflowError,
-            RecursionError,
-        ) as exc:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row exact key cannot reproduce physics bucket: "
-                f"{physics_bucket_hash}"
-            ) from exc
-        if (
-            exact_physics_bytes != physics_bucket_bytes
-            or _sha256(exact_physics_bytes) != physics_bucket_hash
-        ):
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row exact key does not reproduce physics bucket: "
-                f"{physics_bucket_hash}"
-            )
-        entry, decoded = self._entry_from_row(
+        admitted = _admit_stored_row(
             row,
+            store_kind="pt1",
             artifact=artifact,
-            key=row_key,
-            key_bytes=row_key_bytes,
-            key_hash=str(row["key_hash"]),
-            return_decoded=True,
-            decoded_row_key=row_key,
-            admission_keys=(
-                (row_key, query_key)
-                if query_key is not None
-                else (row_key,)
-            ),
+            admission_keys=(query_key,) if query_key is not None else (),
+            physics_bucket_key=physics_bucket_key,
+            physics_bucket_bytes=physics_bucket_bytes,
+            physics_bucket_hash=physics_bucket_hash,
         )
-        return entry, decoded
-
-    def _entry_from_physics_ladder_bucket_row(
-        self,
-        row: sqlite3.Row,
-        *,
-        artifact: str,
-        rung_tag: str,
-        rung_key: Mapping[str, Any],
-        rung_hash: str,
-        query_key: Mapping[str, Any] | None = None,
-    ) -> tuple[dict[str, Any], Any]:
-        row_hash = row[_physics_ladder_hash_column(rung_tag)]
-        if row_hash != rung_hash:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
-            )
-        if row["replay_scope_sha256"] != _replay_scope_hash(rung_key):
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
-            )
-        row_distance = row[_physics_ladder_distance_column(rung_tag)]
-        if row_distance is None:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
-            )
-        try:
-            indexed_distance = float(row_distance)
-        except (TypeError, ValueError, OverflowError) as exc:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
-            ) from exc
-        if not math.isfinite(indexed_distance):
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
-            )
-        row_key_hash = str(row["key_hash"])
-        row_key_bytes = _pt1_row_bytes(
-            row["key_bytes"],
-            field="key",
-            key_hash=row_key_hash,
-        )
-        row_key = _pt1_row_key(row_key_bytes, key_hash=row_key_hash)
-        try:
-            row_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-                row_key,
-                rung_tag,
-            )
-            row_rung_hash = _sha256(canonical_json_bytes(row_rung_key))
-            expected_distance = physics_ladder_bucket_distance_from_replay_key(
-                row_key,
-                rung_tag,
-            )
-        except (
-            AttributeError,
-            KeyError,
-            TypeError,
-            ValueError,
-            OverflowError,
-            RecursionError,
-        ) as exc:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row exact key cannot reproduce {rung_tag} index: {rung_hash}"
-            ) from exc
-        if row_rung_hash != rung_hash:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row exact key does not reproduce {rung_tag} hash: {rung_hash}"
-            )
-        if indexed_distance != expected_distance:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row {rung_tag} distance mismatch: {rung_hash}"
-            )
-        entry, decoded = self._entry_from_row(
-            row,
-            artifact=artifact,
-            key=row_key,
-            key_bytes=row_key_bytes,
-            key_hash=str(row["key_hash"]),
-            return_decoded=True,
-            decoded_row_key=row_key,
-            admission_keys=(
-                (row_key, query_key)
-                if query_key is not None
-                else (row_key,)
-            ),
-        )
-        return entry, decoded
+        assert admitted is not None
+        return admitted.entry, admitted.decoded_payload
 
 
 def _pt1_row_admission(
     row: Mapping[str, Any],
 ) -> bool:
-    """Return whether a stored PT-1 row passes current codec admission."""
+    """Compatibility predicate for tests; row validation has one owner."""
 
-    try:
-        key_hash = str(row["key_hash"])
-        key_bytes = _sqlite_bytes(row["key_bytes"])
-        payload_bytes = _sqlite_bytes(row["payload_bytes"])
-        key = json.loads(key_bytes.decode("utf-8"))
-        payload = json.loads(payload_bytes.decode("utf-8"))
-        canonical_key_bytes = canonical_json_bytes(key)
-        canonical_payload_bytes = canonical_json_bytes(payload)
-    except (KeyError, TypeError, ValueError, UnicodeDecodeError, OverflowError):
-        return False
-    if (
-        not isinstance(key, Mapping)
-        or not isinstance(payload, Mapping)
-        or canonical_key_bytes != key_bytes
-        or canonical_payload_bytes != payload_bytes
-        or _sha256(key_bytes) != key_hash
-        or row["key_sha256"] != key_hash
-        or _sha256(payload_bytes) != row["payload_sha256"]
-    ):
-        return False
-    return _decode_payload_for_admission(
-        str(row["artifact"]),
-        payload,
-        payload_codec_version=row["payload_codec_version"],
-        keys=(key,),
-    ) is not None
+    admitted = _admit_stored_row(row, store_kind="pt1")
+    assert admitted is not None
+    return admitted.decoded_payload is not None
 
 
 def _pt1_cache_merge_identity(
@@ -3840,21 +4024,22 @@ def _copy_pt1_equilibrium_rows(
             )
         )
         original_target_rows: dict[str, dict[str, Any]] = {}
+        original_target_admission: dict[str, _AdmittedStoredRow] = {}
         for row in target_conn.execute(
             f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
         ):
-            key_hash, stored_fields = _pt1_stored_fields_or_corrupt(
-                "<unknown>",
-                lambda row=row: (str(row["key_hash"]), dict(row)),
+            admitted = _admit_stored_row(
+                row,
+                store_kind="pt1",
             )
-            original_target_rows[key_hash] = stored_fields
+            assert admitted is not None and admitted.stored_columns is not None
+            key_hash = str(admitted.entry["key_hash"])
+            original_target_rows[key_hash] = admitted.stored_columns
+            original_target_admission[key_hash] = admitted
         planned_rows = dict(original_target_rows)
         planned_admission = {
-            key_hash: _pt1_stored_fields_or_corrupt(
-                key_hash,
-                lambda row=row: _pt1_row_admission(row),
-            )
-            for key_hash, row in original_target_rows.items()
+            key_hash: admitted.decoded_payload is not None
+            for key_hash, admitted in original_target_admission.items()
         }
         changed_rows: dict[str, dict[str, Any]] = {}
         source_summaries: list[dict[str, Any]] = []
@@ -3864,12 +4049,6 @@ def _copy_pt1_equilibrium_rows(
             source_conn = sqlite3.connect(source_uri, uri=True)
             source_conn.row_factory = sqlite3.Row
             try:
-                source_columns = {
-                    str(row["name"])
-                    for row in source_conn.execute(
-                        f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
-                    )
-                }
                 if selected_hashes is None:
                     source_rows = source_conn.execute(
                         f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
@@ -3895,24 +4074,18 @@ def _copy_pt1_equilibrium_rows(
             inserted = 0
             replaced = 0
             for source_row in source_rows:
-                key_hash, source_fields = _pt1_stored_fields_or_corrupt(
-                    "<unknown>",
-                    lambda: (str(source_row["key_hash"]), dict(source_row)),
+                incoming_admission = _admit_stored_row(
+                    source_row,
+                    store_kind="pt1",
+                    output_columns=target_columns,
                 )
-                incoming_row = _pt1_stored_fields_or_corrupt(
-                    key_hash,
-                    lambda: {
-                        column: source_fields[column]
-                        if column in source_columns
-                        else None
-                        for column in target_columns
-                    },
+                assert (
+                    incoming_admission is not None
+                    and incoming_admission.stored_columns is not None
                 )
-                incoming_row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
-                incoming_admitted = _pt1_stored_fields_or_corrupt(
-                    key_hash,
-                    lambda: _pt1_row_admission(incoming_row),
-                )
+                incoming_row = incoming_admission.stored_columns
+                key_hash = str(incoming_admission.entry["key_hash"])
+                incoming_admitted = incoming_admission.decoded_payload is not None
                 existing_row = planned_rows.get(key_hash)
                 if existing_row is None:
                     planned_rows[key_hash] = incoming_row
@@ -3923,19 +4096,13 @@ def _copy_pt1_equilibrium_rows(
 
                 existing_admitted = planned_admission[key_hash]
                 if existing_admitted and incoming_admitted:
-                    existing_identity = _pt1_stored_fields_or_corrupt(
-                        key_hash,
-                        lambda: _pt1_cache_merge_identity(
-                            existing_row,
-                            require_capture_epoch_match=require_capture_epoch_match,
-                        ),
+                    existing_identity = _pt1_cache_merge_identity(
+                        existing_row,
+                        require_capture_epoch_match=require_capture_epoch_match,
                     )
-                    incoming_identity = _pt1_stored_fields_or_corrupt(
-                        key_hash,
-                        lambda: _pt1_cache_merge_identity(
-                            incoming_row,
-                            require_capture_epoch_match=require_capture_epoch_match,
-                        ),
+                    incoming_identity = _pt1_cache_merge_identity(
+                        incoming_row,
+                        require_capture_epoch_match=require_capture_epoch_match,
                     )
                     if existing_identity != incoming_identity:
                         raise _PT1CacheMergeCollision(
@@ -3957,10 +4124,15 @@ def _copy_pt1_equilibrium_rows(
                         )
                         return merged
 
-                    merged_row = _pt1_stored_fields_or_corrupt(
-                        key_hash,
-                        merge_stored_sidecars,
+                    merged_admission = _admit_stored_row(
+                        merge_stored_sidecars(),
+                        store_kind="pt1",
                     )
+                    assert (
+                        merged_admission is not None
+                        and merged_admission.stored_columns is not None
+                    )
+                    merged_row = merged_admission.stored_columns
                     planned_rows[key_hash] = merged_row
                     planned_admission[key_hash] = True
                     if merged_row != existing_row:
@@ -5881,6 +6053,8 @@ def _emit_repair_notices(
 ) -> list[dict[str, Any]]:
     if sim is None:
         return []
+    if not isinstance(getattr(sim, REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, None), list):
+        setattr(sim, REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, [])
     collected: list[dict[str, Any]] = []
     seen: set[bytes] = set()
     legacy_history_unavailable = False

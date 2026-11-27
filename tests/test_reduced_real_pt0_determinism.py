@@ -294,6 +294,30 @@ def _replay_repair_notice_test_record(
     return entry, sim._reduced_real_repair_notices
 
 
+def test_memory_recapture_replaces_bad_notices_and_empty_notice_hit_sets_collector():
+    capture = PT0DeterminismStore("capture")
+    key, payload = _repair_notice_test_record()
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        payload,
+        repair_notices=[{"kind": "old"}],
+        law_disclosures=[],
+    )
+    key_hash = rrd._sha256(canonical_json_bytes(key))
+    capture._entries[key_hash]["repair_notices_json"] = "["
+
+    _store_repair_notice_test_record(capture, notices=[])
+
+    assert capture._entries[key_hash]["repair_notices_json"] == "[]"
+    replay = PT0DeterminismStore("replay")
+    replay._entries[key_hash] = copy.deepcopy(capture._entries[key_hash])
+    replayed_payload, replayed_notices = _replay_repair_notice_test_record(replay)
+    assert replayed_payload == payload
+    assert replayed_notices == []
+    assert replay.hits == 1
+
+
 class _CaptureDispatchKernel:
     def __init__(self) -> None:
         self.kwargs = None
@@ -4442,6 +4466,55 @@ def test_pt1_nonfinite_stored_key_is_typed_on_every_reader(
     assert isinstance(raised.value.__cause__, PT0NonFinitePayload)
 
 
+def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt1-subnormal-ladder-key.sqlite"
+    key = _freeze_gate_key()
+    payload = _valid_test_gate_payload()
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture._store("freeze_gate_curve", key, payload, law_disclosures=[])
+    original_key_hash = _key_hash(key)
+    corrupt_key = copy.deepcopy(rrd._json_ready(key))
+    corrupt_key["controls"]["T_K"] = 5e-324
+    corrupt_key_bytes = canonical_json_bytes(corrupt_key)
+    corrupt_key_hash = rrd._sha256(corrupt_key_bytes)
+    corrupt_bucket = canonical_physics_bucket_key_from_replay_key(corrupt_key)
+    corrupt_bucket_bytes = canonical_json_bytes(corrupt_bucket)
+    corrupt_bucket_hash = rrd._sha256(corrupt_bucket_bytes)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_sha256 = ?, key_bytes = ?, "
+            "physics_bucket_sha256 = ?, replay_scope_sha256 = ?, "
+            "physics_key_bytes = ? WHERE key_hash = ?",
+            (
+                corrupt_key_hash,
+                corrupt_key_hash,
+                sqlite3.Binary(corrupt_key_bytes),
+                corrupt_bucket_hash,
+                rrd._replay_scope_hash(corrupt_bucket),
+                sqlite3.Binary(corrupt_bucket_bytes),
+                original_key_hash,
+            ),
+        )
+
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    with pytest.raises(PT1PersistentStoreCorrupt) as raised:
+        PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+            artifact="freeze_gate_curve",
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+            query_key=key,
+        )
+    assert isinstance(raised.value.__cause__, ZeroDivisionError)
+
+
 def test_pt1_shard_merge_wraps_nested_stored_repair_notices(
     tmp_path: Path,
 ) -> None:
@@ -4461,6 +4534,37 @@ def test_pt1_shard_merge_wraps_nested_stored_repair_notices(
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET repair_notices_json = ?",
             ("[" * 10_000 + "0" + "]" * 10_000,),
+        )
+
+    with pytest.raises(PT1PersistentStoreCorrupt) as raised:
+        rrd._copy_pt1_equilibrium_rows(
+            (source_path,),
+            target_path,
+            require_capture_epoch_match=False,
+        )
+    assert isinstance(raised.value.__cause__, RecursionError)
+
+
+def test_pt1_shard_first_insert_admits_nested_repair_notices(
+    tmp_path: Path,
+) -> None:
+    source_path = tmp_path / "first-insert-deep-notice-source.sqlite"
+    target_path = tmp_path / "first-insert-deep-notice-target.sqlite"
+    key, payload = _repair_notice_test_record()
+    capture = PT0DeterminismStore("capture", db_path=source_path)
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        payload,
+        repair_notices=[],
+        law_disclosures=[],
+    )
+    key_hash = rrd._sha256(canonical_json_bytes(key))
+    with sqlite3.connect(source_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE key_hash = ?",
+            ("[" * 10_000 + "0" + "]" * 10_000, key_hash),
         )
 
     with pytest.raises(PT1PersistentStoreCorrupt) as raised:
@@ -5149,16 +5253,16 @@ def test_pt1_concurrent_row_copy_checks_and_writes_atomically(
     target_path = tmp_path / "atomic-row-copy-target.sqlite"
     PT1PersistentEquilibriumStore(target_path)
     admission_barrier = threading.Barrier(2)
-    original_admission = rrd._pt1_row_admission
+    original_admission = rrd._admit_stored_row
 
-    def synchronized_admission(row):
+    def synchronized_admission(row, **kwargs):
         try:
             admission_barrier.wait(timeout=1.0)
         except threading.BrokenBarrierError:
             pass
-        return original_admission(row)
+        return original_admission(row, **kwargs)
 
-    monkeypatch.setattr(rrd, "_pt1_row_admission", synchronized_admission)
+    monkeypatch.setattr(rrd, "_admit_stored_row", synchronized_admission)
 
     def copy_source(source_path: Path) -> str:
         try:
@@ -5833,6 +5937,7 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
         key_hash = rrd._sha256(key_bytes)
         return {
             "artifact": "freeze_gate_curve",
+            "store_schema_version": rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,
             "key_hash": key_hash,
             "key_sha256": key_hash,
             "key_bytes": key_bytes,

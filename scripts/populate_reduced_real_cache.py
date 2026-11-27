@@ -13,7 +13,6 @@ from __future__ import annotations
 import argparse
 import ast
 import copy
-import hashlib
 import json
 import math
 import signal
@@ -45,20 +44,14 @@ from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
-    PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
-    _physics_ladder_values_from_replay_key,
-    canonical_json_bytes,
-    canonical_physics_bucket_key_from_replay_key,
+    _admit_stored_row,
     _copy_pt1_equilibrium_rows,
-    validate_reduced_real_equilibrium_record_key,
-    validate_repair_notices_json,
 )
 from simulator.grind_preflight import (
     GrindSourceGateError,
     assert_grind_feedstock_stage0_route_coverage,
     assert_strict_vapor_config,
-    assert_strict_vapor_pt1_row,
     assert_strict_vapor_source_report,
     vapor_pressure_source_report_from_sim,
 )
@@ -676,74 +669,33 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
 
 
 def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
-    artifact = str(row["artifact"])
-    key_bytes = bytes(row["key_bytes"])
-    payload_bytes = bytes(row["payload_bytes"])
-    key_hash = hashlib.sha256(key_bytes).hexdigest()
-    payload_hash = hashlib.sha256(payload_bytes).hexdigest()
-    if str(row["key_hash"]) != key_hash or str(row["key_sha256"]) != key_hash:
-        raise RuntimeError(f"PT-1 cache shard row key hash mismatch: {row['key_hash']}")
-    if str(row["payload_sha256"]) != payload_hash:
-        raise RuntimeError(
-            f"PT-1 cache shard row payload hash mismatch: {row['key_hash']}"
-        )
-    try:
-        key = json.loads(key_bytes.decode("utf-8"))
-    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-        raise RuntimeError(
-            f"PT-1 cache shard row has invalid key bytes: {row['key_hash']}"
-        ) from exc
-    try:
-        payload = json.loads(payload_bytes.decode("utf-8"))
-    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-        raise RuntimeError(
-            f"PT-1 cache shard row has invalid payload bytes: {row['key_hash']}"
-        ) from exc
-    if not isinstance(key, Mapping):
-        raise RuntimeError(
-            f"PT-1 cache shard row key must be a mapping: {row['key_hash']}"
-        )
-    if not isinstance(payload, Mapping):
-        raise RuntimeError(
-            f"PT-1 cache shard row payload must be a mapping: {row['key_hash']}"
-        )
-    if canonical_json_bytes(key) != key_bytes:
-        raise RuntimeError(
-            f"PT-1 cache shard row has non-canonical key bytes: {row['key_hash']}"
-        )
-    if canonical_json_bytes(payload) != payload_bytes:
-        raise RuntimeError(
-            f"PT-1 cache shard row has non-canonical payload bytes: {row['key_hash']}"
-        )
-    if str(row["store_schema_version"]) not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
-        raise RuntimeError(
-            "PT-1 cache shard row store schema version drift: "
-            f"{row['store_schema_version']}"
-        )
-    repair_notices_json = row.get("repair_notices_json")
-    if repair_notices_json is not None and not isinstance(
-        repair_notices_json, str
-    ):
-        raise RuntimeError(
-            f"PT-1 repair_notices_json storage type mismatch: {row['key_hash']}"
-        )
-    payload_codec_version = row.get("payload_codec_version")
-    if payload_codec_version is not None and type(payload_codec_version) is not int:
-        raise RuntimeError(
-            f"PT-1 payload_codec_version storage type mismatch: {row['key_hash']}"
-        )
-    validate_repair_notices_json(repair_notices_json)
-    validate_reduced_real_equilibrium_record_key(artifact, key, payload)
-    assert_strict_vapor_pt1_row(
-        artifact=artifact,
-        key=key,
-        key_hash=key_hash,
-        payload=payload,
-        context=f"PT-1 cache shard {artifact}:{key_hash}",
+    admitted = _admit_stored_row(
+        row,
+        store_kind="pt1",
+        strict_source_validation=True,
     )
-    physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
-    physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
-    physics_bucket_hash = hashlib.sha256(physics_bucket_bytes).hexdigest()
+    assert admitted is not None and admitted.stored_columns is not None
+    if admitted.stale_payload_codec:
+        return {
+            "payload_codec_version": admitted.stored_columns.get(
+                "payload_codec_version"
+            ),
+            "repair_notices_json": admitted.stored_columns.get(
+                "repair_notices_json"
+            ),
+        }
+    entry = admitted.entry
+    stored_columns = admitted.stored_columns
+    artifact = str(entry["artifact"])
+    key_hash = str(entry["key_hash"])
+    key_bytes = bytes(stored_columns["key_bytes"])
+    payload_bytes = bytes(stored_columns["payload_bytes"])
+    payload_hash = str(stored_columns["payload_sha256"])
+    key = entry["key"]
+    payload = entry["payload"]
+    repair_notices_json = entry["repair_notices_json"]
+    payload_codec_version = entry["payload_codec_version"]
+    assert admitted.physics_ladder_values is not None
     return {
         "artifact": artifact,
         "key": key,
@@ -752,29 +704,34 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "payload": payload,
         "payload_bytes": payload_bytes,
         "payload_hash": payload_hash,
-        "physics_bucket_key": physics_bucket_key,
-        "physics_bucket_bytes": physics_bucket_bytes,
-        "physics_bucket_hash": physics_bucket_hash,
-        "ladder_values": _physics_ladder_values_from_replay_key(key),
-        "data_digests_json": str(row["data_digests_json"]),
+        "physics_bucket_key": entry["physics_bucket_key"],
+        "physics_bucket_bytes": entry["physics_bucket_bytes"],
+        "physics_bucket_hash": entry["physics_bucket_hash"],
+        "data_digests_json": str(stored_columns["data_digests_json"]),
         "repair_notices_json": repair_notices_json,
         "payload_codec_version": payload_codec_version,
+        "ladder_values": admitted.physics_ladder_values,
     }
 
 
 def _cache_row_summary(db_path: Path) -> dict[str, Any]:
     payload_rows = _cache_payload_rows(db_path)
     rows: list[dict[str, Any]] = []
-    for row in payload_rows:
-        key = json.loads(bytes(row["key_bytes"]).decode("utf-8"))
-        payload = json.loads(bytes(row["payload_bytes"]).decode("utf-8"))
+    for raw_row in payload_rows:
+        admitted = _admit_stored_row(raw_row, store_kind="pt1")
+        assert admitted is not None
+        if admitted.stale_payload_codec:
+            continue
+        entry = admitted.entry
+        key = entry["key"]
+        payload = entry["payload"]
         authority = payload.get("authority") or {}
         provider = authority.get("provider") or {}
         namespace_id = str(key.get("namespace_id") or "")
         rows.append(
             {
-                "key_hash": row["key_hash"],
-                "artifact": row["artifact"],
+                "key_hash": entry["key_hash"],
+                "artifact": entry["artifact"],
                 "provider_id": provider.get("resolved_provider_id", ""),
                 "provider_role": provider.get("resolved_role", ""),
                 "namespace_id": namespace_id,
@@ -802,9 +759,13 @@ def _cache_row_summary(db_path: Path) -> dict[str, Any]:
 def _magemin_key_hashes(db_path: Path) -> set[str]:
     key_hashes: set[str] = set()
     for row in _cache_payload_rows(db_path):
-        key = json.loads(bytes(row["key_bytes"]).decode("utf-8"))
+        admitted = _admit_stored_row(row, store_kind="pt1")
+        assert admitted is not None
+        if admitted.stale_payload_codec:
+            continue
+        key = admitted.entry["key"]
         if str(key.get("namespace_id") or "").startswith("magemin:"):
-            key_hashes.add(str(row["key_hash"]))
+            key_hashes.add(str(admitted.entry["key_hash"]))
     return key_hashes
 
 

@@ -729,6 +729,72 @@ def test_interpolation_candidates_refuse_corrupt_replay_scope(
         )
 
 
+@pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))
+@pytest.mark.parametrize(
+    "row_version",
+    (None, rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION - 1),
+    ids=("missing-codec", "old-codec"),
+)
+def test_stale_codec_malformed_payload_misses_physics_readers(
+    tmp_path: Path,
+    reader: str,
+    row_version: int | None,
+) -> None:
+    key = _interpolation_key("stale", feo_fraction=0.20, temperature_K=1500.0)
+    db_path = tmp_path / f"stale-codec-{reader}-{row_version}.sqlite"
+    _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
+    key_hash = hashlib.sha256(canonical_json_bytes(key)).hexdigest()
+    malformed_payload = sqlite3.Binary(b"{")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ? "
+            "WHERE key_hash = ?",
+            (
+                malformed_payload,
+                hashlib.sha256(bytes(malformed_payload)).hexdigest(),
+                row_version,
+                key_hash,
+            ),
+        )
+
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    bucket_hash = hashlib.sha256(bucket_bytes).hexdigest()
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    rung_hash = hashlib.sha256(canonical_json_bytes(rung_key)).hexdigest()
+    if reader == "bucket":
+        observed = store._get_by_physics_bucket(
+            artifact="equilibrium_post_record",
+            physics_bucket_key=bucket_key,
+            physics_bucket_bytes=bucket_bytes,
+            physics_bucket_hash=bucket_hash,
+            query_key=key,
+        )
+        assert observed is None
+    elif reader == "ladder":
+        observed = store._get_by_physics_ladder_bucket(
+            artifact="equilibrium_post_record",
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rung_hash,
+            query_key=key,
+        )
+        assert observed is None
+    else:
+        observed = store._list_interpolation_candidates(
+            artifact="equilibrium_post_record",
+            replay_scope_sha256=rci.replay_scope_for_interpolation(key),
+            query_key=key,
+        )
+        assert observed == []
+
+
 def test_interpolation_refuses_attached_base_dependency_vector_mismatch(
     tmp_path: Path,
 ) -> None:
