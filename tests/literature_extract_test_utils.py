@@ -5,6 +5,9 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import BenchIdentityBasis
+from simulator.battery.records import Bench, BenchIdentity
+
 def isolated_root(tmp_path: Path, document: dict) -> Path:
     literature = tmp_path / "data/literature"
     extracts = literature / "extracts"
@@ -17,3 +20,12 @@ def isolated_root(tmp_path: Path, document: dict) -> Path:
         yaml.safe_dump(document, sort_keys=False, allow_unicode=True), encoding="utf-8"
     )
     return tmp_path
+
+
+def activity_test_bench(work_id: str) -> Bench:
+    """Neutral test-only bench for activity consumer APIs; not source data."""
+    return Bench(
+        "literature-activity-test-bench",
+        work_id,
+        BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+    )

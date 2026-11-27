@@ -1,0 +1,2064 @@
+schema_version: literature_extract.v1
+source_id: guo-2022-cmas-mgo-activity-tin
+source:
+  citation: Guo, Y., Shen, F., Zheng, H., Wang, S., Jiang, X. and Gao, Q. (2022), “Effect of temperature
+    on MgO activity in the CaO-SiO2-MgO-Al2O3 system”, Materiali in tehnologije 56(1), 33–38.
+  doi: 10.17222/mit.2021.262
+  year: 2022
+  corpus_asset: raw/guo-2022-cmas-mgo-activity-tin/guo-2022-cmas-mgo-activity-tin.pdf
+  sha256: c17a271673e773127b2a9fa319249b40568370145171a65c77ea168b9381e3c8
+  corpus_sha256: c17a271673e773127b2a9fa319249b40568370145171a65c77ea168b9381e3c8
+extraction:
+  method: Manual transcription of every Table 3 composition, x[Mg] and a(MgO) cell from the rendered page.
+    The paper uses the molten-Sn reference-slag method and Equation (6), a(MgO) = x[Mg]/xref[Mg], with
+    reference-slag activity set to 1. Activities are retained as the authors report them.
+  provenance_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+  date: '2026-11-26'
+  worker: w1126homgsi
+  audit_file: data/literature/extracts/audits/guo-2022-cmas-mgo-activity-tin.cells.csv
+  note: The paper identifies pure solid MgO as the activity standard state. Table 3 reports 4 compositions
+    at 1773, 1823 and 1873 K. No activity uncertainty is printed.
+review_status: draft
+fidelity_samples:
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_1_1773k
+  field: activity
+  value: '0.1726'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 1#
+    column: a(MgO) at 1773 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '218'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_1_1773k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.000219'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 1#
+    column: x[Mg] in Sn at 1773 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '218'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_1_1823k
+  field: activity
+  value: '0.2405'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 1#
+    column: a(MgO) at 1823 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '218'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_1_1823k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.000595'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 1#
+    column: x[Mg] in Sn at 1823 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '218'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_1_1873k
+  field: activity
+  value: '0.2917'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 1#
+    column: a(MgO) at 1873 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '218'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_1_1873k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.000882'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 1#
+    column: x[Mg] in Sn at 1873 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '218'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_2_1773k
+  field: activity
+  value: '0.2186'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 2#
+    column: a(MgO) at 1773 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '219'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_2_1773k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.000278'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 2#
+    column: x[Mg] in Sn at 1773 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '219'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_2_1823k
+  field: activity
+  value: '0.3174'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 2#
+    column: a(MgO) at 1823 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '219'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_2_1823k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.000785'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 2#
+    column: x[Mg] in Sn at 1823 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '219'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_2_1873k
+  field: activity
+  value: '0.3383'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 2#
+    column: a(MgO) at 1873 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '219'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_2_1873k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.001023'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 2#
+    column: x[Mg] in Sn at 1873 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '219'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_3_1773k
+  field: activity
+  value: '0.3067'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 3#
+    column: a(MgO) at 1773 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '220'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_3_1773k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.000390'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 3#
+    column: x[Mg] in Sn at 1773 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '220'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_3_1823k
+  field: activity
+  value: '0.3725'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 3#
+    column: a(MgO) at 1823 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '220'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_3_1823k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.000921'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 3#
+    column: x[Mg] in Sn at 1823 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '220'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_3_1873k
+  field: activity
+  value: '0.4301'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 3#
+    column: a(MgO) at 1873 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '220'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_3_1873k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.001301'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 3#
+    column: x[Mg] in Sn at 1873 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '220'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_4_1773k
+  field: activity
+  value: '0.3949'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 4#
+    column: a(MgO) at 1773 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '221'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_4_1773k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.000502'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 4#
+    column: x[Mg] in Sn at 1773 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '221'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_4_1823k
+  field: activity
+  value: '0.4316'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 4#
+    column: a(MgO) at 1823 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '221'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_4_1823k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.001067'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 4#
+    column: x[Mg] in Sn at 1823 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '221'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_4_1873k
+  field: activity
+  value: '0.4928'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 4#
+    column: a(MgO) at 1873 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '221'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+- species: MgO
+  observable: activity_coefficient
+  observation_id: guo22_t3_row_4_1873k
+  field: x_Mg_in_Sn_as_printed
+  value: '0.001491'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 35
+    table: '3'
+    row: 4#
+    column: x[Mg] in Sn at 1873 K
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: '221'
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+  reviewed_by: w1126attest
+  reviewed_on: '2026-11-26'
+
+experiments:
+- experiment_id: guo22_table3_molten_tin_1773k
+  method: quench_equilibration
+  method_as_printed: Reference-slag equilibrium method using Sn metal as solvent and C as reducing agent.
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 34
+    section: 2.1 Principle of activity determination
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: 109-114
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+    note: Equation (6) reduces measured Mg-in-Sn mole fractions against the CaF2-MgO reference slag.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        column: 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: 214-220
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+- experiment_id: guo22_table3_molten_tin_1823k
+  method: quench_equilibration
+  method_as_printed: Reference-slag equilibrium method using Sn metal as solvent and C as reducing agent.
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 34
+    section: 2.1 Principle of activity determination
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: 109-114
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+    note: Equation (6) reduces measured Mg-in-Sn mole fractions against the CaF2-MgO reference slag.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        column: 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: 214-220
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+- experiment_id: guo22_table3_molten_tin_1873k
+  method: quench_equilibration
+  method_as_printed: Reference-slag equilibrium method using Sn metal as solvent and C as reducing agent.
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 34
+    section: 2.1 Principle of activity determination
+    source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+    line_range: 109-114
+    source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+    note: Equation (6) reduces measured Mg-in-Sn mole fractions against the CaF2-MgO reference slag.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        column: 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: 214-220
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+species:
+  MgO:
+    observations:
+    - observation_id: guo22_t3_row_1_1773k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1773k
+      phase: l
+      units: dimensionless activity
+      locator: &id001
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 1#
+        column: slag composition (wt%); x[Mg] at 1773 K; a(MgO) at 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '218'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1499.85'
+          locator: *id001
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '47.02'
+              - - SiO2
+                - '36.17'
+              - - MgO
+                - '4.8'
+              - - Al2O3
+                - '12'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 1#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '218'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id002
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_1_xmg_1773k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1773k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id002
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.1726'
+        activity_as_printed: '0.1726'
+        x_Mg_in_Sn_as_printed: '0.000219'
+        T_K: '1773'
+        T_C: '1499.85'
+        sample_id: guo22_table3_row_1
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+        composition_wt_pct:
+          CaO: '47.02'
+          SiO2: '36.17'
+          MgO: '4.8'
+          Al2O3: '12'
+    - observation_id: guo22_t3_row_1_1823k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1823k
+      phase: l
+      units: dimensionless activity
+      locator: &id003
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 1#
+        column: slag composition (wt%); x[Mg] at 1823 K; a(MgO) at 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '218'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1549.85'
+          locator: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '47.02'
+              - - SiO2
+                - '36.17'
+              - - MgO
+                - '4.8'
+              - - Al2O3
+                - '12'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 1#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '218'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id004
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_1_xmg_1823k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1823k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id004
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.2405'
+        activity_as_printed: '0.2405'
+        x_Mg_in_Sn_as_printed: '0.000595'
+        T_K: '1823'
+        T_C: '1549.85'
+        sample_id: guo22_table3_row_1
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+    - observation_id: guo22_t3_row_1_1873k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1873k
+      phase: l
+      units: dimensionless activity
+      locator: &id005
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 1#
+        column: slag composition (wt%); x[Mg] at 1873 K; a(MgO) at 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '218'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1599.85'
+          locator: *id005
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '47.02'
+              - - SiO2
+                - '36.17'
+              - - MgO
+                - '4.8'
+              - - Al2O3
+                - '12'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 1#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '218'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id006
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_1_xmg_1873k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1873k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id006
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.2917'
+        activity_as_printed: '0.2917'
+        x_Mg_in_Sn_as_printed: '0.000882'
+        T_K: '1873'
+        T_C: '1599.85'
+        sample_id: guo22_table3_row_1
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+    - observation_id: guo22_t3_row_2_1773k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1773k
+      phase: l
+      units: dimensionless activity
+      locator: &id007
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 2#
+        column: slag composition (wt%); x[Mg] at 1773 K; a(MgO) at 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '219'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1499.85'
+          locator: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '44.65'
+              - - SiO2
+                - '34.34'
+              - - MgO
+                - '6.0'
+              - - Al2O3
+                - '15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 2#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '219'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id008
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_2_xmg_1773k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1773k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id008
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.2186'
+        activity_as_printed: '0.2186'
+        x_Mg_in_Sn_as_printed: '0.000278'
+        T_K: '1773'
+        T_C: '1499.85'
+        sample_id: guo22_table3_row_2
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+        composition_wt_pct:
+          CaO: '44.65'
+          SiO2: '34.34'
+          MgO: '6.0'
+          Al2O3: '15'
+    - observation_id: guo22_t3_row_2_1823k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1823k
+      phase: l
+      units: dimensionless activity
+      locator: &id009
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 2#
+        column: slag composition (wt%); x[Mg] at 1823 K; a(MgO) at 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '219'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1549.85'
+          locator: *id009
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '44.65'
+              - - SiO2
+                - '34.34'
+              - - MgO
+                - '6.0'
+              - - Al2O3
+                - '15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 2#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '219'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id010
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_2_xmg_1823k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1823k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id010
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.3174'
+        activity_as_printed: '0.3174'
+        x_Mg_in_Sn_as_printed: '0.000785'
+        T_K: '1823'
+        T_C: '1549.85'
+        sample_id: guo22_table3_row_2
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+    - observation_id: guo22_t3_row_2_1873k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1873k
+      phase: l
+      units: dimensionless activity
+      locator: &id011
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 2#
+        column: slag composition (wt%); x[Mg] at 1873 K; a(MgO) at 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '219'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1599.85'
+          locator: *id011
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '44.65'
+              - - SiO2
+                - '34.34'
+              - - MgO
+                - '6.0'
+              - - Al2O3
+                - '15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 2#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '219'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id012
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_2_xmg_1873k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1873k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id012
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.3383'
+        activity_as_printed: '0.3383'
+        x_Mg_in_Sn_as_printed: '0.001023'
+        T_K: '1873'
+        T_C: '1599.85'
+        sample_id: guo22_table3_row_2
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+    - observation_id: guo22_t3_row_3_1773k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1773k
+      phase: l
+      units: dimensionless activity
+      locator: &id013
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 3#
+        column: slag composition (wt%); x[Mg] at 1773 K; a(MgO) at 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '220'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1499.85'
+          locator: *id013
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '42.27'
+              - - SiO2
+                - '32.52'
+              - - MgO
+                - '7.2'
+              - - Al2O3
+                - '18'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 3#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '220'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id014
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_3_xmg_1773k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1773k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id014
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.3067'
+        activity_as_printed: '0.3067'
+        x_Mg_in_Sn_as_printed: '0.000390'
+        T_K: '1773'
+        T_C: '1499.85'
+        sample_id: guo22_table3_row_3
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+        composition_wt_pct:
+          CaO: '42.27'
+          SiO2: '32.52'
+          MgO: '7.2'
+          Al2O3: '18'
+    - observation_id: guo22_t3_row_3_1823k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1823k
+      phase: l
+      units: dimensionless activity
+      locator: &id015
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 3#
+        column: slag composition (wt%); x[Mg] at 1823 K; a(MgO) at 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '220'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1549.85'
+          locator: *id015
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '42.27'
+              - - SiO2
+                - '32.52'
+              - - MgO
+                - '7.2'
+              - - Al2O3
+                - '18'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 3#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '220'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id016
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_3_xmg_1823k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1823k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id016
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.3725'
+        activity_as_printed: '0.3725'
+        x_Mg_in_Sn_as_printed: '0.000921'
+        T_K: '1823'
+        T_C: '1549.85'
+        sample_id: guo22_table3_row_3
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+    - observation_id: guo22_t3_row_3_1873k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1873k
+      phase: l
+      units: dimensionless activity
+      locator: &id017
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 3#
+        column: slag composition (wt%); x[Mg] at 1873 K; a(MgO) at 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '220'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1599.85'
+          locator: *id017
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '42.27'
+              - - SiO2
+                - '32.52'
+              - - MgO
+                - '7.2'
+              - - Al2O3
+                - '18'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 3#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '220'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id018
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_3_xmg_1873k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1873k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id018
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.4301'
+        activity_as_printed: '0.4301'
+        x_Mg_in_Sn_as_printed: '0.001301'
+        T_K: '1873'
+        T_C: '1599.85'
+        sample_id: guo22_table3_row_3
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+    - observation_id: guo22_t3_row_4_1773k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1773k
+      phase: l
+      units: dimensionless activity
+      locator: &id019
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 4#
+        column: slag composition (wt%); x[Mg] at 1773 K; a(MgO) at 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '221'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1499.85'
+          locator: *id019
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '40.69'
+              - - SiO2
+                - '31.30'
+              - - MgO
+                - '8.0'
+              - - Al2O3
+                - '20'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 4#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '221'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id020
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_4_xmg_1773k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1773k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id020
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.3949'
+        activity_as_printed: '0.3949'
+        x_Mg_in_Sn_as_printed: '0.000502'
+        T_K: '1773'
+        T_C: '1499.85'
+        sample_id: guo22_table3_row_4
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+        composition_wt_pct:
+          CaO: '40.69'
+          SiO2: '31.30'
+          MgO: '8.0'
+          Al2O3: '20'
+    - observation_id: guo22_t3_row_4_1823k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1823k
+      phase: l
+      units: dimensionless activity
+      locator: &id021
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 4#
+        column: slag composition (wt%); x[Mg] at 1823 K; a(MgO) at 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '221'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1549.85'
+          locator: *id021
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '40.69'
+              - - SiO2
+                - '31.30'
+              - - MgO
+                - '8.0'
+              - - Al2O3
+                - '20'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 4#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '221'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id022
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_4_xmg_1823k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1823k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id022
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.4316'
+        activity_as_printed: '0.4316'
+        x_Mg_in_Sn_as_printed: '0.001067'
+        T_K: '1823'
+        T_C: '1549.85'
+        sample_id: guo22_table3_row_4
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+    - observation_id: guo22_t3_row_4_1873k
+      type: activity_coefficient
+      experiment: guo22_table3_molten_tin_1873k
+      phase: l
+      units: dimensionless activity
+      locator: &id023
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 4#
+        column: slag composition (wt%); x[Mg] at 1873 K; a(MgO) at 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '221'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Table 3 printed cells; T_C is the exact conversion from the printed kelvin value.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The paper states a pure solid reference but does not name a polymorph.
+            component_basis: MgO
+        inferred: false
+        note: The paper states that MgO activity uses the pure substance as its standard state.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 34
+          section: 3.1 Activity of MgO
+          source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+          line_range: 81-91
+          source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1599.85'
+          locator: *id023
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide_weight_percent_as_published
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '40.69'
+              - - SiO2
+                - '31.30'
+              - - MgO
+                - '8.0'
+              - - Al2O3
+                - '20'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 35
+            table: '3'
+            row: 4#
+            column: slag composition (w/%)
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: '221'
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      derived_from: &id024
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_table3_row_4_xmg_1873k
+      - guo-2022-cmas-mgo-activity-tin::context::guo22_t2_reference_xmg_1873k
+      derivation:
+        relation: a(MgO) = x[Mg] / xref[Mg] at equilibrium; the reference-slag activity is 1 and the source
+          treats dilute Mg in Sn as Henry-law behavior (Equation (6)).
+        inputs: *id024
+        output_unit: dimensionless activity
+        method:
+          state:
+            tag: value
+            value: Molten-Sn reference-slag equilibration; Mg in Sn measured by ICP-AES and reduced with
+              Equation (6).
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 34
+            section: 2.1 Principle of activity determination
+            equation: '6'
+            source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+            line_range: 95-114
+            source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity: '0.4928'
+        activity_as_printed: '0.4928'
+        x_Mg_in_Sn_as_printed: '0.001491'
+        T_K: '1873'
+        T_C: '1599.85'
+        sample_id: guo22_table3_row_4
+        method_as_printed: Activity reduced from measured x[Mg] in molten Sn by the reference-slag relation
+          in Equation (6).
+    context:
+    - observation_id: guo22_t2_reference_xmg_1773k
+      type: reference_slag_measurement
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '2'
+        row: 1773 K
+        column: average xref[Mg]
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '155'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Average of the three printed reference-slag xref[Mg] determinations.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1773'
+        reference_slag_as_printed: 45 % CaF2-55 % MgO
+        x_ref_Mg_in_Sn_as_printed: '0.001272'
+    - observation_id: guo22_t2_reference_xmg_1823k
+      type: reference_slag_measurement
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '2'
+        row: 1823 K
+        column: average xref[Mg]
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '156'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Average of the three printed reference-slag xref[Mg] determinations.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1823'
+        reference_slag_as_printed: 45 % CaF2-55 % MgO
+        x_ref_Mg_in_Sn_as_printed: '0.002473'
+    - observation_id: guo22_t2_reference_xmg_1873k
+      type: reference_slag_measurement
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '2'
+        row: 1873 K
+        column: average xref[Mg]
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '157'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Average of the three printed reference-slag xref[Mg] determinations.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1873'
+        reference_slag_as_printed: 45 % CaF2-55 % MgO
+        x_ref_Mg_in_Sn_as_printed: '0.003026'
+    - observation_id: guo22_table3_row_1_xmg_1773k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 1#
+        column: x[Mg] at 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '218'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1773'
+        x_Mg_in_Sn_as_printed: '0.000219'
+    - observation_id: guo22_table3_row_1_xmg_1823k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 1#
+        column: x[Mg] at 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '218'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1823'
+        x_Mg_in_Sn_as_printed: '0.000595'
+    - observation_id: guo22_table3_row_1_xmg_1873k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 1#
+        column: x[Mg] at 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '218'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1873'
+        x_Mg_in_Sn_as_printed: '0.000882'
+    - observation_id: guo22_table3_row_2_xmg_1773k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 2#
+        column: x[Mg] at 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '219'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1773'
+        x_Mg_in_Sn_as_printed: '0.000278'
+    - observation_id: guo22_table3_row_2_xmg_1823k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 2#
+        column: x[Mg] at 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '219'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1823'
+        x_Mg_in_Sn_as_printed: '0.000785'
+    - observation_id: guo22_table3_row_2_xmg_1873k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 2#
+        column: x[Mg] at 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '219'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1873'
+        x_Mg_in_Sn_as_printed: '0.001023'
+    - observation_id: guo22_table3_row_3_xmg_1773k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 3#
+        column: x[Mg] at 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '220'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1773'
+        x_Mg_in_Sn_as_printed: '0.000390'
+    - observation_id: guo22_table3_row_3_xmg_1823k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 3#
+        column: x[Mg] at 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '220'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1823'
+        x_Mg_in_Sn_as_printed: '0.000921'
+    - observation_id: guo22_table3_row_3_xmg_1873k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 3#
+        column: x[Mg] at 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '220'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1873'
+        x_Mg_in_Sn_as_printed: '0.001301'
+    - observation_id: guo22_table3_row_4_xmg_1773k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 4#
+        column: x[Mg] at 1773 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '221'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1773'
+        x_Mg_in_Sn_as_printed: '0.000502'
+    - observation_id: guo22_table3_row_4_xmg_1823k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 4#
+        column: x[Mg] at 1823 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '221'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1823'
+        x_Mg_in_Sn_as_printed: '0.001067'
+    - observation_id: guo22_table3_row_4_xmg_1873k
+      type: measured_activity_reduction_input
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 35
+        table: '3'
+        row: 4#
+        column: x[Mg] at 1873 K
+        source_path: text/guo-2022-cmas-mgo-activity-tin/pdftotext-layout.txt
+        line_range: '221'
+        source_sha256: 093d97a044671b84de3b0e32087e42fc5bfd8dd003f3e3e5400d743d74e56709
+        note: Measured Mg mole fraction in the molten Sn solvent.
+      units: mole fraction Mg in molten Sn
+      values:
+        T_K: '1873'
+        x_Mg_in_Sn_as_printed: '0.001491'

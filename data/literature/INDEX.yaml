@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 861
-  extracts: 854
+  sources: 863
+  extracts: 856
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 88
+  extracts_with_private_locators: 89
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 854
+  extracts_without_pdf: 856
   alias_groups_needing_resolution: 94
 gaps:
   pdfs_without_extract: []
@@ -201,6 +201,7 @@ gaps:
   - gibbons-1963-thesis-cas-slags-cas
   - gornerup-1996-cao-corner-liquidus
   - gorojovsky-wood-2026-sulfur-crustal
+  - gran-2011-thesis-high-basicity-cmas-liquidus
   - gran-sichen-2012-molten12-ladle-slag-liquidus
   - green-1971-apollo12-basalt-petrology
   - greig-1927-ajs-immiscibility-silicate-melts-part1
@@ -209,6 +210,7 @@ gaps:
   - gribchenkova-2017-al2o3-mgo
   - gronvold-sveen-1974-magnetite-high-temperature-cp
   - guo-2021-mgo-activity-cmas-slag
+  - guo-2022-cmas-mgo-activity-tin
   - habermann-daane-1964
   - hamuyuni-2016-copper-oxide-solubility-thesis-summary
   - hanson-jones-1998-am-cr-partitioning-olivine-liquid
@@ -894,6 +896,7 @@ gaps:
   - floss-1998-corundum-hibonite-evaporation-residues
   - fortin-2014-sulfur-saturation-natural-melts-thesis
   - georges-2000-potassium-evaporation-thesis
+  - guo-2022-cmas-mgo-activity-tin
   - itoh-hino-banya-1998-spinel
   - jgr-p-2024-mars-sam-clay-sulfate-ega
   - jsc-a16-special-samples
@@ -12347,6 +12350,64 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: gran-2011-thesis-high-basicity-cmas-liquidus
+  aliases: []
+  citation: Gran, J. (2011). Some Fundamental Aspects Concerning Secondary Steelmaking. Doctoral thesis,
+    Royal Institute of Technology (KTH).
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/gran-2011-thesis-high-basicity-cmas-liquidus.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gran-2011-thesis-high-basicity-cmas-liquidus/gran-2011-thesis-high-basicity-cmas-liquidus.pdf
+      present: true
+      sha256: 17d30fc1ec3175eba336bab4c8f4e6ee730be20fdef82f35dfa7a227d30c081a
+      matches_simulator: null
+    sidecar:
+      path: raw/gran-2011-thesis-high-basicity-cmas-liquidus/sidecar.yaml
+      present: true
+    text:
+      path: text/gran-2011-thesis-high-basicity-cmas-liquidus
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/gran-2011-thesis-high-basicity-cmas-liquidus
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gran-2011-thesis-high-basicity-cmas-liquidus.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gran-2011-thesis-high-basicity-cmas-liquidus.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
   aliases: []
   citation: Jimmy Gran and Du Sichen (2012), "Experimental study on the liquidus of ladle slags", Ninth
@@ -12812,6 +12873,65 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: guo-2022-cmas-mgo-activity-tin
+  aliases: []
+  citation: Guo, Y., Shen, F., Zheng, H., Wang, S., Jiang, X. and Gao, Q. (2022), “Effect of temperature
+    on MgO activity in the CaO-SiO2-MgO-Al2O3 system”, Materiali in tehnologije 56(1), 33–38.
+  doi: 10.17222/mit.2021.262
+  report_number: null
+  identifier: 10.17222/mit.2021.262
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/guo-2022-cmas-mgo-activity-tin.yaml
+    review_status: draft
+    rows: 12
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/guo-2022-cmas-mgo-activity-tin/guo-2022-cmas-mgo-activity-tin.pdf
+      present: true
+      sha256: c17a271673e773127b2a9fa319249b40568370145171a65c77ea168b9381e3c8
+      matches_simulator: null
+    sidecar:
+      path: raw/guo-2022-cmas-mgo-activity-tin/sidecar.yaml
+      present: true
+    text:
+      path: text/guo-2022-cmas-mgo-activity-tin
+      exists: true
+      file_count: 38
+    tables:
+      path: tables/guo-2022-cmas-mgo-activity-tin
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/guo-2022-cmas-mgo-activity-tin.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/guo-2022-cmas-mgo-activity-tin.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: habermann-daane-1964
   aliases: []
   citation: Habermann & Daane, J. Chem. Phys. 41 (1964) 2818–2827

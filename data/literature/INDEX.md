@@ -15,14 +15,14 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 861
-- Extracts (`literature_extract.v1`): 854
+- Sources: 863
+- Extracts (`literature_extract.v1`): 856
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 854
+- Extracts with no PDF: 856
 - Alias groups needing owner/controller resolution: 94
-- Extracts with private/non-public row locators: 88
+- Extracts with private/non-public row locators: 89
 
 ## Sources
 
@@ -210,6 +210,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `gibbons-1963-thesis-cas-slags-cas` | T. B. Gibbons, A study of the thermodynamics of lime/alumina/silica slags containing calcium sulphide, PhD thesis, University of Glasgow, January 1963. |  | ABSENT, `` | `raw/gibbons-1963-thesis-cas-slags-cas/gibbons-1963-thesis-cas-slags-cas.pdf` (present, 21ef98f5); `text/gibbons-1963-thesis-cas-slags-cas/` (92 files, exists); `tables/gibbons-1963-thesis-cas-slags-cas/` (0 files, ABSENT) | `data/literature/extracts/gibbons-1963-thesis-cas-slags-cas.yaml` (6 rows, draft) | `ledger/gibbons-1963-thesis-cas-slags-cas.yaml`: acquired (2026-10-04) |
 | `gornerup-1996-cao-corner-liquidus` | M. Görnerup and O. Wijk, "Liquidus Relationships in the CaO-corner of the Ternary System CaO-Al2O3-SiO2", ISIJ International, 36(12) (1996), 1465-1470. |  | ABSENT, `` | `raw/gornerup-1996-cao-corner-liquidus/gornerup-1996-cao-corner-liquidus.pdf` (present, 32751b05); `text/gornerup-1996-cao-corner-liquidus/` (22 files, exists); `tables/gornerup-1996-cao-corner-liquidus/` (2 files, exists) | `data/literature/extracts/gornerup-1996-cao-corner-liquidus.yaml` (39 rows, draft) | `ledger/gornerup-1996-cao-corner-liquidus.yaml`: extracted (2026-10-04) |
 | `gorojovsky-wood-2026-sulfur-crustal` | Gorojovsky, L. R., and Wood, B. J. (2026), “Solubility and speciation of sulfur in silicate melts under crustal conditions,” Earth and Planetary Science Letters 687:120088. DOI: 10.1016/j.epsl.2026.120088. PDF is the v2 preprint submitted to EPSL. | 10.1016/j.epsl.2026.120088 | ABSENT, `` | `raw/gorojovsky-wood-2026-sulfur-crustal/gorojovsky-wood-2026-sulfur-crustal.pdf` (present, 636148c2); `text/gorojovsky-wood-2026-sulfur-crustal/` (43 files, exists); `tables/gorojovsky-wood-2026-sulfur-crustal/` (0 files, ABSENT) | `data/literature/extracts/gorojovsky-wood-2026-sulfur-crustal.yaml` (983 rows, draft) | `ledger/gorojovsky-wood-2026-sulfur-crustal.yaml`: — (—) |
+| `gran-2011-thesis-high-basicity-cmas-liquidus` | Gran, J. (2011). Some Fundamental Aspects Concerning Secondary Steelmaking. Doctoral thesis, Royal Institute of Technology (KTH). |  | ABSENT, `` | `raw/gran-2011-thesis-high-basicity-cmas-liquidus/gran-2011-thesis-high-basicity-cmas-liquidus.pdf` (present, 17d30fc1); `text/gran-2011-thesis-high-basicity-cmas-liquidus/` (0 files, ABSENT); `tables/gran-2011-thesis-high-basicity-cmas-liquidus/` (0 files, ABSENT) | `data/literature/extracts/gran-2011-thesis-high-basicity-cmas-liquidus.yaml` (0 rows, draft) | `ledger/gran-2011-thesis-high-basicity-cmas-liquidus.yaml`: — (—) |
 | `gran-sichen-2012-molten12-ladle-slag-liquidus` | Jimmy Gran and Du Sichen (2012), "Experimental study on the liquidus of ladle slags", Ninth International Conference on Molten Slags, Fluxes and Salts (MOLTEN12), paper W170. |  | ABSENT, `` | `raw/gran-sichen-2012-molten12-ladle-slag-liquidus/gran-sichen-2012-molten12-ladle-slag-liquidus.pdf` (present, bd7115d7); `text/gran-sichen-2012-molten12-ladle-slag-liquidus/` (43 files, exists); `tables/gran-sichen-2012-molten12-ladle-slag-liquidus/` (8 files, exists) | `data/literature/extracts/gran-sichen-2012-molten12-ladle-slag-liquidus.yaml` (219 rows, draft) | `ledger/gran-sichen-2012-molten12-ladle-slag-liquidus.yaml`: extracted (2026-10-05) |
 | `green-1971-apollo12-basalt-petrology` | Green, D. H., Ringwood, A. E., Ware, N. G., Hibberson, W. O., Major, A. & Kiss, E. (1971), "Experimental petrology and petrogenesis of Apollo 12 basalts", Proceedings of the Second Lunar Science Conference, Vol. 1, pp. 601–615. The M.I.T. Press. |  | ABSENT, `` | `raw/green-1971-apollo12-basalt-petrology/green-1971-apollo12-basalt-petrology.pdf` (present, 9a8e44f5); `text/green-1971-apollo12-basalt-petrology/` (32 files, exists); `tables/green-1971-apollo12-basalt-petrology/` (10 files, exists) | `data/literature/extracts/green-1971-apollo12-basalt-petrology.yaml` (6 rows, draft) | `ledger/green-1971-apollo12-basalt-petrology.yaml`: extracted (2026-10-03) |
 | `greig-1927-ajs-immiscibility-silicate-melts-part1` | J. W. Greig, "Immiscibility in Silicate Melts" (Part I), American Journal of Science, 5th series, Vol. XIII, No. 73, pp. 1-44 (January 1927). | 10.2475/ajs.s5-13.73.1 | ABSENT, `` | `raw/greig-1927-ajs-immiscibility-silicate-melts-part1/greig-1927-ajs-immiscibility-silicate-melts-part1.pdf` (present, 125554c3); `text/greig-1927-ajs-immiscibility-silicate-melts-part1/` (86 files, exists); `tables/greig-1927-ajs-immiscibility-silicate-melts-part1/` (29 files, exists) | `data/literature/extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml` (7 rows, draft) | `ledger/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml`: extracted (2026-10-05) |
@@ -218,6 +219,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `gribchenkova-2017-al2o3-mgo` | Gribchenkova N. A., Smorchkov K. G., Kolmakov A. G. and Alikhanyan A. S. (2017). Vaporization in the Al2O3–MgO System. Inorganic Materials 53(5):514–518. | 10.1134/S0020168517050077 | ABSENT, `` | `raw/gribchenkova-2017-al2o3-mgo/gribchenkova-2017-al2o3-mgo.pdf` (present, 32e839cf); `text/gribchenkova-2017-al2o3-mgo/` (1 files, exists); `tables/gribchenkova-2017-al2o3-mgo/` (0 files, ABSENT) | `data/literature/extracts/gribchenkova-2017-al2o3-mgo.yaml` (3 rows, draft) | `ledger/gribchenkova-2017-al2o3-mgo.yaml`: — (—) |
 | `gronvold-sveen-1974-magnetite-high-temperature-cp` | Grønvold, F. and Sveen, A. (1974), “Heat capacity and thermodynamic properties of synthetic magnetite (Fe3O4) from 300 to 1050 K”, Journal of Chemical Thermodynamics 6, 859–872. | 10.1016/0021-9614(74)90230-4 | ABSENT, `` | `raw/gronvold-sveen-1974-magnetite-high-temperature-cp/gronvold-sveen-1974-magnetite-high-temperature-cp.pdf` (present, f1cfef87); `text/gronvold-sveen-1974-magnetite-high-temperature-cp/` (23 files, exists); `tables/gronvold-sveen-1974-magnetite-high-temperature-cp/` (0 files, ABSENT) | `data/literature/extracts/gronvold-sveen-1974-magnetite-high-temperature-cp.yaml` (15 rows, draft) | `ledger/gronvold-sveen-1974-magnetite-high-temperature-cp.yaml`: — (—) |
 | `guo-2021-mgo-activity-cmas-slag` | Guo, Y., Shen, F., Zheng, H., Wang, S., Jiang, X. and Gao, Q. (2021), "Activity of MgO in CaO–SiO2–MgO–Al2O3 Melts for Blast Furnace Slag at 1873 K", ISIJ International 61(11), 2724–2730. | 10.2355/isijinternational.ISIJINT-2021-224 | ABSENT, `` | `raw/guo-2021-mgo-activity-cmas-slag/guo-2021-mgo-activity-cmas-slag.pdf` (present, 5150f1d2); `text/guo-2021-mgo-activity-cmas-slag/` (37 files, exists); `tables/guo-2021-mgo-activity-cmas-slag/` (12 files, exists) | `data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml` (1 rows, draft) | `ledger/guo-2021-mgo-activity-cmas-slag.yaml`: extracted (2026-10-05) |
+| `guo-2022-cmas-mgo-activity-tin` | Guo, Y., Shen, F., Zheng, H., Wang, S., Jiang, X. and Gao, Q. (2022), “Effect of temperature on MgO activity in the CaO-SiO2-MgO-Al2O3 system”, Materiali in tehnologije 56(1), 33–38. | 10.17222/mit.2021.262 | ABSENT, `` | `raw/guo-2022-cmas-mgo-activity-tin/guo-2022-cmas-mgo-activity-tin.pdf` (present, c17a2716); `text/guo-2022-cmas-mgo-activity-tin/` (38 files, exists); `tables/guo-2022-cmas-mgo-activity-tin/` (0 files, ABSENT) | `data/literature/extracts/guo-2022-cmas-mgo-activity-tin.yaml` (12 rows, draft, private_path) | `ledger/guo-2022-cmas-mgo-activity-tin.yaml`: — (—) |
 | `habermann-daane-1964` | Habermann & Daane, J. Chem. Phys. 41 (1964) 2818–2827 |  | ABSENT, `` | `raw/habermann-daane-1964/habermann-daane-1964.pdf` (ABSENT, ); `text/habermann-daane-1964/` (0 files, ABSENT); `tables/habermann-daane-1964/` (0 files, ABSENT) | `data/literature/extracts/habermann-daane-1964.yaml` (2 rows, draft) | `ledger/habermann-daane-1964.yaml`: extracted (2026-09-06) |
 | `hamuyuni-2016-copper-oxide-solubility-thesis-summary` | Hamuyuni, Joseph (2016). Solubility of high melting temperature oxides (CaO, Al2O3, Cr2O3) in copper oxide liquid. Aalto University Doctoral Dissertation 145/2016. Public thesis summary; the appendices containing the four journal papers are absent. |  | ABSENT, `` | `raw/hamuyuni-2016-copper-oxide-solubility-thesis-summary/hamuyuni-2016-copper-oxide-solubility-thesis-summary.pdf` (present, 6e758f90); `text/hamuyuni-2016-copper-oxide-solubility-thesis-summary/` (17 files, exists); `tables/hamuyuni-2016-copper-oxide-solubility-thesis-summary/` (0 files, ABSENT) | `data/literature/extracts/hamuyuni-2016-copper-oxide-solubility-thesis-summary.yaml` (0 rows, draft) | `ledger/hamuyuni-2016-copper-oxide-solubility-thesis-summary.yaml`: — (—) |
 | `hanson-jones-1998-am-cr-partitioning-olivine-liquid` | Hanson, B. & Jones, J. H. (1998), “The systematics of Cr3+ and Cr2+ partitioning between olivine and liquid in the presence of spinel”, American Mineralogist 83, 669–684. |  | ABSENT, `` | `raw/hanson-jones-1998-am-cr-partitioning-olivine-liquid/hanson-jones-1998-am-cr-partitioning-olivine-liquid.pdf` (present, 0678855f); `text/hanson-jones-1998-am-cr-partitioning-olivine-liquid/` (2 files, exists); `tables/hanson-jones-1998-am-cr-partitioning-olivine-liquid/` (0 files, ABSENT) | `data/literature/extracts/hanson-jones-1998-am-cr-partitioning-olivine-liquid.yaml` (98 rows, draft) | `ledger/hanson-jones-1998-am-cr-partitioning-olivine-liquid.yaml`: — (—) |
@@ -1077,6 +1079,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `gibbons-1963-thesis-cas-slags-cas`
 - `gornerup-1996-cao-corner-liquidus`
 - `gorojovsky-wood-2026-sulfur-crustal`
+- `gran-2011-thesis-high-basicity-cmas-liquidus`
 - `gran-sichen-2012-molten12-ladle-slag-liquidus`
 - `green-1971-apollo12-basalt-petrology`
 - `greig-1927-ajs-immiscibility-silicate-melts-part1`
@@ -1085,6 +1088,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `gribchenkova-2017-al2o3-mgo`
 - `gronvold-sveen-1974-magnetite-high-temperature-cp`
 - `guo-2021-mgo-activity-cmas-slag`
+- `guo-2022-cmas-mgo-activity-tin`
 - `habermann-daane-1964`
 - `hamuyuni-2016-copper-oxide-solubility-thesis-summary`
 - `hanson-jones-1998-am-cr-partitioning-olivine-liquid`
@@ -1771,6 +1775,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `floss-1998-corundum-hibonite-evaporation-residues`
 - `fortin-2014-sulfur-saturation-natural-melts-thesis`
 - `georges-2000-potassium-evaporation-thesis`
+- `guo-2022-cmas-mgo-activity-tin`
 - `itoh-hino-banya-1998-spinel`
 - `jgr-p-2024-mars-sam-clay-sulfate-ega`
 - `jsc-a16-special-samples`
