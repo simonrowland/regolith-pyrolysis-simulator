@@ -690,6 +690,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
+    species_params: tuple[float, float, float] | None = None,
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
@@ -847,15 +848,15 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             raise EvaporationFluxConfigurationError(
                 "gas resistance requires positive overhead_pressure_pa"
             )
-        proxy_molar_mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(species)
-        species_params = None
-        if proxy_molar_mass is not None:
-            sio_sigma, sio_epsilon, _sio_molar_mass = _LENNARD_JONES_PARAMS["SiO"]
-            species_params = (
-                sio_sigma,
-                sio_epsilon,
-                proxy_molar_mass,
-            )
+        if species_params is None:
+            proxy_molar_mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(species)
+            if proxy_molar_mass is not None:
+                sio_sigma, sio_epsilon, _sio_molar_mass = _LENNARD_JONES_PARAMS["SiO"]
+                species_params = (
+                    sio_sigma,
+                    sio_epsilon,
+                    proxy_molar_mass,
+                )
         d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
             species,
             max(effective_T_gas_K, 1.0),
@@ -1610,6 +1611,11 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("hkl_upper_bound_transport_species", ()) or ()
             )
         )
+        estimated_transport_by_species = controls.get(
+            "estimated_lennard_jones_params_by_species", {}
+        )
+        if not isinstance(estimated_transport_by_species, Mapping):
+            estimated_transport_by_species = {}
         from simulator.chemistry.langmuir_knudsen import (
             hertz_knudsen_k_kg_s_m2_pa,
         )
@@ -1914,6 +1920,14 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 flux_uncertainty_pct[species] = uncertainty_pct
 
             try:
+                estimated_transport = estimated_transport_by_species.get(species)
+                species_transport_params = None
+                if isinstance(estimated_transport, Mapping):
+                    species_transport_params = (
+                        float(estimated_transport["sigma_angstrom"]),
+                        float(estimated_transport["epsilon_over_k_K"]),
+                        M_kg_mol * 1000.0,
+                    )
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                     species=species,
                     P_eq_pa=P_eq_Pa,
@@ -1933,6 +1947,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     extrapolate_continuum=continuum_extrapolation is not None,
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
+                    species_params=species_transport_params,
                 )
             except EvaporationFluxConfigurationError as exc:
                 missing_transport_parameters[species] = {

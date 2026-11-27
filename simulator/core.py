@@ -7949,6 +7949,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.chemistry.kernel.dto import IntentRequest
         from simulator.evaporation import (
             _append_capacity_solve_exclusion_notice,
+            EvaporationFluxRefusal,
+            EvaporationMixin,
             _provider_resolved_flux_species,
             _provider_flux_outcome_refusal,
             _record_unavailable_provider_flux_channels,
@@ -8217,6 +8219,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         rates_cache = {}
 
+        class _RestartCapacitySolve(RuntimeError):
+            pass
+
         def flux_at_partials(partials_Pa):
             nonlocal capacity_bound_notice, capacity_flux_overlay
             cache_key = tuple(sorted(
@@ -8247,12 +8252,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if reclosed is not None:
                 reclosed_pressures = {
-                    species: float(
-                        reclosed.pressures_Pa.get(species, 0.0)
-                    )
-                    for species in flux_species
+                    str(species): float(pressure)
+                    for species, pressure in reclosed.pressures_Pa.items()
+                    if str(species) in flux_species
                 }
-                EvaporationMixin._record_langmuir_refusal_notices(
+                closure_failures = EvaporationMixin._record_langmuir_refusal_notices(
                     self,
                     iteration_overlay,
                     reclosed,
@@ -8265,6 +8269,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     surface=reclosed,
                     overhead_partials_Pa=partials_Pa,
                 )
+                trial_states = iteration_overlay.get(
+                    'batch_channel_states', {}
+                )
+                closure_failures = {
+                    species: reason
+                    for species, reason in closure_failures.items()
+                    if not (
+                        isinstance(trial_states, Mapping)
+                        and trial_states.get(species) == 'zero_by_physics'
+                    )
+                }
                 trial_outcome = EvaporationMixin._vapour_batch_resolution_outcome(
                     self,
                     {},
@@ -8282,9 +8297,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ),
                     temperature_K=temperature_K,
                 )
+                trial_resolved_species = trial_outcome.resolved_species
+                if closure_failures:
+                    _append_capacity_solve_exclusion_notice(
+                        self,
+                        iteration_overlay,
+                        resolved_species=trial_resolved_species,
+                    )
+                    hour_cache = getattr(
+                        self, '_vapour_batch_hour_availability', None
+                    )
+                    restart_used = bool(
+                        isinstance(hour_cache, Mapping)
+                        and hour_cache.get('closure_restart_used')
+                    )
+                    if restart_used:
+                        raise EvaporationFluxRefusal(
+                            'capacity_member_closure_failure',
+                            {
+                                'reason': 'capacity_member_closure_failure',
+                                'closure_failures': dict(closure_failures),
+                                'vapour_batch_flux_overlay': iteration_overlay,
+                                'bound_direction': {
+                                    'resolved_fluxes': 'upper',
+                                    'headspace_pressure': 'lower',
+                                },
+                            },
+                        )
+                    EvaporationMixin._classify_hour_vapour_availability(
+                        self,
+                        equilibrium,
+                        batch_flux_pressures,
+                        iteration_overlay,
+                        {},
+                        observed_unavailable_by_species=closure_failures,
+                    )
+                    hour_cache = getattr(
+                        self, '_vapour_batch_hour_availability', None
+                    )
+                    if isinstance(hour_cache, dict):
+                        hour_cache['closure_restart_used'] = True
+                    raise _RestartCapacitySolve(
+                        'Picard closure member became unavailable'
+                    )
                 if trial_outcome.refusal is not None:
                     raise trial_outcome.refusal
-                trial_resolved_species = trial_outcome.resolved_species
                 iteration_flux_pressures = reclosed_pressures
                 owns_oxygen_drive = bool(
                     reclosed.applied and reclosed.surface_pO2_bar is not None
@@ -8454,6 +8511,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     }
                 ),
             )
+        except _RestartCapacitySolve:
+            return self._compute_capacity_coupling_shadow_impl(equilibrium)
         finally:
             assert self.atom_ledger.mol_by_account() == ledger_before
             assert len(self.atom_ledger.transitions) == transition_count_before
@@ -17044,9 +17103,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         capacity_result = None
         if evaporation_campaign:
+            try:
+                inspect.getattr_static(equilibrium, 'vapor_pressures_Pa')
+            except AttributeError:
+                has_static_vapor_pressures = False
+            else:
+                has_static_vapor_pressures = True
             if (
                 self._overhead_headspace_enabled()
-                and hasattr(equilibrium, 'vapor_pressures_Pa')
+                and has_static_vapor_pressures
             ):
                 from simulator.capacity_coupling import (
                     CapacityCouplingRefusalError,

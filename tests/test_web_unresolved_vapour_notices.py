@@ -10,7 +10,7 @@ NOTICE = {
     "kind": "vapour_batch_unresolved",
     "species": "Fe",
     "hour": 4,
-    "reason": "surface closure refusal",
+    "reason": "missing_transport_parameters_possible_continuum",
 }
 CAPACITY_BOUND = {
     "kind": "capacity_solve_excludes_unavailable_species",
@@ -24,22 +24,34 @@ CAPACITY_BOUND = {
         "headspace_pressure": "lower",
     },
 }
+TRANSPORT_ESTIMATE = {
+    "kind": "transport_parameters_estimated",
+    "species": "Fe",
+    "method": "bsl_boiling_point",
+    "sigma_angstrom": 3.5,
+    "epsilon_over_k_K": 120.0,
+    "inputs": {
+        "boiling_molar_volume_cm3_mol": 25.0,
+        "boiling_point_C": 100.0,
+        "normal_boiling_point_K": 373.15,
+    },
+}
 
 
 def _render_notice_summaries(
     shared_summary: str | None = None,
-) -> tuple[str, str, str, str]:
+) -> tuple[str, str, str, str, str, str]:
     payload = {
         "status": "ok",
         "tick_view": "full",
         "n_requested": 1,
         "n_flux_active": 0,
         "n_refused": 1,
-        "flux_overlay": {"notices": [NOTICE, CAPACITY_BOUND]},
+        "flux_overlay": {"notices": [NOTICE, CAPACITY_BOUND, TRANSPORT_ESTIMATE]},
         "vapour_rail_instrumentation": {
             "schema": "vapour_rail_instrumentation.v1",
             "vapour_batch": {"n_flux_active": 0, "n_requested": 1, "n_refused": 1},
-            "flux_overlay": {"notices": [NOTICE, CAPACITY_BOUND]},
+            "flux_overlay": {"notices": [NOTICE, CAPACITY_BOUND, TRANSPORT_ESTIMATE]},
         },
         "condensation_refusals_by_species": {},
         "shared_summary_mutation": shared_summary,
@@ -90,16 +102,20 @@ context.__terminal = payload.vapour_rail_instrumentation
 const reportHtml = vm.runInContext("vapourRailSection(__terminal)", context);
 const reportMatch = reportHtml.match(/<span>Unavailable vapour flux<\/span><b>(.*?)<\/b>/);
 const reportBoundMatch = reportHtml.match(/<span>Capacity coupling bound<\/span><b>(.*?)<\/b>/);
+const reportEstimateMatch = reportHtml.match(/<span>Estimated transport parameters<\/span><b>(.*?)<\/b>/);
 vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
 context.renderVapourRailInstrumentationPanel(payload);
 const liveLines = document.getElementById("vapour-rail-instrumentation-content").children;
 const liveLine = liveLines.find((line) => line.textContent.startsWith("Unavailable vapour flux: "));
 const liveBoundLine = liveLines.find((line) => line.textContent.startsWith("Capacity coupling bound: "));
+const liveEstimateLine = liveLines.find((line) => line.textContent.startsWith("Estimated transport parameters: "));
 process.stdout.write(JSON.stringify({
   report: reportMatch && reportMatch[1],
   live: liveLine && liveLine.textContent.slice("Unavailable vapour flux: ".length),
   report_bound: reportBoundMatch && reportBoundMatch[1],
-  live_bound: liveBoundLine && liveBoundLine.textContent.slice("Capacity coupling bound: ".length)
+  live_bound: liveBoundLine && liveBoundLine.textContent.slice("Capacity coupling bound: ".length),
+  report_estimate: reportEstimateMatch && reportEstimateMatch[1],
+  live_estimate: liveEstimateLine && liveEstimateLine.textContent.slice("Estimated transport parameters: ".length)
 }));
 """
     completed = subprocess.run(
@@ -121,14 +137,21 @@ process.stdout.write(JSON.stringify({
         rendered["report"],
         rendered["live_bound"],
         rendered["report_bound"],
+        rendered["live_estimate"],
+        rendered["report_estimate"],
     )
 
 
 def test_unresolved_vapour_notice_summary_is_pinned_across_surfaces() -> None:
-    expected = "Fe, hour 4: surface closure refusal"
+    expected = "Fe, hour 4: missing_transport_parameters_possible_continuum"
     expected_bound = (
         "Si: missing Chapman-Enskog transport data; resolved fluxes upper; "
         "headspace pressure lower"
+    )
+    expected_estimate = (
+        "Fe: bsl_boiling_point; sigma 3.5 Å; epsilon/k 120 K; inputs "
+        "boiling_molar_volume_cm3_mol=25, boiling_point_C=100, "
+        "normal_boiling_point_K=373.15"
     )
 
     assert _render_notice_summaries() == (
@@ -136,6 +159,8 @@ def test_unresolved_vapour_notice_summary_is_pinned_across_surfaces() -> None:
         expected,
         expected_bound,
         expected_bound,
+        expected_estimate,
+        expected_estimate,
     )
 
 
@@ -145,12 +170,19 @@ def test_live_and_frozen_consumers_use_the_shared_notice_formatter() -> None:
         "Si: missing Chapman-Enskog transport data; resolved fluxes upper; "
         "headspace pressure lower"
     )
+    expected_estimate = (
+        "Fe: bsl_boiling_point; sigma 3.5 Å; epsilon/k 120 K; inputs "
+        "boiling_molar_volume_cm3_mol=25, boiling_point_C=100, "
+        "normal_boiling_point_K=373.15"
+    )
 
     assert _render_notice_summaries(marker) == (
         marker,
         marker,
         expected_bound,
         expected_bound,
+        expected_estimate,
+        expected_estimate,
     )
 
 

@@ -8,6 +8,7 @@ const {
   stageMassQualifier,
   unresolvedVapourNoticeSummary,
   capacitySolveBoundSummary,
+  estimatedTransportParametersSummary,
   esc
 } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
@@ -462,6 +463,10 @@ function vapourRailSection(terminal) {
     overlay.notices,
     "not reported"
   );
+  const estimatedTransportSummary = estimatedTransportParametersSummary(
+    overlay.notices,
+    "not reported"
+  );
   const vrCard = instrumentation
     ? `<div class="card"><div class="ct">Vapour batch · channel authority</div>` +
       `<div class="cbig">${esc(String(batch.n_flux_active ?? "n/a"))} <small>flux-active</small></div>` +
@@ -473,6 +478,7 @@ function vapourRailSection(terminal) {
       `<div class="kv"><span>Catalog Pa shadow outcome</span><b class="mono">${esc(String(catalogOutcome))}</b></div>` +
       `<div class="kv"><span>Unavailable vapour flux</span><b>${esc(unresolvedNoticeSummary)}</b></div>` +
       `<div class="kv"><span>Capacity coupling bound</span><b>${esc(capacityBoundSummary)}</b></div>` +
+      `<div class="kv"><span>Estimated transport parameters</span><b>${esc(estimatedTransportSummary)}</b></div>` +
       `</div>`
     : pending("VR-11", "terminal.vapour_rail_instrumentation was not emitted.");
   let refusalBody;

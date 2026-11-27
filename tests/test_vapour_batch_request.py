@@ -768,7 +768,7 @@ def test_missing_cleanup_context_is_refused_not_dormant(phase, stage):
     answer = result.answers["PO"]
     assert answer.is_refused
     assert answer.extra["applicability_evidence"]["active"] is False
-    assert _channel_flux_gate_state(answer) == REFUSAL_INAPPLICABLE_PREDICATE
+    assert _channel_flux_gate_state(answer) == "refusal"
 
 
 # ---------------------------------------------------------------------------

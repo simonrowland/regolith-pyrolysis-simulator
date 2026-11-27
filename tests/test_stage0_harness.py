@@ -164,7 +164,10 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     assert carriers <= set(channel_states)
     from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
 
-    assert channel_states["P2O5_gas"] == REFUSAL_INAPPLICABLE_PREDICATE
+    assert channel_states["P2O5_gas"] == "refusal"
+    assert flux_overlay["batch_channel_refusal_codes"]["P2O5_gas"] == (
+        REFUSAL_INAPPLICABLE_PREDICATE
+    )
     assert "P2O5_gas" not in flux_overlay["batch_pa_by_species"]
     assert {species: channel_states[species] for species in carriers} == {
         species: "eligible" for species in carriers

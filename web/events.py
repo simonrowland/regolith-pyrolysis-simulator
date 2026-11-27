@@ -482,6 +482,10 @@ _REFUSAL_EXPLANATIONS = {
     'vapour_batch_resolution_error': (
         'Vapour-batch resolution failed without a more specific typed reason.'
     ),
+    'capacity_member_closure_failure': (
+        'A frozen capacity member failed Langmuir closure after the single '
+        'restart that excludes it, so the hour was refused.'
+    ),
     'interpolated_equilibrium_not_flux_eligible': (
         'A cached interpolated equilibrium is available to non-flux consumers, '
         'but it cannot supply evaporation pressure; the flux channel is unavailable.'

@@ -927,19 +927,6 @@ def _channel_flux_gate_state(answer: VapourAnswer) -> str:
     if answer.extra.get("applicability_evidence", {}).get("flux_dormant") is True:
         return "dormant_by_epoch"
     if isinstance(pressure, PressureRefusal) or isinstance(flux, FluxRefusal):
-        if (
-            getattr(answer, "refusal_code", None)
-            == REFUSAL_INAPPLICABLE_PREDICATE
-            or (
-                isinstance(pressure, PressureRefusal)
-                and pressure.code == REFUSAL_INAPPLICABLE_PREDICATE
-            )
-            or (
-                isinstance(flux, FluxRefusal)
-                and flux.code == REFUSAL_INAPPLICABLE_PREDICATE
-            )
-        ):
-            return REFUSAL_INAPPLICABLE_PREDICATE
         return "refusal"
     if isinstance(flux, FluxDiagnosticUpperBound) or isinstance(
         pressure, PressureUpperBound
@@ -950,6 +937,21 @@ def _channel_flux_gate_state(answer: VapourAnswer) -> str:
     if isinstance(pressure, PressureValue) and isinstance(flux, FluxEligible):
         return "eligible"
     return "incomplete_channel"
+
+
+def _channel_is_typed_non_debit(
+    state: object,
+    refusal_code: object = None,
+) -> bool:
+    """Keep the public ``refusal`` tag while recognizing its typed non-debit."""
+
+    return (
+        state in {"zero_by_physics", "upper_bound", "dormant_by_epoch"}
+        or (
+            state == "refusal"
+            and refusal_code == REFUSAL_INAPPLICABLE_PREDICATE
+        )
+    )
 
 
 def _channel_flux_pressure_pa(
@@ -1162,6 +1164,7 @@ def flux_pressures_from_batch(
         "n_extrapolated_flux_species": 0,
         "extrapolated_flux_species": [],
         "batch_channel_states": {},
+        "batch_channel_refusal_codes": {},
         "unresolved_missing_effective_pressure_species": [],
         "note": (
             "VapourBatch owns channel refusal, eligibility, and the active set; "
@@ -1230,6 +1233,7 @@ def flux_pressures_from_batch(
     selected_pressure_source_by_species: dict[str, str] = {}
     extrapolated_flux_species: list[str] = []
     channel_states: dict[str, str] = {}
+    refusal_codes: dict[str, str] = {}
     missing_channel_keys: list[str] = []
 
     for species_id in sorted(batch.requested_species_ids):
@@ -1244,6 +1248,14 @@ def flux_pressures_from_batch(
             if math.isfinite(catalog_pa):
                 batch_pa_by_species[species_id] = catalog_pa
         gate_state = _channel_flux_gate_state(answer)
+        refusal_code = getattr(answer, "refusal_code", None)
+        if refusal_code is None:
+            refusal_code = (
+                getattr(answer.pressure, "code", None)
+                or getattr(answer.flux, "code", None)
+            )
+        if gate_state == "refusal" and refusal_code is not None:
+            refusal_codes[species_id] = str(refusal_code)
         if gate_state == "eligible" and species_id not in batch_active_species_ids:
             channel_states[species_id] = "dormant_by_epoch"
             continue
@@ -1277,6 +1289,7 @@ def flux_pressures_from_batch(
         # refusal / upper_bound / nonfinite / dormant eligible: no debit
 
     report["batch_channel_states"] = channel_states
+    report["batch_channel_refusal_codes"] = refusal_codes
     report["batch_pa_by_species"] = batch_pa_by_species
     report["selected_runtime_pa_by_species"] = selected_runtime_pa_by_species
     report["selected_pressure_source_by_species"] = (

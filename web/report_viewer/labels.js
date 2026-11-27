@@ -192,6 +192,29 @@
     return flags.length ? flags.join("; ") : "none";
   }
 
+  function estimatedTransportParametersSummary(notices, missing = "not reported") {
+    if (!Array.isArray(notices)) return missing;
+    const estimates = notices
+      .filter((notice) => notice && notice.kind === "transport_parameters_estimated")
+      .map((notice) => {
+        const species = notice.species || "unknown species";
+        const method = notice.method || "method not reported";
+        const sigma = Number.isFinite(notice.sigma_angstrom)
+          ? `${notice.sigma_angstrom} Å`
+          : "not reported";
+        const epsilon = Number.isFinite(notice.epsilon_over_k_K)
+          ? `${notice.epsilon_over_k_K} K`
+          : "not reported";
+        const inputs = notice.inputs && typeof notice.inputs === "object"
+          ? Object.entries(notice.inputs)
+              .map(([key, value]) => `${key}=${String(value)}`)
+              .join(", ")
+          : "inputs not reported";
+        return `${species}: ${method}; sigma ${sigma}; epsilon/k ${epsilon}; inputs ${inputs}`;
+      });
+    return estimates.length ? estimates.join("; ") : "none";
+  }
+
   // One stable species colour grammar for every panel (bars, ribbons, chips, stage fills).
   // Keyed by the token's LEAD element so a family shares a hue (Fe/FeO/FeSi, Si/SiO/SiO2, Na/Na2O…);
   // mid-lightness hues chosen to stay legible on both themes. Unlisted species get a deterministic
@@ -227,6 +250,7 @@
     scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock,
     prettyChemText, speciesColor, hasNumber, exactValue, isHashLike,
     priceAuthority, priceAuthorityNote, stageMassQualifier,
-    unresolvedVapourNoticeSummary, capacitySolveBoundSummary, esc
+    unresolvedVapourNoticeSummary, capacitySolveBoundSummary,
+    estimatedTransportParametersSummary, esc
   });
 }(globalThis));

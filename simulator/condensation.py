@@ -317,6 +317,80 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
 }
 
+
+def _estimate_lennard_jones_parameters(
+    species: str,
+    row: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Estimate sigma/epsilon from declared boiling or critical inputs.
+
+    Premise and source: when a species lacks a tabulated Lennard-Jones row,
+    Bird, Stewart & Lightfoot, *Transport Phenomena*, 2nd ed., gives the
+    corresponding-states estimates sigma = 1.18 V_b^(1/3) and epsilon/k =
+    1.15 T_b from normal-boiling liquid molar volume V_b and boiling
+    temperature T_b. If those inputs are absent, use sigma = 0.841 V_c^(1/3)
+    and epsilon/k = 0.77 T_c from critical molar volume V_c and temperature
+    T_c. Volumes are cm^3/mol, temperatures K, sigma Å and epsilon/k K.
+
+    Sanity against the repo's tabulated BSL N2 row: T_c=126.2 K and
+    V_c=90.1 cm^3/mol estimate sigma=3.77 Å and epsilon/k=97.2 K, versus
+    3.798 Å and 71.4 K in ``_LENNARD_JONES_PARAMS``. This is a coarse
+    transport estimate, not a replacement for the tabulated pair.
+    """
+
+    def positive(*keys: str) -> tuple[str, float] | None:
+        for key in keys:
+            try:
+                value = float(row.get(key))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if math.isfinite(value) and value > 0.0:
+                return key, value
+        return None
+
+    boiling_temperature = positive("normal_boiling_point_K")
+    if boiling_temperature is None:
+        boiling_point_c = positive("boiling_point_C")
+        if boiling_point_c is not None:
+            boiling_temperature = (
+                "boiling_point_C",
+                boiling_point_c[1] + CELSIUS_TO_KELVIN_OFFSET,
+            )
+    boiling_volume = positive("boiling_molar_volume_cm3_mol")
+    if boiling_temperature is not None and boiling_volume is not None:
+        method = "bsl_boiling_point"
+        temperature_key, temperature_k = boiling_temperature
+        volume_key, volume_cm3_mol = boiling_volume
+        sigma = 1.18 * volume_cm3_mol ** (1.0 / 3.0)
+        epsilon_over_k = 1.15 * temperature_k
+        inputs = {volume_key: volume_cm3_mol}
+        if temperature_key == "boiling_point_C":
+            inputs[temperature_key] = boiling_point_c[1]
+            inputs["normal_boiling_point_K"] = temperature_k
+        else:
+            inputs[temperature_key] = temperature_k
+    else:
+        critical_temperature = positive("critical_temperature_K")
+        critical_volume = positive("critical_molar_volume_cm3_mol")
+        if critical_temperature is None or critical_volume is None:
+            return None
+        method = "bsl_critical_point_fallback"
+        sigma = 0.841 * critical_volume[1] ** (1.0 / 3.0)
+        epsilon_over_k = 0.77 * critical_temperature[1]
+        inputs = {
+            critical_temperature[0]: critical_temperature[1],
+            critical_volume[0]: critical_volume[1],
+        }
+    if not all(math.isfinite(value) and value > 0.0 for value in (sigma, epsilon_over_k)):
+        return None
+    return {
+        "species": str(species),
+        "sigma_angstrom": sigma,
+        "epsilon_over_k_K": epsilon_over_k,
+        "method": method,
+        "inputs": inputs,
+    }
+
 _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     'N2': {
         'status': 'sourced',

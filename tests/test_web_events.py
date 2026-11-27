@@ -6732,6 +6732,7 @@ def test_web_refusal_registry_covers_stable_typed_reasons():
         "vapour_batch_builder_missing",
         "vapour_batch_resolve_failed",
         "vapour_batch_unavailable",
+        "capacity_member_closure_failure",
         "interpolated_equilibrium_not_flux_eligible",
         "missing_vapour_batch_flux_pressures_Pa",
         "invalid_vapour_batch_flux_pressures_Pa",
