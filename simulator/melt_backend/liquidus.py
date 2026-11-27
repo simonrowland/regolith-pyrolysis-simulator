@@ -11,7 +11,7 @@ from simulator.melt_backend.base import (
     LiquidFractionInvalidError,
     MeltBackendError,
 )
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import finite_float, is_declared_real_scalar
 from simulator.melt_regime import liquid_fraction_invalidity
 
 
@@ -354,16 +354,6 @@ def _equilibrium_path_from_cooling(
     )
 
 
-def _finite_warm_hint(value: object) -> Optional[float]:
-    """Ignore a missing or unusable previous bound. Never refuse the search."""
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        return None
-    number = float(value)
-    if not math.isfinite(number):
-        return None
-    return number
-
-
 def _grid_floor_index(
     grid: Tuple[float, ...],
     temperature_C: float,
@@ -666,8 +656,18 @@ def find_liquidus_solidus_by_fraction(
         # cells or a grid endpoint, refuses on the walk. A dip of at
         # most 0.02 is lifted before the first-crossing test, so the
         # warm root stays on the cold scan's cell.
-        warm_solidus = _finite_warm_hint(warm_solidus_T_C)
-        warm_liquidus = _finite_warm_hint(warm_liquidus_T_C)
+        warm_solidus = (
+            finite_float(warm_solidus_T_C)
+            if isinstance(warm_solidus_T_C, (int, float))
+            and not isinstance(warm_solidus_T_C, bool)
+            else None
+        )
+        warm_liquidus = (
+            finite_float(warm_liquidus_T_C)
+            if isinstance(warm_liquidus_T_C, (int, float))
+            and not isinstance(warm_liquidus_T_C, bool)
+            else None
+        )
         if warm_solidus is not None and warm_liquidus is not None:
             solidus_floor = _grid_floor_index(grid, warm_solidus)
             liquidus_floor = _grid_floor_index(grid, warm_liquidus)
