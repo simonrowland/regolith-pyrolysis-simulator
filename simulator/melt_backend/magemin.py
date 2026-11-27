@@ -207,9 +207,9 @@ _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
 _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
     f'magemin-subprocess-{os.getuid()}.lock'
 )
-_MAGEMIN_ENGINE_VERSION_CACHE: Dict[Tuple[str, int, int, int], str] = {}
-_MAGEMIN_ENGINE_VERSION_IDENTITY_CACHE: Dict[
-    Tuple[str, int, int, int], str
+_MAGEMIN_ENGINE_VERSION_CACHE: Dict[
+    Tuple[str, int, int, int],
+    Tuple[str, Optional[BaseException]],
 ] = {}
 _MAGEMIN_ENGINE_VERSION_CACHE_LOCK = threading.Lock()
 
@@ -2631,31 +2631,27 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 binary_stat.st_size,
                 binary_stat.st_mtime_ns,
             )
-        # Freeze the memo identity at the first probe outcome for this binary
-        # signature. A later successful retry may cache the banner, but must
-        # not replace a path fallback that another caller already memoized.
-        # Wait is the host-wide launch bound (300 s), the same bound an
-        # equilibrium launch uses before a typed refusal. The subprocess
-        # itself stays on a 5 s clock once a slot is held. The cache lock
-        # is not held across that wait: a caller that already owns a slot
-        # must still be able to read a cached banner.
+        # The memo identity is the first probe outcome for this binary
+        # signature, stored in _MAGEMIN_ENGINE_VERSION_CACHE. A failed
+        # probe stores the path fallback and keeps the typed exception
+        # beside it. Later calls return that identity and do not enter
+        # the 300 s slot wait again. Wait is the host-wide launch bound,
+        # the same bound an equilibrium launch uses before a typed
+        # refusal. The subprocess itself stays on a 5 s clock once a
+        # slot is held. The cache lock is not held across that wait: a
+        # caller that already owns a slot must still be able to read a
+        # cached identity.
         with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
             cached = (
                 _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
                 if version_key is not None
                 else None
             )
-            identity = (
-                _MAGEMIN_ENGINE_VERSION_IDENTITY_CACHE.get(version_key)
-                if version_key is not None
-                else None
-            )
         if cached is not None:
-            legacy = identity or cached
+            legacy = cached[0]
         else:
-            legacy = None
-        if legacy is None:
             probed: Optional[str] = None
+            probe_failure: Optional[BaseException] = None
             try:
                 with (
                     _magemin_subprocess_slot(
@@ -2683,31 +2679,24 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 _MAGEMinEngineLifecycleError,
                 OSError,
                 subprocess.TimeoutExpired,
-            ):
-                probed = None
-            with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
-                cached = (
-                    _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
-                    if version_key is not None
-                    else None
+            ) as exc:
+                probe_failure = exc
+            if probed:
+                candidate = (probed, None)
+            else:
+                candidate = (
+                    f'MAGEMin subprocess ({resolved_binary_path})',
+                    probe_failure,
                 )
-                if cached is not None:
-                    candidate_identity = cached
-                elif probed:
-                    if version_key is not None:
-                        _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = probed
-                    candidate_identity = probed
-                else:
-                    candidate_identity = (
-                        f'MAGEMin subprocess ({resolved_binary_path})'
-                    )
-                if version_key is not None:
-                    legacy = _MAGEMIN_ENGINE_VERSION_IDENTITY_CACHE.setdefault(
+            if version_key is not None:
+                with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
+                    # First stored outcome wins, including a failed probe.
+                    legacy = _MAGEMIN_ENGINE_VERSION_CACHE.setdefault(
                         version_key,
-                        candidate_identity,
-                    )
-                else:
-                    legacy = candidate_identity
+                        candidate,
+                    )[0]
+            else:
+                legacy = candidate[0]
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '

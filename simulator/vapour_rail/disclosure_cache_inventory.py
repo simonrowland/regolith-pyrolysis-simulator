@@ -1039,7 +1039,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "kind": 'store',
         "name": '_MAGEMIN_ENGINE_VERSION_CACHE',
         "carries_disclosure": False,
-        "how": 'MAGEMin --version string keyed by binary inode, size, and mtime. Not a vapour-law result.',
+        "how": 'MAGEMin memo identity keyed by binary inode, size, and mtime: the --version banner, or the path fallback after a failed probe. The typed probe failure is stored beside that identity. Not a vapour-law result.',
     },
     'store:simulator/melt_backend/vaporock.py:_SESSION_BACKEND_CACHE': {
         "path": 'simulator/melt_backend/vaporock.py',
