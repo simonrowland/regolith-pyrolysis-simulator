@@ -1093,7 +1093,7 @@ def test_merge_cache_shard_rejects_builtin_fallback_vapor_source(tmp_path):
                 "equilibrium_result": {
                     "status": "ok",
                     "liquid_fraction": 1.0,
-                    "kernel_fallback_used": True,
+                    "diagnostics": {"kernel_fallback_used": True},
                 }
             },
             "kernel_fallback_used",

@@ -59,7 +59,12 @@ try:
 except ImportError:  # pragma: no cover - project runtime normally has PyYAML.
     yaml = None  # type: ignore[assignment]
 
-from scripts.seed_reduced_real_cache import payload_count, seed_cache
+from scripts.seed_reduced_real_cache import (
+    _seed_cache_from_validated_sources,
+    payload_count,
+    seed_cache,
+    validate_cache_source_rows,
+)
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
 from simulator.optimize.recipe import RecipeSchema
@@ -877,34 +882,47 @@ def _merge_source_for_shard(
     return None
 
 
-def _shard_keys_missing_from_base(shard: Path, base_cache: Path) -> int:
+def _admitted_epoch_shard_rows(
+    shard_paths: Iterable[Path],
+    *,
+    target_cache: Path | None = None,
+) -> dict[Path, list[dict[str, Any]]]:
+    target_resolved = target_cache.resolve() if target_cache is not None else None
+    return {
+        shard.resolve(): validate_cache_source_rows(shard)
+        for shard in shard_paths
+        if shard.exists() and shard.resolve() != target_resolved
+    }
+
+
+def _shard_keys_missing_from_base(
+    shard: Path,
+    base_cache: Path,
+    admitted_rows: Sequence[Mapping[str, Any]],
+) -> int:
     if not shard.exists() or not base_cache.exists():
         return 0
-    shard_conn = sqlite3.connect(shard)
+    shard_hashes = list(dict.fromkeys(str(row["key_hash"]) for row in admitted_rows))
+    if not shard_hashes:
+        return 0
     base_conn = sqlite3.connect(base_cache)
     try:
-        shard_hashes = [
-            str(row[0])
-            for row in shard_conn.execute(
-                f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
-            ).fetchall()
-        ]
-        if not shard_hashes:
-            return 0
-        placeholders = ",".join("?" * len(shard_hashes))
-        found = int(
-            base_conn.execute(
-                f"""
-                SELECT count(*)
-                FROM {PT1_EQUILIBRIUM_TABLE}
-                WHERE key_hash IN ({placeholders})
-                """,
-                tuple(shard_hashes),
-            ).fetchone()[0]
-        )
+        found = 0
+        for start in range(0, len(shard_hashes), 900):
+            batch = shard_hashes[start : start + 900]
+            placeholders = ",".join("?" * len(batch))
+            found += int(
+                base_conn.execute(
+                    f"""
+                    SELECT count(*)
+                    FROM {PT1_EQUILIBRIUM_TABLE}
+                    WHERE key_hash IN ({placeholders})
+                    """,
+                    tuple(batch),
+                ).fetchone()[0]
+            )
         return len(shard_hashes) - found
     finally:
-        shard_conn.close()
         base_conn.close()
 
 
@@ -912,6 +930,7 @@ def _shard_merge_row_complete(
     shard: Path,
     base_cache: Path,
     source_entry: Mapping[str, Any],
+    admitted_rows: Sequence[Mapping[str, Any]],
 ) -> tuple[bool, str]:
     source_rows = int(source_entry.get("source_rows", 0))
     seed_rows = int(source_entry.get("seed_rows", 0))
@@ -927,7 +946,11 @@ def _shard_merge_row_complete(
             f"merge over-count for {shard}: inserted_rows={inserted_rows} "
             f"> produced_rows={produced_rows}"
         )
-    missing_keys = _shard_keys_missing_from_base(shard, base_cache)
+    missing_keys = _shard_keys_missing_from_base(
+        shard,
+        base_cache,
+        admitted_rows,
+    )
     if missing_keys > 0:
         return False, (
             f"{missing_keys} row(s) from {shard} missing in {base_cache} after merge "
@@ -941,11 +964,17 @@ def prune_merged_shards(
     base_cache: Path,
     *,
     merge_summary: Mapping[str, Any] | None = None,
+    admitted_rows_by_source: Mapping[Path, Sequence[Mapping[str, Any]]] | None = None,
 ) -> list[str]:
     verify_base_cache_integrity(base_cache)
+    shards = [Path(path) for path in shard_paths]
+    if merge_summary is not None and admitted_rows_by_source is None:
+        admitted_rows_by_source = _admitted_epoch_shard_rows(
+            shards,
+            target_cache=base_cache,
+        )
     pruned: list[str] = []
-    for path in shard_paths:
-        shard = Path(path)
+    for shard in shards:
         if not shard.exists():
             continue
         if merge_summary is not None:
@@ -957,7 +986,12 @@ def prune_merged_shards(
                     shard,
                 )
                 continue
-            complete, reason = _shard_merge_row_complete(shard, base_cache, source_entry)
+            complete, reason = _shard_merge_row_complete(
+                shard,
+                base_cache,
+                source_entry,
+                (admitted_rows_by_source or {}).get(shard.resolve(), ()),
+            )
             if not complete:
                 _LOGGER.warning("prune_merged_shards skipped shard: %s", reason)
                 continue
@@ -976,6 +1010,7 @@ def merge_epoch_shards(
     *,
     seed_fn: Callable[[Path, Iterable[Path]], Mapping[str, Any]] = seed_cache,
     seed_rows_by_source: Mapping[str, int] | None = None,
+    admitted_rows_by_source: Mapping[Path, Sequence[Mapping[str, Any]]] | None = None,
 ) -> dict[str, Any]:
     sources = [path for path in shard_paths if path.exists()]
     if not sources:
@@ -986,15 +1021,49 @@ def merge_epoch_shards(
             "inserted_rows": 0,
             "sources": [],
         }
-    summary = dict(seed_fn(base_cache, sources))
-    merged_seed_source_rows = _merge_seed_source_tables(base_cache, sources)
+    if admitted_rows_by_source is None and seed_fn is seed_cache:
+        admitted_rows_by_source = _admitted_epoch_shard_rows(
+            sources,
+            target_cache=base_cache,
+        )
+    if seed_fn is seed_cache:
+        validated_sources = [
+            (source, list(admitted_rows_by_source.get(source.resolve(), ())))
+            for source in sources
+            if source.resolve() != base_cache.resolve()
+        ]
+        summary = _seed_cache_from_validated_sources(
+            base_cache,
+            sources,
+            validated_sources,
+        )
+    else:
+        summary = dict(seed_fn(base_cache, sources))
+    if admitted_rows_by_source is None:
+        admitted_rows_by_source = _admitted_epoch_shard_rows(
+            sources,
+            target_cache=base_cache,
+        )
+    merged_seed_source_rows = _merge_seed_source_tables(
+        base_cache,
+        sources,
+        admitted_rows_by_source=admitted_rows_by_source,
+    )
     if merged_seed_source_rows:
         summary["seed_source_rows"] = merged_seed_source_rows
         summary["seed_source_table"] = SEED_SOURCE_TABLE
-    if seed_rows_by_source:
-        for source in summary.get("sources", []):
-            if not isinstance(source, dict) or source.get("skipped") == "target":
-                continue
+    for source in summary.get("sources", []):
+        if not isinstance(source, dict) or source.get("skipped") == "target":
+            continue
+        source_path_text = str(source.get("source", ""))
+        source_path = Path(source_path_text).resolve()
+        admitted_rows = admitted_rows_by_source.get(source_path)
+        if admitted_rows is not None:
+            source["superseded_rows"] = int(source.get("source_rows", 0)) - len(
+                admitted_rows
+            )
+            source["source_rows"] = len(admitted_rows)
+        if seed_rows_by_source:
             seed_rows = seed_rows_by_source.get(str(source.get("source")), 0)
             source["seed_rows"] = int(seed_rows)
     return summary
@@ -1295,7 +1364,12 @@ def _ensure_seed_source_table(conn: sqlite3.Connection) -> None:
     )
 
 
-def _merge_seed_source_tables(base_cache: Path, sources: Sequence[Path]) -> int:
+def _merge_seed_source_tables(
+    base_cache: Path,
+    sources: Sequence[Path],
+    *,
+    admitted_rows_by_source: Mapping[Path, Sequence[Mapping[str, Any]]],
+) -> int:
     source_paths = [Path(source) for source in sources if Path(source).exists()]
     if not source_paths:
         return 0
@@ -1333,15 +1407,27 @@ def _merge_seed_source_tables(base_cache: Path, sources: Sequence[Path]) -> int:
                             f"{source} does not match {base_cache}"
                         )
                     column_sql = ", ".join(columns)
-                    before = conn.total_changes
-                    conn.execute(
-                        f"""
-                        INSERT OR REPLACE INTO {SEED_SOURCE_TABLE} ({column_sql})
-                        SELECT {column_sql}
-                        FROM {_SEED_SOURCE_MERGE_ALIAS}.{SEED_SOURCE_TABLE}
-                        """
+                    admitted_rows = admitted_rows_by_source.get(source.resolve(), ())
+                    admitted_hashes = list(
+                        dict.fromkeys(str(row["key_hash"]) for row in admitted_rows)
                     )
-                    merged += conn.total_changes - before
+                    if not admitted_hashes:
+                        conn.commit()
+                        continue
+                    for start in range(0, len(admitted_hashes), 900):
+                        batch = admitted_hashes[start : start + 900]
+                        placeholders = ",".join("?" for _ in batch)
+                        before = conn.total_changes
+                        conn.execute(
+                            f"""
+                            INSERT OR REPLACE INTO {SEED_SOURCE_TABLE} ({column_sql})
+                            SELECT {column_sql}
+                            FROM {_SEED_SOURCE_MERGE_ALIAS}.{SEED_SOURCE_TABLE}
+                            WHERE key_hash IN ({placeholders})
+                            """,
+                            tuple(batch),
+                        )
+                        merged += conn.total_changes - before
                     conn.commit()
                 except Exception:
                     conn.rollback()
@@ -1838,13 +1924,19 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
         )
         _apply_epoch_result(journal, epoch_result)
 
+        shard_paths = [Path(p) for p in epoch_result["shard_dbs"]]
+        admitted_shard_rows = _admitted_epoch_shard_rows(
+            shard_paths,
+            target_cache=manifest.base_cache,
+        )
         merge_summary = merge_epoch_shards(
             manifest.base_cache,
-            [Path(p) for p in epoch_result["shard_dbs"]],
+            shard_paths,
             seed_rows_by_source={
                 str(path): int(rows)
                 for path, rows in epoch_result.get("seed_rows_by_shard", {}).items()
             },
+            admitted_rows_by_source=admitted_shard_rows,
         )
         rate = duplication_rate_from_merge(merge_summary)
         epoch_result["merge"] = merge_summary
@@ -1854,6 +1946,7 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
                 [Path(path) for path in epoch_result["shard_dbs"]],
                 manifest.base_cache,
                 merge_summary=merge_summary,
+                admitted_rows_by_source=admitted_shard_rows,
             )
         journal["dup_rates"] = [*journal.get("dup_rates", []), rate]
         journal.setdefault("epochs", []).append(epoch_result)

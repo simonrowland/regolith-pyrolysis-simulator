@@ -326,6 +326,22 @@ def seed_cache(target: Path, sources: Iterable[Path]) -> dict[str, Any]:
     for source in discovered:
         if source.resolve() != target_resolved:
             validated_sources.append((source, validate_cache_source_rows(source)))
+    return _seed_cache_from_validated_sources(
+        target,
+        discovered,
+        validated_sources,
+    )
+
+
+def _seed_cache_from_validated_sources(
+    target: Path,
+    discovered: list[Path],
+    validated_sources: list[tuple[Path, list[dict[str, Any]]]],
+) -> dict[str, Any]:
+    """Merge rows admitted by the shared PT-1 source validator."""
+
+    target = target.expanduser()
+    target_resolved = target.resolve()
     validated_by_source = {
         source.resolve(): rows for source, rows in validated_sources
     }

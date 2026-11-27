@@ -6100,6 +6100,71 @@ def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version(
     assert replay.hits == 1
 
 
+def test_malformed_stale_gate_row_misses_and_recapture_replaces_it(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "malformed-stale-gate.sqlite"
+    key = _freeze_gate_key()
+    current_payload = {
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    initial_capture = PT0DeterminismStore("capture", db_path=db_path)
+    initial_capture._store(
+        "freeze_gate_curve",
+        key,
+        current_payload,
+        law_disclosures=[],
+    )
+    key_hash = _key_hash(key)
+    malformed_payload_bytes = b'{"curve":'
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ? "
+            "WHERE key_hash = ?",
+            (
+                sqlite3.Binary(malformed_payload_bytes),
+                hashlib.sha256(malformed_payload_bytes).hexdigest(),
+                rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
+                key_hash,
+            ),
+        )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    with pytest.raises(PT0CacheMiss):
+        replay._lookup("freeze_gate_curve", key)
+    assert replay.hits == 0
+
+    recapture = PT0DeterminismStore("capture", db_path=db_path)
+    recapture._store(
+        "freeze_gate_curve",
+        key,
+        current_payload,
+        law_disclosures=[],
+    )
+    assert recapture.persistent_store is not None
+    persisted = recapture.persistent_store.get(
+        artifact="freeze_gate_curve",
+        key=key,
+        key_bytes=canonical_json_bytes(key),
+        key_hash=key_hash,
+    )
+    assert persisted is not None
+    assert persisted["payload"] == current_payload
+    assert persisted["payload_codec_version"] == rrd.PT0_GATE_CURVE_CODEC_VERSION
+    replay_after_recapture = PT0DeterminismStore("replay", db_path=db_path)
+    assert replay_after_recapture._lookup("freeze_gate_curve", key) == current_payload
+
+
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
 def test_gate_codec_stale_row_with_different_payload_bytes_is_replaceable(
     tmp_path: Path,

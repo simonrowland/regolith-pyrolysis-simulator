@@ -2349,6 +2349,11 @@ class PT1PersistentEquilibriumStore:
         with self._connect() as conn:
             self._initialize(conn)
             for row in self._fetch_candidates(conn, key_hash):
+                if _payload_codec_stamp_is_current(
+                    artifact,
+                    row["payload_codec_version"],
+                ) is False:
+                    continue
                 entry = self._entry_from_row(
                     row,
                     artifact=artifact,

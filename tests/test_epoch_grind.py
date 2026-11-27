@@ -9,13 +9,16 @@ import sqlite3
 import sys
 import threading
 import time
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
 
 from scripts import epoch_grind
 from scripts.seed_reduced_real_cache import payload_count
+from simulator.chemistry.kernel import ChemistryIntent
 from simulator.corpus_version import current_corpus_version
+import simulator.reduced_real_determinism as rrd
 from simulator.reduced_real_determinism import (
     PT0_GATE_CURVE_CODEC_VERSION,
     PT1PersistentEquilibriumStore,
@@ -144,6 +147,16 @@ def _pt1_cache_point_id(tag: str, **kwargs: object) -> str:
     return hashlib.sha256(canonical_json_bytes(_pt1_cache_key(tag, **kwargs))).hexdigest()
 
 
+@lru_cache(maxsize=1)
+def _strict_default_vapor_authority() -> dict[str, object]:
+    from tests.test_reduced_real_pt0_determinism import (
+        _build_pt0_sim_with_strict_vapor_default,
+    )
+
+    sim = _build_pt0_sim_with_strict_vapor_default(None)
+    return rrd._provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
+
+
 def _gate_curve_payload(tag: str) -> dict[str, object]:
     return {
         "curve": {
@@ -157,6 +170,7 @@ def _gate_curve_payload(tag: str) -> dict[str, object]:
             "is_liquidus_floor": False,
             "tag": tag,
         },
+        "authority": {"vapor_pressure": _strict_default_vapor_authority()},
     }
 
 
