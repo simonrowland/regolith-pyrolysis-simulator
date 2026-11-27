@@ -7940,6 +7940,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.capacity_coupling import (
+            _headspace_partial_pressures_Pa,
             solve_capacity_shadow,
         )
         from simulator.chemistry.kernel.account_filters import (
@@ -7976,17 +7977,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pre_holdup = self._overhead_holdup_mol()
         headspace_temperature_K = self._headspace_temperature_K()
         headspace_volume_m3 = self._headspace_volume_m3()
-        initial_partials = {
-            species: 0.0
-            for species in dict(equilibrium.vapor_pressures_Pa or {})
-        }
         temperature_K = float(self.melt.temperature_C) + 273.15
         zero_liquid = _zero_liquid_precedes_interpolation(equilibrium)
+        initial_partials = _headspace_partial_pressures_Pa(
+            pre_holdup,
+            species=pre_holdup,
+            temperature_K=headspace_temperature_K,
+            volume_m3=headspace_volume_m3,
+        )
         if zero_liquid:
             self._last_vapour_batch = None
             self._last_vapour_batch_report = None
             self._last_vapour_batch_flux_overlay = {}
             self._last_vapour_batch_resolve_error = {}
+            self._langmuir_flux_closure_context = None
         elif is_interpolated_equilibrium(
             equilibrium,
             vapor_pressure_diagnostic=getattr(
@@ -8081,7 +8085,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             capacity_flux_overlay = copy.deepcopy(batch_flux_overlay)
         else:
             capacity_flux_overlay = {}
-        control_equilibrium = equilibrium
+        if zero_liquid:
+            from types import SimpleNamespace
+
+            control_equilibrium = SimpleNamespace(
+                vapor_pressures_Pa={},
+                vapor_pressures_source={},
+                activity_coefficients={},
+                diagnostics={},
+            )
+            control_vapor_pressure_diagnostic = {}
+        else:
+            control_equilibrium = equilibrium
+            control_vapor_pressure_diagnostic = None
         unresolved_before_controls = {
             (notice.get('species'), notice.get('reason'))
             for notice in capacity_flux_overlay.get('notices', ()) or ()
@@ -8101,6 +8117,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 capacity_flux_overlay
                 if batch_flux_pressures is not None
                 else None
+            ),
+            vapor_pressure_diagnostic_override=(
+                control_vapor_pressure_diagnostic
             ),
         )
         if batch_flux_pressures is not None:
@@ -8228,9 +8247,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if reclosed is not None:
                 reclosed_pressures = {
-                    species: pressure
-                    for species, pressure in reclosed.pressures_Pa.items()
-                    if species in flux_species
+                    species: float(
+                        reclosed.pressures_Pa.get(species, 0.0)
+                    )
+                    for species in flux_species
                 }
                 EvaporationMixin._record_langmuir_refusal_notices(
                     self,
@@ -8275,10 +8295,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 resolved_species=trial_resolved_species,
             )
             iteration_controls = dict(controls)
-            iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
-            iteration_controls['overhead_pressure_pa'] = (
-                self._evaporation_overhead_total_pressure_Pa(partials_Pa)
+            filmed_partials, filmed_pressure = (
+                EvaporationMixin._langmuir_film(self, partials_Pa)
             )
+            iteration_controls['overhead_partials_Pa'] = filmed_partials
+            iteration_controls['overhead_pressure_pa'] = filmed_pressure
             iteration_controls[CONTROL_FLUX_PRESSURES_KEY] = dict(
                 iteration_flux_pressures or {}
             )

@@ -536,22 +536,4 @@ def test_run_subcommand_matches_runner_byte_for_byte(tmp_path: Path):
 
     assert simulator_result.returncode == 0, simulator_result.stderr
     assert runner_result.returncode == 0, runner_result.stderr
-    simulator_bytes = simulator_output.read_bytes()
-    runner_bytes = runner_output.read_bytes()
-    if simulator_bytes != runner_bytes:
-        first_difference = next(
-            (
-                index
-                for index, (simulator_byte, runner_byte) in enumerate(
-                    zip(simulator_bytes, runner_bytes)
-                )
-                if simulator_byte != runner_byte
-            ),
-            min(len(simulator_bytes), len(runner_bytes)),
-        )
-        window = slice(max(0, first_difference - 80), first_difference + 160)
-        raise AssertionError(
-            f"runner outputs differ at byte {first_difference}: "
-            f"simulator={simulator_bytes[window]!r}; "
-            f"runner={runner_bytes[window]!r}"
-        )
+    assert simulator_output.read_bytes() == runner_output.read_bytes()
