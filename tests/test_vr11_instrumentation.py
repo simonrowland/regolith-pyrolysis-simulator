@@ -1545,7 +1545,7 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
             self.overhead = SimpleNamespace(headspace_temperature_K=0.0)
             self._last_vapor_pressure_diagnostic = {}
 
-        def _build_evaporation_aux_maps(self, vapor_pressures):
+        def _build_evaporation_aux_maps(self, vapor_pressures, **_kwargs):
             return {}, {}, {}
 
     host = _Host()
