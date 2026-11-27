@@ -208,6 +208,9 @@ _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
     f'magemin-subprocess-{os.getuid()}.lock'
 )
 _MAGEMIN_ENGINE_VERSION_CACHE: Dict[Tuple[str, int, int, int], str] = {}
+_MAGEMIN_ENGINE_VERSION_IDENTITY_CACHE: Dict[
+    Tuple[str, int, int, int], str
+] = {}
 _MAGEMIN_ENGINE_VERSION_CACHE_LOCK = threading.Lock()
 
 
@@ -2628,21 +2631,29 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 binary_stat.st_size,
                 binary_stat.st_mtime_ns,
             )
-        # One binary has one banner. A 5 s slot wait on a busy studio
-        # raises, and that path fallback is not cached, so the next call
-        # can record the ``--version`` banner instead. Gate-curve memo
-        # evidence then differs across lazy init of the same install.
+        # Freeze the memo identity at the first probe outcome for this binary
+        # signature. A later successful retry may cache the banner, but must
+        # not replace a path fallback that another caller already memoized.
         # Wait is the host-wide launch bound (300 s), the same bound an
         # equilibrium launch uses before a typed refusal. The subprocess
         # itself stays on a 5 s clock once a slot is held. The cache lock
         # is not held across that wait: a caller that already owns a slot
         # must still be able to read a cached banner.
         with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
-            legacy = (
+            cached = (
                 _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
                 if version_key is not None
                 else None
             )
+            identity = (
+                _MAGEMIN_ENGINE_VERSION_IDENTITY_CACHE.get(version_key)
+                if version_key is not None
+                else None
+            )
+        if cached is not None:
+            legacy = identity or cached
+        else:
+            legacy = None
         if legacy is None:
             probed: Optional[str] = None
             try:
@@ -2681,16 +2692,22 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     else None
                 )
                 if cached is not None:
-                    legacy = cached
+                    candidate_identity = cached
                 elif probed:
                     if version_key is not None:
                         _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = probed
-                    legacy = probed
+                    candidate_identity = probed
                 else:
-                    # A real probe failure. Not cached: the next call
-                    # still probes, so a transient slot refusal cannot
-                    # become the permanent identity either.
-                    legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+                    candidate_identity = (
+                        f'MAGEMin subprocess ({resolved_binary_path})'
+                    )
+                if version_key is not None:
+                    legacy = _MAGEMIN_ENGINE_VERSION_IDENTITY_CACHE.setdefault(
+                        version_key,
+                        candidate_identity,
+                    )
+                else:
+                    legacy = candidate_identity
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '

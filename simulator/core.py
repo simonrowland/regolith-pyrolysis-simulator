@@ -7471,6 +7471,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         absorbed_mol = 0.0
         passthrough_mol = 0.0
         absorption_respeciation: Dict[str, Any] = {}
+        at_effervescence_ceiling = False
         if rate_kg_hr <= 0.0:
             reason = 'rate_zero'
         elif commanded_mol <= 0.0:
@@ -7486,21 +7487,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             requested_absorbed_mol = max(0.0, commanded_mol * eta_absorb)
             reason = 'no_melt_redox_capacity'
             if requested_absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
-                reservoir = self._apply_oxygen_reservoir_redox_source_terms(
-                    {'redox_source:o2_bubbler': requested_absorbed_mol},
-                    exchange_direction='redox_source:o2_bubbler',
-                    temperature_K=T_K,
-                    gate_authority=gate_authority,
-                    # The dose was already refused. Recording the skip
-                    # must not apply an oxidizing tangent with no atoms.
-                    honor_ferric_exhaustion=True,
+                at_effervescence_ceiling = (
+                    self._effervescence_bounds_oxidizing_source(
+                        net_o2_equiv_mol=requested_absorbed_mol,
+                        base_fO2_log=current_fO2_log,
+                    )
                 )
-                reason = str(
-                    getattr(reservoir, 'redox_source_skip_reason', '')
-                    or reason
-                )
+                if at_effervescence_ceiling:
+                    # Unlike an evaporative source, this dose has not been
+                    # loaded into the atom ledger. Do not pass a hypothetical
+                    # positive term to the shared source path: its ceiling
+                    # rule means “buffer it for the batch settle,” which
+                    # would label unprovided bubbler oxygen as applied.
+                    reason = 'at_effervescence_ceiling'
+                else:
+                    reservoir = self._apply_oxygen_reservoir_redox_source_terms(
+                        {'redox_source:o2_bubbler': requested_absorbed_mol},
+                        exchange_direction='redox_source:o2_bubbler',
+                        temperature_K=T_K,
+                        gate_authority=gate_authority,
+                        # The dose was already refused. Recording the skip
+                        # must not apply an oxidizing tangent with no atoms.
+                        honor_ferric_exhaustion=True,
+                    )
+                    reason = str(
+                        getattr(reservoir, 'redox_source_skip_reason', '')
+                        or reason
+                    )
             absorption_respeciation = {
-                'status': 'refused',
+                'status': 'skipped' if at_effervescence_ceiling else 'refused',
                 'reason': reason,
                 'oxygen_source': FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER,
                 'applied_o2_mol': 0.0,
@@ -7730,7 +7745,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             + passthrough_kg
         )
         diagnostic = {
-            'status': 'ok',
+            'status': (
+                'skipped'
+                if (
+                    at_effervescence_ceiling
+                    and actual_injected_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                )
+                else 'ok'
+            ),
             'reason': reason,
             'rate_kg_per_hr': rate_kg_hr,
             'eta_absorb': eta_absorb,
