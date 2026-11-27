@@ -641,8 +641,17 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
     )
     reactive_outcome = _oxygen_outcome(on_reactive_knudsen, seen)
     seen.clear()
+    general_experiment = F.tabulation_experiment()
+    general_observation = replace(
+        observation,
+        observation_id=f"{observation.observation_id}-tabulation",
+        experiment_id=general_experiment.experiment_id,
+    )
     general = predict_with_engine(
-        OPENIMCC, observation, experiment=F.tabulation_experiment(), isolated=False
+        OPENIMCC,
+        general_observation,
+        experiment=general_experiment,
+        isolated=False,
     )
     general_outcome = _oxygen_outcome(general, seen)
     assert any(
