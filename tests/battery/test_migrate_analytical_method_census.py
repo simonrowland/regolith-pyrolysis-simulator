@@ -226,11 +226,16 @@ def test_analytical_method_split_census_across_the_store(monkeypatch) -> None:
         for experiment_id, experiment in current.experiments.items()
         if experiment.work_id in aithala_work_ids
     }
+    aithala_declared_parent_ids = {
+        AITHALA_DECLARED_EXPERIMENT_PREFIX + run_id
+        for run_id in declared_runs
+    }
     assert expected_aithala_parent_ids <= aithala_experiment_ids
+    assert aithala_experiment_ids == aithala_declared_parent_ids
     assert len(current_aithala_observations) == 89
     assert current_aithala_observation_ids == legacy_aithala_observation_ids
     assert all(
-        observation.experiment_id in aithala_experiment_ids
+        observation.experiment_id in aithala_declared_parent_ids
         for observation in current_aithala_observations
     )
 
