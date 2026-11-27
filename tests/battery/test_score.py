@@ -5043,27 +5043,72 @@ def test_contradictory_b1259_formula_refuses_before_engine_parse(
             assert_identity_mismatch()
 
 
-@pytest.mark.parametrize("formula", ("CaC03", "CaMg(Si03)2"))
-def test_formula_parser_refuses_leading_zero_counts_and_mutation_is_caught(
-    formula: str, monkeypatch
+@pytest.mark.parametrize(
+    "formula", ("CaC03", "CaMg(Si03)2", "Na2S04", "FeW04", "PbS04", "SrC03")
+)
+def test_formula_parser_refuses_leading_zero_counts(formula: str) -> None:
+    assert parse_species_formula(formula) is None
+
+
+@pytest.mark.parametrize(
+    ("formula", "expected"),
+    (
+        ("Ni1.04Si1.93", {"Ni": 1.04, "Si": 1.93}),
+        (
+            "N1.5617O.41959Ar.00937C.00032",
+            {"Ar": 0.00937, "C": 0.00032, "N": 1.5617, "O": 0.41959},
+        ),
+        (
+            "N1.5617IO.41959Ar.00937C.00032",
+            {
+                "Ar": 0.00937,
+                "C": 0.00032,
+                "I": 1.0,
+                "N": 1.5617,
+                "O": 0.41959,
+            },
+        ),
+        (
+            "CH11.66N4.01O5.89",
+            {"C": 1.0, "H": 11.66, "N": 4.01, "O": 5.89},
+        ),
+        (
+            "Ca1.02Na0.14K.01(Al2.18Si6.82O18)·7.33H2O",
+            {
+                "Al": 2.18,
+                "Ca": 1.02,
+                "H": 14.66,
+                "K": 0.01,
+                "Na": 0.14,
+                "O": 25.33,
+                "Si": 6.82,
+            },
+        ),
+    ),
+)
+def test_formula_parser_preserves_real_decimal_counts(
+    formula: str, expected: dict[str, float]
 ) -> None:
+    parsed = parse_species_formula(formula)
+    assert parsed is not None
+    assert dict(parsed) == expected
 
-    def assert_leading_zero_refused() -> None:
-        assert score_mod.parse_species_formula(formula) is None
 
-    assert_leading_zero_refused()
+def test_leading_zero_mutation_probe_exercises_real_formula_parser(
+    monkeypatch,
+) -> None:
+    leading_zero_search = r"(?:[A-Za-z]|[)\]}])0\d+|(?:^|·)0\d+"
+    real_search = score_mod.re.search
 
-    def restore_leading_zero_acceptance(
-        formula: str, *, species: Species | None = None
-    ) -> tuple[tuple[str, float], ...] | None:
-        return score_mod.atoms_parse_formula_else_janaf(formula)
+    def omit_leading_zero_search(pattern, string, *args, **kwargs):
+        if pattern == leading_zero_search:
+            return None
+        return real_search(pattern, string, *args, **kwargs)
 
+    assert parse_species_formula("CaC03") is None
     with monkeypatch.context() as mutation:
-        mutation.setattr(
-            score_mod, "parse_species_formula", restore_leading_zero_acceptance
-        )
-        with pytest.raises(AssertionError):
-            assert_leading_zero_refused()
+        mutation.setattr(score_mod.re, "search", omit_leading_zero_search)
+        assert parse_species_formula("CaC03") == (("C", 3.0), ("Ca", 1.0))
 
 
 def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> None:

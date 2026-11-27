@@ -1292,7 +1292,7 @@ def parse_species_formula(
     # corruption (for example O3 printed as 03), not a count to interpret.
     # Refuse it here rather than silently turning CaC03 into CaC3.
     if re.search(
-        r"(?:[A-Za-z]|[)\]}])0\d+|(?:^|·)0\d+|\.0\d+(?=[A-Z(])", text
+        r"(?:[A-Za-z]|[)\]}])0\d+|(?:^|·)0\d+", text
     ):
         return None
 
