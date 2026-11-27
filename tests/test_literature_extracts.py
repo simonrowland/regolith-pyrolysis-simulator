@@ -2827,16 +2827,18 @@ def _figure_read_extract() -> dict:
     return doc
 
 
-def test_render_verified_figure_read_is_attested_without_text_artifact():
+def test_render_stamp_does_not_attest_unverified_descendants_without_artifact():
     doc = _figure_read_extract()
+    values = doc["species"]["Fe"]["observations"][0]["values"]
+    values["T_C"] = "1630"
+    doc["fidelity_samples"][0]["value"]["T_C"] = "1630"
 
     warnings = vle.fidelity_source_warnings(doc, label="figure-read")
     by_kind = {warning.kind: warning.count for warning in warnings}
 
-    assert "unattested_sample" not in by_kind
-    assert "source_blind_pin" not in by_kind
-    assert "uncovered_observation" not in by_kind
-    assert vle.certify_extract_source_fidelity(doc, label="figure-read") == []
+    assert by_kind.get("source_blind_pin") == 1
+    assert by_kind.get("uncovered_observation") == 1
+    assert vle.certify_extract_source_fidelity(doc, label="figure-read")
 
 
 def test_figure_read_rejects_extractor_as_reviewer():
@@ -2989,6 +2991,126 @@ def _derivation_extract() -> dict:
 
 def _set_derived_cao(point: dict, amount: str) -> None:
     point["composition"]["state"]["value"]["components"][0][1] = amount
+
+
+def test_by_difference_composition_current_numeric_pin():
+    """Keep current closure output unchanged while moving the physics owner."""
+    masses = vle._by_difference_masses(
+        Decimal("0.3587"),
+        "SiO2",
+        "CaO",
+        (("Al2O3", Decimal("10")), ("MgO", Decimal("30"))),
+    )
+
+    assert masses is not None
+    assert {
+        component: format(amount.quantize(Decimal("0.00000001")), "f")
+        for component, amount in masses.items()
+    } == {
+        "Al2O3": "10.00000000",
+        "MgO": "30.00000000",
+        "SiO2": "40.18539848",
+        "CaO": "19.81460152",
+    }
+
+
+def test_derivation_rejects_extract_value_drift_despite_sample_rel_tol():
+    doc = _derivation_extract()
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["point_conditions"]["composition"]["state"]["value"][
+        "components"
+    ][0][1] = "30.00000000"
+    doc["fidelity_samples"][1]["rel_tol"] = 0.5
+
+    warnings = vle.fidelity_source_warnings(doc, label="rel-tol-attack")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "recomputed value differs from stored" in detail, detail
+
+
+def test_derivation_rejects_mass_percent_amounts_declared_as_mole_fraction():
+    doc = _derivation_extract()
+    observation = doc["species"]["Fe"]["observations"][0]
+    sample = doc["fidelity_samples"][1]
+    observation["point_conditions"]["composition"]["state"]["value"][
+        "amount_basis"
+    ] = "mole_fraction"
+    sample["value"]["composition"]["state"]["value"][
+        "amount_basis"
+    ] = "mole_fraction"
+
+    warnings = vle.fidelity_source_warnings(doc, label="basis-attack")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "amount_basis" in detail, detail
+
+
+def test_derivation_rejects_independent_component_bands_that_open_total():
+    doc = _derivation_extract()
+    observation = doc["species"]["Fe"]["observations"][0]
+    sample = doc["fidelity_samples"][1]
+    for value in (
+        observation["point_conditions"]["composition"]["state"]["value"],
+        sample["value"]["composition"]["state"]["value"],
+    ):
+        components = value["components"]
+        components[0][1] = str(Decimal(components[0][1]) + Decimal("0.001"))
+        components[2][1] = str(Decimal(components[2][1]) + Decimal("0.001"))
+
+    warnings = vle.fidelity_source_warnings(doc, label="open-total-attack")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "joint" in detail and "close" in detail, detail
+
+
+def test_derivation_rejects_temperature_parent_from_another_observation():
+    doc = _derivation_extract()
+    observations = doc["species"]["Fe"]["observations"]
+    other = copy.deepcopy(observations[0])
+    other["observation_id"] = "fe_alpha_2"
+    other["values"]["T_C"] = "1530"
+    observations.append(other)
+    observations[0]["point_conditions"]["T_C"]["state"]["value"] = "1530"
+    derivation = doc["fidelity_samples"][1]
+    derivation["value"]["T_C"]["state"]["value"] = "1530"
+    derivation["verification"]["parents"][-1]["path"] = (
+        "species.Fe.observations[fe_alpha_2].values.T_C"
+    )
+    doc["fidelity_samples"].append(
+        {
+            "path": "species.Fe.observations[fe_alpha_2].values.T_C",
+            "value": "1530",
+            "reviewed_by": "independent reviewer",
+            "reviewed_on": "2026-11-27",
+            "locator": {"page": 2, "table": "1"},
+        }
+    )
+    observation_map, _ambiguous, _missing = vle._scored_observations(doc)
+
+    defects = vle._derivation_pass_defects(
+        doc,
+        doc["fidelity_samples"],
+        [1],
+        [0, 2],
+        {},
+        observation_map,
+        extractor_id="figure-extractor",
+    )
+    rendered = " ".join(defect for _index, group in defects for defect in group)
+
+    assert "different observation" in rendered, rendered
 
 
 def test_derivation_recompute_attests_a_closed_composition():
