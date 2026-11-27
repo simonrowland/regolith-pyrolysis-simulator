@@ -616,6 +616,7 @@ def _normalize_gas_boundary(
                 "vacuum/free-molecular boundary at the printed pressure"
             ),
         }
+        provenance["digest"] = _sha256_canonical(provenance)
         normalized = {
             "background_gas": _normalize_gas_boundary_field(
                 provenance,
