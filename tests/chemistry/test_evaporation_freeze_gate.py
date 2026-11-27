@@ -702,9 +702,18 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             # cache misses on more lunar hours. C0B stays 918.75/1370.3125.
             # The old 921.875/1368.75 rows are gone. Adjacent 1.5625 C cells
             # appear (915.625, 917.1875, 920.3125, 1371.875), and 1045.3125 C
-            # and 1050 C now miss the memo, including three C4 curves. Mars
-            # is unchanged. Each row keeps the magemin-shadow
-            # composition_projected source and the two-point path.
+            # and 1050 C miss the memo. Mars is unchanged. Each row keeps
+            # the magemin-shadow composition_projected source and the
+            # two-point path. Receipt 84f613c8 also recorded a third C4
+            # curve at hour 22, the same 1050.0/1370.3125 brackets as
+            # hour 21: Na2O stepped from 0.0041 to 0.004, across the 1e-4
+            # composition quantum, so the core memo missed. 23c5bd4436
+            # leaves oxide Fe only the leftover of the one Langmuir
+            # ceiling after the native pool. Less Fe leaves the melt
+            # (hour 14 FeO is 0.1456; hour 21 FeO is 0.1436 and Na2O
+            # stays 0.0041). Hour 22 hits that memo, so
+            # _freeze_gate_curve_record does not run and the lunar list
+            # is 11.
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
@@ -767,13 +776,6 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 920.3125,
                 1370.3125,
                 ((920.3125, 0.0), (1370.3125, 1.0)),
-            ),
-            (
-                'C4',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1050.0,
-                1370.3125,
-                ((1050.0, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C4',
