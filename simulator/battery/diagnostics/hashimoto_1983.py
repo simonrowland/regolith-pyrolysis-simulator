@@ -23,17 +23,20 @@ import yaml
 from simulator.battery.migrate import to_plain, torr_to_pa
 from simulator.battery.enums import NoticeKind, Quantity
 from simulator.battery.records import Notice, NoticePolicy
+from simulator.battery.source_declarations import (
+    HASHIMOTO_RESIDUE_PREDICTOR,
+    declared_residue_predictor,
+)
 from simulator.lab_schedule import _pressure_domain_notice_mbar
 from simulator.physical_constants import PA_PER_MBAR
+from simulator.scalar_boundary import require_finite_float
+from simulator.source_ids import HASHIMOTO_SOURCE_ID as SOURCE_ID
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
-SOURCE_ID = "kems-015-hashimoto-1983"
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PRESET_PATH = ROOT / "data/literature/reproduction-inputs/hashimoto_1983.yaml"
-DEFAULT_OBSERVATIONS_PATH = (
-    ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
-)
+DEFAULT_OBSERVATIONS_PATH = ROOT / f"data/literature/extracts-v2/{SOURCE_ID}.yaml"
 REQUIRED_STARTING_OXIDES = ("SiO2", "Al2O3", "FeO", "MgO", "CaO")
 ADMITTED_RECORD_COUNT = 120
 RECORD_UNITS = "wt%"
@@ -141,7 +144,11 @@ def validate_starting_composition(preset: Mapping[str, Any]) -> Mapping[str, flo
     for oxide in REQUIRED_STARTING_OXIDES:
         if oxide not in raw:
             raise Hashimoto1983Refusal("missing_starting_oxide", oxide)
-        composition[oxide] = _finite_number(raw[oxide], f"starting_composition.{oxide}")
+        field = f"starting_composition.{oxide}"
+        try:
+            composition[oxide] = require_finite_float(raw[oxide], field)
+        except ValueError as exc:
+            raise Hashimoto1983Refusal("invalid_numeric_input", field) from exc
     if any(value <= 0.0 for value in composition.values()):
         raise Hashimoto1983Refusal("invalid_starting_oxide_wt_pct")
     if not math.isclose(sum(composition.values()), 100.0, rel_tol=0.0, abs_tol=0.01):
@@ -157,14 +164,22 @@ def require_runtime_inputs(
     validate_starting_composition(preset)
     geometry = preset.get("free_evaporation_geometry")
     area = geometry.get("exposed_melt_area_m2") if isinstance(geometry, Mapping) else None
-    if area is not None and _finite_number(
-        area, "free_evaporation_geometry.exposed_melt_area_m2"
-    ) <= 0.0:
-        raise Hashimoto1983Refusal("invalid_exposed_melt_area")
+    if area is not None:
+        area_field = "free_evaporation_geometry.exposed_melt_area_m2"
+        try:
+            area_value = require_finite_float(area, area_field)
+        except ValueError as exc:
+            raise Hashimoto1983Refusal("invalid_numeric_input", area_field) from exc
+        if area_value <= 0.0:
+            raise Hashimoto1983Refusal("invalid_exposed_melt_area")
     vacuum = preset.get("vacuum")
     if not isinstance(vacuum, Mapping) or vacuum.get("units") != "Torr":
         raise Hashimoto1983Refusal("unsupported_runtime_pressure_unit")
-    pressure_torr = _finite_number(vacuum.get("value"), "vacuum.value")
+    pressure_field = "vacuum.value"
+    try:
+        pressure_torr = require_finite_float(vacuum.get("value"), pressure_field)
+    except ValueError as exc:
+        raise Hashimoto1983Refusal("invalid_numeric_input", pressure_field) from exc
     if pressure_torr <= 0.0:
         raise Hashimoto1983Refusal("invalid_runtime_pressure")
     pressure_mbar = float(
@@ -209,7 +224,7 @@ def load_admitted_observations(
         if not isinstance(locator, Mapping) or str(locator.get("table")) != "3":
             raise Hashimoto1983Refusal("unexpected_residue_table", observation_id)
         source_id = _required_text(row.get("source_id"), "source_id")
-        if source_id != SOURCE_ID:
+        if declared_residue_predictor(source_id) != HASHIMOTO_RESIDUE_PREDICTOR:
             raise Hashimoto1983Refusal("unexpected_source_id", source_id)
         species = _nested(row, "identity", "species")
         if not isinstance(species, Mapping):
@@ -227,7 +242,11 @@ def load_admitted_observations(
         value = row.get("value")
         if not isinstance(value, Mapping) or value.get("kind") != "point":
             raise Hashimoto1983Refusal("missing_published_residue_value", observation_id)
-        published_wt_pct = _finite_number(value.get("point"), "value.point")
+        value_field = "value.point"
+        try:
+            published_wt_pct = require_finite_float(value.get("point"), value_field)
+        except ValueError as exc:
+            raise Hashimoto1983Refusal("invalid_numeric_input", value_field) from exc
         if not 0.0 <= published_wt_pct <= 100.0:
             raise Hashimoto1983Refusal("invalid_published_residue_value", observation_id)
         observations.append(
@@ -311,10 +330,18 @@ def score_hashimoto_1983(
                         raise Hashimoto1983Refusal(
                             "runtime_area_default_notice_missing"
                         )
-                    candidate = _finite_number(
-                        run_output[observation.oxide],
-                        f"runtime_outputs.{observation.experiment_id}.{observation.oxide}",
+                    candidate_field = (
+                        f"runtime_outputs.{observation.experiment_id}."
+                        f"{observation.oxide}"
                     )
+                    try:
+                        candidate = require_finite_float(
+                            run_output[observation.oxide], candidate_field
+                        )
+                    except ValueError as exc:
+                        raise Hashimoto1983Refusal(
+                            "invalid_numeric_input", candidate_field
+                        ) from exc
                     if not 0.0 <= candidate <= 100.0:
                         raise Hashimoto1983Refusal("invalid_runtime_output")
                     simulated = candidate
@@ -396,7 +423,11 @@ def _located_value(raw: Any, field: str) -> float:
         or not isinstance(locator, Mapping)
     ):
         raise Hashimoto1983Refusal("unlocated_point_condition", field)
-    return _finite_number(state.get("value"), f"point_conditions.{field}")
+    value_field = f"point_conditions.{field}"
+    try:
+        return require_finite_float(state.get("value"), value_field)
+    except ValueError as exc:
+        raise Hashimoto1983Refusal("invalid_numeric_input", value_field) from exc
 
 
 def _dp007_area_notice(
@@ -427,8 +458,14 @@ def _dp007_area_notice(
             or policy.get("version") != 1
             or policy.get("status") != "canonical"
             or policy.get("units") != "m²"
-            or _finite_number(policy.get("value"), "DP-007.value") <= 0.0
         ):
+            raise Hashimoto1983Refusal("invalid_runtime_area_default_policy")
+        policy_field = "DP-007.value"
+        try:
+            policy_value = require_finite_float(policy.get("value"), policy_field)
+        except ValueError as exc:
+            raise Hashimoto1983Refusal("invalid_numeric_input", policy_field) from exc
+        if policy_value <= 0.0:
             raise Hashimoto1983Refusal("invalid_runtime_area_default_policy")
         try:
             typed_policy = NoticePolicy(
@@ -480,18 +517,6 @@ def _required_text(value: Any, field: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise Hashimoto1983Refusal("missing_required_text", field)
     return value.strip()
-
-
-def _finite_number(value: Any, field: str) -> float:
-    if isinstance(value, bool):
-        raise Hashimoto1983Refusal("invalid_numeric_input", field)
-    try:
-        number = float(value)
-    except (TypeError, ValueError) as exc:
-        raise Hashimoto1983Refusal("invalid_numeric_input", field) from exc
-    if not math.isfinite(number):
-        raise Hashimoto1983Refusal("invalid_numeric_input", field)
-    return number
 
 
 if __name__ == "__main__":
