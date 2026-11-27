@@ -66,11 +66,22 @@ def _extracts_with_analytical_methods() -> dict[str, Path]:
 def _experiment_ids_by_source(
     result, source_ids: set[str]
 ) -> dict[str, set[str]]:
-    ids = {source_id: set() for source_id in source_ids}
-    for observation in result.observations.values():
-        if observation.source_id in ids:
-            ids[observation.source_id].add(observation.experiment_id)
-    return ids
+    work_ids = {
+        source_id: {
+            work_id
+            for work_id, work in result.works.items()
+            if source_id in work.source_ids
+        }
+        for source_id in source_ids
+    }
+    return {
+        source_id: {
+            experiment_id
+            for experiment_id, experiment in result.experiments.items()
+            if experiment.work_id in source_work_ids
+        }
+        for source_id, source_work_ids in work_ids.items()
+    }
 
 
 def test_analytical_method_split_census_across_the_store(monkeypatch) -> None:
