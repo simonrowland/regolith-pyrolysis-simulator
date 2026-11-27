@@ -2821,7 +2821,17 @@ def _figure_read_extract() -> dict:
             "reviewed_by": "independent figure checker",
             "reviewed_on": "2026-11-26",
             "locator": {"page": 2, "figure": "1"},
-            "verification": {"method": "render", "dpi": 350},
+            "verification": {
+                "method": "render",
+                "dpi": 350,
+                "page": 2,
+                "figure": "1",
+                "covers": [
+                    "species.Fe.observations[fe_alpha_1].values.alpha",
+                    "species.Fe.observations[fe_alpha_1].values.figure_read.read_uncertainty.x",
+                    "species.Fe.observations[fe_alpha_1].values.figure_read.read_uncertainty.y",
+                ],
+            },
         }
     ]
     return doc
@@ -2839,6 +2849,18 @@ def test_render_stamp_does_not_attest_unverified_descendants_without_artifact():
     assert by_kind.get("source_blind_pin") == 1
     assert by_kind.get("uncovered_observation") == 1
     assert vle.certify_extract_source_fidelity(doc, label="figure-read")
+
+
+def test_render_stamp_rejects_page_or_figure_mismatch():
+    doc = _figure_read_extract()
+    verification = doc["fidelity_samples"][0]["verification"]
+    verification["page"] = 3
+
+    warnings = vle.fidelity_source_warnings(doc, label="mislabeled-render")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert by_kind["unattested_sample"].count == 1
+    assert "page" in by_kind["unattested_sample"].detail
 
 
 def test_figure_read_rejects_extractor_as_reviewer():
