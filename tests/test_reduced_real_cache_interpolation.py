@@ -40,6 +40,21 @@ def test_composition_distance_keeps_base_compensated_sum_rounding() -> None:
     assert distance.hex() == "0x1.0000000000001p+0"
 
 
+def test_interpolation_and_ladder_reject_non_string_control_names() -> None:
+    key = _interpolation_key(
+        "non-string-control",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    key["controls"][7] = 1.0
+
+    assert rrd._replay_key_control_shape(key) == (None, "controls")
+    assert rci.interpolation_key_domain_violation(key) == "controls"
+    with pytest.raises(rrd.UncacheableKey) as raised:
+        rrd._ladder_indexability(key)
+    assert raised.value.reason == "controls"
+
+
 def _interpolation_key(
     label: str,
     *,
@@ -361,6 +376,7 @@ def test_greedy_nn_accepts_temperature_above_old_domain_cap(
 
 def test_subnormal_composition_is_not_a_ladder_neighbor_and_put_is_typed(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     artifact = "equilibrium_post_record"
     key = _interpolation_key("subnormal", feo_fraction=0.20, temperature_K=1500.0)
@@ -405,27 +421,53 @@ def test_subnormal_composition_is_not_a_ladder_neighbor_and_put_is_typed(
     )
 
     persistent = rrd.PT1PersistentEquilibriumStore(db_path)
-    assert persistent._get_with_decoded(
-        artifact=artifact,
-        key=key,
-        key_bytes=key_bytes,
-        key_hash=key_hash,
-    ) is not None
     rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
     rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
         key,
         rung_tag,
     )
     rung_hash = hashlib.sha256(canonical_json_bytes(rung_key)).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        (stored_rung_hash,) = conn.execute(
+            f"SELECT {rrd._physics_ladder_hash_column(rung_tag)} "
+            f"FROM {rrd.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored_rung_hash == rung_hash
     assert math.isinf(
         rrd.physics_ladder_bucket_distance_from_replay_key(key, rung_tag)
+    )
+    checked_rows = 0
+    entry_from_ladder_row = persistent._entry_from_physics_ladder_bucket_row
+
+    def count_row_admission(*args, **kwargs):
+        nonlocal checked_rows
+        checked_rows += 1
+        return entry_from_ladder_row(*args, **kwargs)
+
+    monkeypatch.setattr(
+        persistent,
+        "_entry_from_physics_ladder_bucket_row",
+        count_row_admission,
     )
     assert persistent._get_by_physics_ladder_bucket(
         artifact=artifact,
         rung_tag=rung_tag,
         rung_key=rung_key,
         rung_hash=rung_hash,
-        query_key=key,
+        query_key=source_key,
+    ) is None
+    assert checked_rows == 1
+
+    def fail_if_read():
+        pytest.fail("unindexable query reached the PT1 store")
+
+    monkeypatch.setattr(persistent, "_connect", fail_if_read)
+    assert persistent._get_with_decoded(
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
     ) is None
 
 
@@ -1138,6 +1180,86 @@ def test_pt1_put_maps_fresh_candidate_integrity_rejections_to_typed_refusals(
             key_bytes=key_bytes,
             key_hash=hashlib.sha256(key_bytes).hexdigest(),
         ) is not None
+
+
+@pytest.mark.parametrize(
+    ("bad_input", "expected_error"),
+    (
+        ("repair_notices_json", rrd.UncacheablePayload),
+        ("key_bytes", rrd.UncacheableKey),
+        ("physics_bucket_hash", rrd.UncacheableKey),
+    ),
+)
+def test_pt1_put_preflights_fresh_inputs_before_attached_row_lookup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    bad_input: str,
+    expected_error: type[Exception],
+) -> None:
+    base_db = tmp_path / f"preflight-base-{bad_input}.sqlite"
+    local_db = tmp_path / f"preflight-local-{bad_input}.sqlite"
+    key = _interpolation_key(
+        "preflight-attached",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+    _put_interpolation_row(
+        base_db,
+        key,
+        liquid_fraction=0.7,
+        sio_pa=7.0,
+    )
+    store = PT1PersistentEquilibriumStore(
+        local_db,
+        read_only_base_db_path=base_db,
+    )
+
+    key_bytes = canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    payload_bytes = canonical_json_bytes(payload)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    kwargs: dict[str, object] = {}
+    write_key_bytes = key_bytes
+    if bad_input == "repair_notices_json":
+        kwargs["repair_notices_json"] = "["
+    elif bad_input == "key_bytes":
+        write_key_bytes = b"{}"
+    else:
+        kwargs.update(
+            physics_bucket_key=bucket_key,
+            physics_bucket_bytes=bucket_bytes,
+            physics_bucket_hash="0" * 64,
+        )
+
+    def fail_if_row_lookup(*args, **kwargs):
+        pytest.fail("fresh-input preflight read an attached cache row")
+
+    monkeypatch.setattr(store, "_fetch", fail_if_row_lookup)
+    with pytest.raises(expected_error):
+        store.put(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=write_key_bytes,
+            key_hash=key_hash,
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+            law_disclosures=[],
+            **kwargs,
+        )
+
+    with sqlite3.connect(local_db) as conn:
+        (local_rows,) = conn.execute(
+            f"SELECT COUNT(*) FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    with sqlite3.connect(base_db) as conn:
+        (base_rows,) = conn.execute(
+            f"SELECT COUNT(*) FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert local_rows == 0
+    assert base_rows == 1
 
 
 @pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))

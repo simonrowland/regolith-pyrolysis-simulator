@@ -13,6 +13,7 @@ from simulator.reduced_real_determinism import (
     _physics_bucket_consumes_log_fO2,
     _physics_bucket_consumes_pO2_bar,
     _replay_key_composition_shape,
+    _replay_key_control_shape,
     _replay_scope_hash,
     canonical_physics_bucket_key_from_replay_key,
     physics_control_rung_error_budget,
@@ -69,28 +70,8 @@ def interpolation_key_domain_violation(
     if composition_error is not None:
         return composition_error
 
-    controls_present = "controls" in key
-    controls = key.get("controls")
-    if controls_present and not isinstance(controls, Mapping):
-        return "controls"
-    if not isinstance(controls, Mapping):
-        controls = {}
-    for control_name, value in controls.items():
-        control_path = (
-            f"controls.{control_name}"
-            if isinstance(control_name, str)
-            else "controls"
-        )
-        if not is_declared_real_scalar(value):
-            return control_path
-        try:
-            numeric_value = float(value)
-        except (OverflowError, TypeError, ValueError):
-            return control_path
-        if not math.isfinite(numeric_value):
-            return control_path
-
-    return None
+    _controls, controls_error = _replay_key_control_shape(key)
+    return controls_error
 
 
 def interpolation_coordinate_vector(

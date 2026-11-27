@@ -4855,7 +4855,7 @@ def _ladder_special_float_cases() -> tuple[Any, ...]:
     key_shapes = ("with-controls", "pressure-only", "without-controls")
     for value_index, value in enumerate(_LADDER_SPECIAL_FLOATS):
         for shape in key_shapes:
-            for field in (*_FULL_GATE_CONTROL_FIELDS, "composition.FeO"):
+            for field in (*_FULL_GATE_CONTROL_FIELDS, "composition.FeOt"):
                 cases.append(
                     pytest.param(
                         shape,
@@ -4886,14 +4886,15 @@ def test_ladder_indexability_special_float_class(
     elif key_shape == "pressure-only":
         key["controls"] = {"pressure_bar": 1.0}
         key["vapor_pressure_provider_selection"] = None
-    if field == "composition.FeO":
+    if field == "composition.FeOt":
+        species_name = field.partition(".")[2]
         components = key["composition_mol_fraction"]
         for index, component in enumerate(components):
-            if component[0] == "FeO":
+            if component[0] == species_name:
                 components[index] = (component[0], value)
                 break
         else:
-            pytest.fail("the gate key has no FeO composition coordinate")
+            pytest.fail(f"the gate key has no {species_name} composition coordinate")
     else:
         key.setdefault("controls", {})[field] = value
         if field == "pO2_bar":
@@ -5049,18 +5050,44 @@ def test_ladder_indexability_special_float_class(
         physics_bucket_hash=rrd._sha256(bucket_bytes),
         query_key=key,
     ) is not None
+
+    admitted = pt1._get_with_decoded(
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+    )
+    assert admitted is not None
     for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
         rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
             key,
             rung_tag,
         )
-        assert pt1.get_by_physics_ladder_bucket(
+        rung_bytes = canonical_json_bytes(rung_key)
+        rung_hash = rrd._sha256(rung_bytes)
+        with sqlite3.connect(db_path) as conn:
+            (stored_rung_hash,) = conn.execute(
+                f"SELECT {rrd._physics_ladder_hash_column(rung_tag)} "
+                f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                (key_hash,),
+            ).fetchone()
+        assert stored_rung_hash == rung_hash, (
+            f"stored {rung_tag} hash {stored_rung_hash} != query hash {rung_hash}"
+        )
+        rung_hit = pt1.get_by_physics_ladder_bucket(
             artifact=artifact,
             rung_tag=rung_tag,
             rung_key=rung_key,
-            rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+            rung_hash=rung_hash,
             query_key=key,
-        ) is not None
+        )
+        policy_refusal = (
+            field == "pO2_bar"
+            and value == 0.0
+            and key.get("vapor_pressure_provider_selection") is not None
+            and rung_tag in {"h40c", "h30c"}
+        )
+        assert (rung_hit is None) is policy_refusal
     interpolation_candidates = pt1._list_interpolation_candidates(
         artifact=artifact,
         replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
@@ -5285,6 +5312,7 @@ def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
     control_name: str,
     invalid_value: bool,
     reader: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / f"pt1-invalid-{control_name}-{reader}-key.sqlite"
     key = _c3a_ladder_key(
@@ -5297,7 +5325,7 @@ def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
     original_key_hash = _key_hash(key)
     corrupt_key = copy.deepcopy(rrd._json_ready(key))
     corrupt_key["controls"][control_name] = invalid_value
-    corrupt_key_bytes, corrupt_key_hash, bucket_key, bucket_bytes = (
+    _corrupt_key_bytes, corrupt_key_hash, bucket_key, bucket_bytes = (
         _rewrite_pt1_key_and_derived_indexes(
             db_path,
             original_key_hash,
@@ -5316,11 +5344,16 @@ def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
         match=rf"controls\.{control_name}",
     ):
         if reader == "exact":
-            persistent._get_with_decoded(
+            with sqlite3.connect(db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                row = conn.execute(
+                    f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                    (corrupt_key_hash,),
+                ).fetchone()
+            assert row is not None
+            persistent._entry_from_row(
+                row,
                 artifact="equilibrium_post_record",
-                key=corrupt_key,
-                key_bytes=corrupt_key_bytes,
-                key_hash=corrupt_key_hash,
             )
         elif reader == "bucket":
             persistent._get_by_physics_bucket(
@@ -5328,7 +5361,7 @@ def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
                 physics_bucket_key=bucket_key,
                 physics_bucket_bytes=bucket_bytes,
                 physics_bucket_hash=rrd._sha256(bucket_bytes),
-                query_key=corrupt_key,
+                query_key=key,
             )
         elif reader == "ladder":
             persistent._get_by_physics_ladder_bucket(
@@ -5336,14 +5369,53 @@ def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
                 rung_tag=rung_tag,
                 rung_key=rung_key,
                 rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
-                query_key=corrupt_key,
+                query_key=key,
             )
         else:
             persistent._list_interpolation_candidates(
                 artifact="equilibrium_post_record",
                 replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
-                query_key=corrupt_key,
+                query_key=key,
             )
+
+    # A bad query is rejected before any SQLite read, even when the selector
+    # points at the stored row whose key was corrupted above.
+    def fail_if_read() -> Any:
+        pytest.fail("unindexable query reached the PT1 store")
+
+    monkeypatch.setattr(persistent, "_connect", fail_if_read)
+    bad_query = copy.deepcopy(key)
+    bad_query["controls"][control_name] = invalid_value
+    bad_query_bytes = canonical_json_bytes(bad_query)
+    if reader == "exact":
+        assert persistent._get_with_decoded(
+            artifact="equilibrium_post_record",
+            key=bad_query,
+            key_bytes=bad_query_bytes,
+            key_hash=rrd._sha256(bad_query_bytes),
+        ) is None
+    elif reader == "bucket":
+        assert persistent._get_by_physics_bucket(
+            artifact="equilibrium_post_record",
+            physics_bucket_key=bucket_key,
+            physics_bucket_bytes=bucket_bytes,
+            physics_bucket_hash=rrd._sha256(bucket_bytes),
+            query_key=bad_query,
+        ) is None
+    elif reader == "ladder":
+        assert persistent._get_by_physics_ladder_bucket(
+            artifact="equilibrium_post_record",
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+            query_key=bad_query,
+        ) is None
+    else:
+        assert persistent._list_interpolation_candidates(
+            artifact="equilibrium_post_record",
+            replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
+            query_key=bad_query,
+        ) == []
 
 
 def test_pt0_payload_collision_precedes_control_shape_rejection() -> None:
@@ -5411,6 +5483,42 @@ def test_pt0_exact_admission_rejects_boolean_control_shape() -> None:
         corrupt_key_bytes,
         corrupt_hash,
     ) is None
+
+
+def test_pt1_shard_copy_rejects_stored_control_shape_as_corrupt(
+    tmp_path: Path,
+) -> None:
+    source_path = tmp_path / "copy-invalid-control-source.sqlite"
+    target_path = tmp_path / "copy-invalid-control-target.sqlite"
+    key = _c3a_ladder_key(
+        "copy-invalid-control",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    _put_c3a_payload(source_path, key, "copy-invalid-control")
+    corrupt_key = copy.deepcopy(rrd._json_ready(key))
+    corrupt_key["controls"]["T_K"] = True
+    _rewrite_pt1_key_and_derived_indexes(
+        source_path,
+        _key_hash(key),
+        corrupt_key,
+    )
+
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match=r"controls\.T_K",
+    ):
+        rrd._copy_pt1_equilibrium_rows(
+            (source_path,),
+            target_path,
+            require_capture_epoch_match=False,
+        )
+
+    with sqlite3.connect(target_path) as conn:
+        (target_rows,) = conn.execute(
+            f"SELECT COUNT(*) FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert target_rows == 0
 
 
 def test_pt1_shard_merge_wraps_nested_stored_repair_notices(

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import os
 import sqlite3
 import sys
@@ -47,6 +48,37 @@ class RekeyResult:
 
 
 def _key_from_stored_row(row: sqlite3.Row) -> dict[str, Any]:
+    row_columns = set(row.keys())
+    # Green's legacy table predates both columns; partial current layouts stay
+    # on full admission rather than falling back to the weaker legacy check.
+    if not row_columns.intersection({"artifact", "store_schema_version"}):
+        legacy_required_columns = {
+            "key_hash",
+            "key_sha256",
+            "key_bytes",
+            "engine_version",
+        }
+        missing_columns = legacy_required_columns - row_columns
+        if missing_columns:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 legacy cache row is missing rekey columns: "
+                f"{','.join(sorted(missing_columns))}"
+            )
+        try:
+            key_bytes = row["key_bytes"]
+            if not isinstance(key_bytes, (bytes, bytearray, memoryview)):
+                raise TypeError("legacy key_bytes must be bytes")
+            key = json.loads(bytes(key_bytes).decode("utf-8"))
+        except (KeyError, TypeError, ValueError, RecursionError) as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 legacy cache row has invalid key JSON: {row['key_hash']}"
+            ) from exc
+        if not isinstance(key, dict):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 legacy cache row request key is not an object: {row['key_hash']}"
+            )
+        return key
+
     admitted = _admit_stored_row(row, store_kind="pt1")
     if admitted is None:
         raise PT1PersistentStoreCorrupt(

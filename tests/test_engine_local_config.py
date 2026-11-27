@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ctypes
+import hashlib
 import json
 import logging
 import os
@@ -33,10 +34,10 @@ from simulator.engine_local_config import (
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.reduced_real_determinism import (
     PT1_EQUILIBRIUM_TABLE,
+    canonical_json_bytes,
 )
 from simulator.corpus_version import current_corpus_version
 from scripts.rekey_cache_engine_identity import rekey_cache
-from tests.cache_rekey_fixtures import put_rekey_gate_row
 
 
 def _sample_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> EngineLocalConfig:
@@ -653,19 +654,71 @@ def test_rekey_migration_round_trip_and_idempotency(
             "engine_version": "vaporock 0.1.0 (/tmp/vaporock)",
         },
     }
-    key_hash, payload_bytes = put_rekey_gate_row(
-        db_path,
-        key,
-        engine_version=legacy_version,
-    )
-    put_rekey_gate_row(
-        db_path,
-        other_key,
-        engine_version=other_key["engine_version"],
-    )
+    key_bytes = canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    other_key_bytes = canonical_json_bytes(other_key)
+    other_key_hash = hashlib.sha256(other_key_bytes).hexdigest()
+    payload_bytes = b'{"payload": true}'
+    other_payload_bytes = b'{"other": true}'
+
     with sqlite3.connect(db_path) as conn:
         conn.execute(
-            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} DROP COLUMN corpus_version"
+            f"""
+            CREATE TABLE {PT1_EQUILIBRIUM_TABLE} (
+                key_hash TEXT PRIMARY KEY,
+                key_sha256 TEXT NOT NULL,
+                payload_sha256 TEXT NOT NULL,
+                key_bytes BLOB NOT NULL,
+                payload_bytes BLOB NOT NULL,
+                code_version TEXT NOT NULL,
+                engine_version TEXT,
+                data_digests_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                git_dirty INTEGER NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            f"""
+            INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
+                key_hash, key_sha256, payload_sha256,
+                key_bytes, payload_bytes, code_version, engine_version,
+                data_digests_json, created_at, git_dirty
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                key_hash,
+                key_hash,
+                hashlib.sha256(payload_bytes).hexdigest(),
+                key_bytes,
+                payload_bytes,
+                "code-v1",
+                legacy_version,
+                "{}",
+                "now",
+                0,
+            ),
+        )
+        conn.execute(
+            f"""
+            INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
+                key_hash, key_sha256, payload_sha256,
+                key_bytes, payload_bytes, code_version, engine_version,
+                data_digests_json, created_at, git_dirty
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                other_key_hash,
+                other_key_hash,
+                hashlib.sha256(other_payload_bytes).hexdigest(),
+                other_key_bytes,
+                other_payload_bytes,
+                "code-v1",
+                other_key["engine_version"],
+                "{}",
+                "now",
+                0,
+            ),
         )
 
     before_dry_run_bytes = db_path.read_bytes()

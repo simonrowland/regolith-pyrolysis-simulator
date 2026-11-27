@@ -3261,6 +3261,7 @@ def _require_write_candidate_admission(
     key: Mapping[str, Any],
     key_bytes: bytes,
     key_hash: str,
+    expected_payload: Mapping[str, Any] | None = None,
     physics_bucket_key: Mapping[str, Any] | None = None,
     physics_bucket_bytes: bytes | None = None,
     physics_bucket_hash: str | None = None,
@@ -3291,8 +3292,19 @@ def _require_write_candidate_admission(
                 "write_candidate_index",
             ) from exc
         raise UncacheablePayload(artifact, key_hash) from exc
-    if admitted is None or admitted.decoded_payload is None:
+    if admitted is None:
         raise UncacheablePayload(artifact, key_hash)
+    # A reader-context replay miss does not make well-formed caller data
+    # uncacheable; the encoded bytes and row shape are still checked below.
+    if expected_payload is not None:
+        try:
+            payload_matches = canonical_json_bytes(
+                admitted.entry["payload"]
+            ) == canonical_json_bytes(expected_payload)
+        except (OverflowError, TypeError, ValueError):
+            payload_matches = False
+        if not payload_matches:
+            raise UncacheablePayload(artifact, key_hash)
     return admitted
 
 
@@ -3347,12 +3359,16 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str | None = None,
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
+        # Preflight caller input in full before looking up a local or attached
+        # row. Replay-policy misses remain writable.
         indexability_error = _ladder_indexability(key)
         if indexability_error is not None:
             raise indexability_error
-        validate_reduced_real_equilibrium_record_key(artifact, key, payload)
+        try:
+            validate_reduced_real_equilibrium_record_key(artifact, key, payload)
+        except (PT1PersistentStoreCorrupt, RuntimeError) as exc:
+            raise UncacheablePayload(artifact, key_hash) from exc
         payload_codec_version = _payload_codec_version(artifact)
-        validate_repair_notices_json(repair_notices_json)
         if self.strict_vapor_gate:
             assert_strict_vapor_pt1_row(
                 artifact=artifact,
@@ -3368,6 +3384,56 @@ class PT1PersistentEquilibriumStore:
             physics_bucket_hash = _sha256(physics_bucket_bytes)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         ladder_values = _physics_ladder_values_from_replay_key(key)
+
+        preflight_row: dict[str, Any] = {
+            "key_hash": key_hash,
+            "artifact": artifact,
+            "store_schema_version": PT1_STORE_SCHEMA_VERSION,
+            "request_schema_version": SCHEMA_VERSION,
+            "key_sha256": key_hash,
+            "payload_sha256": payload_hash,
+            "payload_codec_version": payload_codec_version,
+            "key_bytes": key_bytes,
+            "payload_bytes": payload_bytes,
+            "code_version": _code_version(),
+            "corpus_version": None,
+            "engine_version": _none_or_str(engine_version_provenance),
+            "data_digests_json": "{}",
+            "repair_notices_json": repair_notices_json,
+            "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
+            "physics_bucket_sha256": physics_bucket_hash,
+            "replay_scope_sha256": _replay_scope_hash(physics_bucket_key),
+            "physics_key_bytes": physics_bucket_bytes,
+            "created_at": (
+                datetime.now(timezone.utc)
+                .isoformat()
+                .replace("+00:00", "Z")
+            ),
+            "git_dirty": self._epoch_git_dirty,
+            "law_disclosures_json": _law_disclosures_json(
+                incoming_disclosures
+            ),
+        }
+        for rung_tag, values in ladder_values.items():
+            preflight_row[_physics_ladder_hash_column(rung_tag)] = values[
+                "sha256"
+            ]
+            preflight_row[_physics_ladder_distance_column(rung_tag)] = values[
+                "distance"
+            ]
+        _require_write_candidate_admission(
+            preflight_row,
+            store_kind="pt1",
+            artifact=artifact,
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+            expected_payload=payload,
+            physics_bucket_key=physics_bucket_key,
+            physics_bucket_bytes=physics_bucket_bytes,
+            physics_bucket_hash=physics_bucket_hash,
+        )
+
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
@@ -3449,6 +3515,7 @@ class PT1PersistentEquilibriumStore:
                         key=key,
                         key_bytes=key_bytes,
                         key_hash=key_hash,
+                        expected_payload=payload,
                         physics_bucket_key=physics_bucket_key,
                         physics_bucket_bytes=physics_bucket_bytes,
                         physics_bucket_hash=physics_bucket_hash,
@@ -3605,6 +3672,7 @@ class PT1PersistentEquilibriumStore:
                 key=key,
                 key_bytes=key_bytes,
                 key_hash=key_hash,
+                expected_payload=payload,
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
@@ -4401,6 +4469,7 @@ def _copy_pt1_equilibrium_rows(
             admitted = _admit_stored_row(
                 row,
                 store_kind="pt1",
+                validate_interpolation_domain=True,
             )
             assert admitted is not None and admitted.stored_columns is not None
             key_hash = str(admitted.entry["key_hash"])
@@ -4449,16 +4518,12 @@ def _copy_pt1_equilibrium_rows(
                     store_kind="pt1",
                     output_columns=target_columns,
                     strict_source_validation=strict_source_validation,
+                    validate_interpolation_domain=True,
                 )
                 assert (
                     incoming_admission is not None
                     and incoming_admission.stored_columns is not None
                 )
-                indexability_error = _ladder_indexability(
-                    incoming_admission.entry["key"]
-                )
-                if indexability_error is not None:
-                    raise indexability_error
                 incoming_row = incoming_admission.stored_columns
                 key_hash = str(incoming_admission.entry["key_hash"])
                 incoming_admitted = incoming_admission.decoded_payload is not None
@@ -4503,6 +4568,7 @@ def _copy_pt1_equilibrium_rows(
                     merged_admission = _admit_stored_row(
                         merge_stored_sidecars(),
                         store_kind="pt1",
+                        validate_interpolation_domain=True,
                     )
                     assert (
                         merged_admission is not None
@@ -7249,6 +7315,30 @@ def _replay_key_composition_shape(
     return composition, None
 
 
+def _replay_key_control_shape(
+    key: Mapping[str, Any],
+) -> tuple[dict[str, float] | None, str | None]:
+    """Return finite numeric controls with string names, or the bad field."""
+
+    raw_controls = key.get("controls", {})
+    if not isinstance(raw_controls, Mapping):
+        return None, "controls"
+    controls: dict[str, float] = {}
+    for name, value in raw_controls.items():
+        if not isinstance(name, str):
+            return None, "controls"
+        if not is_declared_real_scalar(value):
+            return None, f"controls.{name}"
+        try:
+            number = float(value)
+        except (OverflowError, TypeError, ValueError):
+            return None, f"controls.{name}"
+        if not math.isfinite(number):
+            return None, f"controls.{name}"
+        controls[name] = number
+    return controls, None
+
+
 def _ladder_indexability(
     key: Mapping[str, Any],
     *,
@@ -7262,29 +7352,9 @@ def _ladder_indexability(
             composition_error or "composition_mol_fraction",
         )
 
-    raw_controls = key.get("controls", {})
-    if not isinstance(raw_controls, Mapping):
-        return UncacheableKey(first_rung, "controls")
-    controls: dict[str, float] = {}
-    for name, value in raw_controls.items():
-        if not isinstance(name, str) or not is_declared_real_scalar(value):
-            return UncacheableKey(
-                first_rung,
-                f"controls.{name}",
-            )
-        try:
-            number = float(value)
-        except (OverflowError, TypeError, ValueError):
-            return UncacheableKey(
-                first_rung,
-                f"controls.{name}",
-            )
-        if not math.isfinite(number):
-            return UncacheableKey(
-                first_rung,
-                f"controls.{name}",
-            )
-        controls[name] = number
+    controls, controls_error = _replay_key_control_shape(key)
+    if controls_error is not None or controls is None:
+        return UncacheableKey(first_rung, controls_error or "controls")
 
     rungs = (
         ((rung_tag, _physics_ladder_sig_figs(rung_tag)),)

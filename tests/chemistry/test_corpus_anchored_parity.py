@@ -32,10 +32,11 @@ chunk-20/Phase-A-cohort-1 acceptance criterion.
 
 from __future__ import annotations
 
-from collections import Counter
+import hashlib
 import math
 import sqlite3
 import warnings
+from collections import Counter
 from pathlib import Path
 from typing import Mapping
 
@@ -45,7 +46,10 @@ import yaml
 from scripts import cache_convert
 from scripts import grid_pregrind
 from simulator.corpus_version import current_corpus_version
-from simulator.reduced_real_determinism import validated_rekey_corpus_version
+from simulator.reduced_real_determinism import (
+    PT1PersistentStoreCorrupt,
+    validated_rekey_corpus_version,
+)
 from scripts import rekey_cache_engine_identity as rekey
 from scripts import sso_r_validation_map
 from scripts import validate_cache_c4_interpolation as c4_validation
@@ -79,7 +83,6 @@ from tests.chemistry.corpus_fixtures import (
     sf2004_table8_atomic_ratio_anchors,
     _kress91_iw_log_fO2,
 )
-from tests.cache_rekey_fixtures import put_rekey_gate_row
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -2093,14 +2096,30 @@ def test_f353_backend_or_unknown_status_is_not_physics_refusal(status: str) -> N
 
 
 def _write_rekey_table_with_physics_column(db_path: Path) -> None:
-    put_rekey_gate_row(
-        db_path,
+    key_bytes = rekey.canonical_json_bytes(
         {
             "backend": {"backend_name": "alphamelts"},
             "engine_version": "legacy-engine",
-        },
-        engine_version="legacy-engine",
+        }
     )
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"""
+            CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
+                key_hash TEXT PRIMARY KEY,
+                key_sha256 TEXT,
+                key_bytes BLOB,
+                engine_version TEXT,
+                corpus_version TEXT,
+                replay_scope_sha256 TEXT
+            )
+            """
+        )
+        conn.execute(
+            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?, ?)",
+            (key_hash, key_hash, key_bytes, "legacy-engine", None, "stale-scope"),
+        )
 
 
 def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
@@ -2109,11 +2128,6 @@ def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
 ) -> None:
     db_path = tmp_path / "cache.db"
     _write_rekey_table_with_physics_column(db_path)
-    with sqlite3.connect(db_path) as conn:
-        original = conn.execute(
-            f"SELECT corpus_version, replay_scope_sha256 "
-            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
-        ).fetchone()
 
     def fail_physics(_key):
         raise ValueError("synthetic physics derivation failure")
@@ -2126,11 +2140,31 @@ def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
         )
 
     with sqlite3.connect(db_path) as conn:
-        after = conn.execute(
+        corpus_version, replay_scope = conn.execute(
             f"SELECT corpus_version, replay_scope_sha256 "
             f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
-    assert after == original
+    assert corpus_version is None
+    assert replay_scope == "stale-scope"
+
+
+def test_rekey_rejects_legacy_key_that_is_not_a_json_object(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "legacy-non-object-key.db"
+    _write_rekey_table_with_physics_column(db_path)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} SET key_bytes = ?",
+            (b"[]",),
+        )
+
+    with pytest.raises(PT1PersistentStoreCorrupt, match="not an object"):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=current_corpus_version(),
+            dry_run=True,
+        )
 
 
 def test_f360_rekey_rejects_undeclared_corpus_version() -> None:
