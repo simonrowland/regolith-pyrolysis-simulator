@@ -318,8 +318,13 @@ def test_figure_read_uncertainty_floor_fails_when_mutated_below_pixel() -> None:
     with pytest.raises(AssertionError):
         _assert_figure_read_uncertainty_bounds(document)
 
-    row["values"]["read_uncertainty_K"] = "5"
-    row["values"]["read_uncertainty_mol_pct"] = "0.01"
+    document = _load()
+    row = next(
+        row
+        for row in _figure_read_rows(document)
+        if row["observation_id"] == "shornikov_2020_fig1_s2_06"
+    )
+    row["values"]["read_uncertainty_mol_pct"] = "0.03"
     with pytest.raises(AssertionError):
         _assert_figure_read_uncertainty_bounds(document)
 
