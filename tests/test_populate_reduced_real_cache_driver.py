@@ -1001,6 +1001,59 @@ def test_merge_cache_shard_rejects_missing_vapor_source_provenance(tmp_path):
     assert driver._cache_row_summary(target_db)["rows"] == 0
 
 
+@pytest.mark.parametrize("corruption", ("non_mapping", "provider_shape", "stale"))
+def test_cache_summary_counts_rejected_rows_without_reading_their_payload(
+    tmp_path,
+    corruption,
+):
+    db_path = tmp_path / f"cache-summary-{corruption}.db"
+    key = _strict_vapor_pt1_key(f"summary-{corruption}")
+    payload = _strict_vapor_pt1_payload()
+    _write_equilibrium_post_record_row(db_path, key=key, payload=payload)
+    key_hash = hashlib.sha256(_canonical_bytes(key)).hexdigest()
+    if corruption == "non_mapping":
+        payload_bytes = _canonical_bytes([])
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+                (
+                    sqlite3.Binary(payload_bytes),
+                    hashlib.sha256(payload_bytes).hexdigest(),
+                    key_hash,
+                ),
+            )
+    elif corruption == "provider_shape":
+        payload["authority"]["provider"] = []
+        payload_bytes = _canonical_bytes(payload)
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+                (
+                    sqlite3.Binary(payload_bytes),
+                    hashlib.sha256(payload_bytes).hexdigest(),
+                    key_hash,
+                ),
+            )
+    else:
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_codec_version = ? WHERE key_hash = ?",
+                (0, key_hash),
+            )
+
+    summary = driver._cache_row_summary(db_path)
+
+    assert summary["rows"] == 1
+    assert summary["by_artifact"] == {"equilibrium_post_record": 1}
+    assert summary["by_provider"] == {"equilibrium_post_record||": 1}
+    assert summary["unique_keys"] == 1
+    assert summary["magemin_unique_keys"] == 1
+    assert driver._magemin_key_hashes(db_path) == {key_hash}
+
+
 def test_main_preflight_rejects_fallback_enabled_setpoints(tmp_path, monkeypatch):
     profile = tmp_path / "profile.yaml"
     profile.write_text(

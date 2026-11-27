@@ -2547,6 +2547,11 @@ def _admit_stored_row(
                 raise PT0CacheCollision(
                     f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
                 )
+            if physics_bucket_hash is not None and (
+                stored_artifact != artifact
+                or raw_row.get("physics_bucket_hash") != physics_bucket_hash
+            ):
+                return None
             stored_key_hash = raw_row.get("key_hash")
             if stored_key_hash is not None and key_hash is not None and (
                 stored_key_hash != key_hash
@@ -2598,11 +2603,6 @@ def _admit_stored_row(
                     f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
                 )
             if physics_bucket_hash is not None:
-                if raw_row.get("artifact") != artifact:
-                    return None
-                stored_bucket_hash = raw_row.get("physics_bucket_hash")
-                if stored_bucket_hash != physics_bucket_hash:
-                    return None
                 if (
                     stored_bucket != _json_ready(physics_bucket_key)
                     or stored_bucket_bytes != physics_bucket_bytes
@@ -2762,7 +2762,11 @@ def _admit_stored_row(
                     f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
                 )
             indexed_distance = row[_physics_ladder_distance_column(rung_tag)]
-            if isinstance(indexed_distance, bool) or indexed_distance is None:
+            if indexed_distance is None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
+                )
+            if isinstance(indexed_distance, bool):
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
                 )
@@ -2976,7 +2980,11 @@ def _admit_stored_row(
             payload_codec_version,
         ):
             return _AdmittedStoredRow(
-                {"artifact": row_artifact, "key_hash": row_hash},
+                {
+                    "artifact": row_artifact,
+                    "key": copy.deepcopy(dict(row_key)),
+                    "key_hash": row_hash,
+                },
                 None,
                 stored_columns=row,
                 stale_payload_codec=True,

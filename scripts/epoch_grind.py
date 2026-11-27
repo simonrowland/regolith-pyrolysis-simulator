@@ -74,6 +74,7 @@ from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
+    _admit_stored_row,
     _copy_pt1_equilibrium_rows,
 )
 from simulator.interpolation_uncertainty import (
@@ -1086,7 +1087,7 @@ def _seed_cache_rows_from_base(
         placeholders = ",".join("?" for _ in point_ids)
         rows = conn.execute(
             f"""
-            SELECT key_hash, key_bytes
+            SELECT *
             FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
             WHERE key_hash IN ({placeholders})
             """,
@@ -1105,7 +1106,13 @@ def _seed_cache_rows_from_base(
         for point in clean_sources:
             point_id = str(point["point_id"])
             row = rows_by_hash[point_id]
-            key_payload = _seed_row_key_payload(row)
+            admitted = _admit_stored_row(
+                row,
+                store_kind="pt1",
+                strict_source_validation=True,
+            )
+            assert admitted is not None
+            key_payload = admitted.entry["key"]
             rejection = _seed_epoch_rejection(
                 key_payload,
                 expected_seed_epoch=expected_seed_epoch,
@@ -1162,25 +1169,6 @@ def _current_seed_epoch_identity() -> dict[str, Any]:
         "recipe_schema_version": schema.recipe_schema_version,
         "recipe_id_required": True,
     }
-
-
-def _seed_row_key_payload(row: sqlite3.Row) -> dict[str, Any]:
-    try:
-        raw = row["key_bytes"]
-        if isinstance(raw, str):
-            key_bytes = raw.encode("utf-8")
-        else:
-            key_bytes = bytes(raw)
-        decoded = json.loads(key_bytes.decode("utf-8"))
-    except (TypeError, ValueError, UnicodeDecodeError) as exc:
-        raise ValueError(
-            f"acquisition seed row has invalid key_bytes for {row['key_hash']!r}"
-        ) from exc
-    if not isinstance(decoded, Mapping):
-        raise ValueError(
-            f"acquisition seed row key_bytes is not a mapping for {row['key_hash']!r}"
-        )
-    return dict(decoded)
 
 
 def _seed_epoch_rejection(

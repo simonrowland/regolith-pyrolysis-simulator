@@ -19,6 +19,7 @@ from simulator.corpus_version import current_corpus_version
 from simulator.reduced_real_determinism import (
     PT0_GATE_CURVE_CODEC_VERSION,
     PT1PersistentEquilibriumStore,
+    PT1PersistentStoreCorrupt,
     canonical_json_bytes,
 )
 from tests._plugins.time_isolation import patch_module_time
@@ -1432,6 +1433,44 @@ def test_epoch_seed_carries_codec_stamp_across_pt1_column_layouts(
     )
     assert summary["seed_rows"] == 1
     assert stored_version == expected_version
+
+
+def test_epoch_seed_key_decode_uses_stored_row_admission(tmp_path: Path) -> None:
+    base = tmp_path / "deep-key-base.sqlite"
+    original_hash = _put_pt1_cache_row(base, "deep-key")
+    with sqlite3.connect(base) as conn:
+        (original_key_bytes,) = conn.execute(
+            f"SELECT key_bytes FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (original_hash,),
+        ).fetchone()
+        deep_key_bytes = (
+            bytes(original_key_bytes)[:-1]
+            + b',"unread":'
+            + b"[" * 1100
+            + b"0"
+            + b"]" * 1100
+            + b"}"
+        )
+        point_id = hashlib.sha256(deep_key_bytes).hexdigest()
+        conn.execute(
+            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_sha256 = ?, key_bytes = ? WHERE key_hash = ?",
+            (
+                point_id,
+                point_id,
+                sqlite3.Binary(deep_key_bytes),
+                original_hash,
+            ),
+        )
+
+    with pytest.raises(PT1PersistentStoreCorrupt, match="invalid stored fields"):
+        epoch_grind.seed_job_cache(
+            tmp_path / "deep-key-shard.sqlite",
+            base,
+            point_sources=[{"point_id": point_id, "source": "ladder_polish"}],
+            job_id="job-deep-key",
+        )
 
 
 def test_epoch_merge_preserves_payload_codec_stamp(tmp_path: Path) -> None:

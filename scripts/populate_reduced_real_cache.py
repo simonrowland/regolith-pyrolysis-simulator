@@ -720,20 +720,39 @@ def _cache_row_summary(db_path: Path) -> dict[str, Any]:
     for raw_row in payload_rows:
         admitted = _admit_stored_row(raw_row, store_kind="pt1")
         assert admitted is not None
-        if admitted.stale_payload_codec:
-            continue
         entry = admitted.entry
-        key = entry["key"]
-        payload = entry["payload"]
-        authority = payload.get("authority") or {}
-        provider = authority.get("provider") or {}
-        namespace_id = str(key.get("namespace_id") or "")
+        key = entry.get("key")
+        namespace_id = (
+            str(key.get("namespace_id") or "")
+            if isinstance(key, Mapping)
+            else ""
+        )
+        provider_id = ""
+        provider_role = ""
+        if (
+            not admitted.stale_payload_codec
+            and admitted.decoded_payload is not None
+        ):
+            payload = entry.get("payload")
+            authority = (
+                payload.get("authority")
+                if isinstance(payload, Mapping)
+                else None
+            )
+            provider = (
+                authority.get("provider")
+                if isinstance(authority, Mapping)
+                else None
+            )
+            if isinstance(provider, Mapping):
+                provider_id = str(provider.get("resolved_provider_id") or "")
+                provider_role = str(provider.get("resolved_role") or "")
         rows.append(
             {
                 "key_hash": entry["key_hash"],
                 "artifact": entry["artifact"],
-                "provider_id": provider.get("resolved_provider_id", ""),
-                "provider_role": provider.get("resolved_role", ""),
+                "provider_id": provider_id,
+                "provider_role": provider_role,
                 "namespace_id": namespace_id,
             }
         )
@@ -761,10 +780,10 @@ def _magemin_key_hashes(db_path: Path) -> set[str]:
     for row in _cache_payload_rows(db_path):
         admitted = _admit_stored_row(row, store_kind="pt1")
         assert admitted is not None
-        if admitted.stale_payload_codec:
-            continue
-        key = admitted.entry["key"]
-        if str(key.get("namespace_id") or "").startswith("magemin:"):
+        key = admitted.entry.get("key")
+        if isinstance(key, Mapping) and str(
+            key.get("namespace_id") or ""
+        ).startswith("magemin:"):
             key_hashes.add(str(admitted.entry["key_hash"]))
     return key_hashes
 

@@ -3346,6 +3346,33 @@ def test_pt2_ladder_columns_are_nullable_additive(tmp_path: Path) -> None:
         assert column_flags[column] == 0
 
 
+def test_pt0_bucket_lookup_skips_corruption_from_another_bucket(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt0-other-bucket-corruption.sqlite"
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    key_a = _freeze_gate_key()
+    key_b = copy.deepcopy(key_a)
+    key_b["controls"]["T_K"] += 1.0
+    payload = _valid_test_gate_payload()
+    store._store("freeze_gate_curve", key_a, payload, law_disclosures=[])
+    store._store("freeze_gate_curve", key_b, payload, law_disclosures=[])
+    key_hash_a = _key_hash(key_a)
+    key_hash_b = _key_hash(key_b)
+    store._entries[key_hash_a]["payload"]["curve"]["liquidus_T_C"] += 1.0
+    del store._entries[key_hash_b]
+
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key_b)
+    hit = store._entry_for_physics_bucket(
+        "freeze_gate_curve",
+        bucket_key,
+        query_key=key_b,
+    )
+
+    assert hit is not None
+    assert hit[0]["key_hash"] == key_hash_b
+
+
 def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -> None:
     class AlphaMELTSBackend(RealBackendAuthority):
         real_backend_family = RealBackendFamily.ALPHAMELTS
@@ -5938,11 +5965,18 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
         return {
             "artifact": "freeze_gate_curve",
             "store_schema_version": rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,
+            "request_schema_version": rrd.SCHEMA_VERSION,
             "key_hash": key_hash,
             "key_sha256": key_hash,
             "key_bytes": key_bytes,
             "payload_bytes": payload_bytes,
             "payload_sha256": rrd._sha256(payload_bytes),
+            "code_version": rrd._code_version(),
+            "corpus_version": None,
+            "engine_version": None,
+            "data_digests_json": "{}",
+            "created_at": "2026-11-27T00:00:00Z",
+            "git_dirty": 0,
             "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
         }
 
