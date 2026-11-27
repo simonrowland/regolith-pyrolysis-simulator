@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import warnings
 
 
 BASE_SHA = "8d953a6cd26d42310b9fba5851c4f87dc0991d13"
@@ -207,7 +208,7 @@ def run_digest_group(study_key: str, group_index: int) -> None:
             and candidate["row_residual_digests"]
             == base["row_residual_digests"]
         )
-        print("IA_R6_DIGEST_GROUP_PAIR " + json.dumps({
+        warnings.warn("IA_R6_DIGEST_GROUP_PAIR " + json.dumps({
             "study": label,
             "source_id": source_id,
             "group_index": group_index,
@@ -226,7 +227,7 @@ def run_digest_group(study_key: str, group_index: int) -> None:
             "same_rows": same_rows,
             "base": base,
             "candidate": candidate,
-        }, sort_keys=True, separators=(",", ":")), flush=True)
+        }, sort_keys=True, separators=(",", ":")), stacklevel=2)
         assert candidate["budget_refusal_rows"] == base["budget_refusal_rows"] == 0
         assert same_rows, f"{study_key} row digest mismatch in group {group_index}"
     finally:
