@@ -75,6 +75,47 @@ class EllinghamFitSegment:
             - float(temperature_K) * self.dS_f_kJ_per_mol_K_per_mol_O2
         )
 
+
+@dataclass(frozen=True)
+class _EllinghamOxideActivityReference:
+    source_phase_marker: str
+    liquid_phase_marker: str | None
+    fusion_pair_key: str
+    source_phase_active: bool
+    reconstructed_upper_mn: bool
+
+
+def _ellingham_oxide_activity_reference(
+    metal: str,
+    temperature_K: float,
+    phase_basis: str,
+) -> _EllinghamOxideActivityReference:
+    """Shared phase labels for oxide K versus liquid melt activity.
+
+    The fallback metal pressure and the saturation floor consume the same
+    Ellingham rows, so their phase markers and reconstructed upper-Mn rule
+    must agree. This helper owns those labels without importing JANAF data.
+    """
+
+    references = {
+        "Cr": ("Cr2O3(s)", None, "Cr2O3"),
+        "Ti": ("TiO2(rutile,s)", "TiO2(l)", "TiO2"),
+        "Ni": ("NiO(s)", None, "NiO"),
+        "Mn": ("MnO(s)", None, "MnO"),
+    }
+    solid_marker, liquid_marker, fusion_pair_key = references[metal]
+    reconstructed_upper_mn = metal == "Mn" and temperature_K > 2058.0
+    source_marker = (
+        "MnO(lit. liquid range)" if reconstructed_upper_mn else solid_marker
+    )
+    return _EllinghamOxideActivityReference(
+        source_phase_marker=source_marker,
+        liquid_phase_marker=liquid_marker,
+        fusion_pair_key=fusion_pair_key,
+        source_phase_active=source_marker in phase_basis,
+        reconstructed_upper_mn=reconstructed_upper_mn,
+    )
+
 ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     # Legacy representative high-T coefficients kept for keying/stoichiometry
     # compatibility. Authoritative dG(T) now comes from ELLINGHAM_FIT_SEGMENTS.

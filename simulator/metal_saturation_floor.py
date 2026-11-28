@@ -29,6 +29,7 @@ from collections.abc import Mapping
 
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_CONDENSED,
+    _ellingham_oxide_activity_reference,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_metal_phase_kind,
     ellingham_segment_for_temperature,
@@ -168,29 +169,33 @@ def _ellingham_metal_saturation_log10_fO2_bar(
     # fusion helper. NiO has no fusion pair, and reconstructed Mn above 2058 K
     # has no grounded liquid Gibbs basis; both retain this estimate with a
     # typed caveat when their floor binds.
-    crystal_phase_markers = {
-        "SiO2": ("SiO2(II)", "SiO2(II)"),
-        "Cr2O3": ("Cr2O3(s)", "Cr2O3"),
-        "TiO2": ("TiO2(rutile,s)", "TiO2"),
-        "MnO": ("MnO(s)", "MnO"),
-        "NiO": ("NiO(s)", "NiO"),
-    }
     oxide = next(
         oxide
         for candidate, oxide in METAL_SATURATION_FLOOR_OXIDES
         if candidate == metal
     )
-    source_phase_marker, fusion_pair_key = crystal_phase_markers[oxide]
-    if metal == "Mn" and temperature_K > 2058.0:
-        source_phase_marker = "MnO(lit. liquid range)"
+    reconstructed_upper_mn = False
+    if metal == "Si":
+        source_phase_marker, fusion_pair_key = "SiO2(II)", "SiO2(II)"
+        source_phase_active = source_phase_marker in segment.phase_basis
+    else:
+        phase_reference = _ellingham_oxide_activity_reference(
+            metal,
+            temperature_K,
+            segment.phase_basis,
+        )
+        source_phase_marker = phase_reference.source_phase_marker
+        fusion_pair_key = phase_reference.fusion_pair_key
+        source_phase_active = phase_reference.source_phase_active
+        reconstructed_upper_mn = phase_reference.reconstructed_upper_mn
     conversion_caveat: str | None = None
-    if source_phase_marker in segment.phase_basis:
+    if source_phase_active:
         from simulator.reference_data.janaf import (
             JanafMissingFusionPairError,
             JanafOutOfRangeError,
         )
 
-        if metal == "Mn" and temperature_K > 2058.0:
+        if reconstructed_upper_mn:
             # Inspect the shipped JANAF pair as missing-data evidence, but do
             # not convert this project-reconstructed Ellingham K even if the
             # pair exists: the liquid-range phase label does not ground its

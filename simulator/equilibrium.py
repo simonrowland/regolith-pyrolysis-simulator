@@ -19,6 +19,7 @@ from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
+    _ellingham_oxide_activity_reference,
     ellingham_authority_diagnostic,
     ellingham_authority_limit,
     ellingham_delta_g_kj_per_mol_o2,
@@ -429,6 +430,7 @@ class EquilibriumMixin:
             _metadata_value,
             _o2_channel_term_and_potential,
             _pow10_pressure_or_raise,
+            _publishes_vapor_pressure,
             _raise_invalid_antoine_coefficient,
             _range_tuple,
             _require_finite_vapor_value,
@@ -1415,37 +1417,46 @@ class EquilibriumMixin:
                         n_ox * cao_liquid_standard_log10_factor
                     )
             elif parent_oxide in {
-                'K2O', 'Al2O3', 'TiO2', 'Cr2O3', 'NiO', 'MnO', 'ZrO2'
+                'FeO', 'K2O', 'Al2O3', 'TiO2', 'Cr2O3', 'NiO', 'MnO', 'ZrO2'
             }:
                 active_segment = ellingham_segment_for_temperature(
                     species, T_K
                 )
                 source_phase_basis = active_segment.phase_basis
+                phase_reference = (
+                    _ellingham_oxide_activity_reference(
+                        species,
+                        T_K,
+                        source_phase_basis,
+                    )
+                    if species in {'Cr', 'Ti', 'Ni', 'Mn'}
+                    else None
+                )
                 solid_phase_markers = {
+                    'FeO': 'FeO(s)',
                     'K2O': 'K2O(cr)',
                     'Al2O3': 'Al2O3(alpha,s)',
-                    'TiO2': 'TiO2(rutile,s)',
-                    'Cr2O3': 'Cr2O3(s)',
-                    'NiO': 'NiO(s)',
-                    'MnO': 'MnO(s)',
                     'ZrO2': 'ZrO2(II)',
                 }
                 liquid_phase_markers = {
+                    'FeO': 'FeO(l)',
                     'Al2O3': 'Al2O3(l)',
-                    'TiO2': 'TiO2(l)',
                 }
-                liquid_marker = liquid_phase_markers.get(parent_oxide)
+                liquid_marker = (
+                    phase_reference.liquid_phase_marker
+                    if phase_reference is not None
+                    else liquid_phase_markers.get(parent_oxide)
+                )
                 if liquid_marker and liquid_marker in source_phase_basis:
                     # The active Ellingham segment already carries the
                     # liquid-oxide reference used by the melt activity.
                     pass
                 else:
-                    source_phase_marker = solid_phase_markers[parent_oxide]
-                    if (
-                        parent_oxide == 'MnO'
-                        and 'MnO(lit. liquid range)' in source_phase_basis
-                    ):
-                        source_phase_marker = 'MnO(lit. liquid range)'
+                    source_phase_marker = (
+                        phase_reference.source_phase_marker
+                        if phase_reference is not None
+                        else solid_phase_markers[parent_oxide]
+                    )
                     source_phase_name = (
                         f"{source_phase_marker}, {active_segment.janaf_anchor}"
                     )
@@ -1454,18 +1465,37 @@ class EquilibriumMixin:
                     )
                     pair_markers = {
                         'Al2O3': 'Al2O3(alpha,s)',
-                        'TiO2': 'TiO2(rutile,s)',
-                        'Cr2O3': 'Cr2O3(s)',
+                        'FeO': 'FeO(s)',
                         'ZrO2': 'ZrO2(II)',
                     }
+                    pair_marker = (
+                        phase_reference.source_phase_marker
+                        if phase_reference is not None
+                        else pair_markers.get(parent_oxide)
+                    )
+                    pair_marker_active = (
+                        phase_reference.source_phase_active
+                        if phase_reference is not None
+                        else bool(
+                            pair_marker
+                            and pair_marker in source_phase_basis
+                        )
+                    )
                     if (
-                        parent_oxide in pair_markers
-                        and pair_markers[parent_oxide] in source_phase_basis
+                        parent_oxide in {
+                            'FeO', 'Al2O3', 'TiO2', 'Cr2O3', 'ZrO2'
+                        }
+                        and pair_marker_active
                     ):
                         try:
                             liquid_standard_log10_factor = (
                                 _oxide_liquid_standard_log10_factor_per_oxide(
-                                    parent_oxide, T_K
+                                    (
+                                        phase_reference.fusion_pair_key
+                                        if phase_reference is not None
+                                        else parent_oxide
+                                    ),
+                                    T_K,
                                 )
                             )
                         except (
@@ -1500,6 +1530,9 @@ class EquilibriumMixin:
                             # Sanity: the shift is zero at each melting
                             # crossing and positive below Tm because the
                             # liquid has the higher Gibbs energy there.
+                            # For low-temperature Fe, n_ox=n_M=2, so the
+                            # square-root metal pressure inherits one
+                            # per-FeO correction (0.075147 dex at 1500 K).
                             K_decomp *= 10.0 ** (
                                 n_ox * liquid_standard_log10_factor
                             )
@@ -1525,10 +1558,18 @@ class EquilibriumMixin:
                                 'activity; mismatch magnitude is unknown.'
                             ),
                             'MnO': (
-                                'No grounded liquid MnO Gibbs table is '
-                                'available for this crystalline K. The K is '
-                                'retained with the liquid-standard activity; '
-                                'mismatch magnitude is unknown.'
+                                'The MnO liquid-range label above 2058 K uses '
+                                'the same reconstructed coefficients as the '
+                                'crystalline segment; no grounded liquid '
+                                'standard MnO Gibbs energy is available.'
+                                if phase_reference is not None
+                                and phase_reference.reconstructed_upper_mn
+                                else (
+                                    'No grounded liquid MnO Gibbs table is '
+                                    'available for this crystalline K. The K is '
+                                    'retained with the liquid-standard activity; '
+                                    'mismatch magnitude is unknown.'
+                                )
                             ),
                         }
                         activity_standard_state_flags[species] = (
@@ -1827,6 +1868,18 @@ class EquilibriumMixin:
                     else float(data.get('oxide_activity_exponent', 1.0))
                 )
                 oxide_activity = None
+                if (
+                    compiled_evaluator is not None
+                    and activity_exponent == 0.0
+                    and float(melt_account_mol.get(parent_oxide, 0.0) or 0.0)
+                    <= 0.0
+                ):
+                    # A zero reaction activity exponent removes the activity
+                    # multiplier, not the requirement for its source oxide to
+                    # be present (FeO association is defined at pure-Fe
+                    # saturation, but only in an Fe-bearing melt).
+                    _sz_activity_skip(name, None)
+                    continue
                 if compiled_evaluator is None or activity_exponent != 0.0:
                     oxide_activity = melt_oxide_activity(
                         parent_oxide,
@@ -2001,11 +2054,30 @@ class EquilibriumMixin:
 
             if name in oxide_vapor_extrapolations:
                 oxide_vapor_extrapolations[name]["computed_pressure_Pa"] = P_sat
-            if P_sat > 1e-15:
+            if _publishes_vapor_pressure(
+                P_sat,
+                retain_subthreshold=(
+                    compiled_evaluator is not None
+                    or bool(data.get('retain_analytical_pressure_channel', False))
+                ),
+            ):
                 vapor_pressures[name] = P_sat
+                status_bearing_non_authority = (
+                    str(data.get('authority_class', '')).lower()
+                    == 'analytical_non_authoritative'
+                    or str(data.get('runtime_disposition', '')).lower()
+                    == 'status_bearing_non_authoritative'
+                )
                 vapor_pressure_sources[name] = vapor_pressure_source_label(
-                    ('builtin_extrapolation_limited'
-                     if name in oxide_vapor_extrapolations else 'builtin_authoritative'),
+                    (
+                        'builtin_authority_limited'
+                        if status_bearing_non_authority
+                        else (
+                            'builtin_extrapolation_limited'
+                            if name in oxide_vapor_extrapolations
+                            else 'builtin_authoritative'
+                        )
+                    ),
                     data,
                     coefficient_block=coefficient_block,
                     temperature_K=T_K,

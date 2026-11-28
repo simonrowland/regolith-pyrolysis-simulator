@@ -2307,9 +2307,9 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
         vapor_pressure_data,
         melt=_CaOnlyMelt(),
     )._internal_analytical_equilibrium()
-    # d-478: the fallback now evaluates Ca against surface pO2 derived from
-    # melt redox; this replaces the old transport-pO2 value. The kernel value
-    # below remains pinned to its separate provider-car behavior.
+    # d-478: base already used melt-dissociation pO2. The 12.93x fallback
+    # shift at 1713 K is the Ca-027/Ca-028 crystalline-to-liquid standard-
+    # state correction; the kernel value remains on the separate provider car.
     assert legacy.vapor_pressures_Pa["Ca"].hex() == "0x1.529aba65ce20fp-11"
     ca_reference = result.diagnostic[
         "vapor_pressure_numerator_provenance"
@@ -2596,9 +2596,10 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
         vapor_pressure_data,
         melt=_MgOnlyMelt(1360.999),
     )._internal_analytical_equilibrium()
-    # d-478: the fallback Mg estimate now uses the one surface pO2 instead of
-    # headspace transport pO2, shifting this pressure while preserving its
-    # reconstructed-rail authority.
+    # d-478: base already used melt-dissociation pO2. The 32.66x fallback
+    # shift at 1360.999 K is the Mg-008/Mg-009 crystalline-to-liquid standard-
+    # state correction, while this estimate keeps its reconstructed-rail
+    # authority.
     assert result.vapor_pressures_Pa["Mg"].hex() == "0x1.15cbf835b9725p-21"
     assert result.diagnostics["vapor_pressure_authority"][
         VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
@@ -3563,11 +3564,14 @@ def test_active_si_composite_supersedes_legacy_pure_component_sidecar(
     )
 
     assert "SiO" in kernel_vp
+    assert "FeO_association_gas" not in legacy_vp
     assert kernel_vp["Si"] > 0.0
     assert legacy_vp["Si"] == kernel_vp["Si"]
     assert kernel_vp["Si"] == pytest.approx(2.9468548936088294e-07)
-    assert set(legacy_vp) <= set(kernel_vp)
-    assert set(kernel_vp) - set(legacy_vp) == {"Si2", "Si3", "SiO2_gas"}
+    # d-478's predict-and-flag rule keeps positive compiled channels below
+    # the reporting threshold, including the Si3 proxy's cubic mass-action
+    # pressure. The fallback and provider therefore expose the same carriers.
+    assert set(legacy_vp) == set(kernel_vp)
 
 
 def test_transport_po2_and_intrinsic_melt_fo2_are_independent(

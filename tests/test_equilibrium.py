@@ -242,6 +242,7 @@ def test_internal_analytical_ca_pressure_uses_liquid_standard_conversion(
         ('Al', 'Al2O3', 2156.15, 0.1884078657, 0.5),
         ('Ti', 'TiO2', 2073.15, 0.0443590835, 1.0),
         ('Cr', 'Cr2O3', 2156.15, 0.5246179442, 0.5),
+        ('Fe', 'FeO', 1500.0, 0.075147, 1.0),
         ('Zr', 'ZrO2', 2156.15, 0.5289049456, 1.0),
     ],
 )
@@ -740,6 +741,9 @@ def test_internal_analytical_surface_channel_inherits_floor_caveat(monkeypatch):
         oxide_vapors={
             'FeO_association_gas': {
                 'parent_oxide': 'FeO',
+                'fit_target': 'standard_reaction_term',
+                'authority_class': 'analytical_non_authoritative',
+                'runtime_disposition': 'status_bearing_non_authoritative',
                 'reference_pressure_model': {'evaluator_family': 'nasa_cea_9'},
                 'valid_range_K': [2000.0, 2200.0],
                 'reaction': {
@@ -749,6 +753,7 @@ def test_internal_analytical_surface_channel_inherits_floor_caveat(monkeypatch):
         },
         species=(),
     )
+    sim.melt.composition_wt_pct = lambda: {'FeO': 100.0}
     sim.melt.temperature_C = 2156.15 - CELSIUS_TO_KELVIN_OFFSET
     sim.melt.melt_fO2_log = -100.0
     sim.melt.fO2_log = -100.0
@@ -780,6 +785,9 @@ def test_internal_analytical_surface_channel_inherits_floor_caveat(monkeypatch):
     assert channel_caveat['kind'] == 'engine_model_caveat'
     assert channel_caveat['floor_log10_fO2_bar'] == pytest.approx(
         floor_notice['floor_log10_fO2_bar']
+    )
+    assert result.vapor_pressures_source['FeO_association_gas'].startswith(
+        'builtin_authority_limited:standard_reaction_term'
     )
 
 
@@ -824,7 +832,7 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
                 evaluator = compiled_catalog.evaluator_for_hot_train(species)
             except HotTrainInapplicable:
                 continue
-            candidates.append((species, row, evaluator, True))
+            candidates.append((species, row, evaluator, True, False))
             compiled_names.add(species)
         else:
             try:
@@ -833,13 +841,25 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
                 )
             except equilibrium_module._AntoineCoefficientRefusal:
                 continue
-            candidates.append((species, row, None, False))
+            candidates.append((species, row, None, False, False))
+
+    metal_row = {
+        'parent_oxide': 'FeO',
+        'pure_component_antoine': {'A': 3.0, 'B': 0.0, 'C': 0.0},
+        'valid_range_K': [2000.0, 2200.0],
+    }
+    candidates.append(('Fe', metal_row, None, False, True))
 
     assert {
         'Al2O', 'CrO', 'Ca2', 'Mg2', 'FeO_association_gas',
         'K2O_gas', 'Na2O_gas',
     } <= compiled_names
 
+    original_factor = equilibrium_module._oxide_liquid_standard_log10_factor_per_oxide
+    original_floor_activities = equilibrium_module.activities_for_metal_saturation_floor
+    original_melt_oxide_activity = equilibrium_module.melt_oxide_activity
+    original_physical_pO2 = equilibrium_module.physical_melt_dissociation_pO2_bar
+    original_feo_activity = equilibrium_module.calphad_ferrous_feo_activity_diagnostic
     monkeypatch.setattr(
         equilibrium_module,
         '_oxide_liquid_standard_log10_factor_per_oxide',
@@ -851,7 +871,9 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
         lambda *_args, **_kwargs: {},
     )
 
-    def pressure_for(species, row, is_compiled, parent_activity, pO2):
+    def pressure_for(
+        species, row, is_compiled, is_metal, parent_activity, pO2
+    ):
         parent_oxide = row.get('parent_oxide', '')
         cation_count = float(
             MELT_OXIDE_CATIONS_PER_FORMULA.get(parent_oxide, 1.0)
@@ -878,32 +900,45 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
         )
         channel_row = dict(row)
         channel_row['valid_range_K'] = [2000.0, 2200.0]
-        channel_row['antoine'] = (
-            {}
-            if is_compiled
-            else {'A': 3.0, 'B': 0.0, 'C': 0.0}
-        )
+        if not is_metal:
+            channel_row['antoine'] = (
+                {}
+                if is_compiled
+                else {'A': 3.0, 'B': 0.0, 'C': 0.0}
+            )
         sim = _typed_omission_sim(
-            oxide_vapors={species: channel_row},
-            species=(),
+            metals={species: channel_row} if is_metal else {},
+            oxide_vapors={} if is_metal else {species: channel_row},
+            species=(species,) if is_metal else (),
         )
+        sim.melt.composition_wt_pct = lambda: {parent_oxide: 100.0}
         sim.melt.temperature_C = 2156.15 - CELSIUS_TO_KELVIN_OFFSET
         sim.vapour_rail_catalog = catalog
-        result = _run_typed_omission_sim(sim, monkeypatch)
+        result = _run_typed_omission_sim(
+            sim,
+            monkeypatch,
+            a_feo=parent_activity if is_metal else 1.0,
+        )
         assert species in result.vapor_pressures_Pa, species
         return result.vapor_pressures_Pa[species]
 
     tested_names = set()
-    for species, row, evaluator, is_compiled in candidates:
-        base = pressure_for(species, row, is_compiled, 0.8, 1.0e-8)
+    for species, row, evaluator, is_compiled, is_metal in candidates:
+        base = pressure_for(
+            species, row, is_compiled, is_metal, 0.8, 1.0e-3
+        )
         activity_changed = pressure_for(
-            species, row, is_compiled, 0.4, 1.0e-8
+            species, row, is_compiled, is_metal, 0.4, 1.0e-3
         )
         oxygen_changed = pressure_for(
-            species, row, is_compiled, 0.8, 4.0e-8
+            species, row, is_compiled, is_metal, 0.8, 4.0e-3
         )
         parent_oxide = row.get('parent_oxide', '')
-        if is_compiled:
+        if is_metal:
+            n_m, n_ox = equilibrium_module.ellingham_stoichiometry(species)
+            activity_exponent = n_ox / n_m
+            pO2_exponent = -1.0 / n_m
+        elif is_compiled:
             declaration = compiled_catalog.species[
                 species
             ].source_reaction_activity
@@ -951,7 +986,32 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
         tested_names.add(species)
 
     assert compiled_names <= tested_names
+    assert 'Fe' in tested_names
     assert tested_names
+
+    # Exercise the actual Markova floor and compiled evaluator together. The
+    # synthetic probes above isolate each logarithmic slope; this solve checks
+    # that production routes both a metal rail and FeO association through the
+    # same computed surface pO2 without substituting either owner.
+    for name, original in (
+        ('_oxide_liquid_standard_log10_factor_per_oxide', original_factor),
+        ('activities_for_metal_saturation_floor', original_floor_activities),
+        ('melt_oxide_activity', original_melt_oxide_activity),
+        ('physical_melt_dissociation_pO2_bar', original_physical_pO2),
+        ('calphad_ferrous_feo_activity_diagnostic', original_feo_activity),
+    ):
+        monkeypatch.setattr(equilibrium_module, name, original)
+    real_result = EquilibriumMixin._internal_analytical_equilibrium(
+        _markova_core(-100.0)
+    )
+    floor_notice = real_result.diagnostics['melt_metal_saturation_floor_notice']
+    surface_pO2_bar = real_result.diagnostics['surface_oxygen_potential_bar']
+    assert floor_notice['floor_log10_fO2_bar'] > -100.0
+    assert floor_notice['metal'] in real_result.vapor_pressures_Pa
+    assert 'FeO_association_gas' in real_result.vapor_pressures_Pa
+    assert real_result.diagnostics['surface_oxygen_potential_inputs_bar'][
+        'FeO_association_gas'
+    ] == surface_pO2_bar
 
 
 def test_internal_analytical_ca_channels_keep_estimates_at_3700k():

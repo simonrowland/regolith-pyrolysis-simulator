@@ -30,28 +30,21 @@ since = "7dd268c6f"
 node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_shadow_parity_across_short_simulation_run[lunar_mare_low_ti-None]"
 ticket = "d-478"
 tier = "pr"
-reason = "Fallback surface pO2 follows d-478 while the provider car still uses its prior boundary; Mg parity is expected to diverge until that car lands."
+reason = "Fallback Mg is 37.94x higher at 1328.15 K from the Mg-008/Mg-009 crystalline-to-liquid JANAF correction; base already used melt-dissociation pO2, while the separate provider car has not adopted that standard-state correction."
 since = "77e0254"
 
 [[test]]
 node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_shadow_parity_across_short_simulation_run[s_type_asteroid_silicate-None]"
 ticket = "d-478"
 tier = "pr"
-reason = "Fallback surface pO2 follows d-478 while the provider car still uses its prior boundary; Mg parity is expected to diverge until that car lands."
+reason = "Fallback Mg is 37.94x higher at 1328.15 K from the Mg-008/Mg-009 crystalline-to-liquid JANAF correction; base already used melt-dissociation pO2, while the separate provider car has not adopted that standard-state correction."
 since = "77e0254"
 
 [[test]]
 node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_shadow_parity_across_short_simulation_run[mars_basalt-additives_kg1]"
 ticket = "d-478"
 tier = "pr"
-reason = "Fallback surface pO2 follows d-478 while the provider car still uses its prior boundary; Mg parity is expected to diverge until that car lands."
-since = "77e0254"
-
-[[test]]
-node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_active_si_composite_supersedes_legacy_pure_component_sidecar"
-ticket = "d-478"
-tier = "pr"
-reason = "The d-478 fallback predicts FeO_association_gas while the separate provider car does not yet publish it; channel-set parity waits for that car."
+reason = "Fallback Mg is 37.94x higher at 1328.15 K from the Mg-008/Mg-009 crystalline-to-liquid JANAF correction; base already used melt-dissociation pO2, while the separate provider car has not adopted that standard-state correction."
 since = "77e0254"
 
 [[test]]
