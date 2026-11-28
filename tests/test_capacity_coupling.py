@@ -2325,6 +2325,52 @@ def test_capacity_resolution_decision_is_owned_by_evaporation() -> None:
     ) is None
 
 
+def test_live_typed_non_debit_continues_with_unresolved_species_flagged():
+    from simulator.evaporation import _provider_flux_outcome_refusal
+    from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
+
+    overlay = {
+        "batch_channel_states": {"Na": "refusal", "Fe": "eligible"},
+        "batch_channel_refusal_codes": {
+            "Na": REFUSAL_INAPPLICABLE_PREDICATE,
+        },
+        "notices": [{
+            "kind": "vapour_batch_unresolved",
+            "species": "Fe",
+            "hour": 3,
+            "reason": "missing_transport_parameters_possible_continuum",
+        }],
+    }
+
+    capacity_outcome = _provider_flux_outcome_refusal(
+        SimpleNamespace(),
+        "ok",
+        {},
+        {"Fe": "missing_transport_parameters_possible_continuum"},
+        overlay,
+        selector_overlay={},
+    )
+    live_outcome = _provider_flux_outcome_refusal(
+        SimpleNamespace(),
+        "ok",
+        {},
+        {"Fe": "missing_transport_parameters_possible_continuum"},
+        overlay,
+        selector_overlay={},
+        allow_typed_non_debit_with_unresolved=True,
+    )
+
+    assert isinstance(capacity_outcome, EvaporationFluxRefusal)
+    assert capacity_outcome.reason == "vapour_batch_no_debiting_pressure_outcome"
+    assert live_outcome is None
+    assert overlay["notices"] == [{
+        "kind": "vapour_batch_unresolved",
+        "species": "Fe",
+        "hour": 3,
+        "reason": "missing_transport_parameters_possible_continuum",
+    }]
+
+
 def test_provider_terminal_classifier_uses_shared_resolved_inventory(
     monkeypatch,
 ):

@@ -1650,6 +1650,7 @@ def _provider_flux_outcome_refusal(
     flux_overlay: dict[str, Any],
     *,
     selector_overlay: Mapping[str, Any] | None = None,
+    allow_typed_non_debit_with_unresolved: bool = False,
 ) -> EvaporationFluxRefusal | None:
     """Classify provider status and resolved channels for live and capacity."""
     if str(status) != 'ok' and not _transport_only_unavailable_result(
@@ -1678,6 +1679,9 @@ def _provider_flux_outcome_refusal(
             selector_overlay=selector_overlay,
             provider_diagnostic=diagnostic,
             include_unresolved_notices=True,
+            allow_typed_non_debit_with_unresolved=(
+                allow_typed_non_debit_with_unresolved
+            ),
         )
         refusal = outcome.refusal
         if refusal is not None:
@@ -1692,6 +1696,9 @@ def _provider_flux_outcome_refusal(
             selector_overlay=selector_overlay,
             provider_diagnostic=diagnostic,
             include_unresolved_notices=True,
+            allow_typed_non_debit_with_unresolved=(
+                allow_typed_non_debit_with_unresolved
+            ),
         )
         refusal = outcome.refusal
         if refusal is not None:
@@ -2226,6 +2233,7 @@ class EvaporationMixin:
         equilibrium_status: Any = None,
         equilibrium_zero_reason: Any = None,
         effective_pressure_zero_reason: str | None = None,
+        allow_typed_non_debit_with_unresolved: bool = False,
     ) -> _VapourBatchResolutionOutcome:
         """Own the shared resolved, physical-zero, and refusal decision."""
         error = dict(resolve_error or {})
@@ -2243,6 +2251,11 @@ class EvaporationMixin:
             if isinstance(notice, Mapping)
             and notice.get('kind') == 'vapour_batch_unresolved'
         ]
+        unresolved_species = {
+            str(notice['species'])
+            for notice in notices
+            if notice.get('species') is not None
+        }
         channel_states = dict(overlay.get('batch_channel_states', {}) or {})
         refusal_codes = dict(
             overlay.get('batch_channel_refusal_codes', {}) or {}
@@ -2315,15 +2328,25 @@ class EvaporationMixin:
                     evidence,
                     None,
                 )
-            if (
-                not notices
-                and channel_states
-                and all(
-                    _channel_is_typed_non_debit(
-                        state, refusal_codes.get(species)
-                    )
-                    for species, state in channel_states.items()
+            typed_non_debit_species = {
+                str(species)
+                for species, state in channel_states.items()
+                if _channel_is_typed_non_debit(
+                    state, refusal_codes.get(species)
                 )
+            }
+            if (
+                channel_states
+                and typed_non_debit_species
+                and all(
+                    str(species) in typed_non_debit_species
+                    or (
+                        allow_typed_non_debit_with_unresolved
+                        and str(species) in unresolved_species
+                    )
+                    for species in channel_states
+                )
+                and (not notices or allow_typed_non_debit_with_unresolved)
             ):
                 return _VapourBatchResolutionOutcome(
                     resolved_species, 'typed_non_debit', evidence, None
@@ -3501,6 +3524,18 @@ class EvaporationMixin:
             vapor_pressure_diagnostic,
             flux=flux,
         )
+        # Keep the base live dispatch when an unresolved channel accompanies
+        # typed non-debits. The pressure map sent to the provider remains the
+        # resolver's eligible map; unavailable peers stay only in the overlay.
+        continue_live_provider_for_mixed_outcome = (
+            bool(vapor_pressures)
+            and T_K >= 400.0
+            and any(
+                isinstance(notice, Mapping)
+                and notice.get('kind') == 'vapour_batch_unresolved'
+                for notice in flux_overlay_report.get('notices', ()) or ()
+            )
+        )
         outcome = None
         if not vapor_pressures or T_K < 400.0:
             outcome = EvaporationMixin._vapour_batch_resolution_outcome(
@@ -3527,6 +3562,7 @@ class EvaporationMixin:
                 effective_pressure_zero_reason=(
                     effective_pressure_source.physical_zero_reason
                 ),
+                allow_typed_non_debit_with_unresolved=True,
             )
             if outcome.refusal is not None:
                 refusal = outcome.refusal
@@ -3616,7 +3652,11 @@ class EvaporationMixin:
                 'vapour_batch': batch_report,
             }
             return flux
-        if outcome is not None and outcome.reason == 'typed_non_debit':
+        if (
+            outcome is not None
+            and outcome.reason == 'typed_non_debit'
+            and not continue_live_provider_for_mixed_outcome
+        ):
             self._last_evaporation_flux_diagnostic = {
                 **dict(outcome.evidence),
                 'reason': 'vapour_batch_all_channels_non_debiting',
@@ -3756,12 +3796,16 @@ class EvaporationMixin:
                 effective_pressure_zero_reason=(
                     effective_pressure_source.physical_zero_reason
                 ),
+                allow_typed_non_debit_with_unresolved=True,
             )
             if outcome.refusal is not None:
                 refusal = outcome.refusal
                 self._last_evaporation_flux_diagnostic = refusal.diagnostic
                 raise refusal
-        if outcome.reason == 'typed_non_debit':
+        if (
+            outcome.reason == 'typed_non_debit'
+            and not continue_live_provider_for_mixed_outcome
+        ):
             self._last_evaporation_flux_diagnostic = {
                 **dict(outcome.evidence),
                 'reason': 'vapour_batch_all_channels_non_debiting',
@@ -3879,6 +3923,7 @@ class EvaporationMixin:
             provider_unavailable,
             flux_overlay_report,
             selector_overlay=selector_flux_overlay,
+            allow_typed_non_debit_with_unresolved=True,
         )
         if provider_refusal is not None:
             self._last_evaporation_flux_diagnostic = provider_refusal.diagnostic
