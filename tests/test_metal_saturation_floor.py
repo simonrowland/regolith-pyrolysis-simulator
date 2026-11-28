@@ -26,6 +26,7 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.fe_redox import fe_metal_saturation_log10_fO2_bar
 from simulator.metal_saturation_floor import (
     _oxide_liquid_standard_log10_factor_per_oxide,
+    apply_melt_metal_saturation_floor,
     melt_metal_saturation_floor_log10_fO2_bar,
 )
 from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
@@ -138,6 +139,31 @@ def test_cr_floor_converts_crystalline_k_to_liquid_activity_basis() -> None:
     # Two Cr2O3 units enter the Ellingham reaction per three O2, so the
     # liquid-standard correction is 2/3 of the per-formula fusion factor.
     assert floor - crystal_standard_floor == pytest.approx(0.350, abs=0.001)
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "activity", "metal"),
+    [
+        (2156.15, {"NiO": 1.0}, "Ni"),
+        (2156.15, {"MnO": 1.0}, "Mn"),
+    ],
+)
+def test_ungrounded_binding_floor_publishes_liquid_standard_caveat(
+    temperature_K, activity, metal
+):
+    floor, notice = apply_melt_metal_saturation_floor(
+        -100.0,
+        temperature_K,
+        activity,
+    )
+
+    assert notice is not None
+    assert notice["metal"] == metal
+    caveat = notice["engine_model_caveat"]
+    assert caveat["type"] == "typed_notice"
+    assert caveat["kind"] == "engine_model_caveat"
+    assert caveat["floor_log10_fO2_bar"] == pytest.approx(floor)
+    assert caveat["conversion_applied"] is False
 
 
 def _crystal_si_saturation_pa(temperature_K: float) -> float:

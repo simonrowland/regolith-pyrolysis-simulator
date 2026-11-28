@@ -28,6 +28,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_stoichiometry,
 )
 from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_CATIONS_PER_FORMULA,
     melt_oxide_activity,
     single_cation_mole_fractions,
 )
@@ -48,6 +49,7 @@ from simulator.environment import (
 )
 from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
+from simulator.reference_data.janaf import JanafOutOfRangeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, Atmosphere
 
@@ -682,7 +684,7 @@ class EquilibriumMixin:
             mgo_liquid_standard_log10_factor = (
                 _oxide_liquid_standard_log10_factor_per_oxide('MgO', T_K)
             )
-        except ValueError as exc:
+        except (JanafOutOfRangeError, FileNotFoundError) as exc:
             mgo_liquid_standard_log10_factor = None
             activity_standard_state_flags['Mg'] = (
                 _engine_model_standard_state_caveat(
@@ -1370,7 +1372,7 @@ class EquilibriumMixin:
                     cao_liquid_standard_log10_factor = (
                         _oxide_liquid_standard_log10_factor_per_oxide('CaO', T_K)
                     )
-                except ValueError as exc:
+                except (JanafOutOfRangeError, FileNotFoundError) as exc:
                     activity_standard_state_flags[species] = (
                         _engine_model_standard_state_caveat(
                             K_reference_phase='CaO(cr), Ellingham CaO',
@@ -1444,7 +1446,7 @@ class EquilibriumMixin:
                                     parent_oxide, T_K
                                 )
                             )
-                        except ValueError as exc:
+                        except (JanafOutOfRangeError, FileNotFoundError) as exc:
                             activity_standard_state_flags[species] = (
                                 _engine_model_standard_state_caveat(
                                     K_reference_phase=source_phase_name,
@@ -1655,6 +1657,8 @@ class EquilibriumMixin:
             parent_oxide = data.get('parent_oxide', '')
             antoine = data.get('antoine', {})
             coefficient_block = COEFF_BLOCK_ANTOINE
+            compiled_evaluator = None
+            compiled_species = None
             try:
                 A, B, C = _read_antoine_coefficients(antoine)
             except _AntoineCoefficientRefusal as exc:
@@ -1675,20 +1679,7 @@ class EquilibriumMixin:
                             None,
                         )
                         if payload is not None:
-                            try:
-                                catalog = compiled_catalog_for(payload)
-                            except (KeyError, ValueError) as model_error:
-                                _sz_omit(
-                                    str(name),
-                                    ZeroBecause.MISSING_THERMO,
-                                    field='reference_pressure_model',
-                                    detail=(
-                                        'compiled pressure catalog lookup failed; '
-                                        f'no pressure estimate is available: {model_error}'
-                                    ),
-                                    category=CATEGORY_REFUSE,
-                                )
-                                continue
+                            catalog = compiled_catalog_for(payload)
                     if catalog is None:
                         reason = (
                             'compiled standard-reaction catalog is unavailable'
@@ -1701,25 +1692,21 @@ class EquilibriumMixin:
                             category=CATEGORY_REFUSE,
                         )
                         continue
-                    try:
-                        evaluator = catalog.evaluator_for_hot_train(name)
-                        reference_evaluation = evaluator.evaluate(
-                            T_K,
-                            source_activity=1.0,
-                            pO2_bar=evaluator.pO2_reference_bar,
-                        )
-                    except (KeyError, ValueError) as model_error:
-                        _sz_omit(
-                            str(name),
-                            ZeroBecause.MISSING_THERMO,
-                            field='reference_pressure_model',
-                            detail=(
-                                'compiled pressure model lookup failed; no '
-                                f'pressure estimate is available: {model_error}'
-                            ),
-                            category=CATEGORY_REFUSE,
-                        )
-                        continue
+                    compiled_evaluator = catalog.evaluator_for_hot_train(name)
+                    compiled_species = catalog.species.get(name)
+                    reaction_pO2_exponent = float(
+                        compiled_evaluator.pO2_exponent or 0.0
+                    )
+                    channel_pO2_bar = (
+                        _surface_pO2_for_channel(name)
+                        if reaction_pO2_exponent
+                        else surface_pO2_bar
+                    )
+                    reference_evaluation = compiled_evaluator.evaluate(
+                        T_K,
+                        source_activity=1.0,
+                        pO2_bar=channel_pO2_bar,
+                    )
                     P_sat = reference_evaluation.pressure_pa
                     coefficient_block = 'compiled_reference_pressure_model'
                     if reference_evaluation.out_of_range:
@@ -1790,32 +1777,71 @@ class EquilibriumMixin:
                 )
 
             if parent_oxide:
-                activity_exponent = float(
-                    data.get('oxide_activity_exponent', 1.0)
+                activity_exponent = (
+                    float(compiled_evaluator.activity_exponent or 0.0)
+                    if compiled_evaluator is not None
+                    else float(data.get('oxide_activity_exponent', 1.0))
                 )
-                oxide_activity = melt_oxide_activity(
-                    parent_oxide,
-                    melt_account_mol,
-                    cation_mol_fraction=cation_mol_fraction,
-                    temperature_K=T_K,
-                )
-                if oxide_activity is None or oxide_activity.activity <= 1e-10:
-                    _sz_activity_skip(name, oxide_activity)
-                    continue
-                if oxide_activity.warning:
-                    warnings.append(oxide_activity.warning)
-                # The reaction consumes activity_exponent parent units, so
-                # its mass-action term is a_parent**activity_exponent: each
-                # unit contributes one factor of the thermodynamic parent
-                # activity. Taking an exponent-root first would cancel it.
-                a_parent = oxide_activity.thermodynamic_parent_activity()
-                activities[name] = oxide_activity.activity
-                activity_provenance[name] = oxide_activity.provenance()
-                P_sat = _require_finite_vapor_value(
-                    P_sat * max(a_parent, 0.0) ** activity_exponent,
-                    species=name,
-                    field="P_sat_activity",
-                )
+                oxide_activity = None
+                if compiled_evaluator is None or activity_exponent != 0.0:
+                    oxide_activity = melt_oxide_activity(
+                        parent_oxide,
+                        melt_account_mol,
+                        cation_mol_fraction=cation_mol_fraction,
+                        temperature_K=T_K,
+                    )
+                    if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                        _sz_activity_skip(name, oxide_activity)
+                        continue
+                    if oxide_activity.warning:
+                        warnings.append(oxide_activity.warning)
+                    if compiled_evaluator is not None:
+                        declaration = (
+                            compiled_species.source_reaction_activity
+                            if compiled_species is not None
+                            else None
+                        )
+                        if declaration is None:
+                            raise ValueError(
+                                f'{name}: compiled activity exponent has no '
+                                'source-reaction activity declaration'
+                            )
+                        declared_component = declaration.component_id
+                        declared_phase = declaration.standard_state.phase
+                        activity_component = getattr(
+                            oxide_activity, 'single_cation_component', None
+                        )
+                        if activity_component != declared_component:
+                            raise ValueError(
+                                f'{name}: compiled activity component '
+                                f'{declared_component!r} does not match melt '
+                                f'activity component {activity_component!r}'
+                            )
+                        if declared_phase != 'liquid':
+                            raise ValueError(
+                                f'{name}: compiled activity reference phase '
+                                f'{declared_phase!r} does not match the liquid '
+                                'melt activity supplied by the fallback'
+                            )
+                        # The evaluator's exponent is derived from the source
+                        # reaction coefficient on its declared single-cation
+                        # activity. Applying it to that same activity preserves
+                        # the reaction basis for multi-cation parent formulas.
+                        activity_basis = oxide_activity.activity
+                    else:
+                        # Legacy Antoine exponents are declared per parent
+                        # formula unit, so their activity is the product-formula
+                        # activity supplied by MeltOxideActivity.
+                        activity_basis = (
+                            oxide_activity.thermodynamic_parent_activity()
+                        )
+                    activities[name] = oxide_activity.activity
+                    activity_provenance[name] = oxide_activity.provenance()
+                    P_sat = _require_finite_vapor_value(
+                        P_sat * max(activity_basis, 0.0) ** activity_exponent,
+                        species=name,
+                        field="P_sat_activity",
+                    )
                 reaction = data.get('reaction')
                 reaction_formula = (
                     reaction.get('formula', '')
@@ -1823,19 +1849,27 @@ class EquilibriumMixin:
                     else ''
                 )
                 crystal_parent_marker = f'{parent_oxide}(cr)'
-                if parent_oxide and crystal_parent_marker in reaction_formula:
-                    # The reaction consumes activity_exponent parent units.
-                    # Each crystalline unit contributes the shared JANAF
-                    # log10(K_liquid/K_crystal) factor. If that pair is
-                    # missing or out of range, retain the compiled pressure
-                    # estimate and expose the standard-state mismatch.
+                if (
+                    oxide_activity is not None
+                    and parent_oxide
+                    and parent_oxide != 'CoO'
+                    and crystal_parent_marker in reaction_formula
+                ):
+                    # If nu_s is the declared single-cation coefficient,
+                    # nu_v the vapor coefficient, and c cations per parent,
+                    # the compiled exponent is nu_s/nu_v. Since nu_s=c*nu_p,
+                    # the crystalline parent units per vapor are nu_p/nu_v =
+                    # activity_exponent/c; each contributes one JANAF K
+                    # conversion.
+                    # If the pair is missing or out of range, retain the
+                    # compiled pressure estimate and expose the mismatch.
                     try:
                         liquid_standard_log10_factor = (
                             _oxide_liquid_standard_log10_factor_per_oxide(
                                 parent_oxide, T_K
                             )
                         )
-                    except ValueError as exc:
+                    except (JanafOutOfRangeError, FileNotFoundError) as exc:
                         activity_standard_state_flags[name] = (
                             _engine_model_standard_state_caveat(
                                 K_reference_phase=(
@@ -1857,15 +1891,28 @@ class EquilibriumMixin:
                         P_sat = _require_finite_vapor_value(
                             P_sat
                             * 10.0 ** (
-                                activity_exponent
+                                (
+                                    activity_exponent
+                                    if compiled_evaluator is None
+                                    else activity_exponent
+                                    / float(
+                                        MELT_OXIDE_CATIONS_PER_FORMULA.get(
+                                            parent_oxide, 1.0
+                                        )
+                                    )
+                                )
                                 * liquid_standard_log10_factor
                             ),
                             species=name,
                             field='P_sat_liquid_standard',
                         )
 
-            pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
-            if pO2_exponent:
+            pO2_exponent = (
+                float(compiled_evaluator.pO2_exponent or 0.0)
+                if compiled_evaluator is not None
+                else float(data.get('pO2_exponent', 0.0) or 0.0)
+            )
+            if pO2_exponent and compiled_evaluator is None:
                 channel_pO2_bar = _surface_pO2_for_channel(name)
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
@@ -1925,6 +1972,20 @@ class EquilibriumMixin:
 
             else:
                 _sz_below_threshold(name, P_sat, 'P_sat')
+        floor_caveat = (
+            metal_saturation_floor_notice.get('engine_model_caveat')
+            if metal_saturation_floor_notice is not None
+            else None
+        )
+        if isinstance(floor_caveat, Mapping):
+            for channel in surface_pO2_inputs:
+                existing_caveat = activity_standard_state_flags.get(channel)
+                if existing_caveat is None:
+                    activity_standard_state_flags[channel] = dict(floor_caveat)
+                else:
+                    existing_caveat['surface_pO2_floor_caveat'] = dict(
+                        floor_caveat
+                    )
         _eq_diagnostics = {
             'activities_provider': 'internal_analytical_equilibrium',
             'activities_standard_state': {
