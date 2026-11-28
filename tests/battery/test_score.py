@@ -468,7 +468,7 @@ def test_all_stored_nasa_glenn_inert_rows_are_typed_scoring_refusals(
     def assert_scoring_decision() -> None:
         residuals, _candidates = score_store(
             selected_context,
-            engines=(Engine.INTERNAL_ANALYTICAL,),
+            engines=(Engine.NASA_CEA_9,),
             include_diagnostics=True,
         )
         by_reference = {residual.reference: residual for residual in residuals}
