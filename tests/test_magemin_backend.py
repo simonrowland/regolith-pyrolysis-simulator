@@ -349,6 +349,36 @@ def _use_test_magemin_slot_lock(monkeypatch, tmp_path):
     )
 
 
+def _advance_magemin_waiter_clock_past_legacy_limit(
+    monkeypatch,
+    *,
+    waiter_thread_name,
+    slot_contended,
+):
+    clock_advanced = threading.Event()
+    real_monotonic = time.monotonic
+
+    def advance_past_old_slot_limit():
+        now = real_monotonic()
+        if (
+            threading.current_thread().name == waiter_thread_name
+            and slot_contended.is_set()
+        ):
+            clock_advanced.set()
+            return now + 300.01
+        return now
+
+    monkeypatch.setattr(
+        magemin_module,
+        'time',
+        types.SimpleNamespace(
+            monotonic=advance_past_old_slot_limit,
+            sleep=time.sleep,
+        ),
+    )
+    return clock_advanced
+
+
 def _make_pooled_subprocess_backend(exception):
     backend = MAGEMinBackend()
     backend._available = True
@@ -1163,7 +1193,6 @@ def test_magemin_slot_queue_preserves_result_past_legacy_and_warm_limits(
     slots_held = [threading.Event(), threading.Event()]
     release_slot = threading.Event()
     slot_contended = threading.Event()
-    clock_advanced = threading.Event()
 
     def hold_slot(index):
         with _magemin_subprocess_slot():
@@ -1189,25 +1218,10 @@ def test_magemin_slot_queue_preserves_result_past_legacy_and_warm_limits(
 
     monkeypatch.setattr(magemin_module.fcntl, 'flock', observe_slot_contention)
 
-    real_monotonic = time.monotonic
-
-    def advance_past_old_slot_limit():
-        now = real_monotonic()
-        if (
-            threading.current_thread().name == 'magemin-slot-waiter'
-            and slot_contended.is_set()
-        ):
-            clock_advanced.set()
-            return now + 300.01
-        return now
-
-    monkeypatch.setattr(
-        magemin_module,
-        'time',
-        types.SimpleNamespace(
-            monotonic=advance_past_old_slot_limit,
-            sleep=time.sleep,
-        ),
+    clock_advanced = _advance_magemin_waiter_clock_past_legacy_limit(
+        monkeypatch,
+        waiter_thread_name='magemin-slot-waiter',
+        slot_contended=slot_contended,
     )
     outcomes = []
     caller_started = threading.Event()
@@ -4487,6 +4501,11 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(
             raise
 
     monkeypatch.setattr(magemin_module.fcntl, 'flock', observe_slot_contention)
+    clock_advanced = _advance_magemin_waiter_clock_past_legacy_limit(
+        monkeypatch,
+        waiter_thread_name='magemin-native-slot-waiter',
+        slot_contended=slot_contended,
+    )
 
     def repeat_native_equilibrium():
         try:
@@ -4511,6 +4530,9 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(
         assert slot_contended.wait(timeout=5.0)
         time.sleep(MAGEMIN_WARM_CALL_TIMEOUT_S + 0.1)
         assert caller.is_alive(), 'the acquired-slot wall starts after the wait'
+        assert not clock_advanced.is_set(), (
+            'the slot queue must not consult an engine-call deadline'
+        )
     finally:
         release_slots.set()
         for holder in holders:

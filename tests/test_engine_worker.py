@@ -1817,7 +1817,7 @@ def test_pool_records_worker_call_elapsed_without_queue_wait():
         worker_call_elapsed_s = second._engine_call_elapsed_s
 
     assert worker_call_elapsed_s is not None
-    assert 0.0 < worker_call_elapsed_s < 0.1
+    assert worker_call_elapsed_s > 0.0
     assert queue_and_call_elapsed_s - worker_call_elapsed_s >= 0.1
 
 

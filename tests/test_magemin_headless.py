@@ -205,10 +205,8 @@ def test_version_probe_propagates_slot_acquire_failure_without_identity_fallback
 
     @contextmanager
     def unavailable_slot():
-        raise magemin._MAGEMinEngineLifecycleError(
-            'MAGEMinSubprocessSlotUnavailable',
+        raise magemin._MAGEMinSubprocessSlotUnavailable(
             'MAGEMin subprocess slot is unavailable: permission denied',
-            failure_disposition='environment',
         )
         yield
 
@@ -223,7 +221,7 @@ def test_version_probe_propagates_slot_acquire_failure_without_identity_fallback
     backend = MAGEMinBackend()
     backend._binary_path = binary
 
-    with pytest.raises(magemin._MAGEMinEngineLifecycleError) as error:
+    with pytest.raises(magemin._MAGEMinSubprocessSlotUnavailable) as error:
         backend.get_engine_version()
 
     assert error.value.exception_type == 'MAGEMinSubprocessSlotUnavailable'
