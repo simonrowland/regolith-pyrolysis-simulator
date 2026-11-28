@@ -339,7 +339,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/compilation_tier.py:fit_evaluation_cache': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 4823,
+        "line": 4889,
         "kind": 'store',
         "name": 'fit_evaluation_cache',
         "carries_disclosure": False,
