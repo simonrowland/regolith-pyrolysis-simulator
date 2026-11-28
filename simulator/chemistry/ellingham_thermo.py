@@ -87,14 +87,15 @@ class _EllinghamOxideActivityReference:
 
 def _ellingham_oxide_activity_reference(
     metal: str,
-    temperature_K: float,
-    phase_basis: str,
+    selected_segment: EllinghamFitSegment,
 ) -> _EllinghamOxideActivityReference:
     """Shared phase labels for oxide K versus liquid melt activity.
 
     The fallback metal pressure and the saturation floor consume the same
     Ellingham rows, so their phase markers and reconstructed upper-Mn rule
-    must agree. This helper owns those labels without importing JANAF data.
+    must agree. This helper reads the selected segment itself so its marker
+    cannot disagree with the coefficients at a phase boundary. It owns those
+    labels without importing JANAF data.
     """
 
     references = {
@@ -104,7 +105,10 @@ def _ellingham_oxide_activity_reference(
         "Mn": ("MnO(s)", None, "MnO"),
     }
     solid_marker, liquid_marker, fusion_pair_key = references[metal]
-    reconstructed_upper_mn = metal == "Mn" and temperature_K > 2058.0
+    phase_basis = selected_segment.phase_basis
+    reconstructed_upper_mn = (
+        metal == "Mn" and "MnO(lit. liquid range)" in phase_basis
+    )
     source_marker = (
         "MnO(lit. liquid range)" if reconstructed_upper_mn else solid_marker
     )

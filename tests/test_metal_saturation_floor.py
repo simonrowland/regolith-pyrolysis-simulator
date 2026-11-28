@@ -18,6 +18,7 @@ import yaml
 from engines.antoine import _antoine_log10_pressure
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.ellingham_thermo import (
+    _ellingham_oxide_activity_reference,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_segment_for_temperature,
 )
@@ -167,6 +168,29 @@ def test_ungrounded_binding_floor_publishes_liquid_standard_caveat(
     assert caveat["floor_log10_fO2_bar"] == pytest.approx(floor)
     assert caveat["conversion_applied"] is False
     assert f"no JANAF fusion table pair for {metal}O" in caveat["reason"]
+
+
+def test_mn_reconstructed_marker_and_floor_caveat_at_2058k() -> None:
+    segment = ellingham_segment_for_temperature("Mn", 2058.0)
+    reference = _ellingham_oxide_activity_reference("Mn", segment)
+
+    assert segment.range_K[0] == pytest.approx(2058.0)
+    assert reference.reconstructed_upper_mn is True
+    assert reference.source_phase_marker == "MnO(lit. liquid range)"
+
+    floor, notice = apply_melt_metal_saturation_floor(
+        -100.0,
+        2058.0,
+        {"MnO": 1.0},
+    )
+
+    assert floor > -100.0
+    assert notice is not None
+    assert notice["metal"] == "Mn"
+    caveat = notice["engine_model_caveat"]
+    assert caveat["K_reference_phase"] == segment.phase_basis
+    assert "at and above 2058 K" in caveat["reason"]
+    assert caveat["floor_log10_fO2_bar"] == pytest.approx(floor)
 
 
 def test_floor_does_not_catch_unrelated_janaf_value_error(monkeypatch):

@@ -114,19 +114,27 @@ def test_internal_analytical_zero_mbar_is_admitted_vacuum():
 
 # Mg/Ca liquid-standard pressure ratios below use their JANAF factors at
 # 2156.15 K; keep the shared solve at that same physical temperature.
-def _markova_core(fO2_log: float, temperature_K: float = 2156.15):
+def _markova_core(
+    fO2_log: float,
+    temperature_K: float = 2156.15,
+    *,
+    composition_kg: dict[str, float] | None = None,
+):
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _new_internal_analytical_core,
     )
 
     core = _new_internal_analytical_core()
-    composition_kg = {
-        "SiO2": 0.4402,
-        "Al2O3": 0.0456,
-        "FeO": 0.0804,
-        "MgO": 0.3644,
-        "CaO": 0.0695,
-    }
+    if composition_kg is None:
+        composition_kg = {
+            "SiO2": 0.4402,
+            "Al2O3": 0.0456,
+            "FeO": 0.0804,
+            "MgO": 0.3644,
+            "CaO": 0.0695,
+        }
+    else:
+        composition_kg = dict(composition_kg)
     core.atom_ledger = core._new_atom_ledger()
     core._load_ledger_account(
         "process.cleaned_melt",
@@ -147,6 +155,24 @@ def _markova_core(fO2_log: float, temperature_K: float = 2156.15):
         43.7 * 10.0**fO2_log
     )
     return core
+
+
+def test_internal_analytical_mn_uses_selected_segment_at_2058k():
+    result = EquilibriumMixin._internal_analytical_equilibrium(
+        _markova_core(
+            -100.0,
+            2058.0,
+            composition_kg={"MnO": 1.0},
+        )
+    )
+
+    metal_caveat = result.diagnostics["activity_standard_state_flags"]["Mn"]
+    floor_notice = result.diagnostics["melt_metal_saturation_floor_notice"]
+    assert "MnO(lit. liquid range)" in metal_caveat["K_reference_phase"]
+    assert floor_notice["metal"] == "Mn"
+    assert "MnO(lit. liquid range)" in floor_notice["engine_model_caveat"][
+        "K_reference_phase"
+    ]
 
 
 def _markova_surface_equilibrium(fO2_log: float):
@@ -1012,6 +1038,62 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
     assert real_result.diagnostics['surface_oxygen_potential_inputs_bar'][
         'FeO_association_gas'
     ] == surface_pO2_bar
+
+    # Raise a real silica saturation floor by perturbing only the activity
+    # supplied to the production floor calculation. Melt activities and the
+    # production pressure evaluators remain unchanged, so measured pressure
+    # ratios must follow each channel's stoichiometric pO2 exponent.
+    floor_activity_provider = (
+        equilibrium_module.activities_for_metal_saturation_floor
+    )
+    floor_offset_dex = 0.2
+
+    def solve_silica_floor_with_offset(offset_dex):
+        def floor_activities(*args, **kwargs):
+            activities = floor_activity_provider(*args, **kwargs)
+            activities['SiO2'] *= 10.0 ** offset_dex
+            return activities
+
+        monkeypatch.setattr(
+            equilibrium_module,
+            'activities_for_metal_saturation_floor',
+            floor_activities,
+        )
+        core = _markova_core(
+            -100.0,
+            composition_kg={'SiO2': 1.0},
+        )
+        return EquilibriumMixin._internal_analytical_equilibrium(core)
+
+    silica_floor_base = solve_silica_floor_with_offset(0.0)
+    silica_floor_raised = solve_silica_floor_with_offset(floor_offset_dex)
+    base_floor_notice = silica_floor_base.diagnostics[
+        'melt_metal_saturation_floor_notice'
+    ]
+    raised_floor_notice = silica_floor_raised.diagnostics[
+        'melt_metal_saturation_floor_notice'
+    ]
+    assert base_floor_notice['metal'] == raised_floor_notice['metal'] == 'Si'
+    measured_floor_shift = (
+        raised_floor_notice['floor_log10_fO2_bar']
+        - base_floor_notice['floor_log10_fO2_bar']
+    )
+    assert measured_floor_shift == pytest.approx(floor_offset_dex, abs=1e-10)
+    silica_channel_pO2_exponents = {
+        'Si': -1.0,
+        'SiO': -0.5,
+        'Si2': -2.0,
+        'Si3': -3.0,
+        'SiO2_gas': 0.0,
+    }
+    for species, exponent in silica_channel_pO2_exponents.items():
+        base_pressure = silica_floor_base.vapor_pressures_Pa[species]
+        raised_pressure = silica_floor_raised.vapor_pressures_Pa[species]
+        measured_pressure_shift = math.log10(raised_pressure / base_pressure)
+        assert measured_pressure_shift == pytest.approx(
+            exponent * measured_floor_shift,
+            abs=1e-8,
+        ), species
 
 
 def test_internal_analytical_ca_channels_keep_estimates_at_3700k():

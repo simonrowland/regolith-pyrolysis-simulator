@@ -1426,8 +1426,7 @@ class EquilibriumMixin:
                 phase_reference = (
                     _ellingham_oxide_activity_reference(
                         species,
-                        T_K,
-                        source_phase_basis,
+                        active_segment,
                     )
                     if species in {'Cr', 'Ti', 'Ni', 'Mn'}
                     else None
@@ -1558,7 +1557,8 @@ class EquilibriumMixin:
                                 'activity; mismatch magnitude is unknown.'
                             ),
                             'MnO': (
-                                'The MnO liquid-range label above 2058 K uses '
+                                'The MnO liquid-range label at and above '
+                                '2058 K uses '
                                 'the same reconstructed coefficients as the '
                                 'crystalline segment; no grounded liquid '
                                 'standard MnO Gibbs energy is available.'

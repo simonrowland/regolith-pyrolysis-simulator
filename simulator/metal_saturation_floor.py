@@ -166,9 +166,9 @@ def _ellingham_metal_saturation_log10_fO2_bar(
     # The floor consumes the same liquid-standard formula activity as the
     # vapour channels. For Ellingham rows whose explicit oxide reference is
     # crystalline, convert K once per oxide unit using the shared JANAF
-    # fusion helper. NiO has no fusion pair, and reconstructed Mn above 2058 K
-    # has no grounded liquid Gibbs basis; both retain this estimate with a
-    # typed caveat when their floor binds.
+    # fusion helper. NiO has no fusion pair, and reconstructed Mn at and above
+    # 2058 K has no grounded liquid Gibbs basis; both retain this estimate
+    # with a typed caveat when their floor binds.
     oxide = next(
         oxide
         for candidate, oxide in METAL_SATURATION_FLOOR_OXIDES
@@ -181,8 +181,7 @@ def _ellingham_metal_saturation_log10_fO2_bar(
     else:
         phase_reference = _ellingham_oxide_activity_reference(
             metal,
-            temperature_K,
-            segment.phase_basis,
+            segment,
         )
         source_phase_marker = phase_reference.source_phase_marker
         fusion_pair_key = phase_reference.fusion_pair_key
@@ -210,13 +209,15 @@ def _ellingham_metal_saturation_log10_fO2_bar(
                 FileNotFoundError,
             ) as exc:
                 conversion_caveat = (
-                    "The MnO liquid-range label above 2058 K uses the same "
+                    "The MnO liquid-range label at and above "
+                    "2058 K uses the same "
                     "reconstructed coefficients as the crystalline segment; "
                     f"no grounded liquid-standard MnO Gibbs energy is available. {exc}"
                 )
             else:
                 conversion_caveat = (
-                    "The MnO liquid-range label above 2058 K uses the same "
+                    "The MnO liquid-range label at and above "
+                    "2058 K uses the same "
                     "reconstructed coefficients as the crystalline segment; "
                     "no grounded liquid-standard MnO Gibbs energy is available."
                 )

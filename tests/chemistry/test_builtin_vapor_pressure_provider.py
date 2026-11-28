@@ -3568,6 +3568,7 @@ def test_active_si_composite_supersedes_legacy_pure_component_sidecar(
     assert kernel_vp["Si"] > 0.0
     assert legacy_vp["Si"] == kernel_vp["Si"]
     assert kernel_vp["Si"] == pytest.approx(2.9468548936088294e-07)
+    assert {"Si2", "Si3", "SiO2_gas"} <= set(legacy_vp)
     # d-478's predict-and-flag rule keeps positive compiled channels below
     # the reporting threshold, including the Si3 proxy's cubic mass-action
     # pressure. The fallback and provider therefore expose the same carriers.
