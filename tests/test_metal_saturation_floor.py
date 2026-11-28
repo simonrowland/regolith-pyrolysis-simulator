@@ -144,7 +144,9 @@ def test_cr_floor_converts_crystalline_k_to_liquid_activity_basis() -> None:
 @pytest.mark.parametrize(
     ("temperature_K", "activity", "metal"),
     [
-        (2156.15, {"NiO": 1.0}, "Ni"),
+        # Ni's Ellingham row ends at 2000 K; stay inside it to exercise its
+        # missing fusion-pair conversion instead of an absent floor.
+        (1800.0, {"NiO": 1.0}, "Ni"),
         (2156.15, {"MnO": 1.0}, "Mn"),
     ],
 )
@@ -164,6 +166,26 @@ def test_ungrounded_binding_floor_publishes_liquid_standard_caveat(
     assert caveat["kind"] == "engine_model_caveat"
     assert caveat["floor_log10_fO2_bar"] == pytest.approx(floor)
     assert caveat["conversion_applied"] is False
+    assert f"no JANAF fusion table pair for {metal}O" in caveat["reason"]
+
+
+def test_floor_does_not_catch_unrelated_janaf_value_error(monkeypatch):
+    import simulator.metal_saturation_floor as floor_module
+
+    def malformed_metadata(*_args, **_kwargs):
+        raise ValueError("JANAF source hash mismatch")
+
+    monkeypatch.setattr(
+        floor_module,
+        "_oxide_liquid_standard_log10_factor_per_oxide",
+        malformed_metadata,
+    )
+    with pytest.raises(ValueError, match="source hash mismatch"):
+        apply_melt_metal_saturation_floor(
+            -100.0,
+            1800.0,
+            {"NiO": 1.0},
+        )
 
 
 def _crystal_si_saturation_pa(temperature_K: float) -> float:

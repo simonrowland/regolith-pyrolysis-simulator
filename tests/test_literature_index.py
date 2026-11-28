@@ -177,13 +177,17 @@ def test_builder_temp_corpus_row_truth(tmp_path: Path) -> None:
     beta = rows["beta-2021"]
     alpha_sha = hashlib.sha256(alpha_bytes).hexdigest()
     beta_sha = hashlib.sha256(beta_bytes).hexdigest()
+    git_mode, _tracked = builder.git_tracked_set(root)
+    expected_pdf_tracked = "unknown" if git_mode != "git" else False
 
     assert alpha["aliases"] == ["alpha_author_2020"]
     assert alpha["doi"] == "10.9999/alpha-fixture"
     assert alpha["pdf_status"] == "present"
     assert alpha["pdf_path"] == "docs/references/pdfs/99-kems-langmuir/alpha-2020.pdf"
     assert alpha["pdf_sha256"] == alpha_sha
-    assert alpha["pdf_tracked"] == "unknown"
+    # Studio temp roots can sit inside the candidate Git worktree. There the
+    # fixture PDFs are known untracked; outside Git their status is unknown.
+    assert alpha["pdf_tracked"] == expected_pdf_tracked
     assert alpha["extracts"] == [
         {"path": "data/literature/extracts/alpha-2020.yaml", "review_status": "draft", "rows": 0}
     ]
@@ -197,7 +201,7 @@ def test_builder_temp_corpus_row_truth(tmp_path: Path) -> None:
     assert beta["pdf_status"] == "present"
     assert beta["pdf_path"] == "docs/references/pdfs/99-kems-langmuir/beta-2021.pdf"
     assert beta["pdf_sha256"] == beta_sha
-    assert beta["pdf_tracked"] == "unknown"
+    assert beta["pdf_tracked"] == expected_pdf_tracked
     assert beta["battery_datasets"] == []
     assert "data/presets/kems/alpha_case.yaml" not in beta["battery_datasets"]
     assert index["counts"]["sources"] == 2

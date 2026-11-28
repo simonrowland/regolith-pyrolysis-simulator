@@ -112,7 +112,9 @@ def test_internal_analytical_zero_mbar_is_admitted_vacuum():
     assert result.pressure_bar == 0.0
 
 
-def _markova_core(fO2_log: float, temperature_K: float = 1883.0):
+# Mg/Ca liquid-standard pressure ratios below use their JANAF factors at
+# 2156.15 K; keep the shared solve at that same physical temperature.
+def _markova_core(fO2_log: float, temperature_K: float = 2156.15):
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _new_internal_analytical_core,
     )
@@ -537,7 +539,9 @@ def test_internal_analytical_coo_keeps_prediction_with_typed_phase_caveat(
             'CoO_gas': SimpleNamespace(
                 source_reaction_activity=SimpleNamespace(
                     component_id='CoO',
-                    standard_state=SimpleNamespace(phase='liquid'),
+                    # The shipped CoO_gas model declares CoO(cr); preserve
+                    # that phase and disclose the ungrounded liquid activity.
+                    standard_state=SimpleNamespace(phase='crystalline'),
                 )
             )
         }
@@ -779,6 +783,8 @@ def test_internal_analytical_surface_channel_inherits_floor_caveat(monkeypatch):
 def test_internal_analytical_every_channel_obeys_mass_action_exponents(
     monkeypatch,
 ):
+    from simulator.vapour_rail.catalog import HotTrainInapplicable
+
     core = _markova_core(-5.344)
     compiled_catalog = core.vapour_rail_catalog
     projected_rows = core.vapor_pressures['oxide_vapors']
@@ -811,7 +817,10 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
     compiled_names = set()
     for species, row in projected_rows.items():
         if row.get('reference_pressure_model'):
-            evaluator = compiled_catalog.evaluator_for_hot_train(species)
+            try:
+                evaluator = compiled_catalog.evaluator_for_hot_train(species)
+            except HotTrainInapplicable:
+                continue
             candidates.append((species, row, evaluator, True))
             compiled_names.add(species)
         else:
@@ -824,7 +833,8 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
             candidates.append((species, row, None, False))
 
     assert {
-        'Al2O', 'CrO', 'Ca2', 'Mg2', 'FeO_association_gas'
+        'Al2O', 'CrO', 'Ca2', 'Mg2', 'FeO_association_gas',
+        'K2O_gas', 'Na2O_gas',
     } <= compiled_names
 
     monkeypatch.setattr(
@@ -891,12 +901,31 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
         )
         parent_oxide = row.get('parent_oxide', '')
         if is_compiled:
-            activity_exponent = (
-                evaluator.activity_exponent
-                / float(MELT_OXIDE_CATIONS_PER_FORMULA.get(parent_oxide, 1.0))
-                if parent_oxide
-                else 0.0
+            declaration = compiled_catalog.species[
+                species
+            ].source_reaction_activity
+            declared_component = (
+                declaration.component_id if declaration is not None else None
             )
+            if not parent_oxide or evaluator.activity_exponent == 0.0:
+                activity_exponent = 0.0
+            elif declared_component == parent_oxide:
+                # The reaction exponent acts on the declared formula activity,
+                # whose log slope against parent activity is one.
+                activity_exponent = evaluator.activity_exponent
+            elif declared_component == single_cation_component_formula(
+                parent_oxide
+            ):
+                # A single-cation activity is a_parent**(1/c); apply the
+                # reaction's declared exponent through that chain rule.
+                activity_exponent = evaluator.activity_exponent / float(
+                    MELT_OXIDE_CATIONS_PER_FORMULA.get(parent_oxide, 1.0)
+                )
+            else:
+                raise AssertionError(
+                    f'{species}: unexpected declared activity basis '
+                    f'{declared_component!r} for {parent_oxide!r}'
+                )
             pO2_exponent = evaluator.pO2_exponent
         else:
             activity_exponent = (

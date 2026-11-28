@@ -290,6 +290,10 @@ class JanafOutOfRangeError(ValueError):
     """Requested temperature lies outside the printed JANAF table range."""
 
 
+class JanafMissingFusionPairError(ValueError):
+    """No reviewed JANAF crystal/liquid table pair exists for this oxide."""
+
+
 @dataclass
 class ParsedTxtTable:
     """Native NIST ``.txt`` parse: 8-column rows plus short-row ambiguities."""
@@ -1920,7 +1924,9 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
     try:
         crystal_table, liquid_table = _FUSION_TABLES[oxide]
     except KeyError as exc:
-        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+        raise JanafMissingFusionPairError(
+            f"no JANAF fusion table pair for {oxide}"
+        ) from exc
     return _janaf_fusion_energy_for_pair(
         oxide, crystal_table, liquid_table, temperature_K
     )

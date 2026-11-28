@@ -185,27 +185,48 @@ def _ellingham_metal_saturation_log10_fO2_bar(
         source_phase_marker = "MnO(lit. liquid range)"
     conversion_caveat: str | None = None
     if source_phase_marker in segment.phase_basis:
-        if metal == "Ni":
-            conversion_caveat = (
-                "No JANAF NiO(s)/NiO(l) fusion pair grounds conversion of the "
-                "NiO(s) Ellingham K to liquid-standard melt activity."
-            )
-        elif metal == "Mn" and temperature_K > 2058.0:
-            conversion_caveat = (
-                "The MnO liquid-range label above 2058 K uses the same "
-                "reconstructed coefficients as the crystalline segment; no "
-                "grounded liquid-standard MnO Gibbs energy is available."
-            )
-        else:
-            from simulator.reference_data.janaf import JanafOutOfRangeError
+        from simulator.reference_data.janaf import (
+            JanafMissingFusionPairError,
+            JanafOutOfRangeError,
+        )
 
+        if metal == "Mn" and temperature_K > 2058.0:
+            # Inspect the shipped JANAF pair as missing-data evidence, but do
+            # not convert this project-reconstructed Ellingham K even if the
+            # pair exists: the liquid-range phase label does not ground its
+            # Gibbs coefficients.
+            try:
+                _oxide_liquid_standard_log10_factor_per_oxide(
+                    fusion_pair_key, temperature_K
+                )
+            except (
+                JanafMissingFusionPairError,
+                JanafOutOfRangeError,
+                FileNotFoundError,
+            ) as exc:
+                conversion_caveat = (
+                    "The MnO liquid-range label above 2058 K uses the same "
+                    "reconstructed coefficients as the crystalline segment; "
+                    f"no grounded liquid-standard MnO Gibbs energy is available. {exc}"
+                )
+            else:
+                conversion_caveat = (
+                    "The MnO liquid-range label above 2058 K uses the same "
+                    "reconstructed coefficients as the crystalline segment; "
+                    "no grounded liquid-standard MnO Gibbs energy is available."
+                )
+        else:
             try:
                 liquid_standard_factor = (
                     _oxide_liquid_standard_log10_factor_per_oxide(
                         fusion_pair_key, temperature_K
                     )
                 )
-            except (JanafOutOfRangeError, FileNotFoundError) as exc:
+            except (
+                JanafMissingFusionPairError,
+                JanafOutOfRangeError,
+                FileNotFoundError,
+            ) as exc:
                 conversion_caveat = (
                     f"JANAF cannot ground the {oxide} liquid-standard "
                     f"conversion at {temperature_K:g} K: {exc}."

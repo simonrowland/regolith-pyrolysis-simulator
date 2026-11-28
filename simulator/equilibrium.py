@@ -50,7 +50,10 @@ from simulator.environment import (
 )
 from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
-from simulator.reference_data.janaf import JanafOutOfRangeError
+from simulator.reference_data.janaf import (
+    JanafMissingFusionPairError,
+    JanafOutOfRangeError,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, Atmosphere
 
@@ -684,7 +687,11 @@ class EquilibriumMixin:
             mgo_liquid_standard_log10_factor = (
                 _oxide_liquid_standard_log10_factor_per_oxide('MgO', T_K)
             )
-        except (JanafOutOfRangeError, FileNotFoundError) as exc:
+        except (
+            JanafMissingFusionPairError,
+            JanafOutOfRangeError,
+            FileNotFoundError,
+        ) as exc:
             mgo_liquid_standard_log10_factor = None
             activity_standard_state_flags['Mg'] = (
                 _engine_model_standard_state_caveat(
@@ -1372,7 +1379,11 @@ class EquilibriumMixin:
                     cao_liquid_standard_log10_factor = (
                         _oxide_liquid_standard_log10_factor_per_oxide('CaO', T_K)
                     )
-                except (JanafOutOfRangeError, FileNotFoundError) as exc:
+                except (
+                    JanafMissingFusionPairError,
+                    JanafOutOfRangeError,
+                    FileNotFoundError,
+                ) as exc:
                     activity_standard_state_flags[species] = (
                         _engine_model_standard_state_caveat(
                             K_reference_phase='CaO(cr), Ellingham CaO',
@@ -1446,7 +1457,11 @@ class EquilibriumMixin:
                                     parent_oxide, T_K
                                 )
                             )
-                        except (JanafOutOfRangeError, FileNotFoundError) as exc:
+                        except (
+                            JanafMissingFusionPairError,
+                            JanafOutOfRangeError,
+                            FileNotFoundError,
+                        ) as exc:
                             activity_standard_state_flags[species] = (
                                 _engine_model_standard_state_caveat(
                                     K_reference_phase=source_phase_name,
@@ -1669,7 +1684,10 @@ class EquilibriumMixin:
                         field="P_sat",
                     )
                 if data.get('reference_pressure_model'):
-                    from simulator.vapour_rail.catalog import compiled_catalog_for
+                    from simulator.vapour_rail.catalog import (
+                        HotTrainInapplicable,
+                        compiled_catalog_for,
+                    )
 
                     catalog = getattr(self, 'vapour_rail_catalog', None)
                     if catalog is None:
@@ -1692,7 +1710,20 @@ class EquilibriumMixin:
                             category=CATEGORY_REFUSE,
                         )
                         continue
-                    compiled_evaluator = catalog.evaluator_for_hot_train(name)
+                    try:
+                        compiled_evaluator = catalog.evaluator_for_hot_train(name)
+                    except HotTrainInapplicable as model_error:
+                        _sz_omit(
+                            str(name),
+                            ZeroBecause.MISSING_THERMO,
+                            field='reference_pressure_model',
+                            detail=(
+                                'compiled pressure model is not applicable to '
+                                f'the hot-train fallback: {model_error}'
+                            ),
+                            category=CATEGORY_REFUSE,
+                        )
+                        continue
                     compiled_species = catalog.species.get(name)
                     reaction_pO2_exponent = float(
                         compiled_evaluator.pO2_exponent or 0.0
@@ -1710,7 +1741,9 @@ class EquilibriumMixin:
                     P_sat = reference_evaluation.pressure_pa
                     coefficient_block = 'compiled_reference_pressure_model'
                     if reference_evaluation.out_of_range:
-                        valid_reference_range = evaluator.valid_temperature_K
+                        valid_reference_range = (
+                            compiled_evaluator.valid_temperature_K
+                        )
                         oxide_vapor_extrapolations[name] = (
                             _vapor_pressure_temperature_extrapolation_notice(
                                 temperature_K=T_K,
@@ -1807,27 +1840,29 @@ class EquilibriumMixin:
                                 'source-reaction activity declaration'
                             )
                         declared_component = declaration.component_id
-                        declared_phase = declaration.standard_state.phase
                         activity_component = getattr(
                             oxide_activity, 'single_cation_component', None
                         )
-                        if activity_component != declared_component:
+                        if declared_component == parent_oxide:
+                            # Some source reactions use a formula-unit
+                            # activity (e.g. Na2O(l) or K2O(l)); the helper's
+                            # formula activity is a_single**cation_count.
+                            activity_basis = (
+                                oxide_activity.thermodynamic_parent_activity()
+                            )
+                        elif declared_component == activity_component:
+                            activity_basis = oxide_activity.activity
+                        else:
                             raise ValueError(
                                 f'{name}: compiled activity component '
                                 f'{declared_component!r} does not match melt '
-                                f'activity component {activity_component!r}'
+                                f'activity components '
+                                f'{activity_component!r}/{parent_oxide!r}'
                             )
-                        if declared_phase != 'liquid':
-                            raise ValueError(
-                                f'{name}: compiled activity reference phase '
-                                f'{declared_phase!r} does not match the liquid '
-                                'melt activity supplied by the fallback'
-                            )
-                        # The evaluator's exponent is derived from the source
-                        # reaction coefficient on its declared single-cation
-                        # activity. Applying it to that same activity preserves
-                        # the reaction basis for multi-cation parent formulas.
-                        activity_basis = oxide_activity.activity
+                        # The exponent is derived on the declaration's exact
+                        # component. Keep using the calculated liquid melt
+                        # value for its numeric basis, while existing typed
+                        # standard-state caveats disclose a crystalline source.
                     else:
                         # Legacy Antoine exponents are declared per parent
                         # formula unit, so their activity is the product-formula
@@ -1869,7 +1904,11 @@ class EquilibriumMixin:
                                 parent_oxide, T_K
                             )
                         )
-                    except (JanafOutOfRangeError, FileNotFoundError) as exc:
+                    except (
+                        JanafMissingFusionPairError,
+                        JanafOutOfRangeError,
+                        FileNotFoundError,
+                    ) as exc:
                         activity_standard_state_flags[name] = (
                             _engine_model_standard_state_caveat(
                                 K_reference_phase=(
@@ -1978,7 +2017,7 @@ class EquilibriumMixin:
             else None
         )
         if isinstance(floor_caveat, Mapping):
-            for channel in surface_pO2_inputs:
+            for channel in surface_pO2_inputs_bar:
                 existing_caveat = activity_standard_state_flags.get(channel)
                 if existing_caveat is None:
                     activity_standard_state_flags[channel] = dict(floor_caveat)

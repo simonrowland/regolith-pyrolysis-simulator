@@ -109,7 +109,11 @@ def test_equilibrium_duplicate_400k_binding_breaks_owner_assertion(monkeypatch):
         fail_after_cold_gate,
     )
     host = object.__new__(equilibrium.EquilibriumMixin)
-    host.melt = SimpleNamespace(temperature_C=128.0, p_total_mbar=1.0)
+    host.melt = SimpleNamespace(
+        temperature_C=128.0,
+        p_total_mbar=1.0,
+        composition_wt_pct=lambda: {},
+    )
 
     with pytest.raises(AssertionError, match="duplicate 400 K binding bypassed cold gate"):
         equilibrium.EquilibriumMixin._internal_analytical_equilibrium(host)
