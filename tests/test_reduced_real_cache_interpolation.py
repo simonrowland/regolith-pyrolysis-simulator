@@ -318,9 +318,10 @@ def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> 
     )
     assert neighbors == []
     uncertainty = rci.build_interpolation_uncertainty_vector(query, [candidate])
-    assert uncertainty["components"]["cache_distance"]["status"] == (
-        "insufficient_neighbors"
-    )
+    component = uncertainty["components"]["cache_distance"]
+    assert component["status"] == "available"
+    assert component["max_neighbor_distance"] == math.inf
+    assert component["mean_neighbor_distance"] == math.inf
 
 
 def test_exact_only_row_stays_valid_and_is_skipped_for_temperature_interpolation(

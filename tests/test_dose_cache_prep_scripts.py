@@ -133,6 +133,32 @@ def _put_real_equilibrium_cache_row(db_path: Path) -> None:
     )
 
 
+def _put_equilibrium_result_cache_row(db_path: Path) -> None:
+    key = {
+        "schema_version": SCHEMA_VERSION,
+        "namespace_id": "magemin:equilibrium-composite",
+        "artifact": "equilibrium_result",
+        "intent": "EQUILIBRIUM",
+        "code_version": "test",
+        "data_digests": {},
+    }
+    payload = {
+        "equilibrium_result": {"status": "ok"},
+        "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
+    }
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_result",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+
 def _put_internal_analytical_cache_row(db_path: Path) -> None:
     corpus_version = current_corpus_version()
     key = {
@@ -538,6 +564,42 @@ def test_seed_and_merge_reject_null_gate_payload_before_copy(
         captured = capsys.readouterr()
         assert rc == 2
         assert "gate curve payload" in captured.err
+
+    assert target.read_bytes() == before
+    assert payload_count(target) == 1
+
+
+@pytest.mark.parametrize("transport", ["seed", "merge"])
+def test_seed_and_merge_reject_null_equilibrium_result_payload(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    transport: str,
+) -> None:
+    source = tmp_path / f"{transport}-null-equilibrium-source.db"
+    target = tmp_path / f"{transport}-null-equilibrium-target.db"
+    _put_equilibrium_result_cache_row(source)
+    _put_cache_row(target, tag="existing")
+    payload_bytes = canonical_json_bytes(None)
+    with sqlite3.connect(source) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ?",
+            (
+                sqlite3.Binary(payload_bytes),
+                hashlib.sha256(payload_bytes).hexdigest(),
+                rrd._payload_codec_version("equilibrium_result"),
+            ),
+        )
+    before = target.read_bytes()
+
+    if transport == "seed":
+        with pytest.raises(CacheSourceRowInvalid, match="cache source payload"):
+            seed_cache(target, [source])
+    else:
+        rc = merge_grind_cache.main([str(target), str(source)])
+        captured = capsys.readouterr()
+        assert rc == 2
+        assert "cache source payload" in captured.err
 
     assert target.read_bytes() == before
     assert payload_count(target) == 1

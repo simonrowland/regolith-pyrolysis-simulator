@@ -535,8 +535,9 @@ def _strict_vapor_pt1_store_summary(
 ) -> dict[str, int]:
     from simulator.reduced_real_determinism import (
         PT1PersistentStoreCorrupt,
+        _PT1RowLayout,
         _admit_stored_row,
-        _pt1_has_current_layout,
+        _pt1_row_layout,
     )
 
     rows = conn.execute(
@@ -559,7 +560,7 @@ def _strict_vapor_pt1_store_summary(
             f"PRAGMA table_info({_PT1_EQUILIBRIUM_TABLE})"
         ).fetchall()
     }
-    current_layout = _pt1_has_current_layout(table_columns)
+    row_layout = _pt1_row_layout(table_columns)
 
     vapor_active_rows = 0
     source_reports = 0
@@ -567,11 +568,16 @@ def _strict_vapor_pt1_store_summary(
         row = dict(stored_row)
         row_context = f"{context}:{row.get('key_hash', '<missing>')}"
         try:
-            if current_layout:
+            if row_layout is _PT1RowLayout.UNSUPPORTED:
+                raise PT1PersistentStoreCorrupt(
+                    f"{row_context}: unsupported PT-1 physical layout"
+                )
+            if row_layout in (_PT1RowLayout.CURRENT, _PT1RowLayout.V2):
                 try:
                     admitted = _admit_stored_row(
                         row,
                         store_kind="pt1",
+                        source_layout=row_layout,
                         strict_source_validation=True,
                         approved_sources=approved_sources,
                     )

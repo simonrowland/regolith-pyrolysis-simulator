@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pytest
@@ -102,6 +103,35 @@ def test_uncertainty_vector_reports_float64_cache_distance_component() -> None:
     assert vector["components"][CACHE_DISTANCE]["status"] == "available"
     assert vector["vector"][THRESHOLD_STRADDLE] == pytest.approx(0.0)
     assert vector["components"][NONLINEARITY_GENERAL]["status"] == "insufficient_neighborhood"
+
+
+def test_cache_distance_keeps_direct_infinite_neighbor_distance() -> None:
+    query = _key(
+        "query",
+        temperature_K=1500.0,
+        composition=(("FeO", 1.0e-9),),
+    )
+    neighbors = [
+        _neighbor(
+            "same",
+            temperature_K=1500.0,
+            liquid_fraction=0.7,
+            composition=(("FeO", 1.0e-9),),
+        ),
+        _neighbor(
+            "far",
+            temperature_K=1500.0,
+            liquid_fraction=0.8,
+            composition=(("FeO", 1.0e300),),
+        ),
+    ]
+
+    vector = build_interpolation_uncertainty_vector(query, neighbors)
+    component = vector["components"][CACHE_DISTANCE]
+
+    assert component["status"] == "available"
+    assert component["max_neighbor_distance"] == math.inf
+    assert component["mean_neighbor_distance"] == math.inf
 
 
 def test_threshold_straddle_is_categorical_non_interpolable_near_liquidus() -> None:

@@ -525,6 +525,32 @@ def test_populate_accepts_v2_source_and_copies_missing_notices_as_null(
     assert hashlib.sha256(shard_db.read_bytes()).hexdigest() == source_sha256
 
 
+def test_populate_rejects_null_equilibrium_result_payload(tmp_path: Path) -> None:
+    driver = _load_driver()
+    shard_db = tmp_path / "null-equilibrium-result-shard.db"
+    key_hash = _write_pt1_row(shard_db, _pt1_key("null-equilibrium-result"))
+    payload_bytes = rrd.canonical_json_bytes(None)
+    with sqlite3.connect(shard_db) as conn:
+        conn.execute(
+            f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ? "
+            "WHERE key_hash = ?",
+            (
+                sqlite3.Binary(payload_bytes),
+                hashlib.sha256(payload_bytes).hexdigest(),
+                rrd._payload_codec_version("equilibrium_result"),
+                key_hash,
+            ),
+        )
+
+    row = driver._cache_payload_rows(shard_db)[0]
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="cache source payload must be a mapping",
+    ):
+        driver._validated_cache_payload_row(row)
+
+
 def test_merge_cache_shard_rejects_stored_payload_hash_drift(tmp_path):
     driver = _load_driver()
     shard_db = tmp_path / "shard.db"

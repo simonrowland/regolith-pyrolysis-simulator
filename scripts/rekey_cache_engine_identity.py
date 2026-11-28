@@ -20,9 +20,8 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
+    _PT1RowLayout,
     PT1_EQUILIBRIUM_TABLE,
-    PT1_LEGACY_STORE_SCHEMA_VERSION,
-    PT1_STORE_SCHEMA_VERSION,
     PT1PersistentStoreCorrupt,
     _admit_stored_row,
     _derive_pt1_key_indexes,
@@ -30,6 +29,8 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     _physics_ladder_distance_column,
     _physics_ladder_hash_column,
     _pt1_physics_index_columns,
+    _pt1_row_layout,
+    _validate_pt1_layout_stamp,
     _payload_codec_stamp_matches,
     _payload_codec_version,
     _sha256,
@@ -78,14 +79,48 @@ def _json_loads(raw: bytes) -> dict[str, Any]:
     return loaded
 
 
-def _key_from_stored_row(row: sqlite3.Row) -> dict[str, Any]:
+def _key_from_stored_row(
+    row: sqlite3.Row,
+    *,
+    row_layout: _PT1RowLayout | None = None,
+) -> dict[str, Any]:
     row_columns = set(row.keys())
+    layout = row_layout or _pt1_row_layout(row_columns)
     store_stamp = (
         row["store_schema_version"]
         if "store_schema_version" in row_columns
         else None
     )
-    if store_stamp in (None, "pt1", PT1_LEGACY_STORE_SCHEMA_VERSION):
+    if layout is _PT1RowLayout.CURRENT:
+        admitted = _admit_stored_row(
+            row,
+            store_kind="pt1",
+            source_layout=layout,
+        )
+        if admitted is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 cache row rejected during rekey: {row['key_hash']}"
+            )
+        return admitted.entry["key"]
+
+    if layout is _PT1RowLayout.V2:
+        admitted = _admit_stored_row(
+            row,
+            store_kind="pt1",
+            source_layout=layout,
+        )
+        if admitted is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 cache row rejected during rekey: {row['key_hash']}"
+            )
+        return admitted.entry["key"]
+
+    if layout in (_PT1RowLayout.LEGACY, _PT1RowLayout.PARTIAL_BUCKET):
+        _validate_pt1_layout_stamp(
+            layout,
+            store_stamp,
+            key_hash=str(row["key_hash"]),
+        )
         legacy_required_columns = {
             "key_hash",
             "key_sha256",
@@ -127,17 +162,10 @@ def _key_from_stored_row(row: sqlite3.Row) -> dict[str, Any]:
             ) from exc
         return key
 
-    if store_stamp != PT1_STORE_SCHEMA_VERSION:
-        raise PT1PersistentStoreCorrupt(
-            f"PT-1 cache row has unsupported rekey schema stamp: {store_stamp!r}"
-        )
-
-    admitted = _admit_stored_row(row, store_kind="pt1")
-    if admitted is None:
-        raise PT1PersistentStoreCorrupt(
-            f"PT-1 cache row rejected during rekey: {row['key_hash']}"
-        )
-    return admitted.entry["key"]
+    raise PT1PersistentStoreCorrupt(
+        "PT-1 cache row has an unsupported physical layout for rekey: "
+        f"{','.join(sorted(row_columns))}"
+    )
 
 
 def _ensure_corpus_column(conn: sqlite3.Connection) -> None:
@@ -162,8 +190,9 @@ def _count_rows_needing_rekey(
     target_corpus_version: str,
 ) -> int:
     count = 0
+    row_layout = _pt1_row_layout(_table_columns(conn))
     for row in conn.execute(f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"):
-        key = _key_from_stored_row(row)
+        key = _key_from_stored_row(row, row_layout=row_layout)
         if not rekey_row_matches_engine(key, engine):
             continue
         if cache_row_needs_rekey(key, target_corpus_version):
@@ -252,13 +281,14 @@ def rekey_cache(
         _ensure_corpus_column(conn)
         updated = 0
         table_columns = _table_columns(conn)
+        row_layout = _pt1_row_layout(table_columns)
         for row in conn.execute(
             f"""
             SELECT *
             FROM {PT1_EQUILIBRIUM_TABLE}
             """
         ):
-            key = _key_from_stored_row(row)
+            key = _key_from_stored_row(row, row_layout=row_layout)
             if not rekey_row_matches_engine(key, engine):
                 continue
             if not cache_row_needs_rekey(key, target):
@@ -281,13 +311,8 @@ def rekey_cache(
                 if "payload_codec_version" in row_columns
                 else None
             )
-            store_schema_version = (
-                row["store_schema_version"]
-                if "store_schema_version" in row_columns
-                else None
-            )
             legacy_layout = (
-                store_schema_version != PT1_STORE_SCHEMA_VERSION
+                row_layout is not _PT1RowLayout.CURRENT
                 or expected_codec_version is None
                 or not _payload_codec_stamp_matches(
                     expected_codec_version, stored_codec_version

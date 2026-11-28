@@ -560,9 +560,8 @@ def _computed_neighbor_distances(
         try:
             distance = _standardized_distance(query_vector, vector)
         except OverflowError:
-            continue
-        if math.isfinite(distance):
-            distances.append(distance)
+            distance = math.inf
+        distances.append(distance)
     return distances
 
 

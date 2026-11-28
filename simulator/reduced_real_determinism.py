@@ -2967,8 +2967,33 @@ def _validate_pt1_key_indexes(
     )
 
 
-def _pt1_has_current_layout(columns: Iterable[str]) -> bool:
-    required_columns = {
+class _PT1RowLayout(str, Enum):
+    CURRENT = "current"
+    V2 = "v2"
+    PARTIAL_BUCKET = "partial_bucket"
+    LEGACY = "legacy"
+    UNSUPPORTED = "unsupported"
+
+
+def _pt1_row_layout(columns: Iterable[str]) -> _PT1RowLayout:
+    column_names = frozenset(columns)
+    bucket_columns = frozenset(
+        {
+            "physics_bucket_schema_version",
+            "physics_bucket_sha256",
+            "replay_scope_sha256",
+            "physics_key_bytes",
+            *(
+                column
+                for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                for column in (
+                    _physics_ladder_hash_column(rung_tag),
+                    _physics_ladder_distance_column(rung_tag),
+                )
+            ),
+        }
+    )
+    current_columns = frozenset({
         "key_hash",
         "artifact",
         "store_schema_version",
@@ -2977,20 +3002,68 @@ def _pt1_has_current_layout(columns: Iterable[str]) -> bool:
         "payload_codec_version",
         "key_bytes",
         "payload_bytes",
-        "physics_bucket_schema_version",
-        "physics_bucket_sha256",
-        "replay_scope_sha256",
-        "physics_key_bytes",
-        *(
-            column
-            for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
-            for column in (
-                _physics_ladder_hash_column(rung_tag),
-                _physics_ladder_distance_column(rung_tag),
-            )
-        ),
-    }
-    return required_columns.issubset(columns)
+        "repair_notices_json",
+    }) | bucket_columns
+    if current_columns.issubset(column_names):
+        return _PT1RowLayout.CURRENT
+    if (current_columns - {"repair_notices_json"}).issubset(column_names):
+        return _PT1RowLayout.V2
+
+    if bucket_columns.intersection(column_names):
+        return _PT1RowLayout.PARTIAL_BUCKET
+    if {
+        "key_hash",
+        "key_sha256",
+        "key_bytes",
+        "engine_version",
+    }.issubset(column_names):
+        return _PT1RowLayout.LEGACY
+    return _PT1RowLayout.UNSUPPORTED
+
+
+def _validate_pt1_layout_stamp(
+    layout: _PT1RowLayout,
+    store_schema_version: Any,
+    *,
+    key_hash: str,
+) -> None:
+    if layout is _PT1RowLayout.UNSUPPORTED:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row has an unsupported physical layout: {key_hash}"
+        )
+    if (
+        layout is _PT1RowLayout.CURRENT
+        and store_schema_version != PT1_STORE_SCHEMA_VERSION
+    ):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 current-layout row has an invalid store schema stamp: "
+            f"{store_schema_version!r}: {key_hash}"
+        )
+    if (
+        layout is _PT1RowLayout.V2
+        and store_schema_version != PT1_LEGACY_STORE_SCHEMA_VERSION
+    ):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 v2-layout row has an invalid store schema stamp: "
+            f"{store_schema_version!r}: {key_hash}"
+        )
+    if (
+        layout is _PT1RowLayout.LEGACY
+        and store_schema_version == PT1_STORE_SCHEMA_VERSION
+    ):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 row stamp does not match its physical layout: "
+            f"{store_schema_version!r}: {key_hash}"
+        )
+    if (
+        store_schema_version is not None
+        and store_schema_version != "pt1"
+        and store_schema_version not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS
+    ):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 row store schema version drift: "
+            f"{store_schema_version} != {PT1_STORE_SCHEMA_VERSION}"
+        )
 
 
 def _admit_stored_row(
@@ -3010,6 +3083,7 @@ def _admit_stored_row(
     rung_key: Mapping[str, Any] | None = None,
     rung_hash: str | None = None,
     output_columns: Sequence[str] | None = None,
+    source_layout: _PT1RowLayout | None = None,
     strict_source_validation: bool = False,
     validate_source_provenance: bool = False,
     approved_sources: frozenset[str] = APPROVED_LIVE_VAPOR_SOURCES,
@@ -3166,6 +3240,7 @@ def _admit_stored_row(
     try:
         row = dict(raw_row)
         physical_row_columns = set(row)
+        layout = source_layout or _pt1_row_layout(physical_row_columns)
         if output_columns is not None:
             row_keys = set(row)
             row = {
@@ -3177,21 +3252,12 @@ def _admit_stored_row(
         row_hash = str(row["key_hash"])
         row_artifact = str(row["artifact"])
         store_schema_version = row.get("store_schema_version")
-        current_layout = _pt1_has_current_layout(physical_row_columns)
-        if current_layout and store_schema_version != PT1_STORE_SCHEMA_VERSION:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 current-layout row has an invalid store schema stamp: "
-                f"{store_schema_version!r}: {row_hash}"
-            )
-        if (
-            store_schema_version is not None
-            and store_schema_version != "pt1"
-            and store_schema_version not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS
-        ):
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row store schema version drift: "
-                f"{store_schema_version} != {PT1_STORE_SCHEMA_VERSION}"
-            )
+        _validate_pt1_layout_stamp(
+            layout,
+            store_schema_version,
+            key_hash=row_hash,
+        )
+        current_layout = layout in (_PT1RowLayout.CURRENT, _PT1RowLayout.V2)
         def verify_payload_integrity() -> tuple[bytes, Any]:
             payload_bytes = _pt1_row_bytes(
                 row["payload_bytes"], field="payload", key_hash=row_hash
@@ -3358,11 +3424,14 @@ def _admit_stored_row(
 
         strict_vapor_summary = None
         if strict_source_validation:
-            if row_artifact == "freeze_gate_curve" and not isinstance(
-                row_payload, Mapping
-            ):
+            if not isinstance(row_payload, Mapping):
+                payload_label = (
+                    "gate curve payload"
+                    if row_artifact == "freeze_gate_curve"
+                    else "cache source payload"
+                )
                 raise PT1PersistentStoreCorrupt(
-                    "PT-1 cache source gate curve payload must be a mapping: "
+                    f"PT-1 cache source {payload_label} must be a mapping: "
                     f"{row_hash}"
                 )
             if validate_source_provenance:
@@ -3379,15 +3448,14 @@ def _admit_stored_row(
                 row_key,
                 row_payload,
             )
-            if isinstance(row_payload, Mapping):
-                strict_vapor_summary = assert_strict_vapor_pt1_row(
-                    artifact=row_artifact,
-                    key=row_key,
-                    key_hash=row_hash,
-                    payload=row_payload,
-                    context=f"PT-1 cache shard {row_artifact}:{row_hash}",
-                    approved_sources=approved_sources,
-                )
+            strict_vapor_summary = assert_strict_vapor_pt1_row(
+                artifact=row_artifact,
+                key=row_key,
+                key_hash=row_hash,
+                payload=row_payload,
+                context=f"PT-1 cache shard {row_artifact}:{row_hash}",
+                approved_sources=approved_sources,
+            )
         payload_codec_version = row.get("payload_codec_version")
         expected_codec_version = _payload_codec_version(row_artifact)
         if not _payload_codec_stamp_matches(
@@ -3503,8 +3571,15 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
     artifact = row.get("artifact")
     artifact_name = artifact if isinstance(artifact, str) else "unknown"
     row_columns = set(row)
+    layout = _pt1_row_layout(row_columns)
+    if layout is _PT1RowLayout.UNSUPPORTED:
+        raise UncacheableKey(
+            PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+            "write_candidate_layout",
+        )
     legacy_layout = (
-        row.get("store_schema_version") != PT1_STORE_SCHEMA_VERSION
+        layout is not _PT1RowLayout.CURRENT
+        or row.get("store_schema_version") != PT1_STORE_SCHEMA_VERSION
         or (
             _payload_codec_version(artifact_name) is not None
             and row.get("payload_codec_version") is None
@@ -3866,7 +3941,11 @@ class PT1PersistentEquilibriumStore:
 
         with self._connect() as conn:
             self._initialize(conn)
-            existing = self._fetch(conn, key_hash)
+            existing_result = next(self._fetch_candidates(conn, key_hash), None)
+            existing = None if existing_result is None else existing_result[0]
+            existing_layout = (
+                None if existing_result is None else existing_result[1]
+            )
             insert_source = None
             effective_notices_json = repair_notices_json
             existing_admission = None
@@ -3878,6 +3957,7 @@ class PT1PersistentEquilibriumStore:
                     key=key,
                     key_bytes=key_bytes,
                     key_hash=key_hash,
+                    source_layout=existing_layout,
                 )
             if existing is not None:
                 assert existing_admission is not None
@@ -4054,7 +4134,7 @@ class PT1PersistentEquilibriumStore:
             return None
         with self._connect() as conn:
             self._initialize(conn)
-            for row in self._fetch_candidates(conn, key_hash):
+            for row, source_layout in self._fetch_candidates(conn, key_hash):
                 entry, decoded = self._entry_from_row(
                     row,
                     artifact=artifact,
@@ -4063,6 +4143,7 @@ class PT1PersistentEquilibriumStore:
                     key_hash=key_hash,
                     return_decoded=True,
                     strict_vapor_gate=self.strict_vapor_gate,
+                    source_layout=source_layout,
                 )
                 if decoded is None:
                     continue
@@ -4595,31 +4676,41 @@ class PT1PersistentEquilibriumStore:
         conn: sqlite3.Connection,
         key_hash: str,
     ) -> sqlite3.Row | None:
-        return next(self._fetch_candidates(conn, key_hash), None)
+        candidate = next(self._fetch_candidates(conn, key_hash), None)
+        return None if candidate is None else candidate[0]
 
     def _fetch_candidates(
         self,
         conn: sqlite3.Connection,
         key_hash: str,
-    ) -> Iterator[sqlite3.Row]:
+    ) -> Iterator[tuple[sqlite3.Row, _PT1RowLayout]]:
         tables = [PT1_EQUILIBRIUM_TABLE]
         read_only_table = self._read_only_equilibrium_table(conn)
         if read_only_table is not None:
             tables.append(read_only_table)
         for table in tables:
+            if "." in table:
+                schema, table_name = table.split(".", 1)
+                table_info = conn.execute(
+                    f"PRAGMA {schema}.table_info({table_name})"
+                )
+            else:
+                table_info = conn.execute(f"PRAGMA table_info({table})")
+            table_columns = {str(info["name"]) for info in table_info}
+            source_layout = _pt1_row_layout(table_columns)
             repair_column = (
                 "repair_notices_json"
-                if self._table_has_column(conn, table, "repair_notices_json")
+                if "repair_notices_json" in table_columns
                 else "NULL"
             )
             law_column = (
                 "law_disclosures_json"
-                if self._table_has_column(conn, table, "law_disclosures_json")
+                if "law_disclosures_json" in table_columns
                 else "NULL"
             )
             codec_version_column = (
                 "payload_codec_version"
-                if self._table_has_column(conn, table, "payload_codec_version")
+                if "payload_codec_version" in table_columns
                 else "NULL"
             )
             physics_index_columns = (
@@ -4638,7 +4729,7 @@ class PT1PersistentEquilibriumStore:
             )
             physics_index_projection = ",\n                    ".join(
                 column
-                if self._table_has_column(conn, table, column)
+                if column in table_columns
                 else f"NULL AS {column}"
                 for column in physics_index_columns
             )
@@ -4669,7 +4760,7 @@ class PT1PersistentEquilibriumStore:
                 (key_hash,),
             ).fetchone()
             if row is not None:
-                yield row
+                yield row, source_layout
 
     @staticmethod
     def _table_has_column(
@@ -4695,6 +4786,7 @@ class PT1PersistentEquilibriumStore:
         return_decoded: bool = False,
         admission_keys: Sequence[Mapping[str, Any]] | None = None,
         expected_replay_scope_sha256: str | None = None,
+        source_layout: _PT1RowLayout | None = None,
         strict_vapor_gate: bool = False,
     ) -> Any:
         admitted = _admit_stored_row(
@@ -4706,6 +4798,7 @@ class PT1PersistentEquilibriumStore:
             key_hash=key_hash,
             admission_keys=admission_keys,
             expected_replay_scope_sha256=expected_replay_scope_sha256,
+            source_layout=source_layout,
             validate_interpolation_domain=True,
             strict_vapor_gate=strict_vapor_gate,
         )

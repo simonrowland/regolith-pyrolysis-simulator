@@ -209,6 +209,47 @@ def test_rekey_deep_stored_key_fails_through_admission(
     assert admission_calls[0]["store_kind"] == "pt1"
 
 
+def test_rekey_rejects_legacy_stamp_on_current_physical_layout(
+    tmp_path: Path,
+    target_corpus_version: str,
+) -> None:
+    db_path = tmp_path / "current-layout-legacy-stamp.db"
+    key_hash, _payload_bytes = put_rekey_gate_row(
+        db_path,
+        {
+            "backend": {"backend_name": "alphamelts"},
+            "engine_version": "one",
+        },
+        engine_version="one",
+    )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = 'pt1' WHERE key_hash = ?",
+            (key_hash,),
+        )
+        before = conn.execute(
+            f"SELECT store_schema_version, key_bytes, payload_bytes "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt, match="current-layout"):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=target_corpus_version,
+            dry_run=True,
+        )
+
+    with sqlite3.connect(db_path) as conn:
+        after = conn.execute(
+            f"SELECT store_schema_version, key_bytes, payload_bytes "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert after == before
+
+
 def test_rekey_legacy_stamp_rejects_overflowing_key_as_corrupt(
     tmp_path: Path,
     target_corpus_version: str,
