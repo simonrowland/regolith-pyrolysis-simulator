@@ -1412,7 +1412,7 @@ def test_compilation_routing_numeric_pin_detects_suppression_mutation(monkeypatc
     monkeypatch.setattr(
         compilation_tier,
         "_compilation_engines_for_pair",
-        lambda _engines, _identity: (),
+        lambda _engines, _identity, **_kwargs: (),
     )
     with pytest.raises(AssertionError, match="route-na2o-liquid-delta-fg"):
         _assert_compilation_routing_retains_numeric_residuals()
