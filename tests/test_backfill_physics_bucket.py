@@ -115,6 +115,27 @@ def test_backfill_physics_bucket_skips_internal_analytical_rows_before_bucket_de
     assert _null_physics_column_count(db_path) == 1
 
 
+def test_backfill_bad_payload_checksum_counts_row_invalid_without_writing_indexes(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "bad-payload-checksum.db"
+    _create_legacy_db(db_path)
+    key = _replay_key("bad-payload-checksum", setpoints_digest="checksum")
+    _insert_legacy_row(db_path, key)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} SET payload_sha256 = ?",
+            ("0" * 64,),
+        )
+
+    stats = backfill.run_backfill(db_path, dry_run=False)
+
+    assert stats.total_rows == 1
+    assert stats.invalid_rows == 1
+    assert stats.rows_updated == 0
+    assert _null_physics_column_count(db_path) == 1
+
+
 def test_backfill_accepts_new_schema_equilibrium_authority(tmp_path):
     db_path = tmp_path / "new-schema.db"
     _create_legacy_db(db_path)

@@ -28,6 +28,8 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
     PT1_EQUILIBRIUM_TABLE,
+    PT1PersistentStoreCorrupt,
+    _pt1_row_payload_integrity,
     assert_strict_vapor_pt1_row,
     canonical_physics_ladder_bucket_key_from_replay_key,
     canonical_json_bytes,
@@ -326,12 +328,19 @@ def _physics_values_from_admitted_row(row: sqlite3.Row) -> PhysicsBucketValues:
         raise ValueError("row key_sha256 does not match key_bytes")
 
     payload_bytes = _blob_bytes(row["payload_bytes"])
-    payload_hash = _sha256(payload_bytes)
-    if (
-        row["payload_sha256"] is not None
-        and str(row["payload_sha256"]) != payload_hash
-    ):
-        raise ValueError("row payload_sha256 does not match payload_bytes")
+    payload_integrity_row: dict[str, Any] = {"payload_bytes": payload_bytes}
+    if row["payload_sha256"] is not None:
+        payload_integrity_row["payload_sha256"] = str(row["payload_sha256"])
+    try:
+        _pt1_row_payload_integrity(
+            payload_integrity_row,
+            key_hash=key_hash,
+            validate_canonical_json=False,
+        )
+    except PT1PersistentStoreCorrupt as exc:
+        raise ValueError(
+            "row payload_sha256 does not match payload_bytes"
+        ) from exc
 
     key = json.loads(key_bytes.decode("utf-8"))
     payload = json.loads(payload_bytes.decode("utf-8"))

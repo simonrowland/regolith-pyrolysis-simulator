@@ -19,7 +19,6 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from simulator.reduced_real_determinism import (  # noqa: E402
-    PHYSICS_BUCKET_ALL_LADDER_RUNGS,
     _PT1_SOURCE_REQUIRED_TEXT_FIELDS,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1_EQUILIBRIUM_TABLE,
@@ -27,12 +26,13 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     UncacheableKey,
     _admit_stored_row,
     _derive_pt1_key_indexes,
-    _physics_ladder_distance_column,
-    _physics_ladder_hash_column,
+    _pt1_physics_index_column_names,
     _pt1_physics_index_columns,
+    _pt1_row_payload_integrity,
     _pt1_row_key,
     _validate_pt1_key_indexes,
     _sha256,
+    validate_repair_notices_json,
     cache_row_needs_rekey,
     canonical_json_bytes,
     rekey_engine_version_provenance,
@@ -251,20 +251,7 @@ def rekey_cache(
         updated = 0
         table_columns = _table_columns(conn)
         current_layout = _has_current_layout(table_columns)
-        physics_index_columns = {
-            "physics_bucket_schema_version",
-            "physics_bucket_sha256",
-            "replay_scope_sha256",
-            "physics_key_bytes",
-            *(
-                column
-                for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
-                for column in (
-                    _physics_ladder_hash_column(rung_tag),
-                    _physics_ladder_distance_column(rung_tag),
-                )
-            ),
-        }
+        physics_index_columns = set(_pt1_physics_index_column_names())
         physics_columns_present = physics_index_columns & table_columns
         preserved_payload_columns = tuple(
             column
@@ -312,6 +299,20 @@ def rekey_cache(
                 row_values[column] for column in preserved_payload_columns
             )
             row_columns = set(row.keys())
+            if not current_layout:
+                if "payload_bytes" in row_columns or "payload_sha256" in row_columns:
+                    payload_integrity_row = dict(row_values)
+                    if payload_integrity_row.get("payload_sha256") is None:
+                        payload_integrity_row.pop("payload_sha256", None)
+                    _pt1_row_payload_integrity(
+                        payload_integrity_row,
+                        key_hash=old_key_hash,
+                        validate_canonical_json=False,
+                    )
+                if "repair_notices_json" in row_columns:
+                    validate_repair_notices_json(
+                        row_values["repair_notices_json"]
+                    )
             artifact = row["artifact"] if "artifact" in row_columns else None
             legacy_layout = (
                 row_values.get("store_schema_version")

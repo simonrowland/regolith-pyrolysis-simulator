@@ -5501,10 +5501,10 @@ def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
         ) is None
 
 
-def test_pt1_ladder_subnormal_row_validates_sibling_distance_before_miss(
+def test_pt1_ladder_hit_ignores_unselected_sibling_distance(
     tmp_path: Path,
 ) -> None:
-    db_path = tmp_path / "pt1-subnormal-sibling-distance.sqlite"
+    db_path = tmp_path / "pt1-unselected-sibling-distance.sqlite"
     key = _freeze_gate_key()
     capture = PT0DeterminismStore("capture", db_path=db_path)
     capture._store(
@@ -5512,15 +5512,6 @@ def test_pt1_ladder_subnormal_row_validates_sibling_distance_before_miss(
         key,
         _valid_test_gate_payload(),
         law_disclosures=[],
-    )
-    corrupt_key = copy.deepcopy(rrd._json_ready(key))
-    corrupt_key["controls"]["T_K"] = 5e-324
-    _row_key_bytes, _row_key_hash, _bucket, _bucket_bytes = (
-        _rewrite_pt1_key_and_derived_indexes(
-            db_path,
-            _key_hash(key),
-            corrupt_key,
-        )
     )
     selected_rung = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
     sibling_rung = next(
@@ -5533,25 +5524,21 @@ def test_pt1_ladder_subnormal_row_validates_sibling_distance_before_miss(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
             f"SET {rrd._physics_ladder_distance_column(sibling_rung)} = ? "
             "WHERE key_hash = ?",
-            ("bad", _key_hash(corrupt_key)),
+            ("bad", _key_hash(key)),
         )
 
     rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
-        corrupt_key,
+        key,
         selected_rung,
     )
     rung_hash = rrd._sha256(canonical_json_bytes(rung_key))
-    with pytest.raises(
-        PT1PersistentStoreCorrupt,
-        match=f"{sibling_rung} distance is invalid",
-    ):
-        PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
-            artifact="freeze_gate_curve",
-            rung_tag=selected_rung,
-            rung_key=rung_key,
-            rung_hash=rung_hash,
-            query_key=key,
-        )
+    assert PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+        artifact="freeze_gate_curve",
+        rung_tag=selected_rung,
+        rung_key=rung_key,
+        rung_hash=rung_hash,
+        query_key=key,
+    ) is not None
 
 
 @pytest.mark.parametrize(
@@ -6743,6 +6730,41 @@ def test_pt1_concurrent_row_copy_checks_and_writes_atomically(
         canonical_json_bytes(first_payload),
         canonical_json_bytes(second_payload),
     }
+
+
+def test_pt1_copy_uses_one_admission_result_per_source_row(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_path = tmp_path / "single-admission-source.sqlite"
+    target_path = tmp_path / "single-admission-target.sqlite"
+    key = _freeze_gate_key()
+    PT0DeterminismStore("capture", db_path=source_path)._store(
+        "freeze_gate_curve",
+        key,
+        _valid_test_gate_payload(),
+        law_disclosures=[],
+    )
+    PT1PersistentEquilibriumStore(target_path)
+    key_hash = _key_hash(key)
+    original_admission = rrd._admit_stored_row
+    admissions = 0
+
+    def count_admission(row, **kwargs):
+        nonlocal admissions
+        if row.get("key_hash") == key_hash:
+            admissions += 1
+        return original_admission(row, **kwargs)
+
+    monkeypatch.setattr(rrd, "_admit_stored_row", count_admission)
+    result = rrd._copy_pt1_equilibrium_rows(
+        (source_path,),
+        target_path,
+        require_capture_epoch_match=False,
+    )
+
+    assert result["inserted_rows"] == 1
+    assert admissions == 1
 
 
 def test_pt1_capture_rejects_unproven_primary_with_admitted_binding(
@@ -10333,41 +10355,6 @@ _PT1_LADDER_ROW_DEFECT_GROUPS = (
                 ),
             ),
         ),
-    ),
-    *tuple(
-        group
-        for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
-        if rung_tag != _PT1_LADDER_ORDER_TEST_RUNG
-        for group in (
-            (
-                f"sibling-rung-hash:{rung_tag}",
-                _pt1_ladder_defects(
-                    f"sibling-rung-hash:{rung_tag}",
-                    rrd._physics_ladder_hash_column(rung_tag),
-                    (
-                        ("missing", None, "physics bucket hash is missing"),
-                        ("invalid", "bad", f"does not reproduce {rung_tag} hash"),
-                        (
-                            "finite-wrong",
-                            "0" * 64,
-                            f"does not reproduce {rung_tag} hash",
-                        ),
-                    ),
-                ),
-            ),
-            (
-                f"sibling-rung-distance:{rung_tag}",
-                _pt1_ladder_defects(
-                    f"sibling-rung-distance:{rung_tag}",
-                    rrd._physics_ladder_distance_column(rung_tag),
-                    (
-                        ("missing", None, "distance is missing"),
-                        ("invalid", "bad", "distance is invalid"),
-                        ("finite-wrong", -1.0, f"row {rung_tag} distance mismatch"),
-                    ),
-                ),
-            ),
-        )
     ),
     (
         "payload-checksum",

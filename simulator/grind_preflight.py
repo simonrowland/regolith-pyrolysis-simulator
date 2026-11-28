@@ -548,13 +548,13 @@ def _strict_vapor_pt1_store_summary(
     has_checksums = bool(checksum_columns & table_columns)
     selected_columns = (
         "*"
-        if has_checksums and strict_vapor_gate
+        if has_checksums
         else "key_hash, artifact, key_bytes, payload_bytes"
     )
     rows = conn.execute(
         f"SELECT {selected_columns} FROM {_PT1_EQUILIBRIUM_TABLE}"
     ).fetchall()
-    if not strict_vapor_gate:
+    if not strict_vapor_gate and not has_checksums:
         return {
             "rows": len(rows),
             "vapor_active_rows": 0,
@@ -574,20 +574,29 @@ def _strict_vapor_pt1_store_summary(
                         row,
                         store_kind="pt1",
                         validate_store_schema_version=(
-                            "store_schema_version" in table_columns
+                            "physics_bucket_schema_version" in table_columns
                         ),
-                        strict_source_validation=True,
-                        approved_sources=approved_sources,
                         validate_unselected_ladder_indexes=False,
                     )
                 except PT1PersistentStoreCorrupt as exc:
                     raise GrindSourceGateError(
                         f"{row_context}: PT-1 stored row is corrupt"
                     ) from exc
-                row_summary = (
-                    None if admitted is None else admitted.strict_vapor_summary
-                )
-            else:
+                row_summary = None
+                if strict_vapor_gate:
+                    if admitted is None:
+                        raise GrindSourceGateError(
+                            f"{row_context}: PT-1 stored row was not admitted"
+                        )
+                    row_summary = assert_strict_vapor_pt1_row(
+                        artifact=str(admitted.entry["artifact"]),
+                        key=admitted.entry["key"],
+                        key_hash=str(admitted.entry["key_hash"]),
+                        payload=admitted.entry["payload"],
+                        context=row_context,
+                        approved_sources=approved_sources,
+                    )
+            elif strict_vapor_gate:
                 key = _json_mapping(row.get("key_bytes"), f"{row_context}.key")
                 payload = _json_mapping(
                     row.get("payload_bytes"), f"{row_context}.payload"
@@ -600,6 +609,8 @@ def _strict_vapor_pt1_store_summary(
                     context=row_context,
                     approved_sources=approved_sources,
                 )
+            else:
+                continue
             if row_summary is not None:
                 source_reports += int(row_summary["source_reports"])
                 if row_summary["vapor_active"]:
@@ -610,6 +621,13 @@ def _strict_vapor_pt1_store_summary(
             raise GrindSourceGateError(
                 f"{row_context}: PT-1 stored row is invalid"
             ) from exc
+    if not strict_vapor_gate:
+        return {
+            "rows": len(rows),
+            "vapor_active_rows": 0,
+            "source_reports": 0,
+            "pt1_noop_rows": len(rows),
+        }
     return {
         "rows": len(rows),
         "vapor_active_rows": vapor_active_rows,

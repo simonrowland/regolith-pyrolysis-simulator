@@ -459,6 +459,75 @@ def test_rekey_compact_table_overlapping_preflight_signature(
     assert stored_notices == '[{"kind":"legacy"}]'
 
 
+@pytest.mark.parametrize(
+    "corruption",
+    ("payload-checksum", "repair-notices"),
+)
+def test_rekey_compact_pre_codec_rows_validate_carried_integrity(
+    tmp_path: Path,
+    target_corpus_version: str,
+    corruption: str,
+) -> None:
+    db_path = tmp_path / f"compact-integrity-{corruption}.sqlite"
+    _write_rekeyable_rows(db_path, ("one",))
+    opaque_payload = b"opaque compact rekey payload"
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN artifact TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN payload_bytes BLOB"
+        )
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN payload_sha256 TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN repair_notices_json TEXT"
+        )
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET artifact = ?, payload_bytes = ?, payload_sha256 = ?, "
+            "repair_notices_json = ?",
+            (
+                "equilibrium_post_record",
+                sqlite3.Binary(opaque_payload),
+                hashlib.sha256(opaque_payload).hexdigest(),
+                '[{"kind":"legacy"}]',
+            ),
+        )
+        (old_key_hash,) = conn.execute(
+            f"SELECT key_hash FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        if corruption == "payload-checksum":
+            conn.execute(
+                f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_sha256 = ?",
+                ("0" * 64,),
+            )
+        else:
+            conn.execute(
+                f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+                "SET repair_notices_json = ?",
+                ("[",),
+            )
+
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=target_corpus_version,
+        )
+
+    with sqlite3.connect(db_path) as conn:
+        (stored_key_hash,) = conn.execute(
+            f"SELECT key_hash FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert stored_key_hash == old_key_hash
+
+
 def test_rekey_legacy_stamp_rejects_overflowing_key_as_corrupt(
     tmp_path: Path,
     target_corpus_version: str,

@@ -33,7 +33,7 @@ class CacheSourceSchemaMismatch(ValueError):
     """Source DB is not a PT-1 reduced-real cache with the expected schema."""
 
 
-class CacheSourceRowInvalid(ValueError):
+class CacheSourceRowInvalid(PT1PersistentStoreCorrupt):
     """Source row bytes, hashes, or provenance do not match its canonical key."""
 
 
@@ -154,26 +154,9 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
                 validate_source_provenance=True,
             )
         except PT1PersistentStoreCorrupt as exc:
-            message = str(exc)
-            if (
-                isinstance(exc.__cause__, RuntimeError)
-                and str(exc.__cause__).startswith("PT-1 reduced-real ")
-            ):
-                raise
-            field = (
-                "payload_sha256"
-                if "payload hash mismatch" in message
-                else "repair_notices_json"
-                if "repair_notices_json" in message
-                else "key_hash"
-                if "key bytes hash mismatch" in message
-                else "key_sha256"
-                if "key hash mismatch" in message
-                else "stored row"
-            )
             raise CacheSourceRowInvalid(
                 "PT-1 cache source row invalid stored fields: "
-                f"{source}:{field}: {message}"
+                f"{source}: {exc}"
             ) from exc
         assert admitted is not None and admitted.stored_columns is not None
         row = admitted.stored_columns

@@ -15,6 +15,19 @@ from scripts import regenerate_cache_identity_goldens
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 LEGACY_DB = ROOT / "docs-private" / "recipe-db" / "reduced-real.db"
+
+
+def test_legacy_payload_checksum_mismatch_uses_conversion_error():
+    row = cache_convert._load_cache_conversion_fixture_row()
+    row["payload_sha256"] = "0" * 64
+
+    with pytest.raises(
+        cache_convert.ConversionError,
+        match="legacy payload SHA disagrees",
+    ):
+        cache_convert.materialize_legacy_row(row, "0" * 64)
+
+
 def test_encoder_default_materialization_matches_explicit_defaults():
     omitted = cache_convert.materialize_alphamelts_engine_config(
         {"model": "MELTSv1.0.2"}, resolved_mode="subprocess"

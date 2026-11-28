@@ -176,6 +176,129 @@ def _put_interpolation_row(
     )
 
 
+@pytest.mark.parametrize(
+    ("column", "corrupt_value"),
+    (
+        ("physics_bucket_sha256", "0" * 64),
+        ("physics_bucket_h40_distance", -1.0),
+    ),
+    ids=("bucket-hash", "h40-distance"),
+)
+def test_pt1_replacement_rejects_corrupt_retained_indexes(
+    tmp_path: Path,
+    column: str,
+    corrupt_value: object,
+) -> None:
+    db_path = tmp_path / f"retained-index-{column}.sqlite"
+    key = _interpolation_key(
+        "retained-index-corruption",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
+    key_bytes = canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        (original_payload_bytes,) = conn.execute(
+            f"SELECT payload_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            f"SET {column} = ?, payload_codec_version = 0 WHERE key_hash = ?",
+            (corrupt_value, key_hash),
+        )
+
+    replacement_payload = _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0)
+    replacement_bytes = canonical_json_bytes(replacement_payload)
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+        PT1PersistentEquilibriumStore(db_path).put(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+            payload=replacement_payload,
+            payload_bytes=replacement_bytes,
+            payload_hash=hashlib.sha256(replacement_bytes).hexdigest(),
+        )
+
+    with sqlite3.connect(db_path) as conn:
+        (stored_payload_bytes,) = conn.execute(
+            f"SELECT payload_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert bytes(stored_payload_bytes) == bytes(original_payload_bytes)
+
+
+def test_pt1_source_copy_rejects_wrong_bucket_hash_without_schema_stamp(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "null-bucket-schema-source.sqlite"
+    target = tmp_path / "null-bucket-schema-target.sqlite"
+    key = _interpolation_key(
+        "null-bucket-schema-source",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    _put_interpolation_row(source, key, liquid_fraction=0.7, sio_pa=7.0)
+    with sqlite3.connect(source) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET physics_bucket_schema_version = NULL, "
+            "physics_bucket_sha256 = ?",
+            ("0" * 64,),
+        )
+
+    PT1PersistentEquilibriumStore(target)
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+        rrd._copy_pt1_equilibrium_rows(
+            (source,),
+            target,
+            require_capture_epoch_match=False,
+        )
+
+    with sqlite3.connect(target) as conn:
+        (target_rows,) = conn.execute(
+            f"SELECT COUNT(*) FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert target_rows == 0
+
+
+def test_pt1_put_writes_missing_authority_shape_then_reader_misses(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "missing-authority-shape.sqlite"
+    key = _interpolation_key(
+        "missing-authority-shape",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+    payload.pop("authority")
+    key_bytes = canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    payload_bytes = canonical_json_bytes(payload)
+
+    PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+    assert PT1PersistentEquilibriumStore(db_path).get(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+    ) is None
+
+
 def test_partial_pt1_layout_validates_only_the_indexes_each_reader_uses(
     tmp_path: Path,
 ) -> None:

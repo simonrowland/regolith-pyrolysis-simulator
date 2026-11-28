@@ -346,6 +346,57 @@ def _write_pt1_store(
         )
 
 
+def _add_pt1_row_checksums(db_path: Path, *, store_stamp: str | None = None) -> str:
+    with sqlite3.connect(db_path) as conn:
+        columns = {
+            str(row[1])
+            for row in conn.execute(
+                f"PRAGMA table_info({rrd.PT1_EQUILIBRIUM_TABLE})"
+            )
+        }
+        for column in ("key_sha256", "payload_sha256"):
+            if column not in columns:
+                conn.execute(
+                    f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+                    f"ADD COLUMN {column} TEXT"
+                )
+        if store_stamp is not None and "store_schema_version" not in columns:
+            conn.execute(
+                f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+                "ADD COLUMN store_schema_version TEXT"
+            )
+        key_bytes, payload_bytes = conn.execute(
+            f"SELECT key_bytes, payload_bytes "
+            f"FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        key_bytes = rrd.canonical_json_bytes(json.loads(key_bytes))
+        payload_bytes = rrd.canonical_json_bytes(json.loads(payload_bytes))
+        key_hash = hashlib.sha256(key_bytes).hexdigest()
+        assignments = [
+            "key_hash = ?",
+            "key_sha256 = ?",
+            "payload_sha256 = ?",
+            "key_bytes = ?",
+            "payload_bytes = ?",
+        ]
+        values: list[object] = [
+            key_hash,
+            key_hash,
+            hashlib.sha256(payload_bytes).hexdigest(),
+            sqlite3.Binary(key_bytes),
+            sqlite3.Binary(payload_bytes),
+        ]
+        if store_stamp is not None:
+            assignments.append("store_schema_version = ?")
+            values.append(store_stamp)
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            f"SET {', '.join(assignments)}",
+            tuple(values),
+        )
+    return key_hash
+
+
 def test_strict_vapor_config_rejects_fallback_enabled() -> None:
     with pytest.raises(GrindSourceGateError, match="allow_fallback_vapor"):
         assert_strict_vapor_config(
@@ -610,6 +661,45 @@ def test_strict_vapor_result_store_pt1_strict_off_is_explicit_noop(
         "source_reports": 0,
         "pt1_noop_rows": 1,
     }
+
+
+@pytest.mark.parametrize("checksum_column", ("key_sha256", "payload_sha256"))
+def test_strict_vapor_pt1_strict_off_still_verifies_available_checksums(
+    tmp_path: Path,
+    checksum_column: str,
+) -> None:
+    db_path = tmp_path / f"strict-off-corrupt-{checksum_column}.sqlite"
+    _write_pt1_store(db_path, source="vaporock")
+    key_hash = _add_pt1_row_checksums(db_path)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            f"SET {checksum_column} = ? WHERE key_hash = ?",
+            ("0" * 64, key_hash),
+        )
+
+    with pytest.raises(GrindSourceGateError, match="stored row is corrupt"):
+        assert_strict_vapor_result_store(
+            db_path,
+            _decode_result_payload,
+            strict_vapor_gate=False,
+        )
+
+
+def test_strict_vapor_pt1_compact_layout_accepts_legacy_stamp_with_checksums(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "strict-pt1-compact-legacy-stamp.sqlite"
+    _write_pt1_store(db_path, source="builtin_authoritative")
+    _add_pt1_row_checksums(db_path, store_stamp="pt1")
+
+    summary = assert_strict_vapor_result_store(
+        db_path,
+        _decode_result_payload,
+        strict_vapor_gate=True,
+    )
+
+    assert summary["rows"] == 1
 
 
 def test_strict_vapor_result_store_rejects_unrecognized_schema(

@@ -24,7 +24,11 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from simulator.reduced_real_determinism import monotonic_repair_notices_json
+from simulator.reduced_real_determinism import (
+    PT1PersistentStoreCorrupt,
+    _pt1_row_payload_integrity,
+    monotonic_repair_notices_json,
+)
 
 
 DESIGN_VERSION = "0.2.0"
@@ -1760,11 +1764,17 @@ def materialize_legacy_row(
     key_bytes = bytes(row["key_bytes"])
     payload_bytes = bytes(row["payload_bytes"])
     key_sha = sha256_bytes(key_bytes)
-    payload_sha = sha256_bytes(payload_bytes)
     if key_sha != row["key_hash"] or key_sha != row["key_sha256"]:
         raise ConversionError("legacy key SHA columns disagree")
-    if payload_sha != row["payload_sha256"]:
-        raise ConversionError("legacy payload SHA disagrees")
+    try:
+        _pt1_row_payload_integrity(
+            dict(row),
+            key_hash=str(row["key_hash"]),
+            validate_canonical_json=False,
+        )
+    except PT1PersistentStoreCorrupt as exc:
+        raise ConversionError("legacy payload SHA disagrees") from exc
+    payload_sha = str(row["payload_sha256"])
     key, key_tokens = _parse_json_with_number_tokens(key_bytes)
     payload, payload_tokens = _parse_json_with_number_tokens(payload_bytes)
     _validate_legacy_key(key)
