@@ -1,6 +1,7 @@
 import contextlib
 import dataclasses
 import io
+from itertools import product
 import math
 import inspect
 import os
@@ -6767,18 +6768,29 @@ def test_explicit_legacy_mu_maps_keep_non_cao_activity_extraction():
 
 @pytest.mark.parametrize(
     ('mu_name', 'mu0_name'),
-    (
-        ('chem_potentials', 'reference_chemical_potentials'),
-        ('mu', 'mu0'),
-        ('mu_oxides', 'mu0_oxides'),
-        ('oxide_mu', 'oxide_mu0'),
-        ('standard_chemical_potentials', 'reference_chemical_potentials'),
-    ),
+    tuple(product(
+        (
+            'chemical_potentials',
+            'chem_potentials',
+            'mu',
+            'mu_oxides',
+            'oxide_mu',
+        ),
+        (
+            'standard_chemical_potentials',
+            'pure_chemical_potentials',
+            'reference_chemical_potentials',
+            'mu0',
+            'mu0_oxides',
+            'oxide_mu0',
+        ),
+    )),
 )
-def test_legacy_potential_alias_pairs_keep_non_cao_activities_only(
+def test_legacy_potential_alias_combinations_match_base_activity(
     mu_name,
     mu0_name,
 ):
+    """The base adapter accepted each mu alias with each mu0 alias."""
     from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_MU_FIELD
 
     backend = AlphaMELTSBackend()
@@ -6802,6 +6814,60 @@ def test_legacy_potential_alias_pairs_keep_non_cao_activities_only(
         'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
     })
     assert result.diagnostics.get(MELTS_CAO_EXCHANGE_MU_FIELD) is None
+
+
+def test_two_legacy_mu0_aliases_are_not_paired_as_mu_and_mu0():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Na2O': 5.0},
+        'liquid1_prop': {'mass': 100.0},
+        'standard_chemical_potentials': {'Na': -900.0},
+        'reference_chemical_potentials': {'Na': -1000.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Na2O': 5.0},
+    )
+
+    assert result.activity_coefficients == {}
+
+
+def test_unscoped_legacy_calcium_potentials_do_not_publish_raw_activities():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 70.0, 'CaO': 30.0},
+        'liquid1_prop': {'mass': 100.0},
+        'chemical_potentials': {
+            'Na': -900.0,
+            'CaO': -700000.0,
+            'CaSiO3': -710000.0,
+            'Ca3(PO4)2': -720000.0,
+        },
+        'standard_chemical_potentials': {
+            'Na': -1000.0,
+            'CaO': -800000.0,
+            'CaSiO3': -810000.0,
+            'Ca3(PO4)2': -820000.0,
+        },
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 70.0, 'CaO': 30.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
+    })
 
 
 def test_petthermotools_does_not_mix_mu_and_mu0_from_different_sources():

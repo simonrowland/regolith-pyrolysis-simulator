@@ -6298,27 +6298,43 @@ class _MELTSBackendSupport(MeltBackend):
         temperature_C: float,
     ) -> tuple[dict[str, float], str | None]:
         liquid_mu, liquid_mu0 = self._selected_liquid_potential_mappings(results)
-        legacy_potential_pairs = tuple(
-            (
-                self._first_row_mapping(results.get(mu_name, {})),
-                self._first_row_mapping(results.get(mu0_name, {})),
-            )
-            for mu_name, mu0_name in (
-                ('chemical_potentials', 'pure_chemical_potentials'),
-                ('chem_potentials', 'reference_chemical_potentials'),
-                ('mu', 'mu0'),
-                ('mu_oxides', 'mu0_oxides'),
-                ('oxide_mu', 'oxide_mu0'),
-                (
-                    'standard_chemical_potentials',
-                    'reference_chemical_potentials',
-                ),
-            )
-        )
+
+        def first_legacy_potential_mapping(
+            names: tuple[str, ...],
+        ) -> tuple[dict[str, float], bool]:
+            source_seen = False
+            for name in names:
+                row = self._first_row_mapping(results.get(name, {}))
+                source_seen = source_seen or bool(row)
+                mapping = {
+                    str(species): float(value)
+                    for species, value in row.items()
+                    if self._is_number(value)
+                }
+                if mapping:
+                    return mapping, source_seen
+            return {}, source_seen
+
+        legacy_mu, legacy_mu_seen = first_legacy_potential_mapping((
+            'chemical_potentials',
+            'chem_potentials',
+            'mu',
+            'mu_oxides',
+            'oxide_mu',
+        ))
+        legacy_mu0, legacy_mu0_seen = first_legacy_potential_mapping((
+            'standard_chemical_potentials',
+            'pure_chemical_potentials',
+            'reference_chemical_potentials',
+            'mu0',
+            'mu0_oxides',
+            'oxide_mu0',
+        ))
         potential_source_seen = bool(
             liquid_mu
             or liquid_mu0
-            or any(mu or mu0 for mu, mu0 in legacy_potential_pairs)
+            or legacy_mu_seen
+            or legacy_mu0_seen
         )
         liquid_key = self._select_liquid_phase_key(results)
         liquid_prop_key = f'{liquid_key}_prop' if liquid_key else None
@@ -6346,6 +6362,12 @@ class _MELTSBackendSupport(MeltBackend):
         has_calcium = melts_liquid_contains_parent_oxide(
             liquid_composition, 'CaO'
         )
+        calcium_bearing_endmembers = {'CaO'} | {
+            endmember
+            for endmember, parents
+            in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.items()
+            if 'CaO' in parents
+        }
         T_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         raw_activities: Dict[str, float] = {}
         unpaired_source = False
@@ -6353,16 +6375,19 @@ class _MELTSBackendSupport(MeltBackend):
         # side of a liquid pair from the legacy maps, or vice versa.
         for mu_source, mu0_source, is_selected_liquid in (
             (liquid_mu, liquid_mu0, True),
-            *((mu, mu0, False) for mu, mu0 in legacy_potential_pairs),
+            (legacy_mu, legacy_mu0, False),
         ):
             if set(mu_source) != set(mu0_source):
                 unpaired_source = True
             for species in mu_source.keys() & mu0_source.keys():
+                if (
+                    not is_selected_liquid
+                    and str(species) in calcium_bearing_endmembers
+                ):
+                    continue
                 compound_parents = MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.get(
                     str(species), ()
                 )
-                if not is_selected_liquid and 'CaO' in compound_parents:
-                    continue
                 if not has_calcium and 'CaO' in compound_parents:
                     continue
                 try:
