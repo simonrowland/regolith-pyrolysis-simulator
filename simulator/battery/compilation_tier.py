@@ -81,6 +81,7 @@ from simulator.battery.records import (
     Notice,
     Observation,
     Residual,
+    Species,
     State,
     Uncertainty,
     Value,
@@ -1153,17 +1154,11 @@ def _nasa_cea_9_record_index():
     from simulator.reference_data.nasa_glenn import load_all_record_documents
 
     by_formula: dict[str, list[Mapping[str, object]]] = defaultdict(list)
-    by_id: dict[str, Mapping[str, object]] = {}
     for record in load_all_record_documents():
         formula = record.get("formula")
-        record_id = record.get("record_id")
-        if isinstance(formula, str) and isinstance(record_id, str):
+        if isinstance(formula, str):
             by_formula[formula].append(record)
-            by_id[record_id] = record
-    return (
-        {formula: tuple(records) for formula, records in by_formula.items()},
-        by_id,
-    )
+    return {formula: tuple(records) for formula, records in by_formula.items()}
 
 
 def _nasa_cea_9_record_for_species(
@@ -1179,19 +1174,14 @@ def _nasa_cea_9_record_for_species(
         and isinstance(observation.identity, Identity)
         and observation.identity.species == species
     ):
-        locator_values = []
-        if observation.locator is not None:
-            locator_values.extend(
-                (observation.locator.source_path, observation.locator.record)
-            )
-        locator_values.append(observation.read_from)
+        from simulator.battery.records import nasa_glenn_locator_claim_values
         from simulator.reference_data.nasa_glenn import (
             accepted_observation_formula,
         )
 
         record, source_parsed, diagnostic = accepted_observation_formula(
             observation.observation_id,
-            locator_values,
+            nasa_glenn_locator_claim_values(observation),
             species.formula,
         )
         if diagnostic is not None and diagnostic.get("identity_refusal") is True:
@@ -1214,8 +1204,7 @@ def _nasa_cea_9_record_for_species(
         return None, "nasa-cea-phase-not-covered"
 
     if record is None:
-        by_formula, _by_id = _nasa_cea_9_record_index()
-        records = by_formula.get(species.formula, ())
+        records = _nasa_cea_9_record_index().get(species.formula, ())
         if not records:
             return None, "nasa-cea-formula-not-covered"
         matches = [
@@ -1234,6 +1223,8 @@ def _nasa_cea_9_record_for_species(
         if diagnostic is not None and diagnostic.get("identity_refusal") is True:
             return None, "nasa-cea-source-formula-identity-mismatch"
     elif str(record.get("phase", "")).strip().casefold() not in phase_labels:
+        if observation is not None:
+            return record, "nasa-cea-source-card-phase-mismatch"
         return None, "nasa-cea-phase-not-covered"
     if source_parsed is None:
         return None, "nasa-cea-source-formula-identity-mismatch"
@@ -1242,17 +1233,46 @@ def _nasa_cea_9_record_for_species(
     return record, ""
 
 
+def _nasa_cea_9_polynomial(record: Mapping[str, object]):
+    intervals = tuple(
+        (
+            interval["T_min_K"]["value"],
+            interval["T_max_K"]["value"],
+            tuple(item["value"] for item in interval["exponents"][:7]),
+            tuple(item["value"] for item in interval["a_coefficients"]),
+            interval["b1"]["value"],
+            interval["b2"]["value"],
+        )
+        for interval in record["intervals"]
+    )
+    return _nasa_cea_9_polynomial_cached(
+        str(record["record_id"]),
+        str(record["formula"]),
+        str(record["phase"]),
+        intervals,
+        record["delta_f_H_298_15"]["value"],
+        str(record["citation_as_published"]),
+        str(record["source_ref_code"]),
+    )
+
+
 @lru_cache(maxsize=512)
-def _nasa_cea_9_polynomial(record_id: str):
+def _nasa_cea_9_polynomial_cached(
+    record_id: str,
+    formula: str,
+    phase: str,
+    intervals: tuple[tuple[object, ...], ...],
+    delta_f_h_298_15: object,
+    citation: str,
+    source_ref_code: str,
+):
     from simulator.vapour_rail.catalog import (
         CatalogCompileError,
         _polynomial_from_thermo_record,
     )
     from simulator.vapour_rail.nasa_cea import NASA9_DEFAULT_EXPONENTS
 
-    _by_formula, by_id = _nasa_cea_9_record_index()
-    record = by_id[record_id]
-    phase = str(record["phase"]).strip().casefold()
+    phase = phase.strip().casefold()
     standard_state = {
         "g": "gas",
         "gas": "gas",
@@ -1260,32 +1280,28 @@ def _nasa_cea_9_polynomial(record_id: str):
         "liquid": "condensed_liquid",
     }.get(phase, "condensed_solid")
     segments: list[dict[str, object]] = []
-    for interval in record["intervals"]:
-        exponents = tuple(
-            float(item["value"]) for item in interval["exponents"][:7]
-        )
+    for t_min, t_max, exponents, coefficients, b1, b2 in intervals:
+        exponents = tuple(float(value) for value in exponents)
         if exponents != NASA9_DEFAULT_EXPONENTS:
             raise CatalogCompileError(
                 f"{record_id}: unsupported NASA-9 exponent sequence {exponents!r}"
             )
         segments.append(
             {
-                "T_min_K": interval["T_min_K"]["value"],
-                "T_max_K": interval["T_max_K"]["value"],
-                "a_coefficients": [
-                    item["value"] for item in interval["a_coefficients"]
-                ],
-                "b1": interval["b1"]["value"],
-                "b2": interval["b2"]["value"],
+                "T_min_K": t_min,
+                "T_max_K": t_max,
+                "a_coefficients": list(coefficients),
+                "b1": b1,
+                "b2": b2,
             }
         )
     payload = {
-        "formula": record["formula"],
+        "formula": formula,
         "standard_state": standard_state,
         "segments": segments,
-        "delta_f_H_298_15_J_per_mol": record["delta_f_H_298_15"]["value"],
-        "citation": record["citation_as_published"],
-        "source_ref_code": record["source_ref_code"],
+        "delta_f_H_298_15_J_per_mol": delta_f_h_298_15,
+        "citation": citation,
+        "source_ref_code": source_ref_code,
         "reference_pressure_Pa": PA_PER_BAR,
     }
     polynomial = _polynomial_from_thermo_record(
@@ -1352,6 +1368,30 @@ def _nasa_cea_9_attempt_success(
     )
 
 
+def _nasa_cea_9_identity_refusal(
+    record: Mapping[str, object] | None,
+    reason: str,
+    species: Species,
+    *,
+    quantity: Quantity,
+    origin: str,
+) -> ThermoAttempt:
+    extra: dict[str, object] = {"formula": species.formula}
+    if record is not None:
+        extra["source_record_id"] = record.get("record_id")
+        extra["source_phase"] = record.get("phase")
+    requested_phase = phase_token(species)
+    if requested_phase is not None:
+        extra["requested_phase"] = requested_phase.value
+    return _refuse(
+        RefusalReason.IDENTITY_MISMATCH,
+        reason,
+        quantity=quantity,
+        origin=origin,
+        extra=extra,
+    )
+
+
 def _nasa_cea_9_attempt(
     identity: Identity,
     quantity: Quantity,
@@ -1372,6 +1412,28 @@ def _nasa_cea_9_attempt(
             quantity=quantity,
             origin=origin,
         )
+    species_record, species_record_reason = _nasa_cea_9_record_for_species(
+        identity.species, observation=observation
+    )
+    if species_record_reason == "nasa-cea-source-formula-identity-mismatch":
+        return _nasa_cea_9_identity_refusal(
+            species_record,
+            species_record_reason,
+            identity.species,
+            quantity=quantity,
+            origin=origin,
+        )
+    if (
+        species_record_reason == "nasa-cea-source-card-phase-mismatch"
+        and quantity not in {Quantity.DELTA_FH, Quantity.DELTA_FG}
+    ):
+        return _nasa_cea_9_identity_refusal(
+            species_record,
+            species_record_reason,
+            identity.species,
+            quantity=quantity,
+            origin=origin,
+        )
     if quantity is Quantity.P_SAT:
         from simulator.battery.score import stated_pure_substance_reservoir
 
@@ -1389,9 +1451,7 @@ def _nasa_cea_9_attempt(
                 quantity=quantity,
                 origin=origin,
             )
-        gas_record, gas_reason = _nasa_cea_9_record_for_species(
-            identity.species, observation=observation
-        )
+        gas_record, gas_reason = species_record, species_record_reason
         condensed_record, condensed_reason = _nasa_cea_9_record_for_species(
             reservoir.value
         )
@@ -1405,10 +1465,8 @@ def _nasa_cea_9_attempt(
                 extra={"formula": identity.species.formula},
             )
         try:
-            gas_poly = _nasa_cea_9_polynomial(str(gas_record["record_id"]))
-            condensed_poly = _nasa_cea_9_polynomial(
-                str(condensed_record["record_id"])
-            )
+            gas_poly = _nasa_cea_9_polynomial(gas_record)
+            condensed_poly = _nasa_cea_9_polynomial(condensed_record)
             gas_state, gas_outside = _nasa_cea_9_state(
                 gas_poly, temperature_K
             )
@@ -1469,9 +1527,7 @@ def _nasa_cea_9_attempt(
             if isinstance(accepted, ThermoAttempt):
                 return accepted
             reference_temperature, declared_anchor = accepted
-        record, reason = _nasa_cea_9_record_for_species(
-            identity.species, observation=observation
-        )
+        record, reason = species_record, species_record_reason
         if record is None:
             return _refuse(
                 RefusalReason.UNSUPPORTED,
@@ -1502,7 +1558,7 @@ def _nasa_cea_9_attempt(
                     origin=origin,
                 )
         try:
-            polynomial = _nasa_cea_9_polynomial(str(record["record_id"]))
+            polynomial = _nasa_cea_9_polynomial(record)
             state, outside = _nasa_cea_9_state(polynomial, temperature_K)
             if quantity is Quantity.CP:
                 value = as_decimal(str(state.cp_J_per_mol_K))
@@ -1588,7 +1644,21 @@ def _nasa_cea_9_attempt(
             polynomials = []
             extrapolated = False
             for term in reaction.terms:
-                record, reason = _nasa_cea_9_record_for_species(term.species)
+                if (
+                    term.coefficient > 0
+                    and term.species.formula == identity.species.formula
+                ):
+                    record, reason = species_record, species_record_reason
+                else:
+                    record, reason = _nasa_cea_9_record_for_species(term.species)
+                if reason == "nasa-cea-source-card-phase-mismatch":
+                    return _nasa_cea_9_identity_refusal(
+                        record,
+                        reason,
+                        term.species,
+                        quantity=quantity,
+                        origin=origin,
+                    )
                 if record is None:
                     return _refuse(
                         RefusalReason.UNSUPPORTED,
@@ -1597,7 +1667,7 @@ def _nasa_cea_9_attempt(
                         origin=origin,
                         extra={"formula": term.species.formula},
                     )
-                polynomial = _nasa_cea_9_polynomial(str(record["record_id"]))
+                polynomial = _nasa_cea_9_polynomial(record)
                 state, outside = _nasa_cea_9_state(polynomial, temperature_K)
                 term_states.append((float(term.coefficient), state))
                 polynomials.append(polynomial)
@@ -3616,18 +3686,6 @@ def predict_thermo_attempt(
             quantity=quantity,
             origin=origin,
         )
-    if engine is Engine.NASA_CEA_9 and identity.species is not None:
-        _record, record_reason = _nasa_cea_9_record_for_species(
-            identity.species, observation=observation
-        )
-        if record_reason == "nasa-cea-source-formula-identity-mismatch":
-            return _refuse(
-                RefusalReason.IDENTITY_MISMATCH,
-                record_reason,
-                quantity=quantity,
-                origin=origin,
-                extra={"formula": identity.species.formula},
-            )
     if quantity in {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}:
         if engine is not Engine.INTERNAL_ANALYTICAL:
             return _refuse(

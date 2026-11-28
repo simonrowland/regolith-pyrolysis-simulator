@@ -275,7 +275,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:residue_prediction_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 17316,
+        "line": 17311,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
@@ -339,7 +339,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/compilation_tier.py:fit_evaluation_cache': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 4889,
+        "line": 4947,
         "kind": 'store',
         "name": 'fit_evaluation_cache',
         "carries_disclosure": False,
@@ -491,7 +491,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_b1259_tridymite_cristobalite_offset_rows': {
         "path": 'simulator/battery/score.py',
-        "line": 4066,
+        "line": 4061,
         "kind": 'lru',
         "name": '_b1259_tridymite_cristobalite_offset_rows',
         "carries_disclosure": False,
@@ -499,7 +499,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_e15_binding_log10_k': {
         "path": 'simulator/battery/score.py',
-        "line": 21705,
+        "line": 21700,
         "kind": 'lru',
         "name": '_e15_binding_log10_k',
         "carries_disclosure": False,
@@ -507,7 +507,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_iron_saturated_feo_calibration': {
         "path": 'simulator/battery/score.py',
-        "line": 4828,
+        "line": 4823,
         "kind": 'lru',
         "name": '_iron_saturated_feo_calibration',
         "carries_disclosure": False,
@@ -515,7 +515,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_janaf_pure_solid_table_index': {
         "path": 'simulator/battery/score.py',
-        "line": 4004,
+        "line": 3999,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_index',
         "carries_disclosure": False,
@@ -523,7 +523,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_janaf_pure_solid_table_temperature_range': {
         "path": 'simulator/battery/score.py',
-        "line": 4039,
+        "line": 4034,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_temperature_range',
         "carries_disclosure": False,
@@ -899,7 +899,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:_row_metadata_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 26382,
+        "line": 26377,
         "kind": 'store',
         "name": '_row_metadata_cache',
         "carries_disclosure": False,
@@ -1163,27 +1163,27 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_b677_printed_ideal_gas_h298': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 2846,
+        "line": 2916,
         "kind": 'lru',
         "name": '_b677_printed_ideal_gas_h298',
         "carries_disclosure": False,
         "how": 'Boolean check of source heading, formula, JANAF table identity, and printed H−H298 zero. It does not evaluate a vapour law.',
     },
-    'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_polynomial': {
+    'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_polynomial_cached': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 1246,
+        "line": 1260,
         "kind": 'lru',
-        "name": '_nasa_cea_9_polynomial',
+        "name": '_nasa_cea_9_polynomial_cached',
         "carries_disclosure": False,
-        "how": 'Builds a NASA-9 thermo polynomial from a source record; pressure is evaluated later by the caller, so this cache has no run disclosure.',
+        "how": 'Caches NASA-9 polynomial compilation from the selected card fields; pressure is evaluated later by the caller, so this cache has no run disclosure.',
     },
     'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_record_index': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 1152,
+        "line": 1153,
         "kind": 'lru',
         "name": '_nasa_cea_9_record_index',
         "carries_disclosure": False,
-        "how": 'Indexes NASA-9 source records by formula and id. It stores source mappings, not evaluated vapour-law results.',
+        "how": 'Indexes unbound NASA-9 source records by formula. It stores source mappings, not evaluated vapour-law results.',
     },
     'lru:simulator/reference_data/nasa_glenn.py:_nasa_glenn_atomic_weights': {
         "path": 'simulator/reference_data/nasa_glenn.py',
@@ -1243,7 +1243,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_catalog_score_rows': {
         "path": 'simulator/battery/score.py',
-        "line": 14383,
+        "line": 14378,
         "kind": 'lru',
         "name": '_catalog_score_rows',
         "carries_disclosure": False,

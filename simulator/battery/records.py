@@ -1921,6 +1921,20 @@ class Observation:
         return None if condition is None else condition.state.value
 
 
+def nasa_glenn_locator_claim_values(
+    observation: Observation,
+) -> tuple[str | None, ...]:
+    """Return every locator field that may claim a NASA Glenn card."""
+
+    locator_values: list[str | None] = []
+    if observation.locator is not None:
+        locator_values.extend(
+            (observation.locator.source_path, observation.locator.record)
+        )
+    locator_values.append(observation.read_from)
+    return tuple(locator_values)
+
+
 @dataclass(frozen=True)
 class CandidateRequest:
     """Requested engine comparison; quantity is None when identity is unknown."""

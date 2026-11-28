@@ -11295,9 +11295,21 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     assert "_fold_digit_groups" not in normalizer
     assert "_fold_digit_groups" not in inspect.getsource(vle._formula_cell_matches)
     assert not hasattr(vle, "_SUBSCRIPT_DIGIT_FOLD")
+    accounting_text = (
+        REPO_ROOT / "simulator/accounting/formulas.py"
+    ).read_text(encoding="utf-8")
+    assert "return fold_subscript_digits(text)" in accounting_text
     score_text = (REPO_ROOT / "simulator/battery/score.py").read_text(encoding="utf-8")
-    assert "fold_subscript_digits" in score_text
     assert 'maketrans("₀₁₂₃₄₅₆₇₈₉"' not in score_text
+    from simulator.battery.enums import Phase
+    from simulator.battery.records import Species
+    from simulator.battery.score import parse_species_formula
+
+    scorer_formula = parse_species_formula(
+        "SiO₂", species=Species("SiO₂", Phase.G)
+    )
+    assert scorer_formula is not None
+    assert dict(scorer_formula) == {"O": 2.0, "Si": 1.0}
     assert vle._formula_label_in_text("SiO2", "SiO2 100") is True
     assert vle._formula_label_in_text("SiO2100", "SiO2 100") is False
     assert vle._leaf_in_text(100, "SiO2 100") is True

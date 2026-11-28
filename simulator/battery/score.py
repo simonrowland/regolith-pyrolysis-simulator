@@ -1314,19 +1314,14 @@ def _parse_observation_species_formula(
     if not isinstance(identity, Identity) or identity.species is None:
         return None, None
     if observation.source_id == "nasa-glenn":
-        locator_values = []
-        if observation.locator is not None:
-            locator_values.extend(
-                (observation.locator.source_path, observation.locator.record)
-            )
-        locator_values.append(observation.read_from)
+        from simulator.battery.records import nasa_glenn_locator_claim_values
         from simulator.reference_data.nasa_glenn import (
             accepted_observation_formula,
         )
 
         _record, source_formula, diagnostic = accepted_observation_formula(
             observation.observation_id,
-            locator_values,
+            nasa_glenn_locator_claim_values(observation),
             identity.species.formula,
         )
         if diagnostic is not None and diagnostic.get("identity_refusal") is True:

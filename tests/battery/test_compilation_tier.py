@@ -1563,6 +1563,136 @@ def test_nasa9_cp_evaluator_and_router_follow_gas_liquid_crystal_records(
     )
 
 
+def test_nasa9_formation_binds_observed_water_card_through_coefficient_lookup(
+    monkeypatch,
+) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    from simulator.battery.identity import Reaction, ReactionTerm
+    from simulator.reference_data import nasa_glenn
+
+    liquid_water = nasa_glenn.load_record_document_by_id("NG-1523")
+    gas_water = nasa_glenn.load_record_document_by_id("NG-0677")
+    assert liquid_water is not None
+    assert gas_water is not None
+    assert liquid_water["phase"] == "L"
+    assert liquid_water["delta_f_H_298_15"]["value"] == -285830.0
+    assert gas_water["phase"] == "gas"
+    assert gas_water["delta_f_H_298_15"]["value"] == -241826.0
+
+    water_g = Species("H2O", Phase.G)
+    hydrogen_g = Species("H2", Phase.G)
+    oxygen_g = Species("O2", Phase.G)
+    identity = replace(
+        F.o2_identity(),
+        quantity=Quantity.DELTA_FH,
+        species=water_g,
+        reaction=State.of(
+            Reaction(
+                (
+                    ReactionTerm(water_g, Fraction(1)),
+                    ReactionTerm(hydrogen_g, Fraction(-1)),
+                    ReactionTerm(oxygen_g, Fraction(-1, 2)),
+                )
+            )
+        ),
+        formation_elements=State.of((("H", hydrogen_g), ("O", oxygen_g))),
+    )
+    observation = replace(
+        F.observation(
+            "nasa-glenn:NG-1523",
+            "exp-1",
+            identity,
+            Decimal("0"),
+            source_id="nasa-glenn",
+        ),
+        locator=F.loc(
+            source_path=(
+                "data/literature/compilations/nasa-glenn/records/NG-1523.json"
+            )
+        ),
+    )
+
+    selected, decision = compilation_tier._nasa_cea_9_record_for_species(
+        water_g, observation=observation
+    )
+    assert selected is not None
+    assert selected["record_id"] == "NG-1523"
+    assert decision == "nasa-cea-source-card-phase-mismatch"
+    unbound, unbound_decision = compilation_tier._nasa_cea_9_record_for_species(
+        water_g
+    )
+    assert unbound is not None
+    assert unbound["record_id"] == "NG-0677"
+    assert unbound_decision == ""
+
+    def assert_phase_conflict_refused() -> None:
+        attempt = predict_thermo_attempt(Engine.NASA_CEA_9, observation)
+        assert attempt.value is None
+        assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+        assert attempt.refusal_detail["reason"] == (
+            "nasa-cea-source-card-phase-mismatch"
+        )
+        assert attempt.refusal_detail["source_record_id"] == "NG-1523"
+        assert attempt.refusal_detail["source_phase"] == "L"
+        assert attempt.refusal_detail["requested_phase"] == "g"
+
+    assert_phase_conflict_refused()
+
+    resolver = compilation_tier._nasa_cea_9_record_for_species
+
+    def drop_observation_binding(species, *, observation=None):
+        return resolver(species)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            compilation_tier,
+            "_nasa_cea_9_record_for_species",
+            drop_observation_binding,
+        )
+        mutated_attempt = predict_thermo_attempt(Engine.NASA_CEA_9, observation)
+        assert mutated_attempt.value is not None
+        with pytest.raises(AssertionError):
+            assert_phase_conflict_refused()
+
+
+def test_nasa9_bound_card_polynomial_does_not_reload_id_index(monkeypatch) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+
+    water_l = Species("H2O", Phase.L)
+    identity = replace(
+        _gas_thermo("H2O", Quantity.CP, Decimal("298.15")),
+        species=water_l,
+    )
+    observation = replace(
+        F.observation(
+            "nasa-glenn:NG-1523",
+            "exp-1",
+            identity,
+            Decimal("0"),
+            source_id="nasa-glenn",
+        ),
+        locator=F.loc(
+            source_path=(
+                "data/literature/compilations/nasa-glenn/records/NG-1523.json"
+            )
+        ),
+    )
+    cache = compilation_tier._nasa_cea_9_polynomial_cached
+    cache.cache_clear()
+    try:
+        with monkeypatch.context() as mutation:
+            mutation.setattr(
+                compilation_tier,
+                "_nasa_cea_9_record_index",
+                lambda: pytest.fail("bound card polynomial reloaded the id index"),
+            )
+            attempt = predict_thermo_attempt(Engine.NASA_CEA_9, observation)
+        assert attempt.value is not None, attempt.refusal_detail
+        assert "NG-1523" in attempt.call_evidence
+    finally:
+        cache.cache_clear()
+
+
 def test_nasa9_fit_writer_serializes_typed_refusal_fields(tmp_path, monkeypatch) -> None:
     import simulator.battery.compilation_tier as compilation_tier
     import simulator.battery.generators.compilation_thermo_fits as fit_generator

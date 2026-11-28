@@ -403,6 +403,40 @@ def test_nasa9_observation_binding_uses_card_id_and_all_locator_claims(
     assert wrong_locator_attempt.value is None
     assert wrong_locator_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
 
+    conflicting_claims = replace(
+        observation,
+        observation_id="nasa-glenn:NG-2031",
+    )
+
+    def assert_score_refuses_conflicting_claims() -> None:
+        parsed, diagnostic = _parse_observation_species_formula(conflicting_claims)
+        assert parsed is None
+        assert diagnostic is not None
+        assert diagnostic["kind"] == "formula_source_record_identity_disagreement"
+
+    def assert_nasa9_refuses_conflicting_claims() -> None:
+        record, reason = _nasa_cea_9_record_for_species(
+            species, observation=conflicting_claims
+        )
+        assert record is None
+        assert reason == "nasa-cea-source-formula-identity-mismatch"
+
+    assert_score_refuses_conflicting_claims()
+    assert_nasa9_refuses_conflicting_claims()
+
+    from simulator.battery import records as battery_records
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            battery_records,
+            "nasa_glenn_locator_claim_values",
+            lambda _observation: (),
+        )
+        with pytest.raises(AssertionError):
+            assert_score_refuses_conflicting_claims()
+        with pytest.raises(AssertionError):
+            assert_nasa9_refuses_conflicting_claims()
+
     def bypass_source_binding(_observation_id, _locator_values, _formula):
         return air, parse_formula(air["formula"]), None
 
