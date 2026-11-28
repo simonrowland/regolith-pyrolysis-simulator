@@ -424,6 +424,8 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
 
     pending = RunningFuture()
     assert pending.set_running_or_notify_cancel()
+    pending._engine_call_started = threading.Event()
+    pending._engine_call_started.set()
 
     class PendingPool:
         def __init__(self):
@@ -567,12 +569,6 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
         size=1,
     )
     worker = pool.workers[0]
-    original_call = worker.call
-
-    def call_with_long_worker_wall(request, *, timeout_s=None):
-        return original_call(request, timeout_s=30.0)
-
-    worker.call = call_with_long_worker_wall
     backend = _make_pooled_subprocess_backend(None)
     backend._subprocess_pool = pool
     backend._config = worker_config
@@ -620,7 +616,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
         assert len(outcomes) == 1
         assert isinstance(outcomes[0], EngineWorkerTimeout)
         assert outcomes[0].phase == 'job'
-        assert outcomes[0].timeout_s == pytest.approx(4.45)
+        assert outcomes[0].timeout_s == pytest.approx(0.05)
         assert outcomes[0].diagnostic_detail
         assert outcomes[0].diagnostic_detail in str(outcomes[0])
         timeout_text = str(outcomes[0])
@@ -869,8 +865,8 @@ def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot(
     caller.start()
     try:
         assert send_entered.wait(timeout=5.0)
-        # The MAGEMin future wait is 4.45 s for these configured budgets;
-        # the remaining margin covers the worker kill and reap joins.
+        # The dequeue-relative watchdog covers a blocked transport send and
+        # gives the worker its own solve wall plus bounded cleanup.
         assert caller_finished.wait(timeout=7.0), (
             'caller did not return after aborting the blocked send'
         )
@@ -1095,15 +1091,25 @@ def test_magemin_warm_pool_wait_does_not_expire_call_wall(monkeypatch, tmp_path)
     release_result = threading.Event()
 
     class QueuedFuture:
-        def result(self):
+        def __init__(self, started_event):
+            self._engine_call_started = started_event
+
+        def result(self, timeout=None):
             entered_result.set()
-            assert release_result.wait(timeout=2.0)
+            assert release_result.wait(timeout=timeout)
             return {'phases': {'liq': {'mass_kg': 1.0}}}
 
     class QueuedPool:
+        workers = ()
+
+        def __init__(self):
+            self.started_event = threading.Event()
+            self.submitted = threading.Event()
+
         def submit(self, _request, *, timeout_s=None):
             assert timeout_s == pytest.approx(0.05)
-            return QueuedFuture()
+            self.submitted.set()
+            return QueuedFuture(self.started_event)
 
     backend = MAGEMinBackend()
     backend._available = True
@@ -1114,7 +1120,8 @@ def test_magemin_warm_pool_wait_does_not_expire_call_wall(monkeypatch, tmp_path)
         'warm_call_timeout_s': 0.05,
         'worker_startup_timeout_s': 0.01,
     }
-    backend._subprocess_pool = QueuedPool()
+    pool = QueuedPool()
+    backend._subprocess_pool = pool
     projection = backend._build_db_bulk_projection(
         {'SiO2': 60.0, 'MgO': 40.0}
     )
@@ -1135,9 +1142,11 @@ def test_magemin_warm_pool_wait_does_not_expire_call_wall(monkeypatch, tmp_path)
     started_at = time.monotonic()
     caller.start()
     try:
-        assert entered_result.wait(timeout=2.0)
+        assert pool.submitted.wait(timeout=2.0)
         time.sleep(0.1)
         assert caller.is_alive(), 'pool queue time must not use the solve wall'
+        pool.started_event.set()
+        assert entered_result.wait(timeout=2.0)
     finally:
         release_result.set()
         caller.join(timeout=2.0)
@@ -1295,6 +1304,8 @@ def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
         def __init__(self):
             self.timeout_s = None
             self.cancelled = False
+            self._engine_call_started = threading.Event()
+            self._engine_call_started.set()
 
         def result(self, timeout=None):
             self.timeout_s = timeout
@@ -2864,6 +2875,9 @@ def test_magemin_liquidus_finder_honors_aggregate_budget_config(monkeypatch):
     _make_available_magemin(monkeypatch, fake_module)
     patch_module_time(
         monkeypatch, liquidus_module, monotonic=lambda: clock["t"]
+    )
+    patch_module_time(
+        monkeypatch, magemin_module, monotonic=lambda: clock["t"]
     )
 
     backend = MAGEMinBackend()

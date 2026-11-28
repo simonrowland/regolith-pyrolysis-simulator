@@ -428,10 +428,19 @@ def test_slot_acquisition_error_is_terminal_through_provider_and_planner(
         pytest.fail('slot acquisition failure stepped down to another engine')
 
     monkeypatch.setattr(
-        planner, '_dispatch_through_provider', dispatch_through_provider
+        Planner, '_dispatch_through_provider', dispatch_through_provider
     )
     with pytest.raises(magemin_module._MAGEMinSubprocessSlotUnavailable):
-        planner._dispatch_gate_provider_order()
+        planner._dispatch_gate_provider_order(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            redox_state=None,
+            fe_redox_policy='intrinsic',
+            control_inputs=None,
+            declared_accounts=None,
+            account_mol_overrides=None,
+        )
 
     assert attempted == [primary]
 
