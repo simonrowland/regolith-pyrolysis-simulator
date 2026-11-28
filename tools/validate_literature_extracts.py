@@ -5588,6 +5588,22 @@ def fidelity_source_warnings(
         extractor_id=extractor_id,
     ):
         if not derivation_defects:
+            sample = samples[sample_index]
+            observation_key = _fidelity_sample_observation_key(doc, sample)
+            if (
+                observation_key is not None
+                and observation_key in required
+                and _path_selector_names_observation_id(sample)
+                and _sample_addresses_scored_evidence(sample)
+            ):
+                pin_address = _sample_evidence_address(doc, sample)
+                if pin_address is not None:
+                    addressed.add(observation_key)
+                    covered_addresses[observation_key].update(
+                        leaf
+                        for leaf in needed_addresses[observation_key]
+                        if leaf[: len(pin_address)] == pin_address
+                    )
             continue
         unattested += 1
         sample_label = f"{label}:fidelity_samples[{sample_index}]"

@@ -478,7 +478,7 @@ def melt_activity_requests(
         if (
             target.convention != ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER.value
             or target.phase != Phase.L.value
-            or target.component_basis != "raoultian_pure_endmember"
+            or target.component_basis not in _RAOULTIAN_ACTIVITY_COMPONENT_BASES
         ):
             gap = ReadinessGap(
                 "reference_state", GapReason.MISSING_EVIDENCE,
