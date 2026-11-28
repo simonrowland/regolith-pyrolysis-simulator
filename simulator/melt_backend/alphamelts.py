@@ -6066,6 +6066,18 @@ class _MELTSBackendSupport(MeltBackend):
                 f'oxide={item!r} source={source!r} action=dropped '
                 f'reason={reason} selected_source={selected_source!r}'
             )
+        if site == 'SR14':
+            return (
+                'SR14:alphamelts_activity_alias_conflict '
+                'producer=PetThermoTools field=activity_coefficients '
+                f'oxide={item!r} '
+                f'kept_label={issue["kept_label"]!r} '
+                f'kept_activity={issue["kept_activity"]} '
+                f'conflicting_label={issue["conflicting_label"]!r} '
+                f'conflicting_activity={issue["conflicting_activity"]} '
+                f'action=kept_first_reported reason={reason} '
+                f'selected_source={selected_source!r}'
+            )
         return (
             'SR02:alphamelts_direct_activity_repaired '
             'producer=PetThermoTools field=activity_map '
@@ -6100,6 +6112,7 @@ class _MELTSBackendSupport(MeltBackend):
             return {}, {}
 
         activities: dict[str, float] = {}
+        activity_labels: dict[str, str] = {}
         gammas: dict[str, float] = {}
         for raw_name, raw_gamma in dict(coefficients or {}).items():
             oxide = canonical_melt_oxide_activity_name(raw_name)
@@ -6126,7 +6139,28 @@ class _MELTSBackendSupport(MeltBackend):
             # activity is dimensionless. Sanity: gamma=0.5 and x=0.02 gives
             # a=0.01, not the 0.5 value that inflated vapor flux by 50x.
             gammas[str(raw_name)] = gamma
-            activities[oxide] = gamma * mole_fraction
+            activity = gamma * mole_fraction
+            if oxide in activities:
+                # In this gamma*x projection, these aliases share one oxide
+                # component basis; `_Liq` tags its phase, not a second activity
+                # standard state. Keep the first reported value, matching the
+                # prior first-match consumers. If aliases disagree, the output
+                # supplies no physical basis to prefer one, so disclose it.
+                kept_activity = activities[oxide]
+                if activity != kept_activity and repair_issues is not None:
+                    repair_issues.append({
+                        'site': 'SR14',
+                        'source': 'activity_coefficients_times_oxide_mole_fraction',
+                        'item': str(oxide),
+                        'reason': 'different_canonical_oxide_activity_values',
+                        'kept_label': activity_labels[oxide],
+                        'kept_activity': repr(kept_activity),
+                        'conflicting_label': str(raw_name),
+                        'conflicting_activity': repr(activity),
+                    })
+                continue
+            activities[oxide] = activity
+            activity_labels[oxide] = str(raw_name)
         return activities, gammas
 
     def _finite_activity_mapping(

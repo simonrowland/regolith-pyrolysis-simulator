@@ -1753,9 +1753,18 @@ def engine_flags_from_result(
             )
 
     for warning in getattr(result, "warnings", None) or ():
-        if (
-            isinstance(warning, str)
-            and warning.startswith(_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX)
+        if not isinstance(warning, str):
+            continue
+        if warning.startswith("SR14:alphamelts_activity_alias_conflict "):
+            notices.append(
+                {
+                    "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+                    "authority": None,
+                    "reason": warning,
+                }
+            )
+        elif (
+            warning.startswith(_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX)
             and "diagnostic_oxide_activities field " in warning
         ):
             notices.append(

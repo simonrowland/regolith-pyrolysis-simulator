@@ -6840,6 +6840,89 @@ def test_petthermotools_activity_coefficients_are_multiplied_by_mole_fraction():
     )
 
 
+def test_petthermotools_activity_alias_conflict_keeps_first_for_antoine_and_cache():
+    from simulator.battery.enums import NoticeKind
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EquilibrateCell,
+        Po2Request,
+        engine_flags_from_result,
+        extract_reported_quantities,
+    )
+
+    backend = AlphaMELTSBackend()
+    liquid_composition = {'SiO2': 100.0}
+    result = backend._parse_petthermotools_result(
+        ({
+            'Conditions': {'mass': 100.0},
+            'liquid1': liquid_composition,
+            'liquid1_prop': {'mass': 100.0},
+            'activity_coefficients': {
+                'SiO2': 0.4,
+                'SiO2_Liq': 0.6,
+            },
+        }, {}),
+        temperature_C=1600.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt=liquid_composition,
+        total_input_kg=1.0,
+    )
+
+    assert result.activity_coefficients == {'SiO2': pytest.approx(0.4)}
+    warning = next(
+        warning for warning in result.warnings
+        if warning.startswith('SR14:alphamelts_activity_alias_conflict ')
+    )
+    notices, _authority, _band = engine_flags_from_result(result)
+    assert notices == [{
+        'kind': NoticeKind.ENGINE_MODEL_CAVEAT.value,
+        'authority': None,
+        'reason': warning,
+    }]
+    assert "kept_label='SiO2'" in warning
+    assert 'kept_activity=0.4' in warning
+    assert "conflicting_label='SiO2_Liq'" in warning
+    assert 'conflicting_activity=0.6' in warning
+
+    pressures = backend._activities_times_antoine(
+        1600.0,
+        result.activity_coefficients,
+        liquid_composition,
+        pO2_bar=1e-9,
+    )
+    first_alias_pressures = backend._activities_times_antoine(
+        1600.0,
+        {'SiO2': 0.4},
+        liquid_composition,
+        pO2_bar=1e-9,
+    )
+    assert pressures['Si'] == pytest.approx(first_alias_pressures['Si'])
+
+    activities, vapor_pressures, _invalid = extract_reported_quantities(result)
+    cell = EquilibrateCell(
+        pot_id='activity-alias-conflict',
+        engine='alphamelts',
+        temperature_K=1873.15,
+        po2=Po2Request(mode='engine_default', po2_bar=None),
+        status='ok',
+        refusal_reason=None,
+        engine_status='ok',
+        engine_reason=None,
+        melt_activities=activities,
+        gas_partial_pressures_Pa=vapor_pressures,
+        liquid_fraction=result.liquid_fraction,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname='test',
+        notices=notices,
+    )
+    restored = EquilibrateCell.from_engine_cache_value(
+        cell.to_engine_cache_value()
+    )
+    assert restored.melt_activities == {'SiO2': pytest.approx(0.4)}
+    assert restored.notices == notices
+
+
 def test_subprocess_stdout_parser_reports_activity_labels_and_exact_oxide_diagnostic():
     backend = AlphaMELTSBackend()
     output = """
