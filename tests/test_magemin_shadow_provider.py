@@ -41,6 +41,8 @@ from engines.magemin import (
 import engines.magemin.provider as provider_module
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.chemistry.kernel.planner import Planner
+from simulator.chemistry.kernel.registry import ProviderRegistry
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
     REDOX_STATE_REFERENCE_T_K,
@@ -394,6 +396,44 @@ def test_liquidus_finder_forwards_normalized_redox_state():
     )
     assert 'warm_solidus_T_C' not in calls[0]
     assert 'warm_liquidus_T_C' not in calls[0]
+
+
+def test_slot_acquisition_error_is_terminal_through_provider_and_planner(
+    monkeypatch,
+):
+    from simulator.melt_backend import magemin as magemin_module
+
+    slot_error = magemin_module._MAGEMinSubprocessSlotUnavailable(
+        'injected slot acquisition failure'
+    )
+
+    class Backend:
+        def get_engine_version(self):
+            raise slot_error
+
+    primary = MAGEMinShadowProvider(backend=Backend())
+    fallback = MAGEMinShadowProvider()
+    with pytest.raises(magemin_module._MAGEMinSubprocessSlotUnavailable):
+        primary._engine_version()
+
+    registry = ProviderRegistry()
+    registry.gate_provider_order = (primary, fallback)
+    planner = Planner(registry)
+    attempted = []
+
+    def dispatch_through_provider(_intent, provider, **_kwargs):
+        attempted.append(provider)
+        if provider is primary:
+            raise slot_error
+        pytest.fail('slot acquisition failure stepped down to another engine')
+
+    monkeypatch.setattr(
+        planner, '_dispatch_through_provider', dispatch_through_provider
+    )
+    with pytest.raises(magemin_module._MAGEMinSubprocessSlotUnavailable):
+        planner._dispatch_gate_provider_order()
+
+    assert attempted == [primary]
 
 
 def test_liquidus_finder_remembers_published_brackets_only():

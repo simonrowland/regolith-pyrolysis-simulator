@@ -52,6 +52,7 @@ from engines.magemin.domain import (
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import (
+    EquilibriumResult,
     LiquidFractionInvalidError,
     MeltCompositionError,
     project_melt_to_oxide_projection,
@@ -991,8 +992,8 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(
     submitted = {}
 
     class FakeFuture:
-        def result(self, timeout=None):
-            submitted['result_timeout_s'] = timeout
+        def result(self):
+            submitted['result_called'] = True
             return {'phases': {'liq': {'mass_kg': 1.0}}}
 
     class FakePool:
@@ -1036,9 +1037,7 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(
     assert submitted['request']['call_timeout_s'] == pytest.approx(
         MAGEMIN_WARM_CALL_TIMEOUT_S + 0.5
     )
-    assert submitted['result_timeout_s'] == pytest.approx(
-        47.4
-    )
+    assert submitted['result_called'] is True
     assert backend._call_magemin(
         projection,
         1200.0,
@@ -1046,7 +1045,67 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(
         -8.0,
         call_timeout_s=20.0,
     )
-    assert submitted['result_timeout_s'] == pytest.approx(20.0)
+    assert submitted['result_called'] is True
+
+
+def test_magemin_warm_pool_wait_does_not_expire_call_wall(monkeypatch, tmp_path):
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
+    entered_result = threading.Event()
+    release_result = threading.Event()
+
+    class QueuedFuture:
+        def result(self):
+            entered_result.set()
+            assert release_result.wait(timeout=2.0)
+            return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+    class QueuedPool:
+        def submit(self, _request, *, timeout_s=None):
+            assert timeout_s == pytest.approx(0.05)
+            return QueuedFuture()
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 0.01,
+    }
+    backend._subprocess_pool = QueuedPool()
+    projection = backend._build_db_bulk_projection(
+        {'SiO2': 60.0, 'MgO': 40.0}
+    )
+    outcomes = []
+
+    def call():
+        try:
+            outcomes.append(backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+            ))
+        except BaseException as exc:
+            outcomes.append(exc)
+
+    caller = threading.Thread(target=call, daemon=True)
+    started_at = time.monotonic()
+    caller.start()
+    try:
+        assert entered_result.wait(timeout=2.0)
+        time.sleep(0.1)
+        assert caller.is_alive(), 'pool queue time must not use the solve wall'
+    finally:
+        release_result.set()
+        caller.join(timeout=2.0)
+
+    assert not caller.is_alive()
+    assert time.monotonic() - started_at > 0.05
+    assert len(outcomes) == 1
+    assert isinstance(outcomes[0], dict)
+    assert outcomes[0]['phases']['liq']['mass_kg'] == 1.0
 
 
 @pytest.mark.cpu_budget(30)
@@ -1443,7 +1502,7 @@ def test_magemin_subprocess_slot_os_error_is_typed_environment_failure(
     monkeypatch.setattr(magemin_module.fcntl, 'flock', fail_flock)
 
     with pytest.raises(
-        magemin_module._MAGEMinEngineLifecycleError
+        magemin_module._MAGEMinSubprocessSlotUnavailable
     ) as slot_error:
         with magemin_module._magemin_subprocess_slot():
             pytest.fail('slot unexpectedly acquired after directory failure')
@@ -1452,21 +1511,55 @@ def test_magemin_subprocess_slot_os_error_is_typed_environment_failure(
     assert slot_error.value.failure_disposition == 'environment'
     assert 'injected lock acquire failure' in str(slot_error.value)
 
-    result = backend.equilibrate(
-        1500.0,
-        composition_mol={'SiO2': 1.0},
-        fO2_log=-8.0,
-        pressure_bar=1.0,
-    )
+    import simulator.engine_local_config as engine_config
 
-    assert result.status == 'not_converged'
-    assert result.diagnostics['backend_failure_exception'] == (
-        'MAGEMinSubprocessSlotUnavailable'
+    monkeypatch.setattr(engine_config, 'cache_version_for', lambda _name: None)
+    monkeypatch.setattr(engine_config, 'warn_legacy_once', lambda *_args: None)
+    with pytest.raises(magemin_module._MAGEMinSubprocessSlotUnavailable):
+        backend.get_engine_version()
+
+    with pytest.raises(magemin_module._MAGEMinSubprocessSlotUnavailable):
+        backend.equilibrate(
+            1500.0,
+            composition_mol={'SiO2': 1.0},
+            fO2_log=-8.0,
+            pressure_bar=1.0,
+        )
+    with pytest.raises(magemin_module._MAGEMinSubprocessSlotUnavailable):
+        backend.find_liquidus_solidus(
+            composition_mol={'SiO2': 1.0},
+            fO2_log=-8.0,
+            pressure_bar=1.0,
+        )
+
+
+def test_magemin_subprocess_slot_directory_permission_error_is_typed(
+    monkeypatch, tmp_path,
+):
+    lock_dir = tmp_path / 'unwritable-slots'
+    monkeypatch.setattr(magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', lock_dir)
+    monkeypatch.setattr(
+        magemin_module,
+        '_MAGEMIN_SUBPROCESS_LOCK',
+        lock_dir / 'magemin-subprocess.lock',
     )
-    assert result.diagnostics['backend_failure_disposition'] == 'environment'
-    assert 'injected lock acquire failure' in result.diagnostics[
-        'backend_failure_message'
-    ]
+    original_mkdir = Path.mkdir
+
+    def deny_lock_directory(self, *args, **kwargs):
+        if self == lock_dir:
+            raise PermissionError('injected lock directory permission failure')
+        return original_mkdir(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, 'mkdir', deny_lock_directory)
+
+    with pytest.raises(
+        magemin_module._MAGEMinSubprocessSlotUnavailable
+    ) as slot_error:
+        with magemin_module._magemin_subprocess_slot():
+            pytest.fail('slot unexpectedly acquired after directory failure')
+
+    assert slot_error.value.failure_disposition == 'environment'
+    assert 'permission failure' in str(slot_error.value)
 
 
 @pytest.mark.parametrize(
@@ -1507,6 +1600,44 @@ def test_magemin_liquidus_uses_same_hang_guard_for_all_modes(
     )
     assert captured['budget_s'] == pytest.approx(
         liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S
+    )
+    assert callable(captured['budget_elapsed_s'])
+
+
+def test_magemin_liquidus_budget_excludes_slot_wait(monkeypatch):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._config = {'liquidus_finder_budget_s': 0.05}
+    temperatures = []
+
+    def slow_waiting_equilibrium(temperature_C, **_kwargs):
+        temperatures.append(temperature_C)
+        time.sleep(0.06)
+        backend._liquidus_compute_clock.elapsed_s = 0.001
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            liquid_fraction=1.0 if temperature_C >= 1.0 else 0.0,
+            status='ok',
+        )
+
+    monkeypatch.setattr(backend, 'equilibrate', slow_waiting_equilibrium)
+    result = backend.find_liquidus_solidus(
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+        min_T_C=0.0,
+        max_T_C=2.0,
+        scan_step_C=1.0,
+        tolerance_C=1.0,
+    )
+
+    assert len(temperatures) >= 2
+    assert result.status == 'ok'
+    assert (result.diagnostics or {}).get('reason') != (
+        'aggregate_budget_exceeded'
     )
 
 
@@ -4284,10 +4415,18 @@ def test_magemin_live_smoke_runs_real_binary(request):
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_native_activity_matches_direct_same_point_output(request):
+@pytest.mark.cpu_budget(90)
+@pytest.mark.timeout(90)
+def test_magemin_live_native_activity_matches_direct_same_point_output(
+    request, monkeypatch, tmp_path,
+):
     backend = MAGEMinBackend()
     request.addfinalizer(backend.close)
     assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot_count', lambda: 2
+    )
 
     composition = {
         "SiO2": 49.0,
@@ -4313,6 +4452,73 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
         call_timeout_s=20.0,
     )
     assert result.status == "ok", result.warnings
+    baseline_bytes = pickle.dumps(result, protocol=pickle.HIGHEST_PROTOCOL)
+
+    slots_held = [threading.Event(), threading.Event()]
+    release_slots = threading.Event()
+    slot_contended = threading.Event()
+    outcomes = []
+
+    def hold_slot(index):
+        with _magemin_subprocess_slot():
+            slots_held[index].set()
+            release_slots.wait(timeout=60.0)
+
+    holders = [
+        threading.Thread(target=hold_slot, args=(index,), daemon=True)
+        for index in range(2)
+    ]
+    for holder in holders:
+        holder.start()
+    assert all(event.wait(timeout=5.0) for event in slots_held)
+    original_flock = magemin_module.fcntl.flock
+
+    def observe_slot_contention(fd, operation):
+        try:
+            return original_flock(fd, operation)
+        except BlockingIOError:
+            if threading.current_thread().name == 'magemin-native-slot-waiter':
+                slot_contended.set()
+            raise
+
+    monkeypatch.setattr(magemin_module.fcntl, 'flock', observe_slot_contention)
+
+    def repeat_native_equilibrium():
+        try:
+            outcomes.append(backend.equilibrate(
+                temperature_C,
+                composition_kg=composition,
+                fO2_log=fO2_log,
+                pressure_bar=pressure_bar,
+                native_activity_formula="MgO",
+                call_timeout_s=20.0,
+            ))
+        except BaseException as exc:
+            outcomes.append(exc)
+
+    caller = threading.Thread(
+        target=repeat_native_equilibrium,
+        name='magemin-native-slot-waiter',
+        daemon=True,
+    )
+    caller.start()
+    try:
+        assert slot_contended.wait(timeout=5.0)
+        time.sleep(MAGEMIN_WARM_CALL_TIMEOUT_S + 0.1)
+        assert caller.is_alive(), 'the acquired-slot wall starts after the wait'
+    finally:
+        release_slots.set()
+        for holder in holders:
+            holder.join(timeout=5.0)
+        caller.join(timeout=30.0)
+
+    assert not caller.is_alive()
+    assert len(outcomes) == 1
+    assert isinstance(outcomes[0], type(result)), outcomes[0]
+    assert outcomes[0].status == 'ok', outcomes[0].warnings
+    assert pickle.dumps(
+        outcomes[0], protocol=pickle.HIGHEST_PROTOCOL
+    ) == baseline_bytes
 
     # Use the same kg-to-normalized-wt%-to-MAGEMin projection as equilibrate().
     # The raw fixture sums to 99 kg, so passing it straight to the CLI would

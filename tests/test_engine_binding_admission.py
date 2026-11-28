@@ -530,6 +530,33 @@ def test_failed_version_getter_records_typed_unknown_not_unavailable() -> None:
     assert state["value"] != "unavailable"
 
 
+def test_magemin_slot_failure_propagates_through_version_identity_probes():
+    from simulator.backends import _live_backend_identity
+    from simulator.melt_backend.magemin import (
+        _MAGEMinSubprocessSlotUnavailable,
+    )
+    from simulator.reduced_real_determinism import _provider_engine_version
+
+    slot_error = _MAGEMinSubprocessSlotUnavailable(
+        "injected MAGEMin slot acquisition failure"
+    )
+
+    def fail_version():
+        raise slot_error
+
+    with pytest.raises(_MAGEMinSubprocessSlotUnavailable):
+        version_getter_provenance(fail_version)
+
+    backend = SimpleNamespace(
+        name="magemin",
+        get_engine_version=fail_version,
+    )
+    with pytest.raises(_MAGEMinSubprocessSlotUnavailable):
+        _live_backend_identity(backend)
+    with pytest.raises(_MAGEMinSubprocessSlotUnavailable):
+        _provider_engine_version(SimpleNamespace(_backend=backend))
+
+
 def test_version_state_has_one_owner_and_receipt_bytes_are_unchanged(
     tmp_path: Path,
 ) -> None:

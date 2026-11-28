@@ -358,7 +358,7 @@ def _planner_attempt(diagnostic, provider="magemin-shadow"):
 
 
 def _timeout_escape_diagnostics():
-    """The four shapes that retry and used to miss the digest predicate."""
+    """The three shapes that retry and used to miss the digest predicate."""
 
     from simulator.engine_pool import EngineWorkerTimeout
     from simulator.melt_backend.liquidus import liquidus_sample_error_from_exception

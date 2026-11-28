@@ -590,7 +590,7 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
         return SimpleNamespace(returncode=0, stdout="MAGEMin", stderr="")
 
     @contextmanager
-    def recording_slot(_timeout: float):
+    def recording_slot():
         launch_order.append("enter")
         try:
             yield
