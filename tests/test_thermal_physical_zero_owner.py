@@ -103,9 +103,11 @@ def test_equilibrium_duplicate_400k_binding_breaks_owner_assertion(monkeypatch):
     def fail_after_cold_gate(self):
         raise AssertionError("duplicate 400 K binding bypassed cold gate")
 
+    # d-478 takes surface pO2 from melt redox, so transport pO2 is no longer
+    # called on the hot path. The numerical floor is the first post-gate step.
     monkeypatch.setattr(
         equilibrium.EquilibriumMixin,
-        "_headspace_transport_pO2_bar",
+        "_oxygen_numerical_floor_bar",
         fail_after_cold_gate,
     )
     host = object.__new__(equilibrium.EquilibriumMixin)

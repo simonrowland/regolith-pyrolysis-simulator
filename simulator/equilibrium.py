@@ -70,6 +70,18 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
 _ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
 
 
+def physical_melt_dissociation_pO2_bar(
+    fO2_log: float,
+) -> tuple[float, bool]:
+    """Keep the fallback's public pO2 mapper without an import cycle."""
+
+    from engines.builtin.vapor_pressure import (
+        physical_melt_dissociation_pO2_bar as map_melt_fO2_to_pO2,
+    )
+
+    return map_melt_fO2_to_pO2(fO2_log)
+
+
 def _engine_model_standard_state_caveat(
     *,
     K_reference_phase: str,
@@ -422,7 +434,6 @@ class EquilibriumMixin:
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
             _vapor_pressure_temperature_extrapolation_notice,
-            physical_melt_dissociation_pO2_bar,
             reject_noncertifying_vapor_pressure_row,
             require_antoine_source_certified_temperature,
             vapor_pressure_authority_diagnostic,

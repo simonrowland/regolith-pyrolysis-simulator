@@ -2214,16 +2214,18 @@ def test_equilibrium_raises_public_error_for_invalid_antoine_coefficients(
         model._internal_analytical_equilibrium()
 
 
-def test_legacy_sio_continues_below_reference(vapor_pressure_data, monkeypatch):
+def test_legacy_sio_uses_surface_pO2_not_transport_pO2(
+    vapor_pressure_data, monkeypatch
+):
     model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_SiOnlyMelt())
     monkeypatch.setattr(model, "_vacuum_floor_bar", lambda: 1.3e-12)
     answers = {}
     for oxygen in (1.3e-12, 1e-9):
         monkeypatch.setattr(model, "_headspace_transport_pO2_bar", lambda: oxygen)
         answers[oxygen] = model._internal_analytical_equilibrium().vapor_pressures_Pa["SiO"]
-    # Fixed source/temperature: the SiO reaction's -1/2 oxygen exponent must
-    # continue below the reference, independently of the simulated body floor.
-    assert answers[1.3e-12] / answers[1e-9] == pytest.approx((1.3e-12 / 1e-9) ** -0.5)
+    # d-478: this fallback uses the single surface pO2 derived from melt
+    # redox. Changing only headspace transport pO2 cannot move this pressure.
+    assert answers[1.3e-12] / answers[1e-9] == pytest.approx(1.0)
 
 
 def test_legacy_internal_analytical_oxide_antoine_pressure_pin(
@@ -2305,7 +2307,10 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
         vapor_pressure_data,
         melt=_CaOnlyMelt(),
     )._internal_analytical_equilibrium()
-    assert legacy.vapor_pressures_Pa["Ca"].hex() == "0x1.a2f3f64f221b0p-15"
+    # d-478: the fallback now evaluates Ca against surface pO2 derived from
+    # melt redox; this replaces the old transport-pO2 value. The kernel value
+    # below remains pinned to its separate provider-car behavior.
+    assert legacy.vapor_pressures_Pa["Ca"].hex() == "0x1.529aba65ce20fp-11"
     ca_reference = result.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]["Ca"]["P_reference_Antoine_Pa"]
@@ -2591,7 +2596,10 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
         vapor_pressure_data,
         melt=_MgOnlyMelt(1360.999),
     )._internal_analytical_equilibrium()
-    assert result.vapor_pressures_Pa["Mg"].hex() == "0x1.10315b6351d19p-26"
+    # d-478: the fallback Mg estimate now uses the one surface pO2 instead of
+    # headspace transport pO2, shifting this pressure while preserving its
+    # reconstructed-rail authority.
+    assert result.vapor_pressures_Pa["Mg"].hex() == "0x1.15cbf835b9725p-21"
     assert result.diagnostics["vapor_pressure_authority"][
         VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
     ] is False

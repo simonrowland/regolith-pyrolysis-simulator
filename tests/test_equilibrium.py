@@ -753,17 +753,20 @@ def test_internal_analytical_surface_channel_inherits_floor_caveat(monkeypatch):
     sim.melt.melt_fO2_log = -100.0
     sim.melt.fO2_log = -100.0
     sim.vapour_rail_catalog = Catalog()
+    # Ni's Ellingham row ends at 2000 K, below this 2156.15 K fixture. Mn's
+    # upper reconstructed segment is active here and must carry its ungrounded
+    # liquid-standard caveat through the shared surface pO2 channel.
     monkeypatch.setattr(
         equilibrium_module,
         'activities_for_metal_saturation_floor',
-        lambda *_args, **_kwargs: {'NiO': 1.0},
+        lambda *_args, **_kwargs: {'MnO': 1.0},
     )
 
     result = _run_typed_omission_sim(sim, monkeypatch, a_feo=0.0)
 
     floor_notice = result.diagnostics['melt_metal_saturation_floor_notice']
     caveat = floor_notice['engine_model_caveat']
-    assert floor_notice['metal'] == 'Ni'
+    assert floor_notice['metal'] == 'Mn'
     assert caveat['kind'] == 'engine_model_caveat'
     assert caveat['floor_log10_fO2_bar'] == pytest.approx(
         floor_notice['floor_log10_fO2_bar']

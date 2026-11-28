@@ -129,7 +129,7 @@ def test_builtin_vapor_pressure_po2_slope_once(
         ("Ti", 1700.0, -1.0),
     ],
 )
-def test_non_feo_metal_dissociation_uses_shared_surface_pO2(
+def test_non_feo_metal_dissociation_uses_intrinsic_melt_fo2(
     vapor_pressure_data,
     species: str,
     temperature_C: float,
@@ -156,9 +156,11 @@ def test_non_feo_metal_dissociation_uses_shared_surface_pO2(
         )
 
     def dissociation_pO2_bar(diagnostic: dict, planted_log: float) -> float:
-        # d-478 + AMENDMENT 1: every surface reaction consumes the one
-        # melt-interface pO2 from the intrinsic melt redox/floor solve;
-        # headspace transport pressure is a separate gas-side potential.
+        # d-469: dissociation pO2 is the planted intrinsic when that
+        # log sits on or above the condensed-metal line, and the line
+        # when it does not. a_FeO is read at the unfloored log, so two
+        # injections can bind two slightly different Fe lines. The
+        # transport pressure is not this channel.
         notice = diagnostic.get("melt_metal_saturation_floor_notice")
         if notice is None:
             return 10.0 ** planted_log
@@ -175,11 +177,6 @@ def test_non_feo_metal_dissociation_uses_shared_surface_pO2(
 
     assert reduced_pO2_bar == pytest.approx(
         dissociation_pO2_bar(reduced_diag, -12.0)
-    )
-    # The selected surface oxygen potential is also the exact value recorded
-    # as the compiled reaction input (d-478 + AMENDMENT 1).
-    assert reduced_pO2_bar == pytest.approx(
-        reduced_diag["source_reaction_fO2_bar"]
     )
     assert high_transport_pO2_bar == pytest.approx(reduced_pO2_bar)
     assert oxidized_pO2_bar == pytest.approx(
@@ -235,13 +232,12 @@ def test_sio_mass_action_applies_below_reference_at_lunar_floor(
     assert mass_action_ratio == pytest.approx(27.7350098113, rel=1e-9)
 
 
-def test_feo_metal_dissociation_uses_shared_surface_pO2(
+def test_feo_metal_dissociation_transport_denominator_unchanged(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     pressures = []
     provenance_pO2 = []
-    surface_pO2 = []
     for transport_pO2_bar in (1.0e-9, 1.0e-7):
         result = provider.dispatch(
             _request(
@@ -257,16 +253,10 @@ def test_feo_metal_dissociation_uses_shared_surface_pO2(
         provenance_pO2.append(
             diagnostic["vapor_pressure_numerator_provenance"]["Fe"]["pO2_bar"]
         )
-        surface_pO2.append(diagnostic["source_reaction_fO2_bar"])
 
-    # d-478 + AMENDMENT 1: FeO surface dissociation uses the same melt-side
-    # oxygen potential as every other surface channel, never transport pO2.
-    assert provenance_pO2 == pytest.approx(surface_pO2)
-    assert provenance_pO2[0] == pytest.approx(provenance_pO2[1])
+    assert provenance_pO2 == pytest.approx([1.0e-9, 1.0e-7])
     observed_slope = math.log10(pressures[1] / pressures[0]) / math.log10(100.0)
-    # With unchanged melt redox, changing headspace pO2 cannot move the
-    # surface-equilibrium pressure (only the later transport flux can move).
-    assert observed_slope == pytest.approx(0.0, abs=1.0e-9)
+    assert observed_slope == pytest.approx(-0.5, abs=1.0e-9)
 
 
 @pytest.mark.parametrize(

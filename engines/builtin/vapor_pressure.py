@@ -3860,16 +3860,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="K_decomp",
             )
-            # d-478 + AMENDMENT 1: all surface reactions consume the single
-            # melt-interface pO2 selected above. FeO's Kress activity supplies
-            # its oxide activity; it does not create a second headspace oxygen
-            # denominator for the surface dissociation reaction.
-            dissociation_pO2_bar = o2_potential_from_pO2_bar(
-                pO2_bar=melt_dissociation_pO2_bar,
-                temperature_K=T_K,
-                reaction_plane=REACTION_PLANE_MELT_INTERFACE,
-                pO2_reference_bar=1.0,
-            ).legacy_pO2_bar
+            dissociation_pO2_bar = (
+                transport_pO2_bar
+                if parent_oxide == 'FeO'
+                else melt_dissociation_pO2_bar
+            )
+            if parent_oxide != 'FeO':
+                # t-571: the Ellingham O2 denominator is sourced from the
+                # owner-gated O2 channel potential (melt_interface plane).
+                # The potential retains the actual oxygen, including a domain
+                # notice beyond the evaluator band. FeO retains its transport
+                # denominator (Kress91 activity already carries melt redox).
+                dissociation_pO2_bar = o2_potential_from_pO2_bar(
+                    pO2_bar=dissociation_pO2_bar,
+                    temperature_K=T_K,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                    pO2_reference_bar=1.0,
+                ).legacy_pO2_bar
             # Premise: this value is the melt-supported metal source pressure,
             # not the later surface-flux boundary condition. For MgO(l) ->
             # Mg(g) + 1/2 O2, K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The JANAF row
@@ -3884,8 +3891,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # preserving the surface metal-transport path. Pure-MgO congruent
             # co-evolution is a separate reaction-basis validation, not a
             # runtime boundary condition solved by that subtraction.
-            # The same surface pO2 denominator applies to FeO; the Kress91
-            # activity describes the condensed FeO term only.
+            # FeO already carries melt redox through its Kress91 activity and
+            # intentionally retains the legacy transport denominator here.
             numerator = _require_finite_vapor_value(
                 K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar,
                 species=species,

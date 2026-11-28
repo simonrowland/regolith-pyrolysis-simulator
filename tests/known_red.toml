@@ -27,6 +27,34 @@ reason = "C2A staged run captures species outside the pinned set."
 since = "7dd268c6f"
 
 [[test]]
+node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_shadow_parity_across_short_simulation_run[lunar_mare_low_ti-None]"
+ticket = "d-478"
+tier = "pr"
+reason = "Fallback surface pO2 follows d-478 while the provider car still uses its prior boundary; Mg parity is expected to diverge until that car lands."
+since = "77e0254"
+
+[[test]]
+node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_shadow_parity_across_short_simulation_run[s_type_asteroid_silicate-None]"
+ticket = "d-478"
+tier = "pr"
+reason = "Fallback surface pO2 follows d-478 while the provider car still uses its prior boundary; Mg parity is expected to diverge until that car lands."
+since = "77e0254"
+
+[[test]]
+node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_shadow_parity_across_short_simulation_run[mars_basalt-additives_kg1]"
+ticket = "d-478"
+tier = "pr"
+reason = "Fallback surface pO2 follows d-478 while the provider car still uses its prior boundary; Mg parity is expected to diverge until that car lands."
+since = "77e0254"
+
+[[test]]
+node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_active_si_composite_supersedes_legacy_pure_component_sidecar"
+ticket = "d-478"
+tier = "pr"
+reason = "The d-478 fallback predicts FeO_association_gas while the separate provider car does not yet publish it; channel-set parity waits for that car."
+since = "77e0254"
+
+[[test]]
 node = "tests/test_sso_r_validation_map.py::test_owner_pn2_anchor_reports_current_certification_state"
 ticket = "b-1050"
 tier = "pr"
