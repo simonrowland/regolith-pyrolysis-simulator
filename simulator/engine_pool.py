@@ -771,6 +771,35 @@ class _EngineWorkerLaunch:
 class WarmEngineWorker:
     """Persistent spawned worker with deadlines and crash/hang replacement."""
 
+    @staticmethod
+    def _caller_future_timeout_s(
+        call_timeout_s: float,
+        startup_timeout_s: float,
+        watchdog_grace_s: float = ENGINE_WORKER_WATCHDOG_GRACE_S,
+    ) -> float:
+        """Bound a caller wait after dequeue, including startup and cleanup."""
+        call_s = float(call_timeout_s)
+        startup_s = float(startup_timeout_s)
+        grace_s = float(watchdog_grace_s)
+        if not math.isfinite(call_s) or call_s <= 0.0:
+            raise ValueError('worker call timeout must be finite and positive')
+        if not math.isfinite(startup_s) or startup_s <= 0.0:
+            raise ValueError(
+                'worker startup timeout must be finite and positive'
+            )
+        if not math.isfinite(grace_s) or grace_s < 0.0:
+            raise ValueError(
+                'worker watchdog grace must be finite and nonnegative'
+            )
+        return (
+            call_s
+            + startup_s
+            + ENGINE_WORKER_SPAWN_SLACK_S
+            + grace_s
+            + ENGINE_WORKER_STOP_PAIR_JOIN_S
+            + ENGINE_WORKER_CANCEL_POLL_S
+        )
+
     def __init__(
         self,
         *,
@@ -2978,6 +3007,11 @@ class EngineWorkerPool:
                     f'submitting would leave the future permanently pending'
                 )
             future: Future = Future()
+            engine_call_started = threading.Event()
+            future._engine_call_started = engine_call_started
+            future.add_done_callback(
+                lambda _completed: engine_call_started.set()
+            )
             self._queue.put((future, request, timeout_s))
         return future
 
@@ -3075,6 +3109,13 @@ class EngineWorkerPool:
                 if item is None:
                     return
                 future, request, timeout_s = item
+                started_event = getattr(
+                    future,
+                    '_engine_call_started',
+                    None,
+                )
+                if started_event is not None:
+                    started_event.set()
                 cancel_pending = False
                 with self._active_requests_lock:
                     if self._cancel_pending.is_set():

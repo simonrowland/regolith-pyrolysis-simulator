@@ -95,6 +95,7 @@ from __future__ import annotations
 
 import builtins
 import copy
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager, nullcontext
 from decimal import Decimal, InvalidOperation
 import fcntl
@@ -3346,11 +3347,29 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             'call_timeout_s': timeout_s + 0.5,
                             'capture_native_activities': capture_native_activities,
                         }, timeout_s=timeout_s)
+                        started_event = getattr(
+                            future,
+                            '_engine_call_started',
+                            None,
+                        )
+                        if started_event is not None:
+                            # Pool time before dequeue is queueing, not engine
+                            # time. EngineWorkerPool signals this on dequeue.
+                            started_event.wait()
+                        startup_timeout_s = float(self._config.get(
+                            'worker_startup_timeout_s', 30.0
+                        ))
+                        future_timeout_s = (
+                            WarmEngineWorker._caller_future_timeout_s(
+                                timeout_s,
+                                startup_timeout_s,
+                            )
+                        )
                         try:
-                            # Queue time is not engine time. The worker owns
-                            # the solve wall after dequeue; wait for its result
-                            # without a caller-side queue deadline.
-                            result = future.result()
+                            # This watchdog starts after dequeue. The worker's
+                            # own call wall is the normal engine timeout; this
+                            # envelope also catches a dead or blocked sender.
+                            result = future.result(timeout=future_timeout_s)
                             measured_compute_s = getattr(
                                 future,
                                 '_engine_call_elapsed_s',
@@ -3382,6 +3401,32 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 diagnostic_detail,
                             )
                             raise
+                        except FutureTimeoutError as exc:
+                            future.cancel()
+                            diagnostic_detail = (
+                                self._magemin_timeout_diagnostic_detail_safely(
+                                    bulk_projection=bulk_projection,
+                                    composition_mol=composition_mol,
+                                    temperature_C=temperature_C,
+                                    pressure_bar=pressure_bar,
+                                    pressure_kbar=pressure_kbar,
+                                    fO2_log=fO2_log,
+                                )
+                            )
+                            self._subprocess_pool._abort_request(
+                                future,
+                                diagnostic_detail=diagnostic_detail,
+                            )
+                            timeout = EngineWorkerTimeout(
+                                'MAGEMin subprocess pool',
+                                future_timeout_s,
+                                phase='job',
+                            )
+                            self._attach_magemin_timeout_diagnostic(
+                                timeout,
+                                diagnostic_detail,
+                            )
+                            raise timeout from exc
                         except (
                             OSError,
                             subprocess.SubprocessError,
