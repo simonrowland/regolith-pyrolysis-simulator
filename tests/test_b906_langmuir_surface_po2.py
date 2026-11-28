@@ -387,7 +387,9 @@ def _host(
     host._evaporation_flux_control_inputs = (
         EvaporationMixin._evaporation_flux_control_inputs.__get__(host)
     )
-    host._build_evaporation_aux_maps = lambda pressures: ({}, {}, {})
+    host._build_evaporation_aux_maps = lambda pressures, **_kwargs: (
+        {}, {}, {}
+    )
     host._build_partial_melt_offgassing_diagnostic = (
         lambda *args, **kwargs: {}
     )

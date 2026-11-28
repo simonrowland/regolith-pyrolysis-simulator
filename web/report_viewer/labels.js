@@ -187,7 +187,7 @@
               .join(", ")
           : "species not reported";
         const direction = notice.bound_direction || {};
-        return `capacity_solve_excludes_unavailable_species: ${excluded}; resolved fluxes ${direction.resolved_fluxes || "bound not reported"}; headspace pressure ${direction.headspace_pressure || "bound not reported"}`;
+        return `${excluded}; resolved fluxes ${direction.resolved_fluxes || "bound not reported"}; headspace pressure ${direction.headspace_pressure || "bound not reported"}`;
       });
     return flags.length ? flags.join("; ") : "none";
   }

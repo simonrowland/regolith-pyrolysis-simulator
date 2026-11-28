@@ -648,6 +648,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
     species_params: tuple[float, float, float] | None = None,
+    species_transport_property_row: Mapping[str, Any] | None = None,
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
@@ -806,7 +807,14 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 "gas resistance requires positive overhead_pressure_pa"
             )
         if species_params is None:
-            parameters = _resolve_lennard_jones_parameters(species, {})
+            parameters = _resolve_lennard_jones_parameters(
+                species,
+                (
+                    species_transport_property_row
+                    if isinstance(species_transport_property_row, Mapping)
+                    else {}
+                ),
+            )
             if parameters.get("status") in {"tabulated", "estimated"}:
                 species_params = (
                     float(parameters["sigma_angstrom"]),
@@ -1590,7 +1598,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 if decision == "hkl_upper_bound"
             }
         )
-        from simulator.condensation import _resolve_lennard_jones_parameters
         from simulator.chemistry.langmuir_knudsen import (
             hertz_knudsen_k_kg_s_m2_pa,
         )
@@ -1898,40 +1905,18 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 species_transport_params = None
                 if uses_gas_resistance and species not in hkl_upper_bound_transport_species:
                     parameters = transport_parameters_by_species.get(species)
-                    if not isinstance(parameters, Mapping):
-                        property_row = transport_property_rows_by_species.get(
-                            species, {}
-                        )
-                        parameters = _resolve_lennard_jones_parameters(
-                            species,
-                            property_row if isinstance(property_row, Mapping) else {},
-                        )
-                    if parameters.get("status") not in {"tabulated", "estimated"}:
-                        missing_transport_parameters[species] = {
-                            "policy": "fail_loud_missing_transport_parameters",
-                            "carrier_gas": carrier_gas,
-                            "parent_oxide": str(stoich.get("parent_oxide") or ""),
-                            "reason": (
-                                "missing Chapman-Enskog transport parameters "
-                                f"for sampled species: {species}"
+                    if (
+                        isinstance(parameters, Mapping)
+                        and parameters.get("status") in {"tabulated", "estimated"}
+                    ):
+                        species_transport_params = (
+                            float(parameters["sigma_angstrom"]),
+                            float(parameters["epsilon_over_k_K"]),
+                            float(
+                                parameters.get("molar_mass_g_mol")
+                                or M_kg_mol * 1000.0
                             ),
-                            "refusal_type": "EvaporationFluxConfigurationError",
-                            "status": "unavailable",
-                            "authority_level": "unavailable",
-                            "flag": (
-                                parameters.get("flag")
-                                or "missing_transport_parameters_possible_continuum"
-                            ),
-                        }
-                        continue
-                    species_transport_params = (
-                        float(parameters["sigma_angstrom"]),
-                        float(parameters["epsilon_over_k_K"]),
-                        float(
-                            parameters.get("molar_mass_g_mol")
-                            or M_kg_mol * 1000.0
-                        ),
-                    )
+                        )
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                     species=species,
                     P_eq_pa=P_eq_Pa,
@@ -1952,6 +1937,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
                     species_params=species_transport_params,
+                    species_transport_property_row=(
+                        transport_property_rows_by_species.get(species)
+                    ),
                 )
             except EvaporationFluxConfigurationError as exc:
                 missing_transport_parameters[species] = {

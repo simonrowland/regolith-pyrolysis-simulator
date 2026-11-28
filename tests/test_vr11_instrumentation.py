@@ -1389,7 +1389,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
         _melt_activity_shadow_enabled=True,
         _melt_activity_engine_inputs=engine_inputs,
         build_vapour_batch=_builder,
-        _build_evaporation_aux_maps=lambda _pressures: (
+        _build_evaporation_aux_maps=lambda _pressures, **_kwargs: (
             {"Na": 0.023},
             {"Na": {}},
             {"Na": 1.0},
@@ -1543,7 +1543,10 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
             self.overhead = SimpleNamespace(headspace_temperature_K=0.0)
             self._last_vapor_pressure_diagnostic = {}
 
-        def _build_evaporation_aux_maps(self, vapor_pressures):
+        def _build_evaporation_aux_maps(
+            self, vapor_pressures, *, vapour_batch_flux_overlay=None
+        ):
+            del vapour_batch_flux_overlay
             return {}, {}, {}
 
     host = _Host()

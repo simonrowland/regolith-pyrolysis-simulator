@@ -854,45 +854,6 @@ def _classify_langmuir_carriers(
     return legacy, carriers
 
 
-def langmuir_closure_participant_species(
-    pressures_Pa: Mapping[str, Any],
-    *,
-    provenance_by_species: Mapping[str, Mapping[str, Any]] | None,
-    source_reaction_fO2_bar: float | None,
-    transport_pO2_bar: float | None,
-    legacy_catalog: Mapping[str, Any] | None,
-    compiled_catalog: Any | None,
-    melt_redox_capacity_mol_per_ln_fO2: float | None,
-) -> frozenset[str]:
-    """Return residual participants only when the surface closure will run.
-
-    The hourly availability classifier uses this result to reject a missing
-    parent oxide before a coupled carrier can shape its peer's closure.
-    """
-    _, carriers = _classify_langmuir_carriers(
-        pressures_Pa,
-        provenance_by_species=provenance_by_species,
-        source_reaction_fO2_bar=source_reaction_fO2_bar,
-        transport_pO2_bar=transport_pO2_bar,
-        legacy_catalog=legacy_catalog,
-        compiled_catalog=compiled_catalog,
-    )
-    if not any(_gate_opener(carrier) for carrier in carriers):
-        return frozenset()
-    eval_pO2 = _eval_pO2_bar(source_reaction_fO2_bar, carriers)
-    if (
-        not _eval_pO2_is_physical_floor(eval_pO2)
-        and not _capacity_is_negligible(
-            melt_redox_capacity_mol_per_ln_fO2
-        )
-    ):
-        return frozenset()
-    return frozenset(
-        carrier.species for carrier in carriers
-        if _residual_participant(carrier)
-    )
-
-
 def _formula_registry(legacy: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
     registry: dict[str, dict[str, Any]] = {}
     if "metals" in legacy or "oxide_vapors" in legacy:
@@ -1172,16 +1133,11 @@ def _publisher_net_law_with_transport(
         _series_resistance_evaporation_flux_kg_m2_s,
         species_drive_bulk_Pa,
     )
-    from simulator.condensation import _resolve_lennard_jones_parameters
 
     ideal = _ideal_molar_conductance(
         alpha, molar_mass_kg_per_mol, transport.temperature_K
     )
     eligibility = transport.transport_eligibility_by_species.get(species)
-    if eligibility == "unavailable":
-        raise EvaporationFluxConfigurationError(
-            f"transport unavailable for Langmuir closure probe: {species}"
-        )
     hkl_bound = (
         eligibility == "hkl_upper_bound"
         if eligibility is not None
@@ -1205,26 +1161,21 @@ def _publisher_net_law_with_transport(
         return ideal, drive_bulk
 
     parameters = transport.lennard_jones_parameters_by_species.get(species)
-    if not isinstance(parameters, Mapping):
-        property_row = transport.lennard_jones_property_rows_by_species.get(
-            species, {}
+    species_params = None
+    if (
+        isinstance(parameters, Mapping)
+        and parameters.get("status") in {"tabulated", "estimated"}
+    ):
+        species_params = (
+            float(parameters["sigma_angstrom"]),
+            float(parameters["epsilon_over_k_K"]),
+            float(
+                parameters.get("molar_mass_g_mol")
+                or molar_mass_kg_per_mol * 1000.0
+            ),
         )
-        parameters = _resolve_lennard_jones_parameters(
-            species,
-            property_row if isinstance(property_row, Mapping) else {},
-        )
-    if parameters.get("status") not in {"tabulated", "estimated"}:
-        raise EvaporationFluxConfigurationError(
-            "missing transport parameters for Langmuir closure probe: "
-            f"{species} ({parameters.get('flag')})"
-        )
-    species_params = (
-        float(parameters["sigma_angstrom"]),
-        float(parameters["epsilon_over_k_K"]),
-        float(
-            parameters.get("molar_mass_g_mol")
-            or molar_mass_kg_per_mol * 1000.0
-        ),
+    property_row = transport.lennard_jones_property_rows_by_species.get(
+        species, {}
     )
 
     try:
@@ -1245,6 +1196,9 @@ def _publisher_net_law_with_transport(
             extrapolate_continuum=transport.extrapolate_continuum,
             melt_resistance_enabled=False,
             species_params=species_params,
+            species_transport_property_row=(
+                property_row if isinstance(property_row, Mapping) else {}
+            ),
         )
     except EvaporationFluxConfigurationError as exc:
         raise ValueError(

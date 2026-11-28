@@ -1934,6 +1934,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapour_batch_report = None
         self._last_vapour_batch_flux_overlay = {}
         self._last_vapour_batch_resolve_error = {}
+        self._vapour_batch_hour_availability = None
         self._last_imcc_activity_shadow = {}
         self._last_high_t_melt_activity = {}
         self._high_t_melt_activity_fallback_steps = []
@@ -7954,7 +7955,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.chemistry.kernel.dto import IntentRequest
         from simulator.evaporation import (
             _append_capacity_solve_exclusion_notice,
-            EvaporationFluxRefusal,
             EvaporationMixin,
             _provider_resolved_flux_species,
             _provider_flux_outcome_refusal,
@@ -8102,6 +8102,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             control_equilibrium = equilibrium
             control_vapor_pressure_diagnostic = None
+        pre_aux_batch_flux_pressures = dict(batch_flux_pressures or {})
+        notice_count_before_aux = len(
+            capacity_flux_overlay.get('notices', ()) or ()
+        )
         controls, provider_molar_masses = self._evaporation_flux_control_inputs(
             control_equilibrium,
             overhead_partials_Pa=initial_partials,
@@ -8124,10 +8128,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             batch_flux_pressures = dict(
                 controls.get(CONTROL_FLUX_PRESSURES_KEY, {}) or {}
             )
+        late_parent_unavailable = {
+            str(notice.get('species')): str(notice.get('reason'))
+            for notice in (
+                capacity_flux_overlay.get('notices', ()) or ()
+            )[notice_count_before_aux:]
+            if isinstance(notice, Mapping)
+            and notice.get('kind') == 'vapour_batch_unresolved'
+            and notice.get('reason') == 'missing_evaporation_stoichiometry'
+            and notice.get('species') is not None
+        }
+        if late_parent_unavailable:
+            fresh = EvaporationMixin._restart_or_refuse_capacity_members(
+                self,
+                equilibrium,
+                pre_aux_batch_flux_pressures,
+                capacity_flux_overlay,
+                late_parent_unavailable,
+                capacity_restart_used=capacity_restart_used,
+                detail_key='auxiliary_map_unavailable',
+                resolved_species=(batch_flux_pressures or {}),
+            )
+            if fresh:
+                return self._compute_capacity_coupling_shadow_impl(
+                    equilibrium,
+                    capacity_restart_used=True,
+                )
         capacity_bound_notice = _append_capacity_solve_exclusion_notice(
             self,
             capacity_flux_overlay,
-            resolved_species=(outcome.resolved_species if outcome else ()),
+            resolved_species=_provider_resolved_flux_species(
+                {},
+                capacity_flux_overlay,
+                flux_pressures=batch_flux_pressures,
+            ),
         )
         solver_molar_masses = dict(provider_molar_masses)
         availability = getattr(
@@ -8176,23 +8210,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
 
-        def capacity_member_failure(
-            *,
-            details: Mapping[str, Any] | None = None,
-            overlay: Mapping[str, Any] | None = None,
-            bound_notice: Mapping[str, Any] | None = None,
-        ) -> EvaporationFluxRefusal:
-            diagnostic = {'reason': 'capacity_member_closure_failure'}
-            diagnostic.update(dict(details or {}))
-            if overlay is not None:
-                diagnostic['vapour_batch_flux_overlay'] = overlay
-                diagnostic['bound_direction'] = dict(
-                    (bound_notice or {}).get('bound_direction', {})
-                )
-            return EvaporationFluxRefusal(
-                'capacity_member_closure_failure', diagnostic
-            )
-
         def restart_or_refuse_capacity_members(
             failures: Mapping[str, str],
             flux_pressures: Mapping[str, Any],
@@ -8202,27 +8219,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             resolved_species: Iterable[str],
             restart_message: str,
         ) -> None:
-            bound_notice = _append_capacity_solve_exclusion_notice(
-                self,
-                overlay,
-                resolved_species=resolved_species,
-            )
-            fresh = EvaporationMixin._restart_for_late_unavailability(
+            fresh = EvaporationMixin._restart_or_refuse_capacity_members(
                 self,
                 equilibrium,
                 flux_pressures,
                 overlay,
                 failures,
-                capacity_solve=True,
                 capacity_restart_used=capacity_restart_used,
+                detail_key=detail_key,
+                resolved_species=resolved_species,
             )
             if fresh:
                 raise _RestartCapacitySolve(restart_message)
-            raise capacity_member_failure(
-                details={detail_key: dict(failures)},
-                overlay=overlay,
-                bound_notice=bound_notice,
-            )
 
         rates_cache = {}
 
@@ -8345,14 +8353,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'stoich_by_species', {}
                 ),
             )
-            late_provider_unavailable = {
-                str(species): str(reason)
-                for species, reason in provider_unavailable.items()
-                if str(species) in (iteration_flux_pressures or {})
-            }
-            if late_provider_unavailable:
+            if provider_unavailable:
                 restart_or_refuse_capacity_members(
-                    late_provider_unavailable,
+                    provider_unavailable,
                     iteration_flux_pressures or {},
                     iteration_overlay,
                     detail_key='provider_unavailable',
@@ -8484,8 +8487,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         except _RestartCapacitySolve:
             if capacity_restart_used:
-                raise capacity_member_failure(
-                    details={'capacity_restart_used': True}
+                EvaporationMixin._restart_or_refuse_capacity_members(
+                    self,
+                    equilibrium,
+                    batch_flux_pressures or {},
+                    capacity_flux_overlay,
+                    {'capacity_restart_used': 'capacity restart was already used'},
+                    capacity_restart_used=True,
+                    detail_key='capacity_restart_used',
+                    resolved_species=(),
                 )
             return self._compute_capacity_coupling_shadow_impl(
                 equilibrium,
