@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -29,6 +30,7 @@ from simulator.grind_preflight import (
 )
 from simulator.optimize.results_store import _decode_result_payload
 from simulator import reduced_real_determinism as rrd
+from simulator import grind_preflight
 
 
 def _eval_spec(**overrides: object) -> dict[str, object]:
@@ -633,24 +635,160 @@ def test_strict_vapor_result_store_pt1_strict_on_rejects_vaporock(
         )
 
 
-@pytest.mark.parametrize("corrupt_key", ("deep", "invalid-utf8"))
+@pytest.mark.parametrize(
+    "corrupt_row",
+    ("deep-key", "invalid-utf8", "overflow-total"),
+)
 def test_strict_vapor_pt1_preflight_uses_stored_row_admission(
     tmp_path: Path,
-    corrupt_key: str,
+    corrupt_row: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "strict-pt1-deep-key.sqlite"
     _write_pt1_store(db_path, source="builtin-vapor-pressure")
-    if corrupt_key == "deep":
-        key_bytes = b'{"nested":' + b"[" * 1200 + b"0" + b"]" * 1200 + b"}"
-    else:
-        key_bytes = b'{"source":"\xff"}'
+    decoded_contexts: list[str] = []
+    policy_walk_started: list[bool] = []
     with sqlite3.connect(db_path) as conn:
+        if corrupt_row == "deep-key":
+            (stored_key_bytes,) = conn.execute(
+                f"SELECT key_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+            ).fetchone()
+            key_bytes = (
+                bytes(stored_key_bytes)[:-1]
+                + b',"nested":'
+                + b"[" * 900
+                + b"0"
+                + b"]" * 900
+                + b"}"
+            )
+            assert isinstance(json.loads(key_bytes), dict)
+            conn.execute(
+                f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} SET key_bytes = ?",
+                (sqlite3.Binary(key_bytes),),
+            )
+            original_kernel_fallback_path = grind_preflight._kernel_fallback_path
+            original_json_mapping = grind_preflight._json_mapping
+
+            def record_json_mapping(raw, context):
+                value = original_json_mapping(raw, context)
+                decoded_contexts.append(context.rsplit(".", 1)[-1])
+                return value
+
+            def recurse_under_test_limit(payload, path="$"):
+                # Keep JSON decoding at the normal limit; fail only in this walk.
+                original_limit = sys.getrecursionlimit()
+                try:
+                    if not policy_walk_started:
+                        sys.setrecursionlimit(256)
+                        policy_walk_started.append(True)
+                    return original_kernel_fallback_path(payload, path)
+                finally:
+                    if original_limit > sys.getrecursionlimit():
+                        sys.setrecursionlimit(original_limit)
+
+            monkeypatch.setattr(
+                grind_preflight,
+                "_json_mapping",
+                record_json_mapping,
+            )
+            monkeypatch.setattr(
+                grind_preflight,
+                "_kernel_fallback_path",
+                recurse_under_test_limit,
+            )
+        elif corrupt_row == "invalid-utf8":
+            conn.execute(
+                f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} SET key_bytes = ?",
+                (sqlite3.Binary(b'{"source":"\xff"}'),),
+            )
+        else:
+            (stored_payload_bytes,) = conn.execute(
+                f"SELECT payload_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+            ).fetchone()
+            payload = json.loads(stored_payload_bytes)
+            payload_prefix = json.dumps(payload, separators=(",", ":")).encode()
+            payload_bytes = payload_prefix[:-1] + (
+                b',"vapor_pressure_source_report":{"species":'
+                b'{"Na":"builtin-vapor-pressure",'
+                b'"SiO":"builtin-vapor-pressure"},"total_species":1e400}}'
+            )
+            assert json.loads(payload_bytes)["vapor_pressure_source_report"][
+                "total_species"
+            ] == float("inf")
+            conn.execute(
+                f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} SET payload_bytes = ?",
+                (sqlite3.Binary(payload_bytes),),
+            )
+
+    with pytest.raises(GrindSourceGateError):
+        assert_strict_vapor_result_store(
+            db_path,
+            _decode_result_payload,
+            strict_vapor_gate=True,
+        )
+    if corrupt_row == "deep-key":
+        assert decoded_contexts == ["key", "payload"]
+        assert policy_walk_started == [True]
+
+
+def test_strict_vapor_pt1_preflight_uses_table_layout_when_row_stamp_is_damaged(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "strict-pt1-current-layout-damaged-stamp.sqlite"
+    _write_pt1_store(db_path, source="builtin-vapor-pressure")
+    index_columns = {
+        "physics_bucket_schema_version": "TEXT",
+        "physics_bucket_sha256": "TEXT",
+        "replay_scope_sha256": "TEXT",
+        "physics_key_bytes": "BLOB",
+        **{
+            column: sql_type
+            for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+            for column, sql_type in (
+                (rrd._physics_ladder_hash_column(rung_tag), "TEXT"),
+                (rrd._physics_ladder_distance_column(rung_tag), "REAL"),
+            )
+        },
+    }
+    metadata_columns = {
+        "store_schema_version": "TEXT",
+        "request_schema_version": "TEXT",
+        "key_sha256": "TEXT",
+        "payload_sha256": "TEXT",
+        "payload_codec_version": "INTEGER",
+        "code_version": "TEXT",
+        "corpus_version": "TEXT",
+        "engine_version": "TEXT",
+        "data_digests_json": "TEXT",
+        "repair_notices_json": "TEXT",
+        "created_at": "TEXT",
+        "git_dirty": "INTEGER",
+        "law_disclosures_json": "TEXT",
+    }
+    with sqlite3.connect(db_path) as conn:
+        for column, sql_type in {**metadata_columns, **index_columns}.items():
+            conn.execute(
+                f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+                f"ADD COLUMN {column} {sql_type}"
+            )
+        (key_bytes,) = conn.execute(
+            f"SELECT key_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        key_hash = hashlib.sha256(key_bytes).hexdigest()
         conn.execute(
-            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} SET key_bytes = ?",
-            (sqlite3.Binary(key_bytes),),
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, artifact = ?, store_schema_version = ?, "
+            "key_sha256 = ?, payload_sha256 = ?, payload_codec_version = NULL",
+            (
+                key_hash,
+                "equilibrium_post_record",
+                "pt1",
+                key_hash,
+                "damaged-payload-checksum",
+            ),
         )
 
-    with pytest.raises(GrindSourceGateError, match="invalid JSON"):
+    with pytest.raises(GrindSourceGateError, match="stored row is corrupt"):
         assert_strict_vapor_result_store(
             db_path,
             _decode_result_payload,

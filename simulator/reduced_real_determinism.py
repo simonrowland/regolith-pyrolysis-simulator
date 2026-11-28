@@ -2813,10 +2813,6 @@ def _validate_pt1_key_indexes(
                 "PT-1 row invalid stored equilibrium replay key dependency "
                 f"fields: {row_hash}"
             )
-    if require_indexable:
-        indexability_error = _ladder_indexability(row_key)
-        if indexability_error is not None:
-            raise indexability_error
     if derived_indexes is None:
         derived_indexes = _derive_pt1_key_indexes(row_key)
     elif (
@@ -2826,6 +2822,13 @@ def _validate_pt1_key_indexes(
         raise PT1PersistentStoreCorrupt(
             f"PT-1 precomputed indexes do not match stored key: {row_hash}"
         )
+    if require_indexable:
+        indexability_error = _ladder_indexability(
+            row_key if key is None else key,
+            ladder_values=derived_indexes.ladder_values,
+        )
+        if indexability_error is not None:
+            raise indexability_error
 
     bucket_key = derived_indexes.bucket_key
     bucket_bytes = derived_indexes.bucket_bytes
@@ -2894,13 +2897,23 @@ def _validate_pt1_key_indexes(
             continue
         hash_column = _physics_ladder_hash_column(stored_rung_tag)
         distance_column = _physics_ladder_distance_column(stored_rung_tag)
+        if hash_column not in row and distance_column not in row:
+            continue
         stored_rung_hash = row.get(hash_column)
         stored_distance = row.get(distance_column)
-        if stored_bucket_schema is not None and stored_rung_hash is None:
+        if (
+            stored_bucket_schema is not None
+            and hash_column in row
+            and stored_rung_hash is None
+        ):
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {stored_rung_tag} physics bucket hash is missing: {row_hash}"
             )
-        if stored_bucket_schema is not None and stored_distance is None:
+        if (
+            stored_bucket_schema is not None
+            and distance_column in row
+            and stored_distance is None
+        ):
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {stored_rung_tag} distance is missing: {row_hash}"
             )
@@ -3687,9 +3700,6 @@ class PT1PersistentEquilibriumStore:
                 "write_candidate_key",
             )
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
-        indexability_error = _ladder_indexability(key)
-        if indexability_error is not None:
-            raise indexability_error
         try:
             key_bytes = _pt1_row_bytes(
                 key_bytes,
@@ -3855,33 +3865,6 @@ class PT1PersistentEquilibriumStore:
                             incoming_disclosures,
                         )
                     )
-                    candidate_row = dict(existing_fields)
-                    candidate_row["repair_notices_json"] = effective_notices_json
-                    if stale_payload:
-                        candidate_row["payload_sha256"] = payload_hash
-                        candidate_row["payload_bytes"] = payload_bytes
-                        candidate_row["payload_codec_version"] = payload_codec_version
-                    rebuild_indexes = (
-                        existing_fields.get("physics_bucket_sha256") is None
-                        or any(
-                            existing_fields.get(_physics_ladder_hash_column(rung_tag))
-                            is None
-                            for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
-                        )
-                    )
-                    candidate_row["law_disclosures_json"] = _law_disclosures_json(
-                        write_disclosures
-                    )
-                    candidate_row.update(
-                        {
-                            "_write_key": key,
-                            "_write_physics_bucket_key": physics_bucket_key,
-                            "_write_physics_bucket_bytes": physics_bucket_bytes,
-                            "_write_physics_bucket_hash": physics_bucket_hash,
-                            "_write_rebuild_indexes": rebuild_indexes,
-                        }
-                    )
-                    candidate_row = _gate_row_for_write(candidate_row)
                     if stale_payload:
                         conn.execute(
                             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
@@ -3969,15 +3952,6 @@ class PT1PersistentEquilibriumStore:
             candidate_row["law_disclosures_json"] = _law_disclosures_json(
                 write_disclosures
             )
-            candidate_row.update(
-                {
-                    "_write_key": key,
-                    "_write_physics_bucket_key": physics_bucket_key,
-                    "_write_physics_bucket_bytes": physics_bucket_bytes,
-                    "_write_physics_bucket_hash": physics_bucket_hash,
-                }
-            )
-            candidate_row = _gate_row_for_write(candidate_row)
             insert_values = tuple(candidate_row[column] for column in insert_columns)
             columns_sql = ", ".join(insert_columns)
             values_sql = ", ".join("?" for _ in insert_columns)
@@ -6045,7 +6019,18 @@ def canonical_physics_ladder_bucket_key_from_replay_key(
     rung_tag: str,
 ) -> dict[str, Any]:
     sig_figs = _physics_ladder_sig_figs(rung_tag)
-    bucket = canonical_physics_bucket_key_from_replay_key(key)
+    return _canonical_physics_ladder_bucket_key(
+        canonical_physics_bucket_key_from_replay_key(key),
+        rung_tag,
+        sig_figs,
+    )
+
+
+def _canonical_physics_ladder_bucket_key(
+    bucket: Mapping[str, Any],
+    rung_tag: str,
+    sig_figs: float,
+) -> dict[str, Any]:
     physics_bucket = copy.deepcopy(dict(bucket["physics_bucket"]))
     controls = dict(physics_bucket.get("controls", {}) or {})
     controls["T_K"] = _sigfig_snap(controls.get("T_K"), sig_figs)
@@ -6092,6 +6077,23 @@ def physics_ladder_bucket_distance_from_replay_key(
         )
     }
     rung_key = canonical_physics_ladder_bucket_key_from_replay_key(key, rung_tag)
+    return _physics_ladder_bucket_distance_from_rung_key(
+        key,
+        rung_tag,
+        rung_key,
+        sig_figs=sig_figs,
+        exact_composition=exact_composition,
+    )
+
+
+def _physics_ladder_bucket_distance_from_rung_key(
+    key: Mapping[str, Any],
+    rung_tag: str,
+    rung_key: Mapping[str, Any],
+    *,
+    sig_figs: float,
+    exact_composition: Mapping[str, float],
+) -> float:
     rung_bucket = rung_key.get("physics_bucket", {})
     if not isinstance(rung_bucket, Mapping):
         rung_bucket = {}
@@ -7586,18 +7588,32 @@ def _replay_scope_hash(physics_bucket_key: Mapping[str, Any]) -> str:
 
 def _physics_ladder_values_from_replay_key(
     key: Mapping[str, Any],
+    *,
+    bucket_key: Mapping[str, Any] | None = None,
 ) -> dict[str, dict[str, float | str]]:
+    if bucket_key is None:
+        bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    exact_composition = {
+        species: float(fraction)
+        for species, fraction in _composition_items(
+            key.get("composition_mol_fraction", [])
+        )
+    }
     values: dict[str, dict[str, float | str]] = {}
-    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
-        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-            key,
+    for rung_tag, sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        rung_key = _canonical_physics_ladder_bucket_key(
+            bucket_key,
             rung_tag,
+            sig_figs,
         )
         values[rung_tag] = {
             "sha256": _sha256(canonical_json_bytes(rung_key)),
-            "distance": physics_ladder_bucket_distance_from_replay_key(
+            "distance": _physics_ladder_bucket_distance_from_rung_key(
                 key,
                 rung_tag,
+                rung_key,
+                sig_figs=sig_figs,
+                exact_composition=exact_composition,
             ),
         }
     return values
@@ -7615,7 +7631,10 @@ def _derive_pt1_key_indexes(key: Mapping[str, Any]) -> _PT1DerivedKeyIndexes:
         bucket_bytes=bucket_bytes,
         bucket_hash=bucket_hash,
         replay_scope_sha256=_replay_scope_hash(bucket_key),
-        ladder_values=_physics_ladder_values_from_replay_key(key),
+        ladder_values=_physics_ladder_values_from_replay_key(
+            key,
+            bucket_key=bucket_key,
+        ),
     )
 
 
@@ -7695,6 +7714,7 @@ def _ladder_indexability(
     key: Mapping[str, Any],
     *,
     rung_tag: str | None = None,
+    ladder_values: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> UncacheableKey | None:
     composition, composition_error = _replay_key_composition_shape(key)
     first_rung = rung_tag or PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0]
@@ -7733,11 +7753,12 @@ def _ladder_indexability(
             if _sigfig_snap(controls[name], sig_figs) is None:
                 return UncacheableKey(current_rung, f"controls.{name}")
         try:
-            distance = physics_ladder_bucket_distance_from_replay_key(
-                key,
-                current_rung,
+            distance = (
+                physics_ladder_bucket_distance_from_replay_key(key, current_rung)
+                if ladder_values is None
+                else float(ladder_values[current_rung]["distance"])
             )
-        except (OverflowError, TypeError, ValueError, ZeroDivisionError):
+        except (KeyError, OverflowError, TypeError, ValueError, ZeroDivisionError):
             return UncacheableKey(current_rung, "distance")
         if not math.isfinite(distance):
             return UncacheableKey(current_rung, "distance")

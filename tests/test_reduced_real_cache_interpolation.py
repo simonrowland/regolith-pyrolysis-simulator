@@ -1267,7 +1267,12 @@ def test_pt1_write_gate_derives_key_indexes_once(
     )
     original_derive = rrd._derive_pt1_key_indexes
     derivations = 0
-    gate_derivation_counts: list[int] = []
+    gate_calls = 0
+    bucket_calls = 0
+    rung_bucket_calls = 0
+    rung_distance_calls = 0
+    indexability_calls = 0
+    public_distance_calls = 0
 
     def record_derivation(candidate_key):
         nonlocal derivations
@@ -1275,15 +1280,67 @@ def test_pt1_write_gate_derives_key_indexes_once(
         return original_derive(candidate_key)
 
     original_gate = rrd._gate_row_for_write
+    original_bucket = rrd.canonical_physics_bucket_key_from_replay_key
+    original_rung_bucket = rrd._canonical_physics_ladder_bucket_key
+    original_rung_distance = rrd._physics_ladder_bucket_distance_from_rung_key
+    original_public_distance = rrd.physics_ladder_bucket_distance_from_replay_key
+    original_indexability = rrd._ladder_indexability
 
     def record_gate(candidate_row):
-        before = derivations
+        nonlocal gate_calls
+        gate_calls += 1
         result = original_gate(candidate_row)
-        gate_derivation_counts.append(derivations - before)
         return result
+
+    def record_bucket(candidate_key):
+        nonlocal bucket_calls
+        bucket_calls += 1
+        return original_bucket(candidate_key)
+
+    def record_rung_bucket(bucket_key, rung_tag, sig_figs):
+        nonlocal rung_bucket_calls
+        rung_bucket_calls += 1
+        return original_rung_bucket(bucket_key, rung_tag, sig_figs)
+
+    def record_rung_distance(candidate_key, rung_tag, rung_key, **kwargs):
+        nonlocal rung_distance_calls
+        rung_distance_calls += 1
+        return original_rung_distance(candidate_key, rung_tag, rung_key, **kwargs)
+
+    def record_public_distance(candidate_key, rung_tag):
+        nonlocal public_distance_calls
+        public_distance_calls += 1
+        return original_public_distance(candidate_key, rung_tag)
+
+    def record_indexability(candidate_key, **kwargs):
+        nonlocal indexability_calls
+        indexability_calls += 1
+        assert kwargs.get("ladder_values") is not None
+        return original_indexability(candidate_key, **kwargs)
 
     monkeypatch.setattr(rrd, "_derive_pt1_key_indexes", record_derivation)
     monkeypatch.setattr(rrd, "_gate_row_for_write", record_gate)
+    monkeypatch.setattr(
+        rrd,
+        "canonical_physics_bucket_key_from_replay_key",
+        record_bucket,
+    )
+    monkeypatch.setattr(
+        rrd,
+        "_canonical_physics_ladder_bucket_key",
+        record_rung_bucket,
+    )
+    monkeypatch.setattr(
+        rrd,
+        "_physics_ladder_bucket_distance_from_rung_key",
+        record_rung_distance,
+    )
+    monkeypatch.setattr(
+        rrd,
+        "physics_ladder_bucket_distance_from_replay_key",
+        record_public_distance,
+    )
+    monkeypatch.setattr(rrd, "_ladder_indexability", record_indexability)
     _put_interpolation_row(
         tmp_path / "single-index-derivation.sqlite",
         key,
@@ -1291,8 +1348,13 @@ def test_pt1_write_gate_derives_key_indexes_once(
         sio_pa=7.0,
     )
 
-    assert gate_derivation_counts
-    assert set(gate_derivation_counts) == {1}
+    assert gate_calls == 1
+    assert derivations == 1
+    assert bucket_calls == 1
+    assert rung_bucket_calls == len(rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS)
+    assert rung_distance_calls == len(rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS)
+    assert public_distance_calls == 0
+    assert indexability_calls == 1
 
 
 @pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))

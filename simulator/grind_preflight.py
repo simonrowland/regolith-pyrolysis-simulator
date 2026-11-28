@@ -534,8 +534,10 @@ def _strict_vapor_pt1_store_summary(
     strict_vapor_gate: bool,
 ) -> dict[str, int]:
     from simulator.reduced_real_determinism import (
+        PHYSICS_BUCKET_ALL_LADDER_RUNGS,
         PT1PersistentStoreCorrupt,
-        PT1_STORE_SCHEMA_VERSION,
+        _physics_ladder_distance_column,
+        _physics_ladder_hash_column,
         _admit_stored_row,
     )
 
@@ -553,47 +555,79 @@ def _strict_vapor_pt1_store_summary(
             "pt1_noop_rows": len(rows),
         }
 
+    table_columns = {
+        str(column["name"])
+        for column in conn.execute(
+            f"PRAGMA table_info({_PT1_EQUILIBRIUM_TABLE})"
+        ).fetchall()
+    }
+    current_layout = {
+        "key_hash",
+        "artifact",
+        "store_schema_version",
+        "key_sha256",
+        "payload_sha256",
+        "payload_codec_version",
+        "key_bytes",
+        "payload_bytes",
+        "physics_bucket_schema_version",
+        "physics_bucket_sha256",
+        "replay_scope_sha256",
+        "physics_key_bytes",
+        *(
+            column
+            for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+            for column in (
+                _physics_ladder_hash_column(rung_tag),
+                _physics_ladder_distance_column(rung_tag),
+            )
+        ),
+    }.issubset(table_columns)
+
     vapor_active_rows = 0
     source_reports = 0
     for stored_row in rows:
         row = dict(stored_row)
         row_context = f"{context}:{row.get('key_hash', '<missing>')}"
-        if row.get("store_schema_version") == PT1_STORE_SCHEMA_VERSION:
-            try:
-                admitted = _admit_stored_row(
-                    row,
-                    store_kind="pt1",
-                    strict_source_validation=True,
+        try:
+            if current_layout:
+                try:
+                    admitted = _admit_stored_row(
+                        row,
+                        store_kind="pt1",
+                        strict_source_validation=True,
+                        approved_sources=approved_sources,
+                    )
+                except PT1PersistentStoreCorrupt as exc:
+                    raise GrindSourceGateError(
+                        f"{row_context}: PT-1 stored row is corrupt"
+                    ) from exc
+                row_summary = (
+                    None if admitted is None else admitted.strict_vapor_summary
+                )
+            else:
+                key = _json_mapping(row.get("key_bytes"), f"{row_context}.key")
+                payload = _json_mapping(
+                    row.get("payload_bytes"), f"{row_context}.payload"
+                )
+                row_summary = assert_strict_vapor_pt1_row(
+                    artifact=str(row.get("artifact", "")),
+                    key=key,
+                    payload=payload,
+                    key_hash=str(row["key_hash"]),
+                    context=row_context,
                     approved_sources=approved_sources,
                 )
-            except PT1PersistentStoreCorrupt as exc:
-                raise GrindSourceGateError(
-                    f"{row_context}: PT-1 stored row is corrupt"
-                ) from exc
-            row_summary = (
-                None if admitted is None else admitted.strict_vapor_summary
-            )
             if row_summary is not None:
                 source_reports += int(row_summary["source_reports"])
                 if row_summary["vapor_active"]:
                     vapor_active_rows += 1
-            continue
-
-        key = _json_mapping(row.get("key_bytes"), f"{row_context}.key")
-        payload = _json_mapping(
-            row.get("payload_bytes"), f"{row_context}.payload"
-        )
-        row_summary = assert_strict_vapor_pt1_row(
-            artifact=str(row.get("artifact", "")),
-            key=key,
-            payload=payload,
-            key_hash=str(row["key_hash"]),
-            context=row_context,
-            approved_sources=approved_sources,
-        )
-        source_reports += int(row_summary["source_reports"])
-        if row_summary["vapor_active"]:
-            vapor_active_rows += 1
+        except GrindSourceGateError:
+            raise
+        except Exception as exc:
+            raise GrindSourceGateError(
+                f"{row_context}: PT-1 stored row is invalid"
+            ) from exc
     return {
         "rows": len(rows),
         "vapor_active_rows": vapor_active_rows,

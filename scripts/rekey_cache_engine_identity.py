@@ -25,9 +25,11 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_STORE_SCHEMA_VERSION,
     PT1PersistentStoreCorrupt,
     _admit_stored_row,
+    _derive_pt1_key_indexes,
     _gate_row_for_write,
     _physics_ladder_distance_column,
     _physics_ladder_hash_column,
+    _pt1_physics_index_columns,
     _payload_codec_stamp_matches,
     _payload_codec_version,
     _sha256,
@@ -49,6 +51,12 @@ class RekeyResult:
     def __iter__(self):
         yield self.rows_before
         yield self.rows_updated
+
+
+def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
+    """Keep the rekey index hook while delegating its fields to the owner."""
+
+    return _pt1_physics_index_columns(_derive_pt1_key_indexes(key))
 
 
 def _json_loads(raw: bytes) -> dict[str, Any]:
@@ -274,29 +282,39 @@ def rekey_cache(
                 )
             )
             rebuild_indexes = not legacy_layout
+            physics_columns_present = {
+                "physics_bucket_schema_version",
+                "physics_bucket_sha256",
+                "replay_scope_sha256",
+                "physics_key_bytes",
+                *(
+                    column
+                    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                    for column in (
+                        _physics_ladder_hash_column(rung_tag),
+                        _physics_ladder_distance_column(rung_tag),
+                    )
+                ),
+            } & table_columns
+            physics_columns = (
+                _physics_columns(key) if physics_columns_present else {}
+            )
             if legacy_layout:
                 candidate_row = dict(row)
                 candidate_row["corpus_version"] = target
                 candidate_row["engine_version"] = provenance
-                physics_columns_present = {
-                    "physics_bucket_schema_version",
-                    "physics_bucket_sha256",
-                    "replay_scope_sha256",
-                    "physics_key_bytes",
-                    *(
-                        column
-                        for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
-                        for column in (
-                            _physics_ladder_hash_column(rung_tag),
-                            _physics_ladder_distance_column(rung_tag),
-                        )
-                    ),
-                } & table_columns
                 rebuild_indexes = bool(physics_columns_present)
             else:
                 candidate_row = dict(row)
                 candidate_row["corpus_version"] = target
                 candidate_row["engine_version"] = provenance
+            candidate_row.update(
+                {
+                    column: value
+                    for column, value in physics_columns.items()
+                    if column in table_columns
+                }
+            )
             candidate_row.update(
                 {
                     "_write_key": key,
