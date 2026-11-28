@@ -6969,7 +6969,14 @@ def test_suffix_first_oxide_alias_order_matches_score_and_antoine_consumers():
         composition,
         pO2_bar=1e-9,
     )
+    later_alias_pressures = backend._activities_times_antoine(
+        1600.0,
+        {'SiO2': 0.4},
+        composition,
+        pO2_bar=1e-9,
+    )
     assert pressures['Si'] == pytest.approx(first_alias_pressures['Si'])
+    assert pressures['Si'] != pytest.approx(later_alias_pressures['Si'])
 
 
 def test_subprocess_stdout_parser_reports_activity_labels_and_exact_oxide_diagnostic():
