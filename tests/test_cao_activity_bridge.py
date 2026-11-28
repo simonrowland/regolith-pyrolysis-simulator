@@ -544,6 +544,12 @@ def test_thermoengine_casio3_liquid_fusion_residual_is_a_dex_systematic() -> Non
         residual_dex = casio3_fusion_model_systematic_dex(
             melts_delta_g_J_mol, temperature_K,
         )
+        assert result.diagnostics[MELTS_CASIO3_LIQUID_G0_FIELD] == pytest.approx(
+            g0_liquid_J_mol
+        )
+        assert result.diagnostics[MELTS_PWO_G0_FIELD] == pytest.approx(
+            pWo.G_J_mol
+        )
         source_tolerance_kJ_mol = (
             abs(1.0 - temperature_K / 1817.0) * 2.9 + 0.001
         )
@@ -551,15 +557,6 @@ def test_thermoengine_casio3_liquid_fusion_residual_is_a_dex_systematic() -> Non
             -0.233, abs=source_tolerance_kJ_mol,
         ), '±2.9 kJ/mol ΔH_fus uncertainty propagated to 1933 K, plus Cp token rounding'
         assert math.isfinite(residual_dex)
-        caveat = next(
-            notice
-            for notice in result.diagnostics['imcc_notices']
-            if 'CaSiO3(l)-pWo fusion residual' in notice['reason']
-        )
-        assert caveat['kind'] == 'engine_model_caveat'
-        assert caveat['band'] == (
-            f'{residual_dex:+.8g} dex at {temperature_K:g} K'
-        )
     finally:
         backend.close()
 
@@ -619,6 +616,7 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
         root=Path(migrated_root),
     )
     raw_cell_mu_by_pot: dict[str, float] = {}
+    fusion_g0_by_pot: dict[str, tuple[float | None, float | None]] = {}
     equilibrate_cell = binary_pot_battery.equilibrate_cell
 
     def capture_raw_cell_mu(handle, pot, **kwargs):
@@ -627,6 +625,10 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
             raw_cell_mu_by_pot[pot.pot_id] = (
                 cell.mu_CaO_J_per_mol_melts_berman_apparent
             )
+        fusion_g0_by_pot[pot.pot_id] = (
+            getattr(cell, MELTS_CASIO3_LIQUID_G0_FIELD),
+            getattr(cell, MELTS_PWO_G0_FIELD),
+        )
         return cell
 
     monkeypatch.setattr(
@@ -680,7 +682,15 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
         if 'CaSiO3(l)-pWo fusion residual' in notice.reason
     )
     assert fusion_flag.affected_quantities == (Quantity.ACTIVITY,)
-    assert fusion_flag.band is not None and 'dex at 1933 K' in fusion_flag.band
+    g0_liquid, g0_pwo = fusion_g0_by_pot[f'obs:{residual.reference}']
+    assert g0_liquid is not None and g0_pwo is not None
+    expected_fusion_band = casio3_fusion_model_systematic_dex(
+        g0_liquid - g0_pwo,
+        1933.0,
+    )
+    assert fusion_flag.band == (
+        f'{expected_fusion_band:+.8g} dex at 1933 K'
+    )
 
 
 @pytest.mark.skipif(

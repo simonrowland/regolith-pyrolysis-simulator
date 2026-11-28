@@ -54,6 +54,9 @@ MELTS_CAO_EXCHANGE_UNAVAILABLE = (
 MELTS_CASIO3_FUSION_BAND_UNAVAILABLE = (
     'typed-refusal:melts_casio3_fusion_band_unavailable'
 )
+MELTS_LIQUID_ACTIVITY_UNAVAILABLE = (
+    'typed-refusal:alphamelts_liquid_activity_unavailable'
+)
 MELTS_CASIO3_LIQUID_G0_FIELD = (
     'g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent'
 )

@@ -54,6 +54,7 @@ from engines.alphamelts.domain import (
     MELTS_CASIO3_LIQUID_G0_FIELD,
     MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS,
     MELTS_CAO_EXCHANGE_MU_FIELD,
+    MELTS_LIQUID_ACTIVITY_UNAVAILABLE,
     MELTS_PWO_G0_FIELD,
     _canonical_oxide_activity_map_with_notices,
     canonical_melt_oxide_activity_name,
@@ -5775,11 +5776,46 @@ class _MELTSBackendSupport(MeltBackend):
                     'diagnostic_activity_source': 'chemical_potential_mu_minus_mu0'
                 }
         if not activity_coefficients:
-            result_warnings.append(
-                'PetThermoTools activity mapping empty (no direct table, '
-                'gamma*x, phase field, or mu/mu0 path); '
-                'activity-scaled Antoine fallback skipped'
+            liquid_key = self._select_liquid_phase_key(run_result)
+            liquid_prop = (
+                {}
+                if liquid_key is None
+                else self._first_row_mapping(
+                    run_result.get(f'{liquid_key}_prop', {})
+                )
             )
+            has_liquid_potentials = any(
+                str(name).startswith(('mu_', 'mu0_'))
+                for name in liquid_prop
+            )
+            has_non_liquid_potentials = any(
+                str(name).endswith('_prop')
+                and str(name) != (f'{liquid_key}_prop' if liquid_key else None)
+                and any(
+                    str(field).startswith(('mu_', 'mu0_'))
+                    for field in self._first_row_mapping(value)
+                )
+                for name, value in run_result.items()
+            )
+            if has_non_liquid_potentials and not has_liquid_potentials:
+                # PetThermoTools 0.4.5 builds each phase's *_prop table and
+                # reads its endmember mu/mu0 from that same phase
+                # (petthermotools/MELTS.py:111-133). A solid-only potential
+                # cannot be treated as a liquid activity.
+                activity_diagnostics[
+                    'activity_mapping_unavailable_reason'
+                ] = MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+                result_warnings.append(
+                    f'{MELTS_LIQUID_ACTIVITY_UNAVAILABLE}: PetThermoTools '
+                    'chemical potentials are available only for non-liquid '
+                    'phase tables; activity-scaled Antoine fallback skipped'
+                )
+            else:
+                result_warnings.append(
+                    'PetThermoTools activity mapping empty (no direct table, '
+                    'gamma*x, phase field, or mu/mu0 path); '
+                    'activity-scaled Antoine fallback skipped'
+                )
         cao_fusion_values: dict[str, float] = {}
         cao_exchange_mu = self._cao_exchange_mu_from_chemical_potentials(
             run_result,
@@ -6285,6 +6321,25 @@ class _MELTSBackendSupport(MeltBackend):
         temperature_C: float,
     ) -> dict:
         mu, mu0 = self._selected_liquid_potential_mappings(results)
+        # Preserve the explicitly named legacy maps for non-Ca activity
+        # extraction. The CaO exchange path below has its own stricter
+        # selected-liquid-only reader and never uses these maps.
+        for name, value in self._first_row_mapping(
+            results.get('chemical_potentials', {})
+        ).items():
+            species = str(name)
+            if 'CaO' not in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.get(
+                species, ()
+            ) and self._is_number(value):
+                mu.setdefault(species, float(value))
+        for name, value in self._first_row_mapping(
+            results.get('pure_chemical_potentials', {})
+        ).items():
+            species = str(name)
+            if 'CaO' not in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.get(
+                species, ()
+            ) and self._is_number(value):
+                mu0.setdefault(species, float(value))
         if not mu or not mu0:
             return {}
         liquid_key = self._select_liquid_phase_key(results)

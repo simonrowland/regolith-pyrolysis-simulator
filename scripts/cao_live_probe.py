@@ -27,10 +27,10 @@ def main() -> None:
     temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
     backend = AlphaMELTSBackend()
     try:
-        if not backend.initialize({'mode': 'python_api'}):
+        if not backend.initialize({}):
             print(json.dumps({
                 'engine': 'alphamelts',
-                'transport': 'python_api',
+                'transport': backend._mode,
                 'status': 'unavailable',
                 'initialization_reason': backend.unavailable_reason(),
                 'liquid_mu_CaSiO3_J_per_mol': None,
@@ -43,18 +43,19 @@ def main() -> None:
             return
 
         native_liquid_potentials: dict[str, float | None] = {}
-        parse_result = backend._parse_petthermotools_result
+        if backend._mode == 'python_api':
+            parse_result = backend._parse_petthermotools_result
 
-        def capture_liquid_potentials(results, **kwargs):
-            selected = backend._select_petthermotools_run(results)
-            mu, mu0 = backend._selected_liquid_potential_mappings(selected)
-            native_liquid_potentials.update({
-                'mu_CaSiO3': mu.get('CaSiO3'),
-                'mu0_CaSiO3': mu0.get('CaSiO3'),
-            })
-            return parse_result(results, **kwargs)
+            def capture_liquid_potentials(results, **kwargs):
+                selected = backend._select_petthermotools_run(results)
+                mu, mu0 = backend._selected_liquid_potential_mappings(selected)
+                native_liquid_potentials.update({
+                    'mu_CaSiO3': mu.get('CaSiO3'),
+                    'mu0_CaSiO3': mu0.get('CaSiO3'),
+                })
+                return parse_result(results, **kwargs)
 
-        backend._parse_petthermotools_result = capture_liquid_potentials
+            backend._parse_petthermotools_result = capture_liquid_potentials
         result = backend.equilibrate(
             temperature_C=temperature_C,
             composition_kg={'CaO': 48.0, 'SiO2': 52.0},
@@ -64,16 +65,16 @@ def main() -> None:
         )
         diagnostics = result.diagnostics
         liquid_mu = native_liquid_potentials.get('mu_CaSiO3')
-        liquid_mu0 = diagnostics.get(MELTS_CASIO3_LIQUID_G0_FIELD)
+        liquid_g0 = diagnostics.get(MELTS_CASIO3_LIQUID_G0_FIELD)
         g0_pwo = diagnostics.get(MELTS_PWO_G0_FIELD)
         fusion_band = None
         fusion_refusal = None
-        if liquid_mu0 is None or g0_pwo is None:
+        if liquid_g0 is None or g0_pwo is None:
             fusion_refusal = MELTS_CASIO3_FUSION_BAND_UNAVAILABLE
         else:
             try:
                 fusion_band = casio3_fusion_model_systematic_dex(
-                    float(liquid_mu0) - float(g0_pwo),
+                    float(liquid_g0) - float(g0_pwo),
                     temperature_K,
                 )
             except (OverflowError, TypeError, ValueError) as exc:
@@ -109,6 +110,8 @@ def main() -> None:
             'liquid_mu0_CaSiO3_J_per_mol': native_liquid_potentials.get(
                 'mu0_CaSiO3'
             ),
+            'liquid_g0_CaSiO3_J_per_mol': liquid_g0,
+            'pWo_g0_J_per_mol': g0_pwo,
             'fusion_band_dex': fusion_band,
             'fusion_band_refusal': fusion_refusal,
             'a_CaO': cao_activity,
