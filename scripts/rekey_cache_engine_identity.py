@@ -23,6 +23,7 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     _PT1RowLayout,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentStoreCorrupt,
+    UncacheableKey,
     _admit_stored_row,
     _derive_pt1_key_indexes,
     _gate_row_for_write,
@@ -121,18 +122,6 @@ def _key_from_stored_row(
             store_stamp,
             key_hash=str(row["key_hash"]),
         )
-        legacy_required_columns = {
-            "key_hash",
-            "key_sha256",
-            "key_bytes",
-            "engine_version",
-        }
-        missing_columns = legacy_required_columns - row_columns
-        if missing_columns:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 legacy cache row is missing rekey columns: "
-                f"{','.join(sorted(missing_columns))}"
-            )
         try:
             key_bytes = row["key_bytes"]
             if not isinstance(key_bytes, (bytes, bytearray, memoryview)):
@@ -361,7 +350,13 @@ def rekey_cache(
                     "_write_derived_indexes": derived_indexes,
                 }
             )
-            candidate_row = _gate_row_for_write(candidate_row)
+            try:
+                candidate_row = _gate_row_for_write(candidate_row)
+            except UncacheableKey as exc:
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 stored request key is not indexable during rekey: "
+                    f"{old_key_hash}"
+                ) from exc
             update_columns = tuple(
                 column for column in table_columns if column in candidate_row
             )

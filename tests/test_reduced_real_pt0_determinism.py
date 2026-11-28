@@ -12429,3 +12429,45 @@ def test_pt1_row_layout_classifies_each_green_supported_shape(
 
     for name, (columns, expected) in layout_cases.items():
         assert rrd._pt1_row_layout(columns) is expected, name
+        if expected is not rrd._PT1RowLayout.UNSUPPORTED:
+            assert rrd._pt1_row_layout(
+                frozenset(columns) | {"nullable_unrelated_metadata"}
+            ) is expected, f"{name} with an unrelated nullable column"
+
+
+def test_pt1_attached_partial_layout_rejects_legacy_stamp_as_corrupt(
+    tmp_path: Path,
+) -> None:
+    base_db = tmp_path / "attached-partial-stamp.sqlite"
+    local_db = tmp_path / "local-partial-stamp.sqlite"
+    _capture, _capture_sim, _capture_fO2, _curve = _capture_pt0_gate_curve(
+        base_db,
+        solidus_T_C=1100.0,
+    )
+    with sqlite3.connect(base_db) as conn:
+        (key_bytes,) = conn.execute(
+            f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN payload_codec_version"
+        )
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN law_disclosures_json"
+        )
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = 'pt1'"
+        )
+
+    replay = PT0DeterminismStore(
+        "replay",
+        db_path=local_db,
+        read_only_base_db_path=base_db,
+    )
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="legacy stamp is invalid for this physical layout",
+    ):
+        replay._lookup("freeze_gate_curve", json.loads(bytes(key_bytes)))

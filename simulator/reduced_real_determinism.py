@@ -2980,18 +2980,19 @@ class _PT1RowLayout(str, Enum):
 def _pt1_row_layout(columns: Iterable[str]) -> _PT1RowLayout:
     """Classify PT-1 table and admission-row shapes handled by green.
 
-    Green creates or consumes these reduced-real shapes (extra source columns
-    are ignored where noted below):
+    Green creates or consumes these reduced-real shapes. Each signature is a
+    required-column set; additional source columns are ignored. More specific
+    signatures are checked before their subsets.
 
     | Layout | Column signature | Green handling |
     | --- | --- | --- |
     | CURRENT | `{key_hash, artifact, store_schema_version, request_schema_version, key_sha256, payload_sha256, payload_codec_version, key_bytes, payload_bytes, code_version, corpus_version, engine_version, data_digests_json, repair_notices_json, created_at, git_dirty}` plus all bucket/ladder fields | current stamped read/write |
     | V2 | CURRENT without `repair_notices_json` | attached read and seed/merge with the v2 stamp |
-    | PARTIAL_BUCKET | legacy cache or rekey signature plus one or more bucket/ladder fields | legacy read/rekey or incremental index migration |
+    | PARTIAL_BUCKET | legacy cache or rekey required signature plus one or more bucket/ladder fields | legacy read/rekey or incremental index migration |
     | LEGACY cache | `{key_hash, artifact, store_schema_version, request_schema_version, key_sha256, payload_sha256, key_bytes, payload_bytes, code_version, engine_version, data_digests_json, created_at, git_dirty}` | legacy read/copy |
     | LEGACY rekey | `{key_hash, key_sha256, key_bytes, engine_version}` plus optional `corpus_version` | legacy rekey |
-    | PREFLIGHT | exactly `{key_hash, artifact, key_bytes, payload_bytes}` | strict-vapour preflight decodes and walks the two JSON values |
-    | MINIMAL_ADMISSION | exactly `{artifact, key_hash, key_sha256, key_bytes, payload_sha256, payload_bytes, payload_codec_version}` | `_pt1_row_admission` validates the mapping without engine or index columns |
+    | MINIMAL_ADMISSION | requires `{artifact, key_hash, key_sha256, key_bytes, payload_sha256, payload_bytes, payload_codec_version}` | `_pt1_row_admission` validates the mapping without engine or index columns |
+    | PREFLIGHT | requires `{key_hash, artifact, key_bytes, payload_bytes}` | strict-vapour preflight decodes and walks the two JSON values |
 
     Bucket/ladder fields are `physics_bucket_schema_version`,
     `physics_bucket_sha256`, `replay_scope_sha256`, `physics_key_bytes`, and
@@ -3004,7 +3005,8 @@ def _pt1_row_layout(columns: Iterable[str]) -> _PT1RowLayout:
     `test_extrapolated_gate_admission_uses_query_identity_at_each_reader`;
     stored rows passed directly to `_entry_from_row` are full current rows.
     Seed's `source_only_metadata` column is ignored by green for the cache
-    schema signatures. PREFLIGHT and MINIMAL_ADMISSION are exact sets.
+    schema signatures. MINIMAL_ADMISSION is checked before the smaller rekey
+    signature; PREFLIGHT is checked before the same-sized rekey signature.
     Converter-only one-column `reduced_real_equilibrium_payloads(value)`
     tables are not replay layouts.
     """
@@ -3074,24 +3076,10 @@ def _pt1_row_layout(columns: Iterable[str]) -> _PT1RowLayout:
             "engine_version",
         }
     )
-    has_legacy_identity = (
-        legacy_cache_columns.issubset(column_names)
-        or rekey_columns.issubset(column_names)
+    preflight_columns = frozenset(
+        {"key_hash", "artifact", "key_bytes", "payload_bytes"}
     )
-    if bucket_columns.intersection(column_names) and has_legacy_identity:
-        return _PT1RowLayout.PARTIAL_BUCKET
-    if has_legacy_identity:
-        return _PT1RowLayout.LEGACY
-    if column_names == frozenset(
-        {
-            "key_hash",
-            "artifact",
-            "key_bytes",
-            "payload_bytes",
-        }
-    ):
-        return _PT1RowLayout.PREFLIGHT
-    if column_names == frozenset(
+    minimal_admission_columns = frozenset(
         {
             "artifact",
             "key_hash",
@@ -3101,8 +3089,21 @@ def _pt1_row_layout(columns: Iterable[str]) -> _PT1RowLayout:
             "payload_bytes",
             "payload_codec_version",
         }
-    ):
+    )
+    has_legacy_identity = (
+        legacy_cache_columns.issubset(column_names)
+        or rekey_columns.issubset(column_names)
+    )
+    if bucket_columns.intersection(column_names) and has_legacy_identity:
+        return _PT1RowLayout.PARTIAL_BUCKET
+    if legacy_cache_columns.issubset(column_names):
+        return _PT1RowLayout.LEGACY
+    if minimal_admission_columns.issubset(column_names):
         return _PT1RowLayout.MINIMAL_ADMISSION
+    if preflight_columns.issubset(column_names):
+        return _PT1RowLayout.PREFLIGHT
+    if rekey_columns.issubset(column_names):
+        return _PT1RowLayout.LEGACY
     return _PT1RowLayout.UNSUPPORTED
 
 
@@ -3138,6 +3139,11 @@ def _validate_pt1_layout_stamp(
     ):
         raise PT1PersistentStoreCorrupt(
             "PT-1 row stamp does not match its physical layout: "
+            f"{store_schema_version!r}: {key_hash}"
+        )
+    if store_schema_version == "pt1" and layout is not _PT1RowLayout.LEGACY:
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 legacy stamp is invalid for this physical layout: "
             f"{store_schema_version!r}: {key_hash}"
         )
     if (

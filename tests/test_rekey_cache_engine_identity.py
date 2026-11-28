@@ -286,6 +286,59 @@ def test_rekey_legacy_stamp_rejects_overflowing_key_as_corrupt(
         )
 
 
+def test_rekey_wraps_unindexable_stored_key_as_corrupt_and_rolls_back(
+    tmp_path: Path,
+    target_corpus_version: str,
+) -> None:
+    db_path = tmp_path / "legacy-subnormal-key-cache.db"
+    _write_rekeyable_rows(db_path, ("one",))
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN physics_bucket_h40_distance REAL"
+        )
+        key_hash, key_bytes = conn.execute(
+            f"SELECT key_hash, key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        key = rekey._json_loads(bytes(key_bytes))
+        key["controls"] = {"T_K": 5e-324}
+        stored_key_bytes = rekey.canonical_json_bytes(key)
+        stored_key_hash = hashlib.sha256(stored_key_bytes).hexdigest()
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_sha256 = ?, key_bytes = ? "
+            "WHERE key_hash = ?",
+            (
+                stored_key_hash,
+                stored_key_hash,
+                stored_key_bytes,
+                key_hash,
+            ),
+        )
+        before = conn.execute(
+            f"SELECT key_hash, key_sha256, key_bytes, engine_version, "
+            f"corpus_version, physics_bucket_h40_distance "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="stored request key is not indexable",
+    ):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=target_corpus_version,
+        )
+
+    with sqlite3.connect(db_path) as conn:
+        after = conn.execute(
+            f"SELECT key_hash, key_sha256, key_bytes, engine_version, "
+            f"corpus_version, physics_bucket_h40_distance "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert after == before
+
+
 @pytest.mark.parametrize(
     "repair_notices_json",
     ['[{"kind":"rekey_repair"}]', "[]", None],
