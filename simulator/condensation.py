@@ -373,11 +373,36 @@ def _resolve_lennard_jones_parameters(
     proxy row. Tc is K, Pc atm, M g/mol, density g/cm^3, Vb cm^3/mol,
     sigma Å, and epsilon/k K. The Le Bas increments are in cm^3/mol from
     Le Bas, *The Molecular Volumes of Liquid Chemical Compounds* (1915).
+    Evaporation-only SiO-class proxies take precedence over these rungs.
     Sanity: N2's Tc=126.2 K and Pc=33.5 atm give sigma≈3.80 Å and
     epsilon/k=97.2 K, close in size to the sourced repo pair (3.798 Å,
     71.4 K); the tabulated rung remains authoritative.
     """
     row = row if isinstance(row, Mapping) else {}
+
+    proxy_molar_mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(
+        str(species)
+    )
+    if proxy_molar_mass is not None:
+        legacy_row = (
+            "simulator.condensation._EVAPORATION_LJ_PROXY_MOLAR_MASSES"
+            f"[{str(species)!r}]"
+        )
+        sio_sigma, sio_epsilon = _LENNARD_JONES_PARAMS["SiO"][:2]
+        return {
+            "species": str(species),
+            "status": "estimated",
+            "method": "legacy_code_proxy",
+            "flag": "lj_estimated:legacy_code_proxy",
+            "provenance": {
+                "row": legacy_row,
+                "source": _EVAPORATION_CLASS_PROXY_SOURCE,
+            },
+            "sigma_angstrom": sio_sigma,
+            "epsilon_over_k_K": sio_epsilon,
+            "molar_mass_g_mol": proxy_molar_mass,
+            "inputs": {"legacy_row": legacy_row},
+        }
 
     def positive(*keys: str) -> tuple[str, float] | None:
         for key in keys:
@@ -503,29 +528,6 @@ def _resolve_lennard_jones_parameters(
                     "sigma_angstrom": legacy[0],
                     "epsilon_over_k_K": legacy[1],
                     "molar_mass_g_mol": legacy[2],
-                    "inputs": {"legacy_row": legacy_row},
-                }
-            proxy_molar_mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(
-                str(species)
-            )
-            if proxy_molar_mass is not None:
-                legacy_row = (
-                    "simulator.condensation._EVAPORATION_LJ_PROXY_MOLAR_MASSES"
-                    f"[{str(species)!r}]"
-                )
-                sio_sigma, sio_epsilon = _LENNARD_JONES_PARAMS["SiO"][:2]
-                return {
-                    "species": str(species),
-                    "status": "estimated",
-                    "method": "legacy_code_proxy",
-                    "flag": "lj_estimated:legacy_code_proxy",
-                    "provenance": {
-                        "row": legacy_row,
-                        "source": _EVAPORATION_CLASS_PROXY_SOURCE,
-                    },
-                    "sigma_angstrom": sio_sigma,
-                    "epsilon_over_k_K": sio_epsilon,
-                    "molar_mass_g_mol": proxy_molar_mass,
                     "inputs": {"legacy_row": legacy_row},
                 }
             return {

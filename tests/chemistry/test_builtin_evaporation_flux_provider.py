@@ -349,7 +349,7 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     # NaO0.5 activity evidence. This counter test only needs a flux-eligible
     # seam claim so the mocked EVAPORATION_FLUX path can record alpha fallbacks.
     equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"CrO2": 1.0, "Mn": 1.0},
+        vapor_pressures_Pa={"Fe": 1.0},
         vapor_pressures_source={},
         activity_coefficients={},
         diagnostics={},
@@ -1579,7 +1579,7 @@ def test_evaporation_caller_keeps_flagged_alpha_prediction(
 
     monkeypatch.setattr(sim, "_dispatch_only", dispatch)
     equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"CrO": 100.0, "CrO2": 100.0},
+        vapor_pressures_Pa={"Fe": 1.0},
         vapor_pressures_source={},
         activity_coefficients={},
         diagnostics={},
@@ -1678,9 +1678,6 @@ def test_silicon_transport_row_computes_with_sodium_in_mixed_batch():
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=1000.0,
-        # Keep the peer on its explicit HKL upper-bound path while this test
-        # removes Si's continuum transport data.
-        hkl_upper_bound_transport_species=("Na",),
         vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
         molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
         stoich_by_species={
@@ -1888,9 +1885,6 @@ def test_missing_transport_channel_is_unavailable_downstream(
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=1000.0,
-        # Resolve the peer via its explicit HKL bound; Si remains on the
-        # continuum path whose missing collision data this case exercises.
-        hkl_upper_bound_transport_species=("Na",),
         vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
         molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
         stoich_by_species={
@@ -1903,7 +1897,6 @@ def test_missing_transport_channel_is_unavailable_downstream(
     na_only = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=1000.0,
-        hkl_upper_bound_transport_species=("Na",),
     )
     assert result.status == "ok"
     assert "Si" not in result.diagnostic["evaporation_flux_kg_hr"]
@@ -2290,3 +2283,45 @@ def test_provider_canonical_path_is_idempotent_under_clamp():
     assert _w3_dispatch_with_stir({"axial": 4.0})[
         "axial_stir_applied"
     ] == pytest.approx(4.0)
+
+
+def test_lj_estimate_without_collision_mass_uses_request_mass():
+    from simulator.condensation import (
+        _chapman_enskog_d_ab_m2_s,
+        _resolve_lennard_jones_parameters,
+    )
+
+    property_row = {
+        "critical_temperature_K": 6000.0,
+        "critical_pressure_atm": 500.0,
+    }
+    request_mass_g_mol = 55.845
+    parameters = _resolve_lennard_jones_parameters("Fe", property_row)
+
+    result = _series_resistance_evaporation_flux_kg_m2_s(
+        species="Fe",
+        P_eq_pa=2000.0,
+        P_bulk_pa=0.0,
+        T_surface_K=1600.0,
+        molar_mass_kg_mol=request_mass_g_mol / 1000.0,
+        alpha_i=0.5,
+        pipe_diameter_m=0.12,
+        overhead_pressure_pa=1000.0,
+        carrier_gas="N2",
+        T_gas_K=1600.0,
+        species_transport_property_row=property_row,
+    )
+
+    expected_diffusivity = _chapman_enskog_d_ab_m2_s(
+        "Fe",
+        1600.0,
+        1000.0,
+        carrier="N2",
+        species_params=(
+            parameters["sigma_angstrom"],
+            parameters["epsilon_over_k_K"],
+            request_mass_g_mol,
+        ),
+    )
+    assert result.d_ab_m2_s == expected_diffusivity
+    assert result.flux_kg_s_m2 > 0.0

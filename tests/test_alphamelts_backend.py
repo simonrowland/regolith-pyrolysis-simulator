@@ -7082,7 +7082,7 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
             'metals': {'Na': {'evaporation_alpha': {'value': 1.0}}},
             'oxide_vapors': {},
         },
-        _build_evaporation_aux_maps=lambda vapor, **_kwargs: (
+        _build_evaporation_aux_maps=lambda vapor: (
             {species: 1.0 for species in vapor},
             {species: {} for species in vapor},
             {},

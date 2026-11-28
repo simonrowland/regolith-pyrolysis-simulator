@@ -785,7 +785,7 @@ def test_sio_vapor_requires_explicit_stoich_metadata():
     assert all("SiO" not in stage.collected_kg for stage in sim.train.stages)
 
 
-def test_vapor_species_without_parent_oxide_stays_unavailable():
+def test_vapor_species_without_parent_oxide_fails_before_flux():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(

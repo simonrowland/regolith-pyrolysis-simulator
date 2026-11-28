@@ -816,10 +816,13 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 ),
             )
             if parameters.get("status") in {"tabulated", "estimated"}:
+                collision_mass_g_mol = parameters.get("molar_mass_g_mol")
+                if collision_mass_g_mol is None:
+                    collision_mass_g_mol = M_kg_mol * 1000.0
                 species_params = (
                     float(parameters["sigma_angstrom"]),
                     float(parameters["epsilon_over_k_K"]),
-                    float(parameters["molar_mass_g_mol"]),
+                    float(collision_mass_g_mol),
                 )
         d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
             species,

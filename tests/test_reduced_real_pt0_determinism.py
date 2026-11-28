@@ -8975,7 +8975,7 @@ def _exercise_equilibrium_consumers_from_result(
             float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         ),
     )
-    assert isinstance(resolved, tuple) and len(resolved) == 7
+    assert isinstance(resolved, tuple) and len(resolved) == 6
     if not allow_typed_batch_failure:
         assert resolved[3].get("status") != "unavailable"
     assert isinstance(
@@ -9682,7 +9682,7 @@ class _MemoryInterpolationCandidates:
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
-def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
+def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     tmp_path: Path,
     persistent: bool,
     monkeypatch: pytest.MonkeyPatch,
