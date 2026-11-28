@@ -484,6 +484,9 @@ def test_markova_partial_residue_score_carries_redox_diagnostic(
     assert candidate is not None
     assert candidate.value.kind is ValueKind.POINT
     assert candidate.value.point is not None
+    assert candidate.value.point.quantize(Decimal("0.0000001")) == Decimal(
+        "37.8682015"
+    )
     assert float(candidate.value.point) == pytest.approx(37.8682015273, abs=1e-5)
     assert float(residual.numeric.value) == pytest.approx(24.2682015273, abs=1e-5)
     assert (
