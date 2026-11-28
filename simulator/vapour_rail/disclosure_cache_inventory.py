@@ -475,7 +475,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/migrate.py:_volatile_closure_component': {
         "path": 'simulator/battery/migrate.py',
-        "line": 5432,
+        "line": 5436,
         "kind": 'lru',
         "name": '_volatile_closure_component',
         "carries_disclosure": False,
