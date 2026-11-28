@@ -2646,8 +2646,9 @@ def _residue_engine_flag_notices(
         if flag in seen:
             continue
         seen.add(flag)
+        paper_window = "paper-demonstrated-window" in flag
         extrapolated = (
-            "paper-demonstrated-window" in flag
+            paper_window
             or flag == "openimcc_extrapolated"
             or flag.startswith("alpha_extrapolated:")
         )
@@ -2664,6 +2665,8 @@ def _residue_engine_flag_notices(
                 affected_quantities=(quantity,),
                 reason=flag,
                 origin=origin,
+                band=flag if paper_window else None,
+                authority=(Authority.EXTRAPOLATED if paper_window else None),
             )
         )
     return tuple(notices)
@@ -17531,6 +17534,13 @@ def _hashimoto_residue_prediction(
             )
         ]
         notices.extend(
+            _residue_engine_flag_notices(
+                tuple(primary_provenance.get("engine_flags") or ()),
+                quantity=reported_quantity,
+                origin=f"engine:{engine.value}",
+            )
+        )
+        notices.extend(
             _residue_redox_flag_notices(
                 tuple(primary_provenance.get("engine_flags") or ()),
                 quantity=reported_quantity,
@@ -17798,7 +17808,11 @@ def _knudsen_residue_prediction(
                 "element_unavailable" if is_retention else "channel_missing",
                 reference.identity.species.formula,
             )
-        notices = result["notices"]
+        notices = tuple(result["notices"]) + _residue_engine_flag_notices(
+            tuple(result.get("engine_flags") or ()),
+            quantity=reported_quantity,
+            origin=f"engine:{engine.value}",
+        )
         if result.get("trace_tail"):
             # The extent cache shares the solve across residue components.
             # Classify against this row's resolution on a row-local copy.
@@ -17882,7 +17896,14 @@ def _langmuir_residue_prediction(
             unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
             coefficient_sources=sources,
             lineage_complete=False,
-            notices=result["notices"],
+            notices=(
+                *result["notices"],
+                *_residue_engine_flag_notices(
+                    tuple(result.get("engine_flags") or ()),
+                    quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                    origin=f"engine:{engine.value}",
+                ),
+            ),
             identity=reference.identity,
             refusal_detail=provenance,
         )

@@ -1911,6 +1911,27 @@ def _make_residue_pressure_model(
                 )
             except _InternalAnalyticalInputRefusal as exc:
                 raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
+            vapor_diagnostic = response.diagnostics.get(
+                "vapor_pressure_diagnostic"
+            )
+            high_t_activity = (
+                vapor_diagnostic.get("high_t_melt_activity")
+                if isinstance(vapor_diagnostic, Mapping)
+                else None
+            )
+            openimcc_flags = (
+                high_t_activity.get("openimcc_flags")
+                if isinstance(high_t_activity, Mapping)
+                else None
+            )
+            if isinstance(openimcc_flags, Sequence) and not isinstance(
+                openimcc_flags, (str, bytes)
+            ):
+                engine_flags.update(
+                    flag
+                    for flag in openimcc_flags
+                    if isinstance(flag, str) and flag
+                )
             pressures: dict[str, float] = {}
             for channel, pressure in response.vapor_pressures_Pa.items():
                 try:

@@ -10,6 +10,7 @@ import simulator.battery.migrate as migrate_module
 import simulator.battery.score as score_module
 from simulator.battery.enums import (
     AdmissionStatus,
+    Authority,
     Engine,
     ExecutionState,
     MethodToken,
@@ -453,7 +454,7 @@ def test_markova_openimcc_scores_printed_cells_and_keeps_card_blocked(
 @pytest.mark.cpu_budget(672)
 @pytest.mark.xdist_group("serial")
 def test_markova_partial_residue_score_carries_redox_diagnostic(
-    fresh_mass_loss_extracts,
+    fresh_mass_loss_extracts, monkeypatch,
 ) -> None:
     from simulator.battery.score_metrics import metric_operation_for_identity
 
@@ -471,13 +472,45 @@ def test_markova_partial_residue_score_carries_redox_diagnostic(
     assert point_composition.state.is_unknown
     assert "kept sum=91.43 wt% is below 95 wt%" in point_composition.state.reason
 
+    prediction_cache = {}
+    prediction = score_module._knudsen_residue_prediction(
+        context, reference, Engine.INTERNAL_ANALYTICAL, prediction_cache
+    )
+    paper_window_notices = [
+        notice
+        for notice in prediction.notices
+        if "paper-demonstrated-window" in notice.reason
+    ]
+    assert len(paper_window_notices) == 1
+    paper_window_notice = paper_window_notices[0]
+    assert paper_window_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert paper_window_notice.authority is Authority.EXTRAPOLATED
+    assert paper_window_notice.band == paper_window_notice.reason
+    assert "paper-demonstrated domain" in paper_window_notice.band
+    assert "T=2156.15 K" in paper_window_notice.band
+
+    with monkeypatch.context() as without_engine_flag_notices:
+        without_engine_flag_notices.setattr(
+            score_module,
+            "_residue_engine_flag_notices",
+            lambda *_args, **_kwargs: (),
+        )
+        unflagged_prediction = score_module._knudsen_residue_prediction(
+            context, reference, Engine.INTERNAL_ANALYTICAL, prediction_cache
+        )
+    assert prediction.value is not None
+    assert unflagged_prediction.value is not None
+    assert prediction.value.as_tuple() == unflagged_prediction.value.as_tuple()
+
     residual, candidate = compile_residual(
         reference,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
+        prediction=prediction,
     )
     assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
+    assert paper_window_notice in residual.notices
     assert residual.numeric.operation is MetricOperation.ABSOLUTE
     assert residual.numeric.unit == "subtype_defined"
     assert residual.numeric.decision_band is None
