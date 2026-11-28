@@ -1804,6 +1804,10 @@ class EquilibriumMixin:
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
+                # The reaction consumes activity_exponent parent units, so
+                # its mass-action term is a_parent**activity_exponent: each
+                # unit contributes one factor of the thermodynamic parent
+                # activity. Taking an exponent-root first would cancel it.
                 a_parent = oxide_activity.thermodynamic_parent_activity()
                 activities[name] = oxide_activity.activity
                 activity_provenance[name] = oxide_activity.provenance()
