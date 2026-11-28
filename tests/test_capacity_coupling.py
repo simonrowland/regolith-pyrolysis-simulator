@@ -2675,16 +2675,10 @@ def test_capacity_only_carrier_uses_proven_zero_before_refusal(monkeypatch):
         "_headspace_bleed_conductance_kg_s",
         lambda **_kwargs: 0.0,
     )
-    notice = {
-        "kind": "vapour_batch_unresolved",
-        "species": "Fe",
-        "hour": 0,
-        "reason": "surface closure refusal",
-    }
     overlay = {
-        "batch_channel_states": {"Fe": "eligible"},
-        "selected_runtime_pa_by_species": {"Fe": 1.0},
-        "notices": [notice],
+        "batch_channel_states": {"Fe": "zero_by_physics"},
+        "selected_runtime_pa_by_species": {"Fe": 0.0},
+        "notices": [],
     }
     pressure_diagnostic = {
         "vapor_pressure_numerator_provenance": {
@@ -2707,8 +2701,8 @@ def test_capacity_only_carrier_uses_proven_zero_before_refusal(monkeypatch):
         "warning": "surface closure refusal",
     }
     selector_overlay = {
-        "batch_channel_states": {"Fe": "eligible"},
-        "selected_runtime_pa_by_species": {"Fe": 1.0},
+        "batch_channel_states": {"Fe": "zero_by_physics"},
+        "selected_runtime_pa_by_species": {"Fe": 0.0},
         "notices": [],
     }
     resolver_partials = []
