@@ -3687,6 +3687,13 @@ class PT1PersistentEquilibriumStore:
         except PT1PersistentStoreCorrupt as exc:
             raise UncacheablePayload(artifact, key_hash) from exc
         payload_codec_version = _payload_codec_version(artifact)
+        if self.strict_vapor_gate:
+            assert_strict_vapor_pt1_row(
+                artifact=artifact,
+                key=key,
+                payload=payload,
+                key_hash=key_hash,
+            )
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
 
         insert_columns = (
