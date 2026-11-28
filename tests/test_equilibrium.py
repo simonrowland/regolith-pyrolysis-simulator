@@ -248,10 +248,17 @@ def test_internal_analytical_crystal_ellingham_k_is_converted_to_liquid(
     assert log10_factor == pytest.approx(liquid_standard_factor_dex, abs=1e-6)
 
     sim = _metal_ellingham_fallback_sim(species, oxide, temperature_K)
+    # Zr's strongly favorable Ellingham K puts its pressure below the
+    # 1e-15 Pa output cutoff at this test's usual 1e-8 oxide activity.
+    # Unit activity keeps the Zr channel computed so the standard-state
+    # conversion ratio remains observable.
+    oxide_activity_value = 1.0 if species == 'Zr' else 1e-8
     oxide_activity = SimpleNamespace(
-        activity=1e-8,
+        activity=oxide_activity_value,
         warning=None,
-        equivalent_parent_activity=lambda exponent: 1e-8 ** (1.0 / exponent),
+        equivalent_parent_activity=lambda exponent: (
+            oxide_activity_value ** (1.0 / exponent)
+        ),
         provenance=lambda: {},
     )
     monkeypatch.setattr(
