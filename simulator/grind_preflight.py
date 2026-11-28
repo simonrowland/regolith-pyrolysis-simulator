@@ -566,19 +566,15 @@ def _strict_vapor_pt1_store_summary(
             raise GrindSourceGateError(
                 f"{context}: PT-1 source row is corrupt"
             ) from exc
-        if admitted is None or admitted.decoded_payload is None:
+        if admitted is None:
             raise GrindSourceGateError(
-                f"{context}: PT-1 row rejected by cache admission"
+                f"{context}: PT-1 row is unavailable"
             )
-        row_context = f"{context}:{admitted.entry['key_hash']}"
-        row_summary = assert_strict_vapor_pt1_row(
-            artifact=str(admitted.entry["artifact"]),
-            key=admitted.entry["key"],
-            payload=admitted.entry["payload"],
-            key_hash=str(admitted.entry["key_hash"]),
-            context=row_context,
-            approved_sources=approved_sources,
-        )
+        row_summary = admitted.strict_vapor_summary
+        if row_summary is None:
+            raise GrindSourceGateError(
+                f"{context}: PT-1 row has no strict-vapor provenance summary"
+            )
         source_reports += int(row_summary["source_reports"])
         if row_summary["vapor_active"]:
             vapor_active_rows += 1

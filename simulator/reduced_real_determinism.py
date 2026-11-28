@@ -219,6 +219,21 @@ class _AdmittedStoredRow:
     stored_columns: dict[str, Any] | None = None
     physics_ladder_values: dict[str, dict[str, float | str]] | None = None
     stale_payload_codec: bool = False
+    strict_vapor_summary: dict[str, Any] | None = None
+
+
+@dataclasses.dataclass(frozen=True)
+class _PT1KeyIndexValidation:
+    key: Mapping[str, Any]
+    key_bytes: bytes
+    stored_bucket_bytes: bytes | None
+    stored_bucket_schema: Any
+    bucket_key: Mapping[str, Any]
+    bucket_bytes: bytes
+    bucket_hash: str
+    ladder_values: dict[str, dict[str, float | str]]
+    selected_indexed_distance: float | None
+    nonfinite_requested_rung: bool
 
 
 _MAGEMIN_SHADOW_PROVIDER_ID = "magemin-shadow"
@@ -291,7 +306,6 @@ def _gate_curve_identity_rejection(
     keys: Sequence[Mapping[str, Any]],
     *,
     reader_context_policy: bool,
-    write_integrity_only: bool = False,
 ) -> str | None:
     if not keys:
         return None
@@ -357,8 +371,6 @@ def _gate_curve_identity_rejection(
         if stored_or_query_identity.certified_band is None:
             return "gate.key.certified_band_mismatch"
         if not band_shape_valid:
-            if write_integrity_only:
-                return None
             return "gate.key.certified_band_mismatch"
         if (
             tuple(float(bound) for bound in silica_bounds)
@@ -1904,17 +1916,6 @@ class PT0DeterminismStore:
         payload_codec_version = _payload_codec_version(artifact)
         repair_notices_json = encode_repair_notices_json(repair_notices)
         key_hash = _sha256(key_bytes)
-        if artifact == "freeze_gate_curve":
-            curve_payload = payload.get("curve")
-            if isinstance(curve_payload, Mapping):
-                identity_rejection = _gate_curve_identity_rejection(
-                    curve_payload,
-                    (key,),
-                    reader_context_policy=False,
-                    write_integrity_only=True,
-                )
-                if identity_rejection is not None:
-                    raise UncacheablePayload(artifact, key_hash)
         payload_hash = _sha256(payload_bytes)
         physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
         physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
@@ -2639,6 +2640,281 @@ def _pt1_row_key(raw: bytes, *, key_hash: str) -> Mapping[str, Any]:
     return value
 
 
+def _validate_pt1_key_indexes(
+    row: Mapping[str, Any],
+    *,
+    artifact: str | None = None,
+    key: Mapping[str, Any] | None = None,
+    key_bytes: bytes | None = None,
+    key_hash: str | None = None,
+    physics_bucket_key: Mapping[str, Any] | None = None,
+    physics_bucket_bytes: bytes | None = None,
+    physics_bucket_hash: str | None = None,
+    rung_tag: str | None = None,
+    rung_key: Mapping[str, Any] | None = None,
+    rung_hash: str | None = None,
+    expected_replay_scope_sha256: str | None = None,
+    check_key_dependencies: bool = True,
+    require_indexable: bool = False,
+) -> _PT1KeyIndexValidation:
+    """Validate PT1 row key and index integrity for both writes and reads."""
+
+    row_hash = str(row.get("key_hash", ""))
+    row_artifact = str(row.get("artifact", artifact or "unknown"))
+    if artifact is not None and row_artifact != artifact:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row artifact mismatch for {artifact}: {row_hash}"
+        )
+
+    stored_bucket_bytes = None
+    if row.get("physics_key_bytes") is not None:
+        stored_bucket_bytes = _pt1_row_bytes(
+            row["physics_key_bytes"],
+            field="physics bucket key",
+            key_hash=row_hash,
+        )
+
+    # Query index checks run before decoding either JSON blob, preserving the
+    # loud integrity result for compound key/index corruption.
+    if physics_bucket_hash is not None:
+        if row["physics_bucket_schema_version"] != PHYSICS_BUCKET_SCHEMA_VERSION:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row physics bucket schema drift: "
+                f"{row['physics_bucket_schema_version']} != "
+                f"{PHYSICS_BUCKET_SCHEMA_VERSION}"
+            )
+        if row["physics_bucket_sha256"] != physics_bucket_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row physics bucket hash mismatch: {physics_bucket_hash}"
+            )
+        if row["replay_scope_sha256"] != _replay_scope_hash(physics_bucket_key):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row replay scope hash mismatch: {physics_bucket_hash}"
+            )
+        if stored_bucket_bytes is None:
+            _pt1_row_bytes(
+                row["physics_key_bytes"],
+                field="physics bucket key",
+                key_hash=row_hash,
+            )
+        if stored_bucket_bytes != physics_bucket_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row physics bucket bytes mismatch: {physics_bucket_hash}"
+            )
+    if rung_tag is not None:
+        assert rung_key is not None and rung_hash is not None
+        if row[_physics_ladder_hash_column(rung_tag)] != rung_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
+            )
+        if row["replay_scope_sha256"] != _replay_scope_hash(rung_key):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
+            )
+        selected_distance = row.get(_physics_ladder_distance_column(rung_tag))
+        if selected_distance is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
+            )
+        if isinstance(selected_distance, bool):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+            )
+        try:
+            selected_indexed_distance = float(selected_distance)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+            ) from exc
+        if not math.isfinite(selected_indexed_distance):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+            )
+    else:
+        selected_indexed_distance = None
+    if expected_replay_scope_sha256 is not None and (
+        row["replay_scope_sha256"] != expected_replay_scope_sha256
+    ):
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row replay scope hash mismatch: {row_hash}"
+        )
+
+    row_key_bytes = _pt1_row_bytes(row["key_bytes"], field="key", key_hash=row_hash)
+    if row["key_hash"] != row_hash or (
+        "key_sha256" in row and row["key_sha256"] != row_hash
+    ):
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row key hash mismatch for {row_artifact}: {row_hash}"
+        )
+    if _sha256(row_key_bytes) != row_hash:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row key bytes hash mismatch for {row_artifact}: {row_hash}"
+        )
+    if key_hash is not None and row_hash != key_hash:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row key hash mismatch for {row_artifact}: {key_hash}"
+        )
+    if key_bytes is not None and row_key_bytes != key_bytes:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row canonical request bytes mismatch: {row_hash}"
+        )
+    row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
+    if row.get("key_bytes") != row_key_bytes:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row key bytes changed while reading: {row_hash}"
+        )
+    if canonical_json_bytes(row_key) != row_key_bytes:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row non-canonical request bytes: {row_hash}"
+        )
+    if key is not None and row_key != _json_ready(key):
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row canonical request mismatch: {row_hash}"
+        )
+    if check_key_dependencies and row_artifact == "equilibrium_post_record":
+        if (
+            not isinstance(row_key.get("namespace_id"), str)
+            or not row_key["namespace_id"]
+            or (
+                row_key.get("vapor_pressure_provider_selection") is not None
+                and not isinstance(
+                    row_key.get("vapor_pressure_provider_selection"),
+                    (str, Mapping),
+                )
+            )
+            or (
+                "sulfur_side" in row_key
+                and not isinstance(row_key["sulfur_side"], Mapping)
+            )
+            or ("model" in row_key and not isinstance(row_key["model"], Mapping))
+        ):
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row invalid stored equilibrium replay key dependency "
+                f"fields: {row_hash}"
+            )
+    if require_indexable:
+        indexability_error = _ladder_indexability(row_key)
+        if indexability_error is not None:
+            raise indexability_error
+
+    bucket_key = canonical_physics_bucket_key_from_replay_key(row_key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    bucket_hash = _sha256(bucket_bytes)
+    stored_bucket_schema = row.get("physics_bucket_schema_version")
+    replay_scope_sha256 = _replay_scope_hash(bucket_key)
+    if stored_bucket_schema is not None:
+        if stored_bucket_bytes is None:
+            _pt1_row_bytes(
+                row["physics_key_bytes"],
+                field="physics bucket key",
+                key_hash=row_hash,
+            )
+        if (
+            stored_bucket_schema != PHYSICS_BUCKET_SCHEMA_VERSION
+            or row["physics_bucket_sha256"] != bucket_hash
+            or stored_bucket_bytes != bucket_bytes
+        ):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key does not reproduce physics bucket: {row_hash}"
+            )
+        if row["replay_scope_sha256"] != replay_scope_sha256:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key replay scope mismatch: {row_hash}"
+            )
+    elif (
+        expected_replay_scope_sha256 is not None
+        and expected_replay_scope_sha256 != replay_scope_sha256
+    ):
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row exact key replay scope mismatch: {row_hash}"
+        )
+    if physics_bucket_hash is not None and (
+        bucket_hash != physics_bucket_hash or bucket_bytes != physics_bucket_bytes
+    ):
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row exact key does not reproduce physics bucket: {physics_bucket_hash}"
+        )
+
+    ladder_values = _physics_ladder_values_from_replay_key(row_key)
+    nonfinite_requested_rung = False
+    if rung_tag is not None:
+        assert rung_key is not None and rung_hash is not None
+        derived_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+            row_key,
+            rung_tag,
+        )
+        if (
+            derived_rung_key != _json_ready(rung_key)
+            or ladder_values[rung_tag]["sha256"] != rung_hash
+        ):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
+            )
+        derived_selected_distance = float(ladder_values[rung_tag]["distance"])
+        if math.isfinite(derived_selected_distance):
+            if selected_indexed_distance != derived_selected_distance:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {rung_tag} distance mismatch: {rung_hash}"
+                )
+        else:
+            nonfinite_requested_rung = True
+
+    for stored_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        if stored_rung_tag == rung_tag:
+            continue
+        hash_column = _physics_ladder_hash_column(stored_rung_tag)
+        distance_column = _physics_ladder_distance_column(stored_rung_tag)
+        stored_rung_hash = row.get(hash_column)
+        stored_distance = row.get(distance_column)
+        if stored_bucket_schema is not None and stored_rung_hash is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {stored_rung_tag} physics bucket hash is missing: {row_hash}"
+            )
+        if stored_bucket_schema is not None and stored_distance is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {stored_rung_tag} distance is missing: {row_hash}"
+            )
+        if stored_rung_hash is not None and (
+            stored_rung_hash != ladder_values[stored_rung_tag]["sha256"]
+        ):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key does not reproduce {stored_rung_tag} hash: {row_hash}"
+            )
+        if stored_distance is not None:
+            if isinstance(stored_distance, bool):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {stored_rung_tag} distance is invalid: {row_hash}"
+                )
+            try:
+                row_distance = float(stored_distance)
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {stored_rung_tag} distance is invalid: {row_hash}"
+                ) from exc
+            if not math.isfinite(row_distance):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {stored_rung_tag} distance is invalid: {row_hash}"
+                )
+            derived_distance = float(ladder_values[stored_rung_tag]["distance"])
+            if math.isfinite(derived_distance) and row_distance != derived_distance:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {stored_rung_tag} distance mismatch: {row_hash}"
+                )
+
+    return _PT1KeyIndexValidation(
+        key=row_key,
+        key_bytes=row_key_bytes,
+        stored_bucket_bytes=stored_bucket_bytes,
+        stored_bucket_schema=stored_bucket_schema,
+        bucket_key=bucket_key,
+        bucket_bytes=bucket_bytes,
+        bucket_hash=bucket_hash,
+        ladder_values=ladder_values,
+        selected_indexed_distance=selected_indexed_distance,
+        nonfinite_requested_rung=nonfinite_requested_rung,
+    )
+
+
 def _admit_stored_row(
     raw_row: Mapping[str, Any],
     *,
@@ -2801,13 +3077,12 @@ def _admit_stored_row(
 
     try:
         row = dict(raw_row)
-        row_keys = set(row)
         if output_columns is not None:
+            row_keys = set(row)
             row = {
                 column: row[column] if column in row_keys else None
                 for column in output_columns
             }
-            row_keys = set(row)
         raw_key_bytes_are_bytes = isinstance(row.get("key_bytes"), bytes)
         raw_payload_bytes_are_bytes = isinstance(row.get("payload_bytes"), bytes)
         row_hash = str(row["key_hash"])
@@ -2818,56 +3093,6 @@ def _admit_stored_row(
                 "PT-1 row store schema version drift: "
                 f"{store_schema_version} != {PT1_STORE_SCHEMA_VERSION}"
             )
-        if artifact is not None and row_artifact != artifact:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row artifact mismatch for {artifact}: {row_hash}"
-            )
-        stored_bucket_bytes = None
-        if row.get("physics_key_bytes") is not None:
-            stored_bucket_bytes = _pt1_row_bytes(
-                row["physics_key_bytes"],
-                field="physics bucket key",
-                key_hash=row_hash,
-            )
-
-        if stored_bucket_bytes is not None:
-            row["physics_key_bytes"] = stored_bucket_bytes
-
-        def verify_key_hashes() -> None:
-            if (
-                row["key_hash"] != row["key_sha256"]
-                or row["key_sha256"] != row_hash
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row key hash mismatch for {row_artifact}: {row_hash}"
-                )
-            if _sha256(row_key_bytes) != row_hash:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row key bytes hash mismatch for {row_artifact}: {row_hash}"
-                )
-            if key_hash is not None and row_hash != key_hash:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row key hash mismatch for {row_artifact}: {key_hash}"
-                )
-            if key_bytes is not None and row_key_bytes != key_bytes:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row canonical request bytes mismatch: {row_hash}"
-                )
-
-        def verify_canonical_key(row_key: Mapping[str, Any]) -> None:
-            if row["key_bytes"] != row_key_bytes:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row key bytes changed while reading: {row_hash}"
-                )
-            if canonical_json_bytes(row_key) != row_key_bytes:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row non-canonical request bytes: {row_hash}"
-                )
-            if key is not None and row_key != _json_ready(key):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row canonical request mismatch: {row_hash}"
-                )
-
         def verify_payload_integrity() -> tuple[bytes, Any]:
             payload_bytes = _pt1_row_bytes(
                 row["payload_bytes"], field="payload", key_hash=row_hash
@@ -2886,186 +3111,35 @@ def _admit_stored_row(
                 )
             return payload_bytes, payload_value
 
-        def finite_ladder_distance(
-            value: Any,
-            tag: str,
-            distance_hash: str = row_hash,
-        ) -> float:
-            if isinstance(value, bool):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {tag} distance is invalid: {distance_hash}"
-                )
-            try:
-                distance = float(value)
-            except (TypeError, ValueError, OverflowError) as exc:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {tag} distance is invalid: {distance_hash}"
-                ) from exc
-            if not math.isfinite(distance):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {tag} distance is invalid: {distance_hash}"
-                )
-            return distance
-
-        # Checks against the indexed query happen before JSON decoding. This
-        # preserves the PT1 integrity ordering for compound corruptions.
-        if physics_bucket_hash is not None:
-            if row["physics_bucket_schema_version"] != PHYSICS_BUCKET_SCHEMA_VERSION:
-                raise PT1PersistentStoreCorrupt(
-                    "PT-1 row physics bucket schema drift: "
-                    f"{row['physics_bucket_schema_version']} != "
-                    f"{PHYSICS_BUCKET_SCHEMA_VERSION}"
-                )
-            if row["physics_bucket_sha256"] != physics_bucket_hash:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row physics bucket hash mismatch: {physics_bucket_hash}"
-                )
-            if row["replay_scope_sha256"] != _replay_scope_hash(physics_bucket_key):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row replay scope hash mismatch: {physics_bucket_hash}"
-                )
-            if stored_bucket_bytes is None:
-                _pt1_row_bytes(
-                    row["physics_key_bytes"],
-                    field="physics bucket key",
-                    key_hash=row_hash,
-                )
-            if stored_bucket_bytes != physics_bucket_bytes:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row physics bucket bytes mismatch: {physics_bucket_hash}"
-                )
-        if rung_tag is not None:
-            assert rung_key is not None and rung_hash is not None
-            if row[_physics_ladder_hash_column(rung_tag)] != rung_hash:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
-                )
-            if row["replay_scope_sha256"] != _replay_scope_hash(rung_key):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
-                )
-            selected_distance = row.get(_physics_ladder_distance_column(rung_tag))
-            if selected_distance is None:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
-                )
-            selected_indexed_distance = finite_ladder_distance(
-                selected_distance,
-                rung_tag,
-                rung_hash,
-            )
-        else:
-            selected_indexed_distance = None
-        if expected_replay_scope_sha256 is not None and (
-            row["replay_scope_sha256"] != expected_replay_scope_sha256
-        ):
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row replay scope hash mismatch: {row_hash}"
-            )
-
-        row_key_bytes = _pt1_row_bytes(
-            row["key_bytes"], field="key", key_hash=row_hash
+        index_validation = _validate_pt1_key_indexes(
+            row,
+            artifact=artifact,
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+            physics_bucket_key=physics_bucket_key,
+            physics_bucket_bytes=physics_bucket_bytes,
+            physics_bucket_hash=physics_bucket_hash,
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rung_hash,
+            expected_replay_scope_sha256=expected_replay_scope_sha256,
+            check_key_dependencies=_payload_codec_stamp_matches(
+                _payload_codec_version(row_artifact),
+                row.get("payload_codec_version"),
+            ),
         )
-
-        # Query index metadata and key-byte integrity precede key admission.
-        verify_key_hashes()
-
-        row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
-        verify_canonical_key(row_key)
-
-        derived_bucket_key = canonical_physics_bucket_key_from_replay_key(row_key)
-        derived_bucket_bytes = canonical_json_bytes(derived_bucket_key)
-        derived_bucket_hash = _sha256(derived_bucket_bytes)
-        stored_bucket_schema = row.get("physics_bucket_schema_version")
-        derived_replay_scope_sha256 = _replay_scope_hash(derived_bucket_key)
-        if stored_bucket_schema is not None:
-            if stored_bucket_bytes is None:
-                _pt1_row_bytes(
-                    row["physics_key_bytes"],
-                    field="physics bucket key",
-                    key_hash=row_hash,
-                )
-            if (
-                stored_bucket_schema != PHYSICS_BUCKET_SCHEMA_VERSION
-                or row["physics_bucket_sha256"] != derived_bucket_hash
-                or stored_bucket_bytes != derived_bucket_bytes
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row exact key does not reproduce physics bucket: {row_hash}"
-                )
-            if row["replay_scope_sha256"] != derived_replay_scope_sha256:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row exact key replay scope mismatch: {row_hash}"
-                )
-        elif (
-            expected_replay_scope_sha256 is not None
-            and expected_replay_scope_sha256 != derived_replay_scope_sha256
-        ):
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row exact key replay scope mismatch: {row_hash}"
-            )
-        if physics_bucket_hash is not None and (
-            derived_bucket_hash != physics_bucket_hash
-            or derived_bucket_bytes != physics_bucket_bytes
-        ):
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row exact key does not reproduce physics bucket: {physics_bucket_hash}"
-            )
-        ladder_values = _physics_ladder_values_from_replay_key(row_key)
-        nonfinite_requested_rung = False
-        if rung_tag is not None:
-            assert rung_key is not None and rung_hash is not None
-            derived_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-                row_key,
-                rung_tag,
-            )
-            if (
-                derived_rung_key != _json_ready(rung_key)
-                or ladder_values[rung_tag]["sha256"] != rung_hash
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
-                )
-            derived_selected_distance = float(ladder_values[rung_tag]["distance"])
-            if math.isfinite(derived_selected_distance):
-                if selected_indexed_distance != derived_selected_distance:
-                    raise PT1PersistentStoreCorrupt(
-                        f"PT-1 row {rung_tag} distance mismatch: {rung_hash}"
-                    )
-            else:
-                nonfinite_requested_rung = True
-
-        for stored_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
-            if stored_rung_tag == rung_tag:
-                continue
-            hash_column = _physics_ladder_hash_column(stored_rung_tag)
-            distance_column = _physics_ladder_distance_column(stored_rung_tag)
-            stored_rung_hash = row.get(hash_column)
-            stored_distance = row.get(distance_column)
-            if stored_bucket_schema is not None and stored_rung_hash is None:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {stored_rung_tag} physics bucket hash is missing: {row_hash}"
-                )
-            if stored_bucket_schema is not None and stored_distance is None:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {stored_rung_tag} distance is missing: {row_hash}"
-                )
-            if stored_rung_hash is not None and (
-                stored_rung_hash != ladder_values[stored_rung_tag]["sha256"]
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row exact key does not reproduce {stored_rung_tag} hash: {row_hash}"
-                )
-            if stored_distance is not None:
-                row_distance = finite_ladder_distance(
-                    stored_distance, stored_rung_tag
-                )
-                derived_distance = float(ladder_values[stored_rung_tag]["distance"])
-                if math.isfinite(derived_distance) and row_distance != derived_distance:
-                    raise PT1PersistentStoreCorrupt(
-                        f"PT-1 row {stored_rung_tag} distance mismatch: {row_hash}"
-                    )
-
+        row_key_bytes = index_validation.key_bytes
+        row_key = index_validation.key
+        stored_bucket_bytes = index_validation.stored_bucket_bytes
+        if stored_bucket_bytes is not None:
+            row["physics_key_bytes"] = stored_bucket_bytes
+        derived_bucket_key = index_validation.bucket_key
+        derived_bucket_bytes = index_validation.bucket_bytes
+        derived_bucket_hash = index_validation.bucket_hash
+        stored_bucket_schema = index_validation.stored_bucket_schema
+        ladder_values = index_validation.ladder_values
+        nonfinite_requested_rung = index_validation.nonfinite_requested_rung
         row_payload_bytes, row_payload = verify_payload_integrity()
         if validate_interpolation_domain:
             from simulator.reduced_real_cache_interpolation import (
@@ -3085,11 +3159,6 @@ def _admit_stored_row(
                     "PT-1 row invalid stored equilibrium replay key "
                     f"{section} ({domain_violation}): {row_hash}"
                 )
-        if rung_tag is not None and _ladder_indexability(
-            row_key,
-            rung_tag=rung_tag,
-        ) is not None:
-            nonfinite_requested_rung = True
         all_index_columns = (
             "physics_bucket_schema_version",
             "physics_bucket_sha256",
@@ -3171,6 +3240,7 @@ def _admit_stored_row(
         row["key_bytes"] = row_key_bytes
         row["payload_bytes"] = row_payload_bytes
 
+        strict_vapor_summary = None
         if strict_source_validation:
             if row_artifact == "freeze_gate_curve" and not isinstance(
                 row_payload, Mapping
@@ -3194,7 +3264,7 @@ def _admit_stored_row(
                 row_payload,
             )
             if isinstance(row_payload, Mapping):
-                assert_strict_vapor_pt1_row(
+                strict_vapor_summary = assert_strict_vapor_pt1_row(
                     artifact=row_artifact,
                     key=row_key,
                     key_hash=row_hash,
@@ -3224,32 +3294,8 @@ def _admit_stored_row(
                 None,
                 stored_columns=row,
                 stale_payload_codec=True,
+                strict_vapor_summary=strict_vapor_summary,
             )
-        if row_artifact == "equilibrium_post_record":
-            if (
-                not isinstance(row_key.get("namespace_id"), str)
-                or not row_key["namespace_id"]
-                or (
-                    row_key.get("vapor_pressure_provider_selection") is not None
-                    and not isinstance(
-                        row_key.get("vapor_pressure_provider_selection"),
-                        (str, Mapping),
-                    )
-                )
-                or (
-                    "sulfur_side" in row_key
-                    and not isinstance(row_key["sulfur_side"], Mapping)
-                )
-                or (
-                    "model" in row_key
-                    and not isinstance(row_key["model"], Mapping)
-                )
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    "PT-1 row invalid stored equilibrium replay key dependency "
-                    f"fields: {row_hash}"
-                )
-
         entry = {
             "artifact": row_artifact,
             "key": copy.deepcopy(dict(row_key)),
@@ -3270,7 +3316,13 @@ def _admit_stored_row(
             "physics_bucket_hash": derived_bucket_hash,
         }
         if not isinstance(row_payload, Mapping):
-            return _AdmittedStoredRow(entry, None, row, ladder_values)
+            return _AdmittedStoredRow(
+                entry,
+                None,
+                row,
+                ladder_values,
+                strict_vapor_summary=strict_vapor_summary,
+            )
 
         decode_keys = [row_key]
         if key is not None and _json_ready(key) != row_key:
@@ -3288,7 +3340,13 @@ def _admit_stored_row(
         )
         if nonfinite_requested_rung:
             decoded = None
-        return _AdmittedStoredRow(entry, decoded, row, ladder_values)
+        return _AdmittedStoredRow(
+            entry,
+            decoded,
+            row,
+            ladder_values,
+            strict_vapor_summary=strict_vapor_summary,
+        )
     except (sqlite3.Error, PT1PersistentStoreCorrupt, GrindSourceGateError):
         raise
     except Exception as exc:
@@ -3303,22 +3361,17 @@ def _admit_stored_row(
 
 
 def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
-    """Validate one final PT1 row's key and index integrity before writing.
-
-    Private ``_write_*`` values carry the caller's inputs to this boundary so
-    that serialization failures are converted to the same typed write refusal
-    as failures discovered while deriving the stored indexes. Payload replay
-    shape remains reader admission policy; extrapolated gate identity is the
-    one payload-to-key identity checked here.
-    """
+    """Validate one final PT1 row's key and index integrity before writing."""
 
     try:
         row = dict(raw_row)
     except Exception as exc:
-        raise UncacheablePayload("unknown", "") from exc
+        raise UncacheableKey(
+            PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+            "write_candidate_index",
+        ) from exc
     expected_key = row.pop("_write_key", None)
     replace_key = row.pop("_write_replace_key", False)
-    expected_payload = row.pop("_write_payload", None)
     input_bucket_key = row.pop("_write_physics_bucket_key", None)
     input_bucket_bytes = row.pop("_write_physics_bucket_bytes", None)
     input_bucket_hash = row.pop("_write_physics_bucket_hash", None)
@@ -3341,8 +3394,10 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
     try:
         key_hash = str(row.get("key_hash", ""))
     except Exception as exc:
-        raise UncacheablePayload(artifact_name, "") from exc
-    stage = "key"
+        raise UncacheableKey(
+            PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+            "write_candidate_index",
+        ) from exc
 
     try:
         if type(replace_key) is not bool or type(rebuild_indexes) is not bool:
@@ -3353,12 +3408,9 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
         if expected_key is not None:
             if not isinstance(expected_key, Mapping):
                 raise TypeError("caller key must be a mapping")
-            if not legacy_layout:
-                indexability_error = _ladder_indexability(expected_key)
-                if indexability_error is not None:
-                    raise indexability_error
-            canonical_key_bytes = canonical_json_bytes(expected_key)
+            stored_key = _json_ready(expected_key)
             if replace_key:
+                canonical_key_bytes = canonical_json_bytes(expected_key)
                 key_hash = _sha256(canonical_key_bytes)
                 row["key_hash"] = key_hash
                 if "key_sha256" in row_columns:
@@ -3366,43 +3418,13 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                 row["key_bytes"] = sqlite3.Binary(canonical_key_bytes)
                 if not legacy_layout:
                     row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
-                stored_key = dict(_json_ready(expected_key))
-            else:
-                supplied_key_bytes = _pt1_row_bytes(
-                    row.get("key_bytes"), field="key", key_hash=key_hash
-                )
-                if supplied_key_bytes != canonical_key_bytes:
-                    raise UncacheableKey(
-                        PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                        "write_candidate_key_bytes",
-                    )
-                stored_key = _pt1_row_key(
-                    supplied_key_bytes, key_hash=key_hash
-                )
         else:
-            supplied_key_bytes = _pt1_row_bytes(
+            stored_key_bytes = _pt1_row_bytes(
                 row.get("key_bytes"), field="key", key_hash=key_hash
             )
-            stored_key = _pt1_row_key(supplied_key_bytes, key_hash=key_hash)
-            canonical_key_bytes = canonical_json_bytes(stored_key)
+            stored_key = _pt1_row_key(stored_key_bytes, key_hash=key_hash)
 
-        supplied_key_bytes = _pt1_row_bytes(
-            row.get("key_bytes"), field="key", key_hash=key_hash
-        )
-        if supplied_key_bytes != canonical_key_bytes:
-            raise UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                "write_candidate_key_bytes",
-            )
-        key_hash = _sha256(canonical_key_bytes)
-        if row.get("key_hash") != key_hash or (
-            "key_sha256" in row_columns and row.get("key_sha256") != key_hash
-        ):
-            raise UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                "write_candidate_key_hash",
-            )
-
+        derive_indexes = False
         if legacy_layout:
             index_columns = {
                 "physics_bucket_schema_version",
@@ -3419,13 +3441,12 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                 ),
             }
             if rebuild_indexes and index_columns.intersection(row_columns):
+                derive_indexes = True
                 bucket_key = canonical_physics_bucket_key_from_replay_key(
                     stored_key
                 )
                 bucket_bytes = canonical_json_bytes(bucket_key)
-                ladder_values = _physics_ladder_values_from_replay_key(
-                    stored_key
-                )
+                ladder_values = _physics_ladder_values_from_replay_key(stored_key)
                 legacy_indexes = {
                     "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
                     "physics_bucket_sha256": _sha256(bucket_bytes),
@@ -3441,134 +3462,59 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                     ]
                 for column in index_columns.intersection(row_columns):
                     row[column] = legacy_indexes[column]
-            return row
-
-        indexability_error = _ladder_indexability(stored_key)
-        if indexability_error is not None:
-            raise indexability_error
-
-        derived_bucket_key = canonical_physics_bucket_key_from_replay_key(
-            stored_key
-        )
-        bucket_key = (
-            derived_bucket_key
-            if input_bucket_key is None
-            else input_bucket_key
-        )
-        canonical_bucket_bytes = canonical_json_bytes(bucket_key)
-        derived_bucket_bytes = canonical_json_bytes(derived_bucket_key)
-        if canonical_bucket_bytes != derived_bucket_bytes:
-            raise UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                "write_candidate_physics_bucket_key",
-            )
-        if input_bucket_bytes is not None and bytes(input_bucket_bytes) != canonical_bucket_bytes:
-            raise UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                "write_candidate_physics_bucket_bytes",
-            )
-        bucket_hash = _sha256(canonical_bucket_bytes)
-        if input_bucket_hash is not None and input_bucket_hash != bucket_hash:
-            raise UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                "write_candidate_physics_bucket_hash",
-            )
-
-        ladder_values = _physics_ladder_values_from_replay_key(stored_key)
-        rebuild_indexes = rebuild_indexes or (
-            row.get("store_schema_version") != PT1_STORE_SCHEMA_VERSION
-            or row.get("physics_bucket_schema_version") is None
-        )
-        if rebuild_indexes:
-            row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
-            row["physics_bucket_schema_version"] = PHYSICS_BUCKET_SCHEMA_VERSION
-            row["physics_bucket_sha256"] = bucket_hash
-            row["replay_scope_sha256"] = _replay_scope_hash(bucket_key)
-            row["physics_key_bytes"] = sqlite3.Binary(canonical_bucket_bytes)
-            for rung_tag, values in ladder_values.items():
-                row[_physics_ladder_hash_column(rung_tag)] = values["sha256"]
-                row[_physics_ladder_distance_column(rung_tag)] = values[
-                    "distance"
-                ]
         else:
-            stored_bucket_bytes = _pt1_row_bytes(
-                row.get("physics_key_bytes"),
-                field="physics bucket key",
-                key_hash=key_hash,
+            bucket_key = canonical_physics_bucket_key_from_replay_key(stored_key)
+            canonical_bucket_bytes = canonical_json_bytes(bucket_key)
+            bucket_hash = _sha256(canonical_bucket_bytes)
+            ladder_values = _physics_ladder_values_from_replay_key(stored_key)
+            rebuild_indexes = rebuild_indexes or (
+                row.get("store_schema_version") != PT1_STORE_SCHEMA_VERSION
+                or row.get("physics_bucket_schema_version") is None
             )
-            if stored_bucket_bytes != canonical_bucket_bytes:
+            derive_indexes = rebuild_indexes
+            if rebuild_indexes:
+                row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+                row["physics_bucket_schema_version"] = PHYSICS_BUCKET_SCHEMA_VERSION
+                row["physics_bucket_sha256"] = bucket_hash
+                row["replay_scope_sha256"] = _replay_scope_hash(bucket_key)
+                row["physics_key_bytes"] = sqlite3.Binary(canonical_bucket_bytes)
+                for rung_tag, values in ladder_values.items():
+                    row[_physics_ladder_hash_column(rung_tag)] = values["sha256"]
+                    row[_physics_ladder_distance_column(rung_tag)] = values[
+                        "distance"
+                    ]
+
+        if input_bucket_bytes is not None:
+            try:
+                input_bucket_bytes = _pt1_row_bytes(
+                    input_bucket_bytes,
+                    field="physics bucket key",
+                    key_hash=key_hash,
+                )
+            except PT1PersistentStoreCorrupt as exc:
                 raise UncacheableKey(
                     PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
                     "write_candidate_physics_bucket_bytes",
-                )
-            if (
-                row.get("physics_bucket_schema_version")
-                != PHYSICS_BUCKET_SCHEMA_VERSION
-                or row.get("physics_bucket_sha256") != bucket_hash
-                or row.get("replay_scope_sha256") != _replay_scope_hash(bucket_key)
-            ):
-                raise UncacheableKey(
-                    PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                    "write_candidate_physics_bucket_index",
-                )
-            for rung_tag, values in ladder_values.items():
-                indexed_distance = row.get(
-                    _physics_ladder_distance_column(rung_tag)
-                )
-                if (
-                    row.get(_physics_ladder_hash_column(rung_tag))
-                    != values["sha256"]
-                    or isinstance(indexed_distance, bool)
-                    or not isinstance(indexed_distance, (int, float))
-                    or not math.isfinite(float(indexed_distance))
-                    or float(indexed_distance) != float(values["distance"])
-                ):
-                    raise UncacheableKey(rung_tag, "write_candidate_ladder_index")
-
-        stage = "payload"
-        payload_bytes = _pt1_row_bytes(
-            row.get("payload_bytes"), field="payload", key_hash=key_hash
+                ) from exc
+        _validate_pt1_key_indexes(
+            row,
+            artifact=artifact_name,
+            key=expected_key,
+            key_hash=key_hash,
+            physics_bucket_key=input_bucket_key,
+            physics_bucket_bytes=input_bucket_bytes,
+            physics_bucket_hash=input_bucket_hash,
+            check_key_dependencies=not legacy_layout,
+            require_indexable=derive_indexes or not legacy_layout,
         )
-        payload_value = _pt1_row_json(
-            payload_bytes, field="payload", key_hash=key_hash
-        )
-        canonical_payload_bytes = _payload_integrity_bytes(payload_value)
-        if (
-            canonical_payload_bytes != payload_bytes
-            or row.get("payload_sha256") != _sha256(payload_bytes)
-        ):
-            raise UncacheablePayload(artifact_name, key_hash)
-        if expected_payload is not None and (
-            canonical_json_bytes(expected_payload) != payload_bytes
-        ):
-            raise UncacheablePayload(artifact_name, key_hash)
-        validate_repair_notices_json(row.get("repair_notices_json"))
-
-        if artifact_name == "freeze_gate_curve":
-            curve_payload = (
-                payload_value.get("curve")
-                if isinstance(payload_value, Mapping)
-                else None
-            )
-            if isinstance(curve_payload, Mapping):
-                identity_rejection = _gate_curve_identity_rejection(
-                    curve_payload,
-                    (stored_key,),
-                    reader_context_policy=False,
-                    write_integrity_only=True,
-                )
-                if identity_rejection is not None:
-                    raise UncacheablePayload(artifact_name, key_hash)
         return row
-    except (UncacheableKey, UncacheablePayload):
+    except UncacheableKey:
         raise
     except Exception as exc:
-        if stage == "key":
-            raise UncacheableKey(
-                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                "write_candidate_index",
-            ) from exc
-        raise UncacheablePayload(artifact_name, key_hash) from exc
+        raise UncacheableKey(
+            PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+            "write_candidate_index",
+        ) from exc
 
 
 class PT1PersistentEquilibriumStore:
@@ -3627,6 +3573,7 @@ class PT1PersistentEquilibriumStore:
                 PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
                 "write_candidate_key",
             )
+        validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         indexability_error = _ladder_indexability(key)
         if indexability_error is not None:
             raise indexability_error
@@ -3650,6 +3597,13 @@ class PT1PersistentEquilibriumStore:
         except PT1PersistentStoreCorrupt as exc:
             raise UncacheablePayload(artifact, key_hash) from exc
         payload_codec_version = _payload_codec_version(artifact)
+        if self.strict_vapor_gate:
+            assert_strict_vapor_pt1_row(
+                artifact=artifact,
+                key=key,
+                payload=payload,
+                key_hash=key_hash,
+            )
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
 
         insert_columns = (
@@ -3725,7 +3679,6 @@ class PT1PersistentEquilibriumStore:
         candidate_row.update(
             {
                 "_write_key": key,
-                "_write_payload": payload,
                 "_write_physics_bucket_key": physics_bucket_key,
                 "_write_physics_bucket_bytes": physics_bucket_bytes,
                 "_write_physics_bucket_hash": physics_bucket_hash,
@@ -3806,7 +3759,6 @@ class PT1PersistentEquilibriumStore:
                     candidate_row.update(
                         {
                             "_write_key": key,
-                            "_write_payload": payload,
                             "_write_physics_bucket_key": physics_bucket_key,
                             "_write_physics_bucket_bytes": physics_bucket_bytes,
                             "_write_physics_bucket_hash": physics_bucket_hash,
@@ -3904,7 +3856,6 @@ class PT1PersistentEquilibriumStore:
             candidate_row.update(
                 {
                     "_write_key": key,
-                    "_write_payload": payload,
                     "_write_physics_bucket_key": physics_bucket_key,
                     "_write_physics_bucket_bytes": physics_bucket_bytes,
                     "_write_physics_bucket_hash": physics_bucket_hash,
@@ -3975,6 +3926,13 @@ class PT1PersistentEquilibriumStore:
                     key_hash=key_hash,
                     return_decoded=True,
                 )
+                if self.strict_vapor_gate and decoded is not None:
+                    assert_strict_vapor_pt1_row(
+                        artifact=artifact,
+                        key=entry["key"],
+                        payload=entry["payload"],
+                        key_hash=key_hash,
+                    )
                 if decoded is None:
                     continue
                 return entry, decoded
@@ -4383,38 +4341,11 @@ class PT1PersistentEquilibriumStore:
                 "PT-1 persistent store schema version drift: "
                 f"{metadata['value']} != {PT1_STORE_SCHEMA_VERSION}"
             )
-        legacy_rows = (
-            conn.execute(
-                f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} "
-                "WHERE store_schema_version = ?",
-                (PT1_LEGACY_STORE_SCHEMA_VERSION,),
-            ).fetchall()
-            if metadata is None
-            or metadata["value"] == PT1_LEGACY_STORE_SCHEMA_VERSION
-            else ()
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET store_schema_version = ? "
+            "WHERE store_schema_version = ?",
+            (PT1_STORE_SCHEMA_VERSION, PT1_LEGACY_STORE_SCHEMA_VERSION),
         )
-        if legacy_rows:
-            row_columns = tuple(
-                str(row["name"])
-                for row in conn.execute(
-                    f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
-                )
-            )
-            assignments = ", ".join(f'"{column}" = ?' for column in row_columns)
-            for legacy_row in legacy_rows:
-                candidate_row = dict(legacy_row)
-                candidate_row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
-                candidate_row["_write_rebuild_indexes"] = True
-                try:
-                    writable_row = _gate_row_for_write(candidate_row)
-                except (UncacheableKey, UncacheablePayload):
-                    continue
-                conn.execute(
-                    f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {assignments} "
-                    'WHERE "key_hash" = ?',
-                    tuple(writable_row[column] for column in row_columns)
-                    + (writable_row["key_hash"],),
-                )
         if metadata is not None and metadata["value"] != PT1_STORE_SCHEMA_VERSION:
             conn.execute(
                 f"UPDATE {PT1_METADATA_TABLE} SET value = ? WHERE key = ?",

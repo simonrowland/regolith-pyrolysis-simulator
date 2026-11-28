@@ -269,7 +269,6 @@ def _cache_distance_component(
         _finite_float(neighbor.get("interpolation_distance"))
         for neighbor in neighbors
     ]
-    distances = [value for value in distances if value is not None]
     if not distances:
         distances = _computed_neighbor_distances(query_key, neighbors)
     if not distances:
