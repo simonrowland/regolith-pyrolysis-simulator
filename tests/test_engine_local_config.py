@@ -653,9 +653,9 @@ def test_rekey_migration_round_trip_and_idempotency(
         },
     }
     key_bytes = canonical_json_bytes(key)
-    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    key_hash = __import__("hashlib").sha256(key_bytes).hexdigest()
     other_key_bytes = canonical_json_bytes(other_key)
-    other_key_hash = hashlib.sha256(other_key_bytes).hexdigest()
+    other_key_hash = __import__("hashlib").sha256(other_key_bytes).hexdigest()
     payload_bytes = b'{"payload": true}'
 
     with sqlite3.connect(db_path) as conn:

@@ -123,25 +123,6 @@ def _strict_vapor_pt1_payload(
     vapor_provider_id="builtin-vapor-pressure",
     fallback_provider_id=None,
 ):
-    result = EquilibriumResult(
-        temperature_C=1200.0,
-        pressure_bar=0.001,
-        phases_present=["liquid"],
-        phase_masses_kg={"liquid": 1.0},
-        liquid_fraction=0.5,
-        liquid_composition_wt_pct={"Na2O": 50.0, "SiO2": 50.0},
-        vapor_pressures_Pa={"Na": 1.0},
-        vapor_pressures_source={"Na": "builtin_authoritative"},
-        warnings=[],
-    )
-    equilibrium_result = {
-        field.name: rrd._json_ready(getattr(result, field.name))
-        for field in rrd._equilibrium_result_payload_fields()
-        if not (
-            field.name in rrd._EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
-            and getattr(result, field.name) is None
-        )
-    }
     return {
         "authority": {
             "schema": "reduced-real-authority-v1",
@@ -165,9 +146,8 @@ def _strict_vapor_pt1_payload(
                 "fallback_allowed": fallback_provider_id is not None,
             },
         },
-        "equilibrium_result": equilibrium_result,
+        "equilibrium_result": {"status": "ok"},
         "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
-        "last_vapor_pressure_diagnostic": {},
     }
 
 
@@ -1387,3 +1367,92 @@ def test_full_population_command_documents_authorized_backend():
     assert "--backend alphamelts" in command
     assert "--require-magemin" in command
     assert "--allow-stub-equilibrium" not in command
+
+
+@pytest.mark.parametrize("write_path", ("put", "merge"))
+@pytest.mark.parametrize(
+    ("case_name", "key_kwargs", "payload_update", "match"),
+    (
+        (
+            "key_non_authoritative_provider",
+            {"vapor_provider_id": "vaporock"},
+            {},
+            "resolved_provider_id",
+        ),
+        (
+            "key_fallback_provider",
+            {"fallback_provider_id": "builtin-vapor-pressure"},
+            {},
+            "fallback_provider_id",
+        ),
+        (
+            "payload_builtin_fallback",
+            {},
+            {"last_vapor_pressures_source": {"Na": "builtin_fallback"}},
+            "builtin_fallback",
+        ),
+        (
+            "payload_kernel_fallback",
+            {},
+            {"equilibrium_result": {"status": "ok", "kernel_fallback_used": True}},
+            "kernel_fallback_used",
+        ),
+    ),
+)
+def test_strict_pt1_write_paths_share_vapor_gate(
+    tmp_path,
+    write_path,
+    case_name,
+    key_kwargs,
+    payload_update,
+    match,
+):
+    target_db = tmp_path / f"{write_path}-{case_name}-target.db"
+    key = _strict_vapor_pt1_key(case_name, **key_kwargs)
+    payload = _strict_vapor_pt1_payload(**key_kwargs)
+    payload.update(payload_update)
+
+    def write_put():
+        _write_equilibrium_post_record_row(
+            target_db,
+            key=key,
+            payload=payload,
+            strict_vapor_gate=True,
+        )
+
+    def write_merge():
+        shard_db = tmp_path / f"{write_path}-{case_name}-shard.db"
+        _write_equilibrium_post_record_row(
+            shard_db,
+            key=key,
+            payload=payload,
+            strict_vapor_gate=False,
+        )
+        driver._merge_cache_shard(shard_db, target_db)
+
+    write = write_put if write_path == "put" else write_merge
+    with pytest.raises(driver.GrindSourceGateError, match=match):
+        write()
+
+    assert driver._cache_row_summary(target_db)["rows"] == 0
+
+    clean_target_db = tmp_path / f"{write_path}-{case_name}-clean-target.db"
+    clean_key = _strict_vapor_pt1_key(f"{case_name}-clean")
+    clean_payload = _strict_vapor_pt1_payload()
+    if write_path == "put":
+        _write_equilibrium_post_record_row(
+            clean_target_db,
+            key=clean_key,
+            payload=clean_payload,
+            strict_vapor_gate=True,
+        )
+    else:
+        clean_shard_db = tmp_path / f"{write_path}-{case_name}-clean-shard.db"
+        _write_equilibrium_post_record_row(
+            clean_shard_db,
+            key=clean_key,
+            payload=clean_payload,
+            strict_vapor_gate=False,
+        )
+        driver._merge_cache_shard(clean_shard_db, clean_target_db)
+    assert driver._cache_row_summary(clean_target_db)["rows"] == 1

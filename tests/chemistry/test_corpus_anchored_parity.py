@@ -2130,28 +2130,24 @@ def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
 ) -> None:
     db_path = tmp_path / "cache.db"
     _write_rekey_table_with_physics_column(db_path)
-    with sqlite3.connect(db_path) as conn:
-        original = conn.execute(
-            f"SELECT corpus_version, replay_scope_sha256 "
-            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
-        ).fetchone()
 
     def fail_physics(_key):
         raise ValueError("synthetic physics derivation failure")
 
-    monkeypatch.setattr(rrd, "_physics_ladder_values_from_replay_key", fail_physics)
-    with pytest.raises(UncacheableKey):
+    monkeypatch.setattr(rekey, "_physics_columns", fail_physics)
+    with pytest.raises(ValueError, match="physics derivation failure"):
         rekey.rekey_cache(
             db_path,
             target_corpus_version=current_corpus_version(),
         )
 
     with sqlite3.connect(db_path) as conn:
-        after = conn.execute(
+        corpus_version, replay_scope = conn.execute(
             f"SELECT corpus_version, replay_scope_sha256 "
             f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
-    assert after == original
+    assert corpus_version is None
+    assert replay_scope == "stale-scope"
 
 
 def test_rekey_rejects_legacy_key_that_is_not_a_json_object(

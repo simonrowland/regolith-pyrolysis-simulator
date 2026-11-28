@@ -298,63 +298,50 @@ def _write_pt1_store(
     *,
     source: str = "vaporock",
 ) -> None:
-    provider = rrd._provider_authority_payload(
-        resolved_provider_id="alphamelts-diagnostic",
-        resolved_role="authoritative",
-        authoritative_provider_id="alphamelts-diagnostic",
-        fallback_provider_id=None,
-        fallback_allowed=False,
-        model="MELTSv1.0.2",
-        mode="subprocess",
-    )
-    vapor_provider = rrd._provider_authority_payload(
-        resolved_provider_id=source,
-        resolved_role="authoritative",
-        authoritative_provider_id=source,
-        fallback_provider_id=None,
-        fallback_allowed=False,
-        model="test-vapor-provider",
-        mode="test",
-    )
+    # Compose cache-design PT-1 keys use selection + payload authority (not the
+    # legacy key.vapor_pressure_provider blob alone). Emit both so the
+    # selection/authority mismatch gate and the vaporock rejection remain
+    # independently exercisable.
+    provider = {
+        "resolved_provider_id": source,
+        "authoritative_provider_id": source,
+    }
     key = {
-        "namespace_id": "alphamelts:equilibrium-composite",
-        "composition_mol_fraction": [["Na2O", 0.1], ["SiO2", 0.9]],
-        "controls": {"T_K": 1473.15, "log_fO2": -8.0, "pressure_bar": 0.001},
-        "redox": {"fe_redox_policy": "intrinsic", "fe_split": {}},
+        "schema_version": "pt1-test-key",
+        "corpus_version": "test-corpus",
+        "data_digests": {},
         "vapor_pressure_provider_selection": source,
-        "sulfur_side": {"S_input_ppm": 0.0, "stage0_inventory_digest": "test"},
-        "model": {"model": "alphamelts-diagnostic", "mode": "AlphaMELTSProvider"},
+        "vapor_pressure_provider": provider,
     }
-    key_bytes = rrd.canonical_json_bytes(key)
-    key_hash = rrd._sha256(key_bytes)
     payload = {
-        "equilibrium_result": {"status": "ok"},
+        "equilibrium_result": {},
         "last_vapor_pressures_source": {"Na": source, "SiO": source},
-        "authority": {
-            "schema": "reduced-real-authority-v1",
-            "evidence_class": "melts",
-            "backend_family": "alphamelts",
-            "backend": {
-                "backend_name": "AlphaMELTSBackend",
-                "backend_class": (
-                    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
-                ),
-            },
-            "provider": provider,
-            "vapor_pressure": vapor_provider,
-        },
+        "authority": {"vapor_pressure": provider},
     }
-    payload_bytes = rrd.canonical_json_bytes(payload)
-    rrd.PT1PersistentEquilibriumStore(db_path).put(
-        artifact="equilibrium_post_record",
-        key=key,
-        key_bytes=key_bytes,
-        key_hash=key_hash,
-        payload=payload,
-        payload_bytes=payload_bytes,
-        payload_hash=rrd._sha256(payload_bytes),
-        law_disclosures=[],
-    )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            """
+            CREATE TABLE reduced_real_equilibrium_payloads (
+                key_hash TEXT PRIMARY KEY,
+                artifact TEXT NOT NULL,
+                key_bytes BLOB NOT NULL,
+                payload_bytes BLOB NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO reduced_real_equilibrium_payloads
+                (key_hash, artifact, key_bytes, payload_bytes)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                "pt1-row-1",
+                "equilibrium_post_record",
+                json.dumps(key, sort_keys=True).encode("utf-8"),
+                json.dumps(payload, sort_keys=True).encode("utf-8"),
+            ),
+        )
 
 
 def test_strict_vapor_config_rejects_fallback_enabled() -> None:

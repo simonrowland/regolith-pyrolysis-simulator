@@ -26,15 +26,32 @@ def _write_rekeyable_rows(
     db_path: Path,
     engine_versions: tuple[str, ...] = ("one", "two"),
 ) -> None:
+    conn = sqlite3.connect(db_path)
+    conn.execute(
+        f"""
+        CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
+            key_hash TEXT PRIMARY KEY,
+            key_sha256 TEXT,
+            key_bytes BLOB,
+            engine_version TEXT,
+            corpus_version TEXT
+        )
+        """
+    )
     for engine_version in engine_versions:
-        put_rekey_gate_row(
-            db_path,
+        key_bytes = rekey.canonical_json_bytes(
             {
                 "backend": {"backend_name": "alphamelts"},
                 "engine_version": engine_version,
-            },
-            engine_version=engine_version,
+            }
         )
+        key_hash = hashlib.sha256(key_bytes).hexdigest()
+        conn.execute(
+            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?)",
+            (key_hash, key_hash, key_bytes, engine_version, None),
+        )
+    conn.commit()
+    conn.close()
 
 
 def test_failed_rekey_retry_reuses_content_addressed_backup(
@@ -130,7 +147,7 @@ def test_rekey_locks_identity_decision_before_backup(
         (backup_key_bytes,) = backup_conn.execute(
             f"SELECT key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
-    assert json.loads(bytes(backup_key_bytes))["engine_version"] == "one"
+    assert rekey._json_loads(bytes(backup_key_bytes))["engine_version"] == "one"
 
 
 def test_rekey_deep_stored_key_fails_through_admission(
@@ -236,6 +253,10 @@ def test_rekey_preserves_repair_notice_values(
     db_path = tmp_path / "notice-cache.db"
     _write_rekeyable_rows(db_path, ("one",))
     with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN repair_notices_json TEXT"
+        )
         conn.execute(
             f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
             "SET repair_notices_json = ? WHERE engine_version = 'one'",

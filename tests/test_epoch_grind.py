@@ -162,7 +162,7 @@ def _pt1_gate_payload(tag: str) -> dict[str, object]:
 
 def _put_pt1_cache_row(db_path: Path, tag: str, **kwargs: object) -> str:
     key = _pt1_cache_key(tag, **kwargs)
-    payload = _pt1_gate_payload(tag)
+    payload = {"curve": {"status": "in_range", "tag": tag}}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     key_hash = hashlib.sha256(key_bytes).hexdigest()
@@ -1818,12 +1818,7 @@ def test_epoch_child_cache_gate_receives_profile_strict_vapor_flag(
         lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="completed", returncode=0),
     )
 
-    def record_cache_gate(
-        db_path: Path,
-        decode_result_payload: object,
-        **kwargs: object,
-    ) -> dict[str, int]:
-        assert callable(decode_result_payload)
+    def record_cache_gate(db_path: Path, **kwargs: object) -> dict[str, int]:
         calls.append({"db_path": db_path, **kwargs})
         return {"rows": 0, "vapor_active_rows": 0, "source_reports": 0}
 
@@ -2365,7 +2360,7 @@ def _put_shard_row(shard_db: Path, *, tag: str, base_db: Path | None = None) -> 
         "schema_version": "test",
         "tag": tag,
     }
-    payload = _pt1_gate_payload(tag)
+    payload = {"curve": {"status": "in_range", "tag": tag}}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(

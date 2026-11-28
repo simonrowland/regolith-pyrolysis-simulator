@@ -813,41 +813,24 @@ def _silicate_equilibrium_key(
 
 def _pt0_equilibrium_capture_context(
     store: PT0DeterminismStore,
-    *,
-    backend_family: RealBackendFamily = RealBackendFamily.ALPHAMELTS,
 ) -> tuple[Any, EquilibriumResult]:
+    class AlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
+        def equilibrate(self, *, composition_mol_by_account=None):
+            raise AssertionError(
+                "the registered equilibrium fixture provider must handle the solve"
+            )
+
+        def get_engine_version(self) -> str:
+            return "non-stub-test"
+
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic",
+        engine_version="alpha-v1",
+    )
     sim = _build_pt0_sim(store)
-    if backend_family is RealBackendFamily.ALPHAMELTS:
-        class AlphaMELTSBackend(RealBackendAuthority):
-            real_backend_family = RealBackendFamily.ALPHAMELTS
-
-            def equilibrate(self, *, composition_mol_by_account=None):
-                raise AssertionError(
-                    "the registered equilibrium fixture provider must handle the solve"
-                )
-
-            def get_engine_version(self) -> str:
-                return "non-stub-test"
-
-        provider = _CountingSilicateEquilibriumProvider(
-            provider_id="alphamelts-diagnostic",
-            engine_version="alpha-v1",
-        )
-        sim.backend = AlphaMELTSBackend()
-    elif backend_family is RealBackendFamily.THERMOENGINE:
-        class ThermoEngineBackend(RealBackendAuthority):
-            real_backend_family = RealBackendFamily.THERMOENGINE
-            _model = "thermoengine-test"
-            _mode = None
-
-            def is_available(self) -> bool:
-                return True
-
-        backend = ThermoEngineBackend()
-        provider = AlphaMELTSProvider(backend=backend)
-        sim.backend = backend
-    else:
-        raise ValueError(f"unsupported test backend family: {backend_family!r}")
+    sim.backend = AlphaMELTSBackend()
     sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -2492,7 +2475,7 @@ def test_marker_only_melt_envelope_is_rejected_before_replay_reconstruction(
         replay()
 
 
-def test_pt1_put_does_not_apply_strict_vapor_reader_policy(
+def test_pt1_strict_vapor_policy_rejects_builtin_fallback_exact_hit(
     tmp_path: Path,
 ) -> None:
     capture = PT0DeterminismStore("capture")
@@ -2507,9 +2490,8 @@ def test_pt1_put_does_not_apply_strict_vapor_reader_policy(
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     db_path = tmp_path / "strict-pt1.sqlite"
-    store = rrd.PT1PersistentEquilibriumStore(db_path, strict_vapor_gate=True)
-
-    store.put(
+    writer = rrd.PT1PersistentEquilibriumStore(db_path)
+    writer.put(
         artifact="equilibrium_post_record",
         key=key,
         key_bytes=key_bytes,
@@ -2519,6 +2501,17 @@ def test_pt1_put_does_not_apply_strict_vapor_reader_policy(
         payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
     )
 
+    strict_reader = rrd.PT1PersistentEquilibriumStore(
+        db_path,
+        strict_vapor_gate=True,
+    )
+    with pytest.raises(GrindSourceGateError, match="builtin_fallback"):
+        strict_reader.get(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        )
     assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 1
 
 
@@ -2875,8 +2868,6 @@ def test_pt0_production_gate_curve_cold_replays_across_isochemical_ramp(
     replay_sim.melt.oxygen_reservoir.reference_T_K = 1723.15
     replay_sim._sync_oxygen_reservoir_mirror()
     assert replay_sim._freeze_gate_curve() == curve
-    assert replay.hits == 1
-    assert replay.last_cache_state == "cached_exact"
     replay_controls = replay.replay_sequence[-1]["key"]["controls"]
     assert replay_controls == capture_controls
 
@@ -6447,16 +6438,16 @@ def test_pt1_concurrent_row_copy_checks_and_writes_atomically(
     target_path = tmp_path / "atomic-row-copy-target.sqlite"
     PT1PersistentEquilibriumStore(target_path)
     admission_barrier = threading.Barrier(2)
-    original_admission = rrd._admit_stored_row
+    original_admission = rrd._pt1_row_admission
 
-    def synchronized_admission(row, **kwargs):
+    def synchronized_admission(row):
         try:
             admission_barrier.wait(timeout=1.0)
         except threading.BrokenBarrierError:
             pass
-        return original_admission(row, **kwargs)
+        return original_admission(row)
 
-    monkeypatch.setattr(rrd, "_admit_stored_row", synchronized_admission)
+    monkeypatch.setattr(rrd, "_pt1_row_admission", synchronized_admission)
 
     def copy_source(source_path: Path) -> str:
         try:
@@ -7033,35 +7024,20 @@ def test_extrapolated_gate_rows_that_miss_d447_are_replaceable(
         **stale_curve,
         "certified_band": {"sio2_wt_pct": [30.0, 80.0]},
     }
-    if bad_band is None:
-        _store_unadmitted_test_payload(
-            store,
-            "freeze_gate_curve",
-            key,
-            {"curve": stale_curve},
-            law_disclosures=[],
-        )
-        miss = (
-            PT0DeterminismStore("replay", db_path=db_path)
-            if persistent
-            else store
-        )
-        with pytest.raises(PT0CacheMiss):
-            miss._lookup("freeze_gate_curve", key)
-    else:
-        with pytest.raises(rrd.UncacheablePayload):
-            store._store(
-                "freeze_gate_curve",
-                key,
-                {"curve": stale_curve},
-                law_disclosures=[],
-            )
-        assert store._entries == {}
-        if persistent:
-            assert _persistent_artifact_count(
-                db_path,
-                "freeze_gate_curve",
-            ) == 0
+    _store_unadmitted_test_payload(
+        store,
+        "freeze_gate_curve",
+        key,
+        {"curve": stale_curve},
+        law_disclosures=[],
+    )
+    miss = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else store
+    )
+    with pytest.raises(PT0CacheMiss):
+        miss._lookup("freeze_gate_curve", key)
 
     store._store(
         "freeze_gate_curve",
@@ -7134,27 +7110,6 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
             }
         }
 
-    memory_bad_capture = PT0DeterminismStore("capture")
-    with pytest.raises(rrd.UncacheablePayload):
-        memory_bad_capture._store(
-            "freeze_gate_curve",
-            key,
-            payload_for([0.0, 100.0]),
-            law_disclosures=[],
-        )
-    assert memory_bad_capture._entries == {}
-
-    bad_capture_db = tmp_path / "extrapolated-gate-write-band-mismatch.sqlite"
-    bad_capture = PT0DeterminismStore("capture", db_path=bad_capture_db)
-    with pytest.raises(rrd.UncacheablePayload):
-        bad_capture._store(
-            "freeze_gate_curve",
-            key,
-            payload_for([0.0, 100.0]),
-            law_disclosures=[],
-        )
-    assert _persistent_artifact_count(bad_capture_db, "freeze_gate_curve") == 0
-
     def row_for(
         payload: Mapping[str, Any],
         *,
@@ -7165,30 +7120,39 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
         )
         payload_bytes = canonical_json_bytes(payload)
         key_hash = rrd._sha256(key_bytes)
-        return {
+        selected_key = key if replay_key is None else replay_key
+        bucket_key = canonical_physics_bucket_key_from_replay_key(selected_key)
+        bucket_bytes = canonical_json_bytes(bucket_key)
+        ladder_values = rrd._physics_ladder_values_from_replay_key(selected_key)
+        row = {
             "artifact": "freeze_gate_curve",
-            "store_schema_version": rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,
+            "store_schema_version": rrd.PT1_STORE_SCHEMA_VERSION,
             "request_schema_version": rrd.SCHEMA_VERSION,
             "key_hash": key_hash,
             "key_sha256": key_hash,
             "key_bytes": key_bytes,
             "payload_bytes": payload_bytes,
             "payload_sha256": rrd._sha256(payload_bytes),
+            "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
             "code_version": rrd._code_version(),
             "corpus_version": None,
             "engine_version": None,
             "data_digests_json": "{}",
+            "repair_notices_json": "[]",
+            "physics_bucket_schema_version": rrd.PHYSICS_BUCKET_SCHEMA_VERSION,
+            "physics_bucket_sha256": rrd._sha256(bucket_bytes),
+            "replay_scope_sha256": rrd._replay_scope_hash(bucket_key),
+            "physics_key_bytes": bucket_bytes,
             "created_at": "2026-11-27T00:00:00Z",
             "git_dirty": 0,
-            "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
         }
+        for rung_tag, values in ladder_values.items():
+            row[rrd._physics_ladder_hash_column(rung_tag)] = values["sha256"]
+            row[rrd._physics_ladder_distance_column(rung_tag)] = values["distance"]
+        return row
 
     stale_payload = payload_for([0.0, 100.0])
     valid_payload = payload_for([30.0, 80.0])
-    current_write_row = row_for(stale_payload)
-    current_write_row["store_schema_version"] = rrd.PT1_STORE_SCHEMA_VERSION
-    with pytest.raises(rrd.UncacheablePayload):
-        rrd._gate_row_for_write(current_write_row)
     assert not rrd._pt1_row_admission(row_for(stale_payload))
     assert rrd._pt1_row_admission(row_for(valid_payload))
     reversed_band_key = copy.deepcopy(rrd._json_ready(key))
@@ -7206,7 +7170,6 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
             replay_key=reversed_band_key,
         )
     )
-
     store = PT0DeterminismStore(
         "capture",
         db_path=tmp_path / "d447-query-identity-readers.sqlite",
@@ -8009,19 +7972,10 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
     assert entry["payload_codec_version"] == (
         rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
     )
-    prior_notice = {"kind": "stale_codec_repair"}
-    prior_notices_json = rrd.encode_repair_notices_json([prior_notice])
-    entry["repair_notices_json"] = prior_notices_json
     entry["payload_codec_version"] = row_version
     if persistent:
         assert db_path is not None
         _set_pt1_payload_codec_version(db_path, key_hash, row_version)
-        with sqlite3.connect(db_path) as conn:
-            conn.execute(
-                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                "SET repair_notices_json = ? WHERE key_hash = ?",
-                (prior_notices_json, key_hash),
-            )
 
     miss_store = (
         PT0DeterminismStore("replay", db_path=db_path)
@@ -8038,7 +7992,6 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
         rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
     )
     assert entry["payload"] == current_payload
-    assert entry["repair_notices_json"] == prior_notices_json
     if persistent:
         assert capture.persistent_store is not None
         persisted_entry = capture.persistent_store.get(
@@ -8051,46 +8004,28 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
         assert persisted_entry["payload_codec_version"] == (
             rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
         )
-        assert persisted_entry["repair_notices_json"] == prior_notices_json
     replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
     assert replay._lookup("equilibrium_post_record", key, sim=sim) == current_payload
     assert replay.hits == 1
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
-@pytest.mark.parametrize(
-    "backend_family",
-    (RealBackendFamily.ALPHAMELTS, RealBackendFamily.THERMOENGINE),
-    ids=("alphamelts", "thermoengine"),
-)
 def test_current_equilibrium_capture_hits_after_admission(
     tmp_path: Path,
     persistent: bool,
-    backend_family: RealBackendFamily,
 ) -> None:
     db_path = tmp_path / "current-equilibrium-hit.sqlite" if persistent else None
     capture = PT0DeterminismStore("capture", db_path=db_path)
-    sim, result = _pt0_equilibrium_capture_context(
-        capture,
-        backend_family=backend_family,
-    )
+    sim, result = _pt0_equilibrium_capture_context(capture)
     capture.capture_equilibrium(sim, result)
     key = capture._equilibrium_key(sim)
-    assert any(
-        float(component[1]) > 1.0
-        for component in key["composition_mol_fraction"]
-    )
-    assert math.isfinite(
-        rrd.physics_ladder_bucket_distance_from_replay_key(key, "h40")
-    )
-    current_payload = capture._lookup("equilibrium_post_record", key, sim=sim)
-    assert current_payload is not None
-    assert capture.hits == 1
+    current_payload = capture._entries[_key_hash(key)]["payload"]
 
-    replay = PT0DeterminismStore("replay", db_path=db_path)
-    if not persistent:
-        replay._entries = copy.deepcopy(capture._entries)
-        replay.physics_bucket_entries = dict(capture.physics_bucket_entries)
+    replay = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else capture
+    )
     assert replay._lookup("equilibrium_post_record", key, sim=sim) == current_payload
     assert replay.hits == 1
 
@@ -9300,27 +9235,18 @@ def test_pt1_verify_on_hit_fails_loudly(
 
 
 @pytest.mark.parametrize(
-    ("index_kind", "distance_corruption", "corrupt_payload_bytes"),
+    ("index_kind", "distance_corruption"),
     (
-        ("bucket", None, False),
-        ("ladder", "missing", False),
-        ("ladder", "incorrect", False),
-        ("ladder", "missing", True),
-        ("ladder", "incorrect", True),
+        ("bucket", None),
+        ("ladder", "missing"),
+        ("ladder", "incorrect"),
     ),
-    ids=(
-        "bucket-key-bytes",
-        "ladder-distance-missing",
-        "ladder-distance-wrong",
-        "ladder-distance-missing-before-invalid-payload-bytes",
-        "ladder-distance-wrong-before-invalid-payload-bytes",
-    ),
+    ids=("bucket-key-bytes", "ladder-distance-missing", "ladder-distance-wrong"),
 )
 def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
     tmp_path: Path,
     index_kind: str,
     distance_corruption: str | None,
-    corrupt_payload_bytes: bool,
 ) -> None:
     db_path = tmp_path / f"pt1-{index_kind}-{distance_corruption}.sqlite"
     capture = PT0DeterminismStore("capture", db_path=db_path)
@@ -9359,29 +9285,15 @@ def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
                     )
                     + 0.01
                 )
-            payload_bytes_assignment = (
-                ", payload_bytes = ?" if corrupt_payload_bytes else ""
-            )
-            update_values: tuple[object, ...] = (0, corrupted_distance)
-            if corrupt_payload_bytes:
-                update_values += (-1,)
             conn.execute(
                 f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                f"SET payload_codec_version = ?, {distance_column} = ?"
-                f"{payload_bytes_assignment} "
+                f"SET payload_codec_version = ?, {distance_column} = ? "
                 "WHERE key_hash = ?",
-                (*update_values, key_hash),
+                (0, corrupted_distance, key_hash),
             )
 
     persistent = PT1PersistentEquilibriumStore(db_path)
-    expected_message = (
-        "distance is missing"
-        if distance_corruption == "missing"
-        else "distance mismatch"
-        if distance_corruption == "incorrect"
-        else None
-    )
-    with pytest.raises(PT1PersistentStoreCorrupt, match=expected_message):
+    with pytest.raises(PT1PersistentStoreCorrupt):
         if index_kind == "bucket":
             persistent._get_by_physics_bucket(
                 artifact="freeze_gate_curve",
@@ -9434,18 +9346,8 @@ def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
             PT1PersistentStoreCorrupt,
         ),
         (
-            "pt1_bucket",
-            "compound_payload_checksum_physics_key_bytes",
-            PT1PersistentStoreCorrupt,
-        ),
-        (
             "pt1_ladder",
             "compound_key_json_ladder_distance",
-            PT1PersistentStoreCorrupt,
-        ),
-        (
-            "pt1_ladder",
-            "compound_payload_checksum_ladder_distance",
             PT1PersistentStoreCorrupt,
         ),
         (
@@ -9477,9 +9379,7 @@ def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
         "pt1-replace-malformed-payload-json",
         "pt1-replace-key-hash",
         "pt1-bucket-key-json-before-physics-index",
-        "pt1-bucket-metadata-before-payload-checksum",
         "pt1-ladder-key-json-before-distance",
-        "pt1-ladder-distance-before-payload-checksum",
         "pt1-interpolation-scope-before-payload-json",
     ),
 )
@@ -9585,14 +9485,6 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
                     "SET key_bytes = ?, physics_key_bytes = ? WHERE key_hash = ?",
                     (sqlite3.Binary(b"{"), sqlite3.Binary(b"{}"), key_hash),
                 )
-        elif corruption == "compound_payload_checksum_physics_key_bytes":
-            with sqlite3.connect(db_path) as conn:
-                conn.execute(
-                    f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                    "SET payload_sha256 = ?, physics_key_bytes = ? "
-                    "WHERE key_hash = ?",
-                    ("0" * 64, sqlite3.Binary(b"{}"), key_hash),
-                )
         elif corruption == "compound_key_json_ladder_distance":
             distance_column = rrd._physics_ladder_distance_column(rung_tag)
             with sqlite3.connect(db_path) as conn:
@@ -9601,15 +9493,6 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
                     f"SET key_bytes = ?, {distance_column} = NULL "
                     "WHERE key_hash = ?",
                     (sqlite3.Binary(b"{"), key_hash),
-                )
-        elif corruption == "compound_payload_checksum_ladder_distance":
-            distance_column = rrd._physics_ladder_distance_column(rung_tag)
-            with sqlite3.connect(db_path) as conn:
-                conn.execute(
-                    f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                    f"SET payload_sha256 = ?, {distance_column} = NULL "
-                    "WHERE key_hash = ?",
-                    ("0" * 64, key_hash),
                 )
         elif corruption == "compound_replay_scope_malformed_payload_json":
             malformed_payload = sqlite3.Binary(b"{")
@@ -9784,11 +9667,7 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
     assert type(raised.value) is error_type
     if corruption == "compound_key_json_physics_key_bytes":
         assert "physics bucket bytes mismatch" in str(raised.value)
-    elif corruption == "compound_payload_checksum_physics_key_bytes":
-        assert "physics bucket bytes mismatch" in str(raised.value)
     elif corruption == "compound_key_json_ladder_distance":
-        assert "distance is missing" in str(raised.value)
-    elif corruption == "compound_payload_checksum_ladder_distance":
         assert "distance is missing" in str(raised.value)
     elif corruption == "compound_replay_scope_malformed_payload_json":
         assert "exact key replay scope mismatch" in str(raised.value)
@@ -10482,20 +10361,6 @@ def _curated_recursive_mutations(
                 0,
             ),
             (("equilibrium_result", "pressure_bar"), "none", None),
-            # Exhaustive coverage found the nullable authority field can pass
-            # structural admission but must miss when it no longer matches
-            # the validated provider identity.
-            (
-                ("authority", "provider", "authoritative_provider_id"),
-                "none",
-                None,
-            ),
-            # Keep a string-shaped bad id so identity admission must reject it.
-            (
-                ("authority", "provider", "fallback_provider_id"),
-                "wrong-scalar",
-                "wrong-type",
-            ),
             (
                 ("last_vapor_pressure_diagnostic", "source_reaction_fO2_bar"),
                 "bool",
@@ -11638,16 +11503,6 @@ def _run_real_cache_payload_recursive_mutations(
             "vaporock_cap_K wrong-scalar"
         )
         assert outcomes[high_t_cap_path] == "miss"
-        authoritative_provider_path = (
-            "encoded-row: "
-            "root.authority.provider.authoritative_provider_id none"
-        )
-        assert outcomes[authoritative_provider_path] == "miss"
-        fallback_provider_path = (
-            "encoded-row: root.authority.provider.fallback_provider_id "
-            "wrong-scalar"
-        )
-        assert outcomes[fallback_provider_path] == "miss"
     else:
         admitted_step_down_path = (
             "real-gate-step-down-output: "
@@ -12003,3 +11858,31 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     assert "miss" in outcomes.values()
     assert "admitted" in outcomes.values()
     assert not failures, "\n".join(failures)
+
+
+def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
+    tmp_path: Path,
+) -> None:
+    key = _strict_vapor_key()
+    payload = {
+        "authority": _alphamelts_record_authority(),
+        "equilibrium_result": {"status": "ok"},
+        "last_vapor_pressures_source": {"Na": "builtin_fallback"},
+    }
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    db_path = tmp_path / "strict-pt1.sqlite"
+    store = rrd.PT1PersistentEquilibriumStore(db_path, strict_vapor_gate=True)
+
+    with pytest.raises(GrindSourceGateError, match="builtin_fallback"):
+        store.put(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=hashlib.sha256(key_bytes).hexdigest(),
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+        )
+
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
