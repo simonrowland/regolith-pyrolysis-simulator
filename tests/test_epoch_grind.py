@@ -16,6 +16,7 @@ import pytest
 from scripts import epoch_grind
 from scripts.seed_reduced_real_cache import payload_count
 from simulator.corpus_version import current_corpus_version
+import simulator.reduced_real_determinism as rrd
 from simulator.reduced_real_determinism import (
     PT0_GATE_CURVE_CODEC_VERSION,
     PT1PersistentEquilibriumStore,
@@ -145,9 +146,23 @@ def _pt1_cache_point_id(tag: str, **kwargs: object) -> str:
     return hashlib.sha256(canonical_json_bytes(_pt1_cache_key(tag, **kwargs))).hexdigest()
 
 
+def _pt1_gate_payload(tag: str) -> dict[str, object]:
+    return {
+        "curve": rrd._curve_payload(
+            {
+                "source": f"unit-test:epoch:{tag}",
+                "solidus_T_C": 1200.0,
+                "liquidus_T_C": 1300.0,
+                "path": ((1200.0, 0.0), (1300.0, 1.0)),
+                "is_liquidus_floor": False,
+            }
+        )
+    }
+
+
 def _put_pt1_cache_row(db_path: Path, tag: str, **kwargs: object) -> str:
     key = _pt1_cache_key(tag, **kwargs)
-    payload = {"curve": {"status": "in_range", "tag": tag}}
+    payload = _pt1_gate_payload(tag)
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     key_hash = hashlib.sha256(key_bytes).hexdigest()
@@ -161,6 +176,41 @@ def _put_pt1_cache_row(db_path: Path, tag: str, **kwargs: object) -> str:
         payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
     )
     return key_hash
+
+
+def test_epoch_gate_curve_write_passes_artifact_decoder(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    gate_rows: list[dict[str, object]] = []
+    decoded_payloads: list[object] = []
+    original_gate = rrd._gate_row_for_write
+    original_decode = rrd._decode_payload_for_admission
+
+    def record_gate(row):
+        admitted_row = original_gate(row)
+        if row.get("artifact") == "freeze_gate_curve":
+            gate_rows.append(admitted_row)
+        return admitted_row
+
+    def record_decode(artifact, payload, **kwargs):
+        decoded = original_decode(artifact, payload, **kwargs)
+        if (
+            artifact == "freeze_gate_curve"
+            and kwargs.get("reader_context_policy") is False
+        ):
+            decoded_payloads.append(decoded)
+        return decoded
+
+    monkeypatch.setattr(rrd, "_gate_row_for_write", record_gate)
+    monkeypatch.setattr(rrd, "_decode_payload_for_admission", record_decode)
+
+    db_path = tmp_path / "epoch-gate-write-gate.sqlite"
+    _put_pt1_cache_row(db_path, "write-gate-trace")
+
+    assert gate_rows
+    assert any(decoded is not None for decoded in decoded_payloads)
+    assert gate_rows[-1]["artifact"] == "freeze_gate_curve"
 
 
 def test_control_quantization_cli_parse_and_epoch_profile_overlay(
@@ -2315,7 +2365,7 @@ def _put_shard_row(shard_db: Path, *, tag: str, base_db: Path | None = None) -> 
         "schema_version": "test",
         "tag": tag,
     }
-    payload = {"curve": {"status": "in_range", "tag": tag}}
+    payload = _pt1_gate_payload(tag)
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(

@@ -19,16 +19,15 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from simulator.reduced_real_determinism import (  # noqa: E402
-    PHYSICS_BUCKET_SCHEMA_VERSION,
     PT1_EQUILIBRIUM_TABLE,
+    PT1_LEGACY_STORE_SCHEMA_VERSION,
+    PT1_STORE_SCHEMA_VERSION,
     PT1PersistentStoreCorrupt,
     _admit_stored_row,
-    _ladder_indexability,
-    _physics_ladder_values_from_replay_key,
-    _replay_scope_hash,
+    _gate_row_for_write,
+    _sha256,
     cache_row_needs_rekey,
     canonical_json_bytes,
-    canonical_physics_bucket_key_from_replay_key,
     rekey_engine_version_provenance,
     rekey_row_matches_engine,
     replace_rekey_cache_identity,
@@ -49,9 +48,12 @@ class RekeyResult:
 
 def _key_from_stored_row(row: sqlite3.Row) -> dict[str, Any]:
     row_columns = set(row.keys())
-    # Green's legacy table predates both columns; partial current layouts stay
-    # on full admission rather than falling back to the weaker legacy check.
-    if not row_columns.intersection({"artifact", "store_schema_version"}):
+    store_stamp = (
+        row["store_schema_version"]
+        if "store_schema_version" in row_columns
+        else None
+    )
+    if store_stamp in (None, "pt1", PT1_LEGACY_STORE_SCHEMA_VERSION):
         legacy_required_columns = {
             "key_hash",
             "key_sha256",
@@ -68,16 +70,35 @@ def _key_from_stored_row(row: sqlite3.Row) -> dict[str, Any]:
             key_bytes = row["key_bytes"]
             if not isinstance(key_bytes, (bytes, bytearray, memoryview)):
                 raise TypeError("legacy key_bytes must be bytes")
-            key = json.loads(bytes(key_bytes).decode("utf-8"))
+            raw_key_bytes = bytes(key_bytes)
+            key = json.loads(raw_key_bytes.decode("utf-8"))
+            if not isinstance(key, dict):
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 legacy cache row request key is not an object: "
+                    f"{row['key_hash']}"
+                )
+            canonical_key_bytes = canonical_json_bytes(key)
+            key_hash = _sha256(canonical_key_bytes)
+            if (
+                canonical_key_bytes != raw_key_bytes
+                or row["key_hash"] != key_hash
+                or row["key_sha256"] != key_hash
+            ):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 legacy cache row key integrity mismatch: {row['key_hash']}"
+                )
+        except PT1PersistentStoreCorrupt:
+            raise
         except (KeyError, TypeError, ValueError, RecursionError) as exc:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 legacy cache row has invalid key JSON: {row['key_hash']}"
             ) from exc
-        if not isinstance(key, dict):
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 legacy cache row request key is not an object: {row['key_hash']}"
-            )
         return key
+
+    if store_stamp != PT1_STORE_SCHEMA_VERSION:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 cache row has unsupported rekey schema stamp: {store_stamp!r}"
+        )
 
     admitted = _admit_stored_row(row, store_kind="pt1")
     if admitted is None:
@@ -99,29 +120,6 @@ def _table_columns(conn: sqlite3.Connection) -> set[str]:
     return {
         str(row["name"])
         for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
-    }
-
-
-def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
-    physics_key = canonical_physics_bucket_key_from_replay_key(key)
-    physics_bytes = canonical_json_bytes(physics_key)
-    indexability_error = _ladder_indexability(key)
-    if indexability_error is not None:
-        raise indexability_error
-    ladder_values = _physics_ladder_values_from_replay_key(key)
-    return {
-        "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
-        "physics_bucket_sha256": hashlib.sha256(physics_bytes).hexdigest(),
-        "replay_scope_sha256": _replay_scope_hash(physics_key),
-        "physics_key_bytes": sqlite3.Binary(physics_bytes),
-        "physics_bucket_h40_sha256": ladder_values["h40"]["sha256"],
-        "physics_bucket_h40_distance": ladder_values["h40"]["distance"],
-        "physics_bucket_h30_sha256": ladder_values["h30"]["sha256"],
-        "physics_bucket_h30_distance": ladder_values["h30"]["distance"],
-        "physics_bucket_h40c_sha256": ladder_values["h40c"]["sha256"],
-        "physics_bucket_h40c_distance": ladder_values["h40c"]["distance"],
-        "physics_bucket_h30c_sha256": ladder_values["h30c"]["sha256"],
-        "physics_bucket_h30c_distance": ladder_values["h30c"]["distance"],
     }
 
 
@@ -238,43 +236,24 @@ def rekey_cache(
             )
             if not replace_rekey_cache_identity(key, target):
                 continue
-            key_bytes = canonical_json_bytes(key)
-            key_hash = hashlib.sha256(key_bytes).hexdigest()
-            physics_columns_present = {
-                "physics_bucket_schema_version",
-                "physics_bucket_sha256",
-                "replay_scope_sha256",
-                "physics_key_bytes",
-                "physics_bucket_h40_sha256",
-                "physics_bucket_h40_distance",
-                "physics_bucket_h30_sha256",
-                "physics_bucket_h30_distance",
-                "physics_bucket_h40c_sha256",
-                "physics_bucket_h40c_distance",
-                "physics_bucket_h30c_sha256",
-                "physics_bucket_h30c_distance",
-            } & table_columns
-            physics = _physics_columns(key) if physics_columns_present else {}
-            assignments = [
-                "key_bytes = ?",
-                "key_sha256 = ?",
-                "key_hash = ?",
-                "corpus_version = ?",
-                "engine_version = ?",
-            ]
-            values: list[Any] = [
-                sqlite3.Binary(key_bytes),
-                key_hash,
-                key_hash,
-                target,
-                provenance,
-            ]
-            for column, value in physics.items():
-                if column not in table_columns:
-                    continue
-                assignments.append(f"{column} = ?")
-                values.append(value)
-            values.append(row["key_hash"])
+            old_key_hash = str(row["key_hash"])
+            candidate_row = dict(row)
+            candidate_row["corpus_version"] = target
+            candidate_row["engine_version"] = provenance
+            candidate_row.update(
+                {
+                    "_write_key": key,
+                    "_write_replace_key": True,
+                    "_write_rebuild_indexes": True,
+                }
+            )
+            candidate_row = _gate_row_for_write(candidate_row)
+            update_columns = tuple(
+                column for column in table_columns if column in candidate_row
+            )
+            assignments = [f'"{column}" = ?' for column in update_columns]
+            values = [candidate_row[column] for column in update_columns]
+            values.append(old_key_hash)
             conn.execute(
                 f"""
                 UPDATE {PT1_EQUILIBRIUM_TABLE}

@@ -4587,6 +4587,9 @@ def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
         # separate cross-knee approximation refusal.
         key["controls"]["pO2_bar"] = 1.0e-8
     payload = _valid_test_gate_payload()
+    payload["authority"] = {
+        "vapor_pressure": _alphamelts_record_authority()["vapor_pressure"]
+    }
 
     capture = PT0DeterminismStore("capture", db_path=source_db)
     capture._store(
@@ -5508,6 +5511,64 @@ def test_pt1_shard_copy_rejects_stored_control_shape_as_corrupt(
         PT1PersistentStoreCorrupt,
         match=r"controls\.T_K",
     ):
+        rrd._copy_pt1_equilibrium_rows(
+            (source_path,),
+            target_path,
+            require_capture_epoch_match=False,
+        )
+
+    with sqlite3.connect(target_path) as conn:
+        (target_rows,) = conn.execute(
+            f"SELECT COUNT(*) FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert target_rows == 0
+
+
+def test_pt1_shard_copy_refuses_subnormal_key_with_missing_ladder_indexes(
+    tmp_path: Path,
+) -> None:
+    source_path = tmp_path / "copy-subnormal-source.sqlite"
+    target_path = tmp_path / "copy-subnormal-target.sqlite"
+    key = _c3a_ladder_key(
+        "copy-subnormal-control",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    _put_c3a_payload(source_path, key, "copy-subnormal-control")
+    corrupt_key = copy.deepcopy(rrd._json_ready(key))
+    corrupt_key["controls"]["T_K"] = 5e-324
+    _key_bytes, corrupt_key_hash, _bucket_key, _bucket_bytes = (
+        _rewrite_pt1_key_and_derived_indexes(
+            source_path,
+            _key_hash(key),
+            corrupt_key,
+        )
+    )
+    missing_index_columns = [
+        "physics_bucket_schema_version",
+        "physics_bucket_sha256",
+        "replay_scope_sha256",
+        "physics_key_bytes",
+        *(
+            column
+            for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+            for column in (
+                rrd._physics_ladder_hash_column(rung_tag),
+                rrd._physics_ladder_distance_column(rung_tag),
+            )
+        ),
+    ]
+    assignments = ", ".join(
+        f'"{column}" = NULL' for column in missing_index_columns
+    )
+    with sqlite3.connect(source_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {assignments} "
+            "WHERE key_hash = ?",
+            (corrupt_key_hash,),
+        )
+
+    with pytest.raises(PT1PersistentStoreCorrupt, match="not copyable"):
         rrd._copy_pt1_equilibrium_rows(
             (source_path,),
             target_path,
@@ -7536,6 +7597,89 @@ def test_empty_gate_curve_capture_skips_write_with_notice(
     assert notices[0]["kind"] == "reduced_real_cache_write_skipped"
     assert notices[0]["category"] == "invalid-payload"
     assert "freeze_gate_curve payload is not replayable" in notices[0]["reason"]
+
+
+def test_pt1_legacy_stamp_upgrade_gates_final_row(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "legacy-stamp-empty-gate.sqlite"
+    _capture, _sim, _curve, key, baseline = _capture_recursive_gate_row(
+        db_path,
+        persistent=True,
+    )
+    key_hash = _key_hash(key)
+    invalid_payload = copy.deepcopy(baseline)
+    invalid_payload["curve"]["path"] = []
+    _write_pt1_payload_for_invariant(db_path, key_hash, invalid_payload)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET store_schema_version = ? "
+            "WHERE key_hash = ?",
+            (rrd.PT1_LEGACY_STORE_SCHEMA_VERSION, key_hash),
+        )
+        conn.execute(
+            f"UPDATE {rrd.PT1_METADATA_TABLE} SET value = ? "
+            "WHERE key = 'store_schema_version'",
+            (rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,),
+        )
+
+    gate_refusals: list[BaseException] = []
+    original_gate = rrd._gate_row_for_write
+
+    def record_gate_refusal(row):
+        try:
+            return original_gate(row)
+        except (rrd.UncacheableKey, rrd.UncacheablePayload) as exc:
+            gate_refusals.append(exc)
+            raise
+
+    monkeypatch.setattr(rrd, "_gate_row_for_write", record_gate_refusal)
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    key_bytes = canonical_json_bytes(key)
+    assert store.get(
+        artifact="freeze_gate_curve",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+    ) is None
+    assert len(gate_refusals) == 1
+    assert isinstance(gate_refusals[0], rrd.UncacheablePayload)
+    with sqlite3.connect(db_path) as conn:
+        (store_stamp,) = conn.execute(
+            f"SELECT store_schema_version FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert store_stamp == rrd.PT1_LEGACY_STORE_SCHEMA_VERSION
+
+
+def test_pt1_write_gate_maps_nonfinite_caller_bucket_key_to_uncacheable_key(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "nonfinite-caller-bucket.sqlite"
+    key = _freeze_gate_key()
+    payload = _valid_test_gate_payload()
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    bucket_key = {"replay_scope": {"x": float("inf")}}
+    noncanonical_bucket_bytes = b'{"replay_scope":{"x":Infinity}}'
+
+    with pytest.raises(rrd.UncacheableKey):
+        PT1PersistentEquilibriumStore(db_path).put(
+            artifact="freeze_gate_curve",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=rrd._sha256(key_bytes),
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=rrd._sha256(payload_bytes),
+            physics_bucket_key=bucket_key,
+            physics_bucket_bytes=noncanonical_bucket_bytes,
+            physics_bucket_hash=rrd._sha256(noncanonical_bucket_bytes),
+        )
+
+    assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))

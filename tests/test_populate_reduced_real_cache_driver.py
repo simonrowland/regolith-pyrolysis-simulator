@@ -12,6 +12,7 @@ import pytest
 import simulator.reduced_real_determinism as rrd
 from simulator.corpus_version import current_corpus_version
 from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
+from simulator.melt_backend.base import EquilibriumResult
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -122,6 +123,25 @@ def _strict_vapor_pt1_payload(
     vapor_provider_id="builtin-vapor-pressure",
     fallback_provider_id=None,
 ):
+    result = EquilibriumResult(
+        temperature_C=1200.0,
+        pressure_bar=0.001,
+        phases_present=["liquid"],
+        phase_masses_kg={"liquid": 1.0},
+        liquid_fraction=0.5,
+        liquid_composition_wt_pct={"Na2O": 50.0, "SiO2": 50.0},
+        vapor_pressures_Pa={"Na": 1.0},
+        vapor_pressures_source={"Na": "builtin_authoritative"},
+        warnings=[],
+    )
+    equilibrium_result = {
+        field.name: rrd._json_ready(getattr(result, field.name))
+        for field in rrd._equilibrium_result_payload_fields()
+        if not (
+            field.name in rrd._EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
+            and getattr(result, field.name) is None
+        )
+    }
     return {
         "authority": {
             "schema": "reduced-real-authority-v1",
@@ -145,8 +165,9 @@ def _strict_vapor_pt1_payload(
                 "fallback_allowed": fallback_provider_id is not None,
             },
         },
-        "equilibrium_result": {"status": "ok"},
+        "equilibrium_result": equilibrium_result,
         "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
+        "last_vapor_pressure_diagnostic": {},
     }
 
 
@@ -171,6 +192,46 @@ def _write_equilibrium_post_record_row(
         payload_bytes=payload_bytes,
         payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
     )
+
+
+def test_populate_equilibrium_post_record_write_passes_artifact_decoder(
+    tmp_path,
+    monkeypatch,
+):
+    gate_rows = []
+    decoded_payloads = []
+    original_gate = rrd._gate_row_for_write
+    original_decode = rrd._decode_payload_for_admission
+
+    def record_gate(row):
+        admitted_row = original_gate(row)
+        if row.get("artifact") == "equilibrium_post_record":
+            gate_rows.append(admitted_row)
+        return admitted_row
+
+    def record_decode(artifact, payload, **kwargs):
+        decoded = original_decode(artifact, payload, **kwargs)
+        if (
+            artifact == "equilibrium_post_record"
+            and kwargs.get("reader_context_policy") is False
+        ):
+            decoded_payloads.append(decoded)
+        return decoded
+
+    monkeypatch.setattr(rrd, "_gate_row_for_write", record_gate)
+    monkeypatch.setattr(rrd, "_decode_payload_for_admission", record_decode)
+
+    db_path = tmp_path / "populate-equilibrium-write-gate.db"
+    key = _strict_vapor_pt1_key("write-gate-trace")
+    _write_equilibrium_post_record_row(
+        db_path,
+        key=key,
+        payload=_strict_vapor_pt1_payload(),
+    )
+
+    assert gate_rows
+    assert any(decoded is not None for decoded in decoded_payloads)
+    assert gate_rows[-1]["artifact"] == "equilibrium_post_record"
 
 
 def _write_equilibrium_post_record_row_raw(

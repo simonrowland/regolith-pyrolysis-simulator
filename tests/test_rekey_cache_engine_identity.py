@@ -192,6 +192,38 @@ def test_rekey_deep_stored_key_fails_through_admission(
     assert admission_calls[0]["store_kind"] == "pt1"
 
 
+def test_rekey_legacy_stamp_rejects_overflowing_key_as_corrupt(
+    tmp_path: Path,
+    target_corpus_version: str,
+) -> None:
+    db_path = tmp_path / "legacy-overflow-key-cache.db"
+    _write_rekeyable_rows(db_path, ("one",))
+    with sqlite3.connect(db_path) as conn:
+        key_hash, key_bytes = conn.execute(
+            f"SELECT key_hash, key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        overflow_key_bytes = bytes(key_bytes)[:-1] + b',"overflow":1e400}'
+        overflow_hash = hashlib.sha256(overflow_key_bytes).hexdigest()
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_sha256 = ?, key_bytes = ?, "
+            "store_schema_version = 'pt1' WHERE key_hash = ?",
+            (
+                overflow_hash,
+                overflow_hash,
+                sqlite3.Binary(overflow_key_bytes),
+                key_hash,
+            ),
+        )
+
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=target_corpus_version,
+            dry_run=True,
+        )
+
+
 @pytest.mark.parametrize(
     "repair_notices_json",
     ['[{"kind":"rekey_repair"}]', "[]", None],

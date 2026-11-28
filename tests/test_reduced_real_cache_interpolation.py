@@ -50,9 +50,9 @@ def test_interpolation_and_ladder_reject_non_string_control_names() -> None:
 
     assert rrd._replay_key_control_shape(key) == (None, "controls")
     assert rci.interpolation_key_domain_violation(key) == "controls"
-    with pytest.raises(rrd.UncacheableKey) as raised:
-        rrd._ladder_indexability(key)
-    assert raised.value.reason == "controls"
+    refusal = rrd._ladder_indexability(key)
+    assert isinstance(refusal, rrd.UncacheableKey)
+    assert refusal.reason == "controls"
 
 
 def _interpolation_key(

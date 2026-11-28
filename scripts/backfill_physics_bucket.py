@@ -28,7 +28,10 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
     PT1_EQUILIBRIUM_TABLE,
+    UncacheableKey,
+    UncacheablePayload,
     _admit_stored_row,
+    _gate_row_for_write,
     _ladder_indexability,
     assert_strict_vapor_pt1_row,
     canonical_json_bytes,
@@ -166,39 +169,49 @@ def run_backfill(
                     continue
                 stats.rows_needing_backfill += 1
                 if not dry_run:
+                    candidate_row = dict(row)
+                    candidate_row.update(
+                        {
+                            "physics_bucket_schema_version": values.schema_version,
+                            "physics_bucket_sha256": values.physics_bucket_sha256,
+                            "replay_scope_sha256": values.replay_scope_sha256,
+                            "physics_key_bytes": sqlite3.Binary(
+                                values.physics_key_bytes
+                            ),
+                            "physics_bucket_h40_sha256": values.physics_bucket_h40_sha256,
+                            "physics_bucket_h40_distance": values.physics_bucket_h40_distance,
+                            "physics_bucket_h30_sha256": values.physics_bucket_h30_sha256,
+                            "physics_bucket_h30_distance": values.physics_bucket_h30_distance,
+                            "physics_bucket_h40c_sha256": values.physics_bucket_h40c_sha256,
+                            "physics_bucket_h40c_distance": values.physics_bucket_h40c_distance,
+                            "physics_bucket_h30c_sha256": values.physics_bucket_h30c_sha256,
+                            "physics_bucket_h30c_distance": values.physics_bucket_h30c_distance,
+                            "_write_rebuild_indexes": True,
+                        }
+                    )
+                    try:
+                        writable_row = _gate_row_for_write(candidate_row)
+                    except (UncacheableKey, UncacheablePayload):
+                        stats.invalid_rows += 1
+                        continue
+                    update_columns = tuple(PHYSICS_COLUMNS)
+                    if "store_schema_version" in columns:
+                        update_columns = ("store_schema_version", *update_columns)
                     updates.append(
-                        (
-                            values.schema_version,
-                            values.physics_bucket_sha256,
-                            values.replay_scope_sha256,
-                            sqlite3.Binary(values.physics_key_bytes),
-                            values.physics_bucket_h40_sha256,
-                            values.physics_bucket_h40_distance,
-                            values.physics_bucket_h30_sha256,
-                            values.physics_bucket_h30_distance,
-                            values.physics_bucket_h40c_sha256,
-                            values.physics_bucket_h40c_distance,
-                            values.physics_bucket_h30c_sha256,
-                            values.physics_bucket_h30c_distance,
-                            row["key_hash"],
-                        )
+                        tuple(writable_row[column] for column in update_columns)
+                        + (row["key_hash"],)
                     )
             if updates:
+                update_columns = tuple(PHYSICS_COLUMNS)
+                if "store_schema_version" in columns:
+                    update_columns = ("store_schema_version", *update_columns)
+                assignments = ", ".join(
+                    f"{column} = ?" for column in update_columns
+                )
                 update_cursor = conn.executemany(
                     f"""
                     UPDATE {PT1_EQUILIBRIUM_TABLE}
-                    SET physics_bucket_schema_version = ?,
-                        physics_bucket_sha256 = ?,
-                        replay_scope_sha256 = ?,
-                        physics_key_bytes = ?,
-                        physics_bucket_h40_sha256 = ?,
-                        physics_bucket_h40_distance = ?,
-                        physics_bucket_h30_sha256 = ?,
-                        physics_bucket_h30_distance = ?,
-                        physics_bucket_h40c_sha256 = ?,
-                        physics_bucket_h40c_distance = ?,
-                        physics_bucket_h30c_sha256 = ?,
-                        physics_bucket_h30c_distance = ?
+                    SET {assignments}
                     WHERE key_hash = ?
                       AND (
                           physics_bucket_schema_version IS NULL

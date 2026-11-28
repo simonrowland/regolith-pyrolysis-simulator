@@ -32,7 +32,6 @@ chunk-20/Phase-A-cohort-1 acceptance criterion.
 
 from __future__ import annotations
 
-import hashlib
 import math
 import sqlite3
 import warnings
@@ -46,11 +45,14 @@ import yaml
 from scripts import cache_convert
 from scripts import grid_pregrind
 from simulator.corpus_version import current_corpus_version
+import simulator.reduced_real_determinism as rrd
 from simulator.reduced_real_determinism import (
     PT1PersistentStoreCorrupt,
+    UncacheableKey,
     validated_rekey_corpus_version,
 )
 from scripts import rekey_cache_engine_identity as rekey
+from tests.cache_rekey_fixtures import put_rekey_gate_row
 from scripts import sso_r_validation_map
 from scripts import validate_cache_c4_interpolation as c4_validation
 
@@ -2096,29 +2098,18 @@ def test_f353_backend_or_unknown_status_is_not_physics_refusal(status: str) -> N
 
 
 def _write_rekey_table_with_physics_column(db_path: Path) -> None:
-    key_bytes = rekey.canonical_json_bytes(
+    put_rekey_gate_row(
+        db_path,
         {
             "backend": {"backend_name": "alphamelts"},
             "engine_version": "legacy-engine",
-        }
+        },
+        engine_version="legacy-engine",
     )
-    key_hash = hashlib.sha256(key_bytes).hexdigest()
     with sqlite3.connect(db_path) as conn:
         conn.execute(
-            f"""
-            CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
-                key_hash TEXT PRIMARY KEY,
-                key_sha256 TEXT,
-                key_bytes BLOB,
-                engine_version TEXT,
-                corpus_version TEXT,
-                replay_scope_sha256 TEXT
-            )
-            """
-        )
-        conn.execute(
-            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?, ?)",
-            (key_hash, key_hash, key_bytes, "legacy-engine", None, "stale-scope"),
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = 'pt1'"
         )
 
 
@@ -2128,24 +2119,28 @@ def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
 ) -> None:
     db_path = tmp_path / "cache.db"
     _write_rekey_table_with_physics_column(db_path)
+    with sqlite3.connect(db_path) as conn:
+        original = conn.execute(
+            f"SELECT corpus_version, replay_scope_sha256 "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
 
     def fail_physics(_key):
         raise ValueError("synthetic physics derivation failure")
 
-    monkeypatch.setattr(rekey, "_physics_columns", fail_physics)
-    with pytest.raises(ValueError, match="physics derivation failure"):
+    monkeypatch.setattr(rrd, "_physics_ladder_values_from_replay_key", fail_physics)
+    with pytest.raises(UncacheableKey):
         rekey.rekey_cache(
             db_path,
             target_corpus_version=current_corpus_version(),
         )
 
     with sqlite3.connect(db_path) as conn:
-        corpus_version, replay_scope = conn.execute(
+        after = conn.execute(
             f"SELECT corpus_version, replay_scope_sha256 "
             f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
-    assert corpus_version is None
-    assert replay_scope == "stale-scope"
+    assert after == original
 
 
 def test_rekey_rejects_legacy_key_that_is_not_a_json_object(

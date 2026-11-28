@@ -293,6 +293,7 @@ def _admission_rejection(
     payload_codec_version: int | None = None,
     keys: Sequence[Mapping[str, Any]] = (),
     interpolation_synthesized: bool = False,
+    reader_context_policy: bool = True,
 ) -> str | None:
     expected_version = _payload_codec_version(artifact)
     if expected_version is None:
@@ -453,7 +454,7 @@ def _admission_rejection(
     if not has_finite_json_numbers(payload):
         return "payload.json_number"
     if artifact == "freeze_gate_curve":
-        if not keys:
+        if reader_context_policy and not keys:
             return "gate.key_missing"
         curve_payload = payload.get("curve")
         if not isinstance(curve_payload, Mapping):
@@ -468,70 +469,71 @@ def _admission_rejection(
             and not valid_composition_projected_notice(projected_notice)
         ):
             return "gate.composition_projected_notice"
-        magemin_identities = []
-        for key in keys:
-            if not isinstance(key, Mapping):
-                return "gate.key.type"
-            identity_key = key.get("freeze_gate_cache_key")
-            identity_is_required = (
-                getattr(identity_key, "magemin_domain_identity", None) is not None
-                or (
-                    isinstance(identity_key, Mapping)
-                    and identity_key.get("magemin_domain_identity") is not None
+        if reader_context_policy:
+            magemin_identities = []
+            for key in keys:
+                if not isinstance(key, Mapping):
+                    return "gate.key.type"
+                identity_key = key.get("freeze_gate_cache_key")
+                identity_is_required = (
+                    getattr(identity_key, "magemin_domain_identity", None) is not None
+                    or (
+                        isinstance(identity_key, Mapping)
+                        and identity_key.get("magemin_domain_identity") is not None
+                    )
+                    or (
+                        isinstance(identity_key, (list, tuple))
+                        and len(identity_key) == 9
+                        and identity_key[7] is not None
+                    )
                 )
-                or (
-                    isinstance(identity_key, (list, tuple))
-                    and len(identity_key) == 9
-                    and identity_key[7] is not None
-                )
-            )
-            try:
-                identity = _magemin_identity_from_replay_key(key)
-            except (OverflowError, TypeError, ValueError):
-                identity = None
-            if identity is None and identity_is_required:
-                return "gate.key.identity"
-            if identity is None:
-                continue
-            if identity.silica_verdict not in {"in_band", "extrapolated"}:
-                return "gate.key.silica_verdict"
-            magemin_identities.append(identity)
-        extrapolated_identities = [
-            identity
-            for identity in magemin_identities
-            if identity.silica_verdict == "extrapolated"
-        ]
-        if extrapolated_identities:
-            stored_or_query_identity = extrapolated_identities[0]
-            if (
-                len(keys) > 1
-                and len(magemin_identities) != len(keys)
-            ) or any(
-                not stored_or_query_identity.matches(identity)
+                try:
+                    identity = _magemin_identity_from_replay_key(key)
+                except (OverflowError, TypeError, ValueError):
+                    identity = None
+                if identity is None and identity_is_required:
+                    return "gate.key.identity"
+                if identity is None:
+                    continue
+                if identity.silica_verdict not in {"in_band", "extrapolated"}:
+                    return "gate.key.silica_verdict"
+                magemin_identities.append(identity)
+            extrapolated_identities = [
+                identity
                 for identity in magemin_identities
-            ):
-                return "gate.key.identity_mismatch"
-            certified_band = curve.get("certified_band")
-            silica_bounds = (
-                certified_band.get("sio2_wt_pct")
-                if isinstance(certified_band, Mapping)
-                else None
-            )
-            if (
-                not isinstance(silica_bounds, (list, tuple))
-                or isinstance(silica_bounds, (str, bytes))
-                or len(silica_bounds) != 2
-                or not all(
-                    _is_finite_cache_number(bound)
-                    for bound in silica_bounds
+                if identity.silica_verdict == "extrapolated"
+            ]
+            if extrapolated_identities:
+                stored_or_query_identity = extrapolated_identities[0]
+                if (
+                    len(keys) > 1
+                    and len(magemin_identities) != len(keys)
+                ) or any(
+                    not stored_or_query_identity.matches(identity)
+                    for identity in magemin_identities
+                ):
+                    return "gate.key.identity_mismatch"
+                certified_band = curve.get("certified_band")
+                silica_bounds = (
+                    certified_band.get("sio2_wt_pct")
+                    if isinstance(certified_band, Mapping)
+                    else None
                 )
-                or silica_bounds[0] >= silica_bounds[1]
-                or stored_or_query_identity.certified_band is None
-                or curve.get("authority") != "extrapolated"
-                or tuple(float(bound) for bound in silica_bounds)
-                != stored_or_query_identity.certified_band
-            ):
-                return "gate.key.certified_band_mismatch"
+                if (
+                    not isinstance(silica_bounds, (list, tuple))
+                    or isinstance(silica_bounds, (str, bytes))
+                    or len(silica_bounds) != 2
+                    or not all(
+                        _is_finite_cache_number(bound)
+                        for bound in silica_bounds
+                    )
+                    or silica_bounds[0] >= silica_bounds[1]
+                    or stored_or_query_identity.certified_band is None
+                    or curve.get("authority") != "extrapolated"
+                    or tuple(float(bound) for bound in silica_bounds)
+                    != stored_or_query_identity.certified_band
+                ):
+                    return "gate.key.certified_band_mismatch"
         return None
     if artifact == "equilibrium_post_record":
         equilibrium_result = payload.get("equilibrium_result")
@@ -584,7 +586,7 @@ def _admission_rejection(
                 return "equilibrium.authority.provider_shape"
         elif "authority" in payload and not isinstance(authority, Mapping):
             return "equilibrium.authority.type"
-        if not interpolation_synthesized and keys:
+        if not interpolation_synthesized and reader_context_policy and keys:
             try:
                 validate_reduced_real_equilibrium_record_key(
                     artifact,
@@ -791,6 +793,7 @@ def _decode_payload_for_admission(
     payload_codec_version: int | None = None,
     keys: Sequence[Mapping[str, Any]] = (),
     interpolation_synthesized: bool = False,
+    reader_context_policy: bool = True,
 ) -> Any | None:
     if _admission_rejection(
         artifact,
@@ -798,6 +801,7 @@ def _decode_payload_for_admission(
         payload_codec_version=payload_codec_version,
         keys=keys,
         interpolation_synthesized=interpolation_synthesized,
+        reader_context_policy=reader_context_policy,
     ) is not None:
         return None
     expected_version = _payload_codec_version(artifact)
@@ -1962,9 +1966,8 @@ class PT0DeterminismStore:
             "cache_state": "live_fill",
         }
         if self.persistent_store is None:
-            _require_write_candidate_admission(
+            _require_pt0_memory_candidate_admission(
                 entry,
-                store_kind="pt0",
                 artifact=artifact,
                 key=key,
                 key_bytes=key_bytes,
@@ -2614,6 +2617,7 @@ def _admit_stored_row(
     validate_source_provenance: bool = False,
     approved_sources: frozenset[str] = APPROVED_LIVE_VAPOR_SOURCES,
     validate_interpolation_domain: bool = False,
+    reader_context_policy: bool = True,
 ) -> _AdmittedStoredRow | None:
     """Admit one stored row using a single PT1 integrity-check sequence.
 
@@ -2734,10 +2738,11 @@ def _admit_stored_row(
                         if candidate != stored_key
                     ]
                 ),
+                reader_context_policy=reader_context_policy,
             )
             if decoded is not None:
                 decode_repair_notices_json(raw_row.get("repair_notices_json"))
-                if not _disclosures_known(raw_row):
+                if reader_context_policy and not _disclosures_known(raw_row):
                     decoded = None
             return _AdmittedStoredRow(
                 dict(raw_row), decoded, physics_ladder_values=stored_ladder_values
@@ -3236,6 +3241,7 @@ def _admit_stored_row(
             row_payload,
             payload_codec_version=payload_codec_version,
             keys=tuple(decode_keys),
+            reader_context_policy=reader_context_policy,
         )
         if nonfinite_requested_rung:
             decoded = None
@@ -3253,59 +3259,217 @@ def _admit_stored_row(
         ) from exc
 
 
-def _require_write_candidate_admission(
-    row: Mapping[str, Any],
-    *,
-    store_kind: str,
-    artifact: str,
-    key: Mapping[str, Any],
-    key_bytes: bytes,
-    key_hash: str,
-    expected_payload: Mapping[str, Any] | None = None,
-    physics_bucket_key: Mapping[str, Any] | None = None,
-    physics_bucket_bytes: bytes | None = None,
-    physics_bucket_hash: str | None = None,
-) -> _AdmittedStoredRow:
+def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
+    """Canonicalize and admit one final PT1 row before its SQL mutation.
+
+    Private ``_write_*`` values carry the caller's inputs to this boundary so
+    that serialization failures are converted to the same typed write refusal
+    as failures discovered while decoding the encoded row.
+    """
+
     try:
-        admitted = _admit_stored_row(
-            row,
-            store_kind=store_kind,
-            artifact=artifact,
-            key=key,
-            key_bytes=key_bytes,
-            key_hash=key_hash,
-            physics_bucket_key=physics_bucket_key,
-            physics_bucket_bytes=physics_bucket_bytes,
-            physics_bucket_hash=physics_bucket_hash,
-            validate_interpolation_domain=True,
+        row = dict(raw_row)
+    except Exception as exc:
+        raise UncacheablePayload("unknown", "") from exc
+    expected_key = row.pop("_write_key", None)
+    replace_key = row.pop("_write_replace_key", False)
+    expected_payload = row.pop("_write_payload", None)
+    input_bucket_key = row.pop("_write_physics_bucket_key", None)
+    input_bucket_bytes = row.pop("_write_physics_bucket_bytes", None)
+    input_bucket_hash = row.pop("_write_physics_bucket_hash", None)
+    rebuild_indexes = row.pop("_write_rebuild_indexes", False)
+    artifact = row.get("artifact")
+    artifact_name = artifact if isinstance(artifact, str) else "unknown"
+    try:
+        key_hash = str(row.get("key_hash", ""))
+    except Exception as exc:
+        raise UncacheablePayload(artifact_name, "") from exc
+    stage = "key"
+
+    try:
+        if type(replace_key) is not bool or type(rebuild_indexes) is not bool:
+            raise TypeError("invalid PT1 write-gate options")
+        if not isinstance(artifact, str):
+            raise TypeError("PT1 write row artifact must be a string")
+
+        if expected_key is not None:
+            if not isinstance(expected_key, Mapping):
+                raise TypeError("caller key must be a mapping")
+            canonical_key_bytes = canonical_json_bytes(expected_key)
+            if replace_key:
+                key_hash = _sha256(canonical_key_bytes)
+                row["key_hash"] = key_hash
+                row["key_sha256"] = key_hash
+                row["key_bytes"] = sqlite3.Binary(canonical_key_bytes)
+                row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+                stored_key = dict(_json_ready(expected_key))
+            else:
+                supplied_key_bytes = _pt1_row_bytes(
+                    row.get("key_bytes"), field="key", key_hash=key_hash
+                )
+                if supplied_key_bytes != canonical_key_bytes:
+                    raise UncacheableKey(
+                        PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                        "write_candidate_key_bytes",
+                    )
+                stored_key = _pt1_row_key(
+                    supplied_key_bytes, key_hash=key_hash
+                )
+        else:
+            supplied_key_bytes = _pt1_row_bytes(
+                row.get("key_bytes"), field="key", key_hash=key_hash
+            )
+            stored_key = _pt1_row_key(supplied_key_bytes, key_hash=key_hash)
+            canonical_key_bytes = canonical_json_bytes(stored_key)
+
+        supplied_key_bytes = _pt1_row_bytes(
+            row.get("key_bytes"), field="key", key_hash=key_hash
         )
-    except PT1PersistentStoreCorrupt as exc:
-        if store_kind != "pt1":
-            raise
-        message = str(exc).lower()
-        if any(
-            marker in message
-            for marker in ("key", "bucket", "scope", "ladder", "distance")
+        if supplied_key_bytes != canonical_key_bytes:
+            raise UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "write_candidate_key_bytes",
+            )
+        key_hash = _sha256(canonical_key_bytes)
+        if row.get("key_hash") != key_hash or row.get("key_sha256") != key_hash:
+            raise UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "write_candidate_key_hash",
+            )
+        indexability_error = _ladder_indexability(stored_key)
+        if indexability_error is not None:
+            raise indexability_error
+
+        derived_bucket_key = canonical_physics_bucket_key_from_replay_key(
+            stored_key
+        )
+        bucket_key = (
+            derived_bucket_key
+            if input_bucket_key is None
+            else input_bucket_key
+        )
+        canonical_bucket_bytes = canonical_json_bytes(bucket_key)
+        derived_bucket_bytes = canonical_json_bytes(derived_bucket_key)
+        if canonical_bucket_bytes != derived_bucket_bytes:
+            raise UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "write_candidate_physics_bucket_key",
+            )
+        if input_bucket_bytes is not None and bytes(input_bucket_bytes) != canonical_bucket_bytes:
+            raise UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "write_candidate_physics_bucket_bytes",
+            )
+        bucket_hash = _sha256(canonical_bucket_bytes)
+        if input_bucket_hash is not None and input_bucket_hash != bucket_hash:
+            raise UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "write_candidate_physics_bucket_hash",
+            )
+
+        ladder_values = _physics_ladder_values_from_replay_key(stored_key)
+        rebuild_indexes = rebuild_indexes or (
+            row.get("store_schema_version") != PT1_STORE_SCHEMA_VERSION
+            or row.get("physics_bucket_schema_version") is None
+        )
+        if rebuild_indexes:
+            row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+            row["physics_bucket_schema_version"] = PHYSICS_BUCKET_SCHEMA_VERSION
+            row["physics_bucket_sha256"] = bucket_hash
+            row["replay_scope_sha256"] = _replay_scope_hash(bucket_key)
+            row["physics_key_bytes"] = sqlite3.Binary(canonical_bucket_bytes)
+            for rung_tag, values in ladder_values.items():
+                row[_physics_ladder_hash_column(rung_tag)] = values["sha256"]
+                row[_physics_ladder_distance_column(rung_tag)] = values[
+                    "distance"
+                ]
+        else:
+            stored_bucket_bytes = _pt1_row_bytes(
+                row.get("physics_key_bytes"),
+                field="physics bucket key",
+                key_hash=key_hash,
+            )
+            if stored_bucket_bytes != canonical_bucket_bytes:
+                raise UncacheableKey(
+                    PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                    "write_candidate_physics_bucket_bytes",
+                )
+
+        stage = "payload"
+        payload_bytes = _pt1_row_bytes(
+            row.get("payload_bytes"), field="payload", key_hash=key_hash
+        )
+        payload_value = _pt1_row_json(
+            payload_bytes, field="payload", key_hash=key_hash
+        )
+        canonical_payload_bytes = _payload_integrity_bytes(payload_value)
+        if (
+            canonical_payload_bytes != payload_bytes
+            or row.get("payload_sha256") != _sha256(payload_bytes)
         ):
+            raise UncacheablePayload(artifact_name, key_hash)
+        if expected_payload is not None and (
+            canonical_json_bytes(expected_payload) != payload_bytes
+        ):
+            raise UncacheablePayload(artifact_name, key_hash)
+
+        try:
+            admitted = _admit_stored_row(
+                row,
+                store_kind="pt1",
+                reader_context_policy=False,
+            )
+        except PT1PersistentStoreCorrupt as exc:
+            message = str(exc).lower()
+            if any(
+                marker in message
+                for marker in (
+                    "key",
+                    "bucket",
+                    "scope",
+                    "ladder",
+                    "distance",
+                    "replay key",
+                )
+            ):
+                raise UncacheableKey(
+                    PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                    "write_candidate_index",
+                ) from exc
+            raise UncacheablePayload(artifact_name, key_hash) from exc
+        if admitted is None or admitted.decoded_payload is None:
+            raise UncacheablePayload(artifact_name, key_hash)
+        return dict(admitted.stored_columns or row)
+    except (UncacheableKey, UncacheablePayload):
+        raise
+    except Exception as exc:
+        if stage == "key":
             raise UncacheableKey(
                 PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
                 "write_candidate_index",
             ) from exc
-        raise UncacheablePayload(artifact, key_hash) from exc
-    if admitted is None:
+        raise UncacheablePayload(artifact_name, key_hash) from exc
+
+
+def _require_pt0_memory_candidate_admission(
+    row: Mapping[str, Any],
+    *,
+    artifact: str,
+    key: Mapping[str, Any],
+    key_bytes: bytes,
+    key_hash: str,
+) -> None:
+    admitted = _admit_stored_row(
+        row,
+        store_kind="pt0",
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        reader_context_policy=False,
+    )
+    if admitted is None or admitted.decoded_payload is None:
         raise UncacheablePayload(artifact, key_hash)
-    # A reader-context replay miss does not make well-formed caller data
-    # uncacheable; the encoded bytes and row shape are still checked below.
-    if expected_payload is not None:
-        try:
-            payload_matches = canonical_json_bytes(
-                admitted.entry["payload"]
-            ) == canonical_json_bytes(expected_payload)
-        except (OverflowError, TypeError, ValueError):
-            payload_matches = False
-        if not payload_matches:
-            raise UncacheablePayload(artifact, key_hash)
-    return admitted
 
 
 class PT1PersistentEquilibriumStore:
@@ -3359,11 +3523,8 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str | None = None,
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
-        # Preflight caller input in full before looking up a local or attached
-        # row. Replay-policy misses remain writable.
-        indexability_error = _ladder_indexability(key)
-        if indexability_error is not None:
-            raise indexability_error
+        # Preserve the capture-side authority rule; replay policy is excluded
+        # from the shared PT1 write gate below.
         try:
             validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         except (PT1PersistentStoreCorrupt, RuntimeError) as exc:
@@ -3376,62 +3537,95 @@ class PT1PersistentEquilibriumStore:
                 payload=payload,
                 key_hash=key_hash,
             )
-        if physics_bucket_key is None:
-            physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
-        if physics_bucket_bytes is None:
-            physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
-        if physics_bucket_hash is None:
-            physics_bucket_hash = _sha256(physics_bucket_bytes)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
-        ladder_values = _physics_ladder_values_from_replay_key(key)
 
-        preflight_row: dict[str, Any] = {
-            "key_hash": key_hash,
-            "artifact": artifact,
-            "store_schema_version": PT1_STORE_SCHEMA_VERSION,
-            "request_schema_version": SCHEMA_VERSION,
-            "key_sha256": key_hash,
-            "payload_sha256": payload_hash,
-            "payload_codec_version": payload_codec_version,
-            "key_bytes": key_bytes,
-            "payload_bytes": payload_bytes,
-            "code_version": _code_version(),
-            "corpus_version": None,
-            "engine_version": _none_or_str(engine_version_provenance),
-            "data_digests_json": "{}",
-            "repair_notices_json": repair_notices_json,
-            "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
-            "physics_bucket_sha256": physics_bucket_hash,
-            "replay_scope_sha256": _replay_scope_hash(physics_bucket_key),
-            "physics_key_bytes": physics_bucket_bytes,
-            "created_at": (
-                datetime.now(timezone.utc)
-                .isoformat()
-                .replace("+00:00", "Z")
-            ),
-            "git_dirty": self._epoch_git_dirty,
-            "law_disclosures_json": _law_disclosures_json(
-                incoming_disclosures
-            ),
-        }
-        for rung_tag, values in ladder_values.items():
-            preflight_row[_physics_ladder_hash_column(rung_tag)] = values[
-                "sha256"
-            ]
-            preflight_row[_physics_ladder_distance_column(rung_tag)] = values[
-                "distance"
-            ]
-        _require_write_candidate_admission(
-            preflight_row,
-            store_kind="pt1",
-            artifact=artifact,
-            key=key,
-            key_bytes=key_bytes,
+        insert_columns = (
+            "key_hash",
+            "artifact",
+            "store_schema_version",
+            "request_schema_version",
+            "key_sha256",
+            "payload_sha256",
+            "payload_codec_version",
+            "key_bytes",
+            "payload_bytes",
+            "code_version",
+            "corpus_version",
+            "engine_version",
+            "data_digests_json",
+            "repair_notices_json",
+            "physics_bucket_schema_version",
+            "physics_bucket_sha256",
+            "replay_scope_sha256",
+            "physics_key_bytes",
+            "physics_bucket_h40_sha256",
+            "physics_bucket_h40_distance",
+            "physics_bucket_h30_sha256",
+            "physics_bucket_h30_distance",
+            "physics_bucket_h40c_sha256",
+            "physics_bucket_h40c_distance",
+            "physics_bucket_h30c_sha256",
+            "physics_bucket_h30c_distance",
+            "created_at",
+            "git_dirty",
+        )
+        candidate_row: dict[str, Any] = dict(
+            zip(
+                insert_columns,
+                (
+                    key_hash,
+                    artifact,
+                    PT1_STORE_SCHEMA_VERSION,
+                    SCHEMA_VERSION,
+                    key_hash,
+                    payload_hash,
+                    payload_codec_version,
+                    sqlite3.Binary(key_bytes),
+                    sqlite3.Binary(payload_bytes),
+                    _code_version(),
+                    None,
+                    _none_or_str(engine_version_provenance),
+                    "{}",
+                    repair_notices_json,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    datetime.now(timezone.utc)
+                    .isoformat()
+                    .replace("+00:00", "Z"),
+                    self._epoch_git_dirty,
+                ),
+            )
+        )
+        candidate_row["law_disclosures_json"] = _law_disclosures_json(
+            incoming_disclosures
+        )
+        candidate_row.update(
+            {
+                "_write_key": key,
+                "_write_payload": payload,
+                "_write_physics_bucket_key": physics_bucket_key,
+                "_write_physics_bucket_bytes": physics_bucket_bytes,
+                "_write_physics_bucket_hash": physics_bucket_hash,
+                "_write_rebuild_indexes": True,
+            }
+        )
+        candidate_row = _gate_row_for_write(candidate_row)
+        physics_bucket_bytes = bytes(candidate_row["physics_key_bytes"])
+        physics_bucket_hash = str(candidate_row["physics_bucket_sha256"])
+        physics_bucket_key = _pt1_row_json(
+            physics_bucket_bytes,
+            field="physics bucket key",
             key_hash=key_hash,
-            expected_payload=payload,
-            physics_bucket_key=physics_bucket_key,
-            physics_bucket_bytes=physics_bucket_bytes,
-            physics_bucket_hash=physics_bucket_hash,
         )
 
         with self._connect() as conn:
@@ -3485,41 +3679,28 @@ class PT1PersistentEquilibriumStore:
                         candidate_row["payload_sha256"] = payload_hash
                         candidate_row["payload_bytes"] = payload_bytes
                         candidate_row["payload_codec_version"] = payload_codec_version
-                    if existing_fields.get("physics_bucket_sha256") is None or any(
-                        existing_fields.get(_physics_ladder_hash_column(rung_tag))
-                        is None
-                        for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
-                    ):
-                        candidate_row["physics_bucket_schema_version"] = (
-                            PHYSICS_BUCKET_SCHEMA_VERSION
+                    rebuild_indexes = (
+                        existing_fields.get("physics_bucket_sha256") is None
+                        or any(
+                            existing_fields.get(_physics_ladder_hash_column(rung_tag))
+                            is None
+                            for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
                         )
-                        candidate_row["physics_bucket_sha256"] = physics_bucket_hash
-                        candidate_row["replay_scope_sha256"] = _replay_scope_hash(
-                            physics_bucket_key
-                        )
-                        candidate_row["physics_key_bytes"] = physics_bucket_bytes
-                        for rung_tag, values in ladder_values.items():
-                            candidate_row[_physics_ladder_hash_column(rung_tag)] = (
-                                values["sha256"]
-                            )
-                            candidate_row[_physics_ladder_distance_column(rung_tag)] = (
-                                values["distance"]
-                            )
+                    )
                     candidate_row["law_disclosures_json"] = _law_disclosures_json(
                         write_disclosures
                     )
-                    _require_write_candidate_admission(
-                        candidate_row,
-                        store_kind="pt1",
-                        artifact=artifact,
-                        key=key,
-                        key_bytes=key_bytes,
-                        key_hash=key_hash,
-                        expected_payload=payload,
-                        physics_bucket_key=physics_bucket_key,
-                        physics_bucket_bytes=physics_bucket_bytes,
-                        physics_bucket_hash=physics_bucket_hash,
+                    candidate_row.update(
+                        {
+                            "_write_key": key,
+                            "_write_payload": payload,
+                            "_write_physics_bucket_key": physics_bucket_key,
+                            "_write_physics_bucket_bytes": physics_bucket_bytes,
+                            "_write_physics_bucket_hash": physics_bucket_hash,
+                            "_write_rebuild_indexes": rebuild_indexes,
+                        }
                     )
+                    candidate_row = _gate_row_for_write(candidate_row)
                     if stale_payload:
                         conn.execute(
                             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
@@ -3544,9 +3725,23 @@ class PT1PersistentEquilibriumStore:
                         conn,
                         key_hash=key_hash,
                         physics_bucket_key=physics_bucket_key,
-                        physics_bucket_bytes=physics_bucket_bytes,
-                        physics_bucket_hash=physics_bucket_hash,
-                        ladder_values=ladder_values,
+                        physics_bucket_bytes=bytes(
+                            candidate_row["physics_key_bytes"]
+                        ),
+                        physics_bucket_hash=str(
+                            candidate_row["physics_bucket_sha256"]
+                        ),
+                        ladder_values={
+                            rung_tag: {
+                                "sha256": candidate_row[
+                                    _physics_ladder_hash_column(rung_tag)
+                                ],
+                                "distance": candidate_row[
+                                    _physics_ladder_distance_column(rung_tag)
+                                ],
+                            }
+                            for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                        },
                     )
                     self._write_law_disclosures(conn, key_hash, write_disclosures)
                     return
@@ -3566,92 +3761,6 @@ class PT1PersistentEquilibriumStore:
                 else:
                     insert_source = existing_fields
             source = insert_source
-            if source is None:
-                source_key_bytes = key_bytes
-                source_payload_bytes = payload_bytes
-                source_payload_hash = payload_hash
-                source_request_schema = SCHEMA_VERSION
-                source_code_version = _code_version()
-                source_corpus_version = None
-                source_engine_version = _none_or_str(engine_version_provenance)
-                source_data_digests_json = "{}"
-                source_created_at = (
-                    datetime.now(timezone.utc)
-                    .isoformat()
-                    .replace("+00:00", "Z")
-                )
-                source_git_dirty = self._epoch_git_dirty
-            else:
-                source_key_bytes = source["key_bytes"]
-                source_payload_bytes = source["payload_bytes"]
-                source_payload_hash = source["payload_sha256"]
-                source_request_schema = source["request_schema_version"]
-                source_code_version = source["code_version"]
-                source_corpus_version = source["corpus_version"]
-                source_engine_version = source["engine_version"]
-                source_data_digests_json = source["data_digests_json"]
-                source_created_at = source["created_at"]
-                source_git_dirty = source["git_dirty"]
-            insert_columns = (
-                "key_hash",
-                "artifact",
-                "store_schema_version",
-                "request_schema_version",
-                "key_sha256",
-                "payload_sha256",
-                "payload_codec_version",
-                "key_bytes",
-                "payload_bytes",
-                "code_version",
-                "corpus_version",
-                "engine_version",
-                "data_digests_json",
-                "repair_notices_json",
-                "physics_bucket_schema_version",
-                "physics_bucket_sha256",
-                "replay_scope_sha256",
-                "physics_key_bytes",
-                "physics_bucket_h40_sha256",
-                "physics_bucket_h40_distance",
-                "physics_bucket_h30_sha256",
-                "physics_bucket_h30_distance",
-                "physics_bucket_h40c_sha256",
-                "physics_bucket_h40c_distance",
-                "physics_bucket_h30c_sha256",
-                "physics_bucket_h30c_distance",
-                "created_at",
-                "git_dirty",
-            )
-            insert_values = (
-                key_hash,
-                artifact,
-                PT1_STORE_SCHEMA_VERSION,
-                source_request_schema,
-                key_hash,
-                source_payload_hash,
-                payload_codec_version,
-                sqlite3.Binary(source_key_bytes),
-                sqlite3.Binary(source_payload_bytes),
-                source_code_version,
-                source_corpus_version,
-                source_engine_version,
-                source_data_digests_json,
-                effective_notices_json,
-                PHYSICS_BUCKET_SCHEMA_VERSION,
-                physics_bucket_hash,
-                _replay_scope_hash(physics_bucket_key),
-                sqlite3.Binary(physics_bucket_bytes),
-                ladder_values["h40"]["sha256"],
-                ladder_values["h40"]["distance"],
-                ladder_values["h30"]["sha256"],
-                ladder_values["h30"]["distance"],
-                ladder_values["h40c"]["sha256"],
-                ladder_values["h40c"]["distance"],
-                ladder_values["h30c"]["sha256"],
-                ladder_values["h30c"]["distance"],
-                source_created_at,
-                source_git_dirty,
-            )
             stored = (
                 entry["law_disclosures"]
                 if existing is not None and not stale_payload
@@ -3661,22 +3770,35 @@ class PT1PersistentEquilibriumStore:
                 stored,
                 incoming_disclosures,
             )
-            candidate_row = dict(zip(insert_columns, insert_values))
+            if source is not None:
+                for field in (
+                    "request_schema_version",
+                    "code_version",
+                    "corpus_version",
+                    "engine_version",
+                    "data_digests_json",
+                    "created_at",
+                    "git_dirty",
+                ):
+                    candidate_row[field] = source[field]
+                candidate_row["key_bytes"] = source["key_bytes"]
+                candidate_row["payload_bytes"] = source["payload_bytes"]
+                candidate_row["payload_sha256"] = source["payload_sha256"]
+            candidate_row["repair_notices_json"] = effective_notices_json
             candidate_row["law_disclosures_json"] = _law_disclosures_json(
                 write_disclosures
             )
-            _require_write_candidate_admission(
-                candidate_row,
-                store_kind="pt1",
-                artifact=artifact,
-                key=key,
-                key_bytes=key_bytes,
-                key_hash=key_hash,
-                expected_payload=payload,
-                physics_bucket_key=physics_bucket_key,
-                physics_bucket_bytes=physics_bucket_bytes,
-                physics_bucket_hash=physics_bucket_hash,
+            candidate_row.update(
+                {
+                    "_write_key": key,
+                    "_write_payload": payload,
+                    "_write_physics_bucket_key": physics_bucket_key,
+                    "_write_physics_bucket_bytes": physics_bucket_bytes,
+                    "_write_physics_bucket_hash": physics_bucket_hash,
+                }
             )
+            candidate_row = _gate_row_for_write(candidate_row)
+            insert_values = tuple(candidate_row[column] for column in insert_columns)
             columns_sql = ", ".join(insert_columns)
             values_sql = ", ".join("?" for _ in insert_columns)
             conn.execute(
@@ -4148,11 +4270,38 @@ class PT1PersistentEquilibriumStore:
                 "PT-1 persistent store schema version drift: "
                 f"{metadata['value']} != {PT1_STORE_SCHEMA_VERSION}"
             )
-        conn.execute(
-            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET store_schema_version = ? "
-            "WHERE store_schema_version = ?",
-            (PT1_STORE_SCHEMA_VERSION, PT1_LEGACY_STORE_SCHEMA_VERSION),
+        legacy_rows = (
+            conn.execute(
+                f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} "
+                "WHERE store_schema_version = ?",
+                (PT1_LEGACY_STORE_SCHEMA_VERSION,),
+            ).fetchall()
+            if metadata is None
+            or metadata["value"] == PT1_LEGACY_STORE_SCHEMA_VERSION
+            else ()
         )
+        if legacy_rows:
+            row_columns = tuple(
+                str(row["name"])
+                for row in conn.execute(
+                    f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+                )
+            )
+            assignments = ", ".join(f'"{column}" = ?' for column in row_columns)
+            for legacy_row in legacy_rows:
+                candidate_row = dict(legacy_row)
+                candidate_row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+                candidate_row["_write_rebuild_indexes"] = True
+                try:
+                    writable_row = _gate_row_for_write(candidate_row)
+                except (UncacheableKey, UncacheablePayload):
+                    continue
+                conn.execute(
+                    f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {assignments} "
+                    'WHERE "key_hash" = ?',
+                    tuple(writable_row[column] for column in row_columns)
+                    + (writable_row["key_hash"],),
+                )
         if metadata is not None and metadata["value"] != PT1_STORE_SCHEMA_VERSION:
             conn.execute(
                 f"UPDATE {PT1_METADATA_TABLE} SET value = ? WHERE key = ?",
@@ -4614,7 +4763,14 @@ def _copy_pt1_equilibrium_rows(
                 'WHERE "key_hash" = ?'
             )
             for key_hash, row in changed_rows.items():
-                values = tuple(row[column] for column in target_columns)
+                try:
+                    writable_row = _gate_row_for_write(row)
+                except (UncacheableKey, UncacheablePayload) as exc:
+                    raise PT1PersistentStoreCorrupt(
+                        "PT-1 stored source row is not copyable after migration: "
+                        f"{key_hash}"
+                    ) from exc
+                values = tuple(writable_row[column] for column in target_columns)
                 if key_hash in original_target_rows:
                     target_conn.execute(update_statement, (*values, key_hash))
                 else:
