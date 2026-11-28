@@ -11,6 +11,17 @@ returns ``(valid, warnings)`` and never raises. The caller (the kernel
 planner post-carve-out; the today-hook adapter pre-carve-out) is
 responsible for routing rejected compositions elsewhere (e.g. builtin
 Stage 0 cleanup).
+
+This is a MELTS-basis admission and composition-domain check, not a query
+for membership in a selected MAGEMin database. CoO and MnO are in the 14-oxide
+basis and can pass this gate, but the ``ig`` and ``igad`` bulk orders omit
+both. The real membership check is the database-specific bulk projection.
+It rejects unrecognised positive inputs (zero and negative amounts are skipped
+first) and, when it succeeds, records positive components absent from the
+selected database's bulk order, compared after FeO/Fe2O3 are folded into FeOt
+and O, as dropped components, in
+``simulator/melt_backend/magemin.py:2868`` (orders) and
+``simulator/melt_backend/magemin.py:3881`` (projection and dropped list).
 """
 
 from __future__ import annotations
