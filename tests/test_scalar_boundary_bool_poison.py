@@ -52,7 +52,6 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.phase_context import (
     InvalidLiquidFractionError,
     _caller_fraction,
-    _finite as phase_finite,
     _optional_fraction,
 )
 from simulator.coating_lifespan import (
@@ -157,7 +156,10 @@ from simulator.runner import (
     _preset_duration_h,
     build_sio_yield_report,
 )
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import (
+    is_declared_real_scalar,
+    require_finite_float as phase_finite,
+)
 from simulator.session import _finite_float as session_finite_float, drive_session
 from simulator.stage0_harness import _positive_float as stage0_positive_float
 from simulator.state import CondensationTrain, MeltState, clamp_stir_factor
