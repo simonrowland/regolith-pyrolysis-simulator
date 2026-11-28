@@ -2839,16 +2839,18 @@ def _figure_read_extract() -> dict:
 
 
 def test_render_stamp_does_not_attest_unverified_descendants_without_artifact():
-    doc = _figure_read_extract()
-    values = doc["species"]["Fe"]["observations"][0]["values"]
-    values["T_C"] = "1630"
-    doc["fidelity_samples"][0]["value"]["T_C"] = "1630"
+    doc = _render_partition_extract_with_temperature()
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    doc["fidelity_samples"][0]["verification"]["locators"][path] = (
+        _render_leaf_locator()
+    )
 
     warnings = vle.fidelity_source_warnings(doc, label="figure-read")
     by_kind = {warning.kind: warning.count for warning in warnings}
 
     assert by_kind.get("source_blind_pin") == 1
     assert by_kind.get("uncovered_observation") == 1
+    assert "unattested_sample" not in by_kind
     assert vle.certify_extract_source_fidelity(doc, label="figure-read")
 
 
@@ -2949,7 +2951,12 @@ def test_render_verification_does_not_attest_a_non_figure_leaf():
 
 
 def _render_leaf_locator(path: str = "render-leaf-source.txt") -> dict:
-    return {"page": 2, "line_range": "1", "source_path": path}
+    return {
+        "page": 2,
+        "published_page": 137,
+        "line_range": "1",
+        "source_path": path,
+    }
 
 
 def _render_partition_extract_with_temperature() -> dict:
