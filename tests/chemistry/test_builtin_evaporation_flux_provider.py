@@ -1787,6 +1787,35 @@ def test_provider_refuses_missing_species_transport_parameters(monkeypatch):
 
 
 @pytest.mark.xdist_group("serial")
+def test_provider_uses_hkl_at_free_molecular_pressure_without_lj(monkeypatch):
+    from simulator.condensation import _LENNARD_JONES_PARAMS
+
+    monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Si", raising=False)
+    result = _w3_result_with_controls(
+        1.0,
+        vapour_batch_flux_pressures_Pa={"Si": 100.0},
+        overhead_pressure_pa=1.0e-9,
+        molar_mass_kg_mol={"Si": 0.028085},
+        stoich_by_species={
+            "Si": {
+                "parent_oxide": "SiO2",
+                "oxide_per_product_kg": 2.139,
+                "O2_per_product_kg": 1.139,
+            }
+        },
+        available_oxide_kg={"Si": 10.0},
+        alpha={"Si": 0.5},
+    )
+
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Si"] > 0.0
+    assert "missing_transport_parameters" not in result.diagnostic
+    assert result.diagnostic["evaporation_series_resistance"]["Si"][
+        "gas_resistance_weight"
+    ] == 0.0
+
+
+@pytest.mark.xdist_group("serial")
 def test_provider_keeps_computed_zero_when_peer_lacks_transport(monkeypatch):
     from types import SimpleNamespace
 

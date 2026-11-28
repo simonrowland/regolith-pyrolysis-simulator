@@ -791,11 +791,18 @@ def test_vapor_species_without_parent_oxide_stays_unavailable():
     sim = PyrolysisSimulator(
         backend,
         {"campaigns": {}},
-        {"oxide": {"label": "Oxide", "composition_wt_pct": {"FeO": 100.0}}},
+        {"oxide": {
+            "label": "Oxide",
+            "composition_wt_pct": {"FeO": 50.0, "Na2O": 50.0},
+        }},
         {
             "metals": {
                 "Fe": {
                     "molar_mass_g_mol": MOLAR_MASS["Fe"],
+                },
+                "Na": {
+                    "parent_oxide": "Na2O",
+                    "molar_mass_g_mol": MOLAR_MASS["Na"],
                 },
             },
             "oxide_vapors": {},
@@ -804,13 +811,15 @@ def test_vapor_species_without_parent_oxide_stays_unavailable():
     sim.load_batch("oxide", mass_kg=1000.0)
     _install_passthrough_vapour_batch(sim)
     sim.melt.temperature_C = 1000.0
-    equilibrium = types.SimpleNamespace(vapor_pressures_Pa={"Fe": 1.0e5})
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 1.0e5, "Na": 1.0e5}
+    )
 
-    with pytest.raises(evaporation_module.EvaporationFluxRefusal) as refusal:
-        sim._calculate_evaporation(equilibrium)
+    flux = sim._calculate_evaporation(equilibrium)
 
-    assert refusal.value.reason == "vapour_batch_no_debiting_pressure_outcome"
-    overlay = refusal.value.diagnostic["vapour_batch_flux_overlay"]
+    assert flux.species_kg_hr["Na"] > 0.0
+    assert "Fe" not in flux.species_kg_hr
+    overlay = sim._last_vapour_batch_flux_overlay
     assert overlay["notices"] == [{
         "kind": "vapour_batch_unresolved",
         "species": "Fe",
