@@ -140,6 +140,7 @@ def test_standalone_activity_prediction_closes_its_engine_handle(monkeypatch) ->
         "_activity_request_or_contract_refusal",
         lambda *_args, **_kwargs: (
             SimpleNamespace(
+                provenance={},
                 payload={
                     "composition_mol": {"SiO2": 0.5, "Al2O3": 0.5},
                 }

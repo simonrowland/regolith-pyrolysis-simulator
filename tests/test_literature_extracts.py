@@ -948,7 +948,10 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         ]
         assert len(matches) == 1, (sample, temperature, condition)
         observation = matches[0]
-        assert observation.experiment_id.endswith(f"::{row['experiment']}")
+        assert (
+            f"::experiment::{row['experiment']}::method:"
+            in observation.experiment_id
+        )
         assert f"row={sample}" in observation.locator.note
         experiment = migrator.result.experiments[observation.experiment_id]
         assert experiment.sample.form is not None
@@ -2950,7 +2953,7 @@ def test_render_verification_does_not_attest_a_non_figure_leaf():
     assert "unattested_sample" not in by_kind
 
 
-def _render_leaf_locator(path: str = "render-leaf-source.txt") -> dict:
+def _render_leaf_locator(path: str = "text/render-leaf-source.txt") -> dict:
     return {
         "page": 2,
         "published_page": 137,
@@ -3018,7 +3021,9 @@ def test_render_sample_cannot_cover_a_prose_leaf():
 
 def test_render_sample_accepts_a_correct_render_and_text_leaf_split(tmp_path):
     doc = _render_partition_extract_with_temperature()
-    (tmp_path / "render-leaf-source.txt").write_text("Temperature 1630 C.\n")
+    source = tmp_path / "text" / "render-leaf-source.txt"
+    source.parent.mkdir()
+    source.write_text("Temperature 1630 C.\n")
     path = "species.Fe.observations[fe_alpha_1].values.T_C"
     verification = doc["fidelity_samples"][0]["verification"]
     verification["locators"][path] = _render_leaf_locator()
@@ -3114,7 +3119,21 @@ def _derivation_extract() -> dict:
             "reviewed_by": "independent figure checker",
             "reviewed_on": "2026-11-26",
             "locator": {"page": 2, "figure": "3"},
-            "verification": {"method": "render", "dpi": 350},
+            "verification": {
+                "method": "render",
+                "dpi": 350,
+                "page": 2,
+                "figure": "3",
+                "covers": [
+                    f"{prefix}.values.T_C",
+                    f"{prefix}.values.figure_read.read_uncertainty.x",
+                    f"{prefix}.values.figure_read.read_uncertainty.y",
+                    f"{prefix}.values.composition_as_plotted.N_SiO2_mole_fraction",
+                    f"{prefix}.values.composition_as_plotted.Al2O3_mass_percent_as_series",
+                    f"{prefix}.values.composition_as_plotted.MgO_mass_percent_as_series",
+                ],
+                "locators": {},
+            },
         },
         {
             "path": f"{prefix}.point_conditions",
@@ -15611,7 +15630,7 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
         rows = [
             item
             for item in result.experiments.values()
-            if item.experiment_id.endswith("::experiment::" + local)
+            if f"::experiment::{local}::method:" in item.experiment_id
         ]
         assert len(rows) == 1, local
         return rows[0]
@@ -15702,7 +15721,7 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     table2_experiment = hastie.experiments[table2[0].experiment_id]
     assert table2_experiment.bench_id is not None
     assert table2_experiment.bench_id.endswith("::bench::hastie-1981-tms")
-    assert table2_experiment.experiment_id.endswith("::experiment::hastie-1981-pt-tms")
+    assert "::experiment::hastie-1981-pt-tms::method:" in table2_experiment.experiment_id
     tms_bench = hastie.benches[table2_experiment.bench_id]
     assert tms_bench.cell_material_and_liner is not None
     assert tms_bench.cell_material_and_liner.state.is_value
@@ -15755,7 +15774,7 @@ def test_shornikov_kems_methods_migrate_with_typed_unverified_regime(
         )
         experiment = next(
             item for item in migrated.experiments.values()
-            if item.experiment_id.endswith(f"::experiment::{local_id}")
+            if f"::experiment::{local_id}::method:" in item.experiment_id
         )
         assert experiment.method.is_value
         assert experiment.method.value.value == "knudsen_effusion"
@@ -15797,7 +15816,7 @@ def test_shornikov_kems_methods_migrate_with_typed_unverified_regime(
         )
         mutant_experiment = next(
             item for item in mutant_migration.experiments.values()
-            if item.experiment_id.endswith(f"::experiment::{local_id}")
+            if f"::experiment::{local_id}::method:" in item.experiment_id
         )
         assert mutant_experiment.method.is_value
         assert mutant_experiment.method.value.value == "knudsen_effusion"

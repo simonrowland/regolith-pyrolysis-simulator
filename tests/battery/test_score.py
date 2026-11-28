@@ -19116,6 +19116,7 @@ def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
         bench_module,
         "activity_request_for_engine",
         lambda *_args, **_kwargs: SimpleNamespace(
+            provenance={},
             payload={
                 "composition_mol": {
                     "SiO2": Decimal("0.55"),
@@ -19209,6 +19210,7 @@ def test_magemin_native_activity_failure_keeps_typed_cause(
         bench_module,
         "activity_request_for_engine",
         lambda *_args, **_kwargs: SimpleNamespace(
+            provenance={},
             payload={
                 "composition_mol": {
                     "SiO2": Decimal("0.55"),
@@ -19322,6 +19324,7 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
         bench_module,
         "activity_request_for_engine",
         lambda *_args, **_kwargs: SimpleNamespace(
+            provenance={},
             payload={
                 "composition_mol": {
                     "SiO2": Decimal("0.55"),
@@ -19400,6 +19403,7 @@ def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
         bench_module,
         "activity_request_for_engine",
         lambda *_args, **_kwargs: SimpleNamespace(
+            provenance={},
             # Positive SiO2 beyond the calibration window is extrapolated
             # with a notice; zero silica remains a typed domain refusal.
             payload={"composition_mol": {"SiO2": Decimal("0"), "MgO": Decimal("1")}}
