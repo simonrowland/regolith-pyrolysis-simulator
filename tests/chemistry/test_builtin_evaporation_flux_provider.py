@@ -1695,6 +1695,62 @@ def test_silicon_transport_row_computes_with_sodium_in_mixed_batch():
     assert "missing_transport_parameters" not in result.diagnostic
 
 
+@pytest.mark.parametrize(
+    ("species", "parent_oxide", "molar_mass_g_mol", "base_d_ab", "base_rate"),
+    [
+        ("SiO", "SiO2", 44.084, 0.049095565578101914, 2.8618682672185747),
+        ("Ca", "CaO", 40.08, 0.03462266415682097, 1.8422451354096279),
+    ],
+)
+@pytest.mark.xdist_group("serial")
+def test_legacy_collision_triples_match_base_d_ab_and_flux_at_fixed_state(
+    species,
+    parent_oxide,
+    molar_mass_g_mol,
+    base_d_ab,
+    base_rate,
+):
+    """Pin base 8b1a97fed Chapman-Enskog and rate values at 1973.15 K/1000 Pa."""
+    provider = BuiltinEvaporationFluxProvider()
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {parent_oxide: 10.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1700.0,
+        pressure_bar=0.01,
+        fO2_log=None,
+        control_inputs={
+            "vapour_batch_flux_pressures_Pa": {species: 2000.0},
+            "overhead_partials_Pa": {species: 1000.0},
+            "overhead_pressure_pa": 1000.0,
+            "gas_temperature_K": 1973.15,
+            "carrier_gas": "N2",
+            "pipe_diameter_m": 0.12,
+            "molar_mass_kg_mol": {species: molar_mass_g_mol / 1000.0},
+            "stoich_by_species": {
+                species: {
+                    "parent_oxide": parent_oxide,
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                }
+            },
+            "available_oxide_kg": {species: 10.0},
+            "melt_surface_area_m2": 0.2,
+            "stir_factor": {"axial": 0.0, "radial": 1.0},
+            "alpha": {species: 0.5},
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    series = result.diagnostic["evaporation_series_resistance"][species]
+    assert series["d_ab_m2_s"] == base_d_ab
+    assert result.diagnostic["evaporation_flux_kg_hr"][species] == base_rate
+
+
 @pytest.mark.xdist_group("serial")
 def test_provider_refuses_missing_species_transport_parameters(monkeypatch):
     from simulator.condensation import _LENNARD_JONES_PARAMS

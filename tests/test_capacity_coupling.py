@@ -427,30 +427,6 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             (peer_state, "provider_refusal"),
         )
     )
-    production_booking_cases = frozenset(
-        f"{left}+{right}"
-        for state in (
-            "unavailable_catalog",
-            "unavailable_parent",
-            "unavailable_transport",
-            "provider_refusal",
-        )
-        for left, right in ((state, "resolved"), ("resolved", state))
-    ) | frozenset(
-        f"{left}+{right}"
-        for peer_state in (
-            "catalog_proven_zero",
-            "closure_proven_zero",
-            "unavailable_catalog",
-            "unavailable_parent",
-            "unavailable_transport",
-        )
-        for left, right in (
-            ("provider_refusal", peer_state),
-            (peer_state, "provider_refusal"),
-        )
-    )
-
     basis = _real_capacity_sim()
     basis.start_campaign(CampaignPhase.C0)
     basis.melt.temperature_C = 1600.0
@@ -509,6 +485,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
         capacity_sim._headspace_bleed_conductance_kg_s = lambda **_kwargs: 0.0
         provider_statuses = []
         provider_request_maps = []
+        provider_stoich_memberships = []
         closure_publications = []
         booked_by_production_step = set()
         case_should_refuse = not any(
@@ -570,7 +547,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                     # Peer-not-requested removes it from both the actual
                     # request and the real equilibrium source map.
                     case_equilibrium.vapor_pressures_Pa.pop(species, None)
-                elif state == "unavailable_transport":
+                elif state in {"unavailable_transport", "catalog_proven_zero"}:
                     from simulator.condensation import _LENNARD_JONES_PARAMS
 
                     local.delitem(
@@ -657,8 +634,10 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
 
                         target.build_vapour_batch = build_with_proven_zero
 
-            if case_name.startswith("provider_refusal+") or case_name.endswith(
-                "+provider_refusal"
+            if (
+                case_name.startswith("provider_refusal+")
+                or case_name.endswith("+provider_refusal")
+                or "unavailable_parent" in state_by_species.values()
             ):
                 from engines.builtin.evaporation_flux import (
                     BuiltinEvaporationFluxProvider,
@@ -667,23 +646,30 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
 
                 real_dispatch = BuiltinEvaporationFluxProvider.dispatch
                 refused_species = next(
-                    species
-                    for species, state in state_by_species.items()
-                    if state == "provider_refusal"
+                    (
+                        species
+                        for species, state in state_by_species.items()
+                        if state == "provider_refusal"
+                    ),
+                    None,
                 )
-                local.delitem(
-                    state_module.MOLAR_MASS,
-                    refused_species,
-                    raising=False,
-                )
+                if refused_species is not None:
+                    local.delitem(
+                        state_module.MOLAR_MASS,
+                        refused_species,
+                        raising=False,
+                    )
 
-                def refuse_provider_channel(provider, request):
+                def capture_and_refuse_provider_channel(provider, request):
                     controls = dict(request.control_inputs)
                     requested = dict(
                         controls.get("vapour_batch_flux_pressures_Pa", {}) or {}
                     )
                     provider_request_maps.append(set(requested))
-                    if refused_species not in requested:
+                    provider_stoich_memberships.append(
+                        set(controls.get("stoich_by_species", {}) or {})
+                    )
+                    if refused_species is None or refused_species not in requested:
                         return real_dispatch(provider, request)
                     molar_masses = dict(
                         controls.get("molar_mass_kg_mol", {}) or {}
@@ -706,7 +692,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                 local.setattr(
                     BuiltinEvaporationFluxProvider,
                     "dispatch",
-                    refuse_provider_channel,
+                    capture_and_refuse_provider_channel,
                 )
 
             if any(
@@ -756,19 +742,23 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             live_surface = copy.deepcopy(
                 getattr(sim, "_last_langmuir_surface_oxygen", {}) or {}
             )
-            if case_name in production_booking_cases:
-                sim._get_equilibrium = lambda: case_equilibrium
-                transition_start = len(sim.atom_ledger.transitions)
-                try:
-                    sim.step()
-                except EvaporationFluxRefusal:
-                    assert case_should_refuse, case_name
-                booked_by_production_step = {
-                    species
-                    for transition in sim.atom_ledger.transitions[transition_start:]
-                    for lot in (*transition.debits, *transition.credits)
-                    for species in lot.species_kg
-                }
+            sim._get_equilibrium = lambda: case_equilibrium
+            transition_start = len(sim.atom_ledger.transitions)
+            try:
+                sim.step()
+            except EvaporationFluxRefusal as exc:
+                assert case_should_refuse, case_name
+                assert exc.reason == (
+                    "vapour_batch_no_debiting_pressure_outcome"
+                ), case_name
+            else:
+                assert not case_should_refuse, case_name
+            booked_by_production_step = {
+                species
+                for transition in sim.atom_ledger.transitions[transition_start:]
+                for lot in (*transition.debits, *transition.credits)
+                for species in lot.species_kg
+            }
 
         unavailable = {
             species
@@ -788,6 +778,25 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
         should_refuse = case_should_refuse
         assert (live_refusal is not None) is should_refuse, case_name
         assert (capacity_refusal is not None) is should_refuse, case_name
+
+        excluded_booking_species = set(unavailable)
+        if "Fe" in unavailable:
+            excluded_booking_species.add("FeO")
+        if "Si" in unavailable:
+            excluded_booking_species.update({"SiO", "SiO2"})
+        for zero_species in zero_by_physics:
+            excluded_booking_species.add(zero_species)
+            if zero_species == "Fe":
+                excluded_booking_species.add("FeO")
+            elif zero_species == "Si":
+                excluded_booking_species.update({"SiO", "SiO2"})
+        assert excluded_booking_species.isdisjoint(
+            booked_by_production_step
+        ), (
+            case_name,
+            booked_by_production_step,
+        )
+
         if case_name.startswith("provider_refusal+") or case_name.endswith(
             "+provider_refusal"
         ):
@@ -802,23 +811,41 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                 )
                 for refused in provider_statuses
             ), (case_name, provider_statuses)
-            assert any(
-                refused_species in publication
-                for publication in closure_publications
-            ), (case_name, closure_publications)
+            assert provider_request_maps, case_name
             first_refusal_request = next(
                 index
                 for index, request_species in enumerate(provider_request_maps)
                 if refused_species in request_species
             )
-            assert any(
-                refused_species not in request_species
-                for request_species in provider_request_maps[
-                    first_refusal_request + 1:
-                ]
-            ), (case_name, provider_request_maps)
-            assert capacity_surface.get("applied") is True, case_name
-            assert live_surface.get("applied") is True, case_name
+            remaining_resolved_peer = any(
+                species != refused_species and state == "resolved"
+                for species, state in state_by_species.items()
+            )
+            if remaining_resolved_peer:
+                assert any(
+                    refused_species not in request_species
+                    for request_species in provider_request_maps[
+                        first_refusal_request + 1:
+                    ]
+                ), (case_name, provider_request_maps)
+                assert any(
+                    refused_species in publication
+                    for publication in closure_publications
+                ), (case_name, closure_publications)
+                assert capacity_surface.get("applied") is True, case_name
+                assert live_surface.get("applied") is True, case_name
+            elif should_refuse:
+                assert live_refusal is not None, case_name
+                assert capacity_refusal is not None, case_name
+                assert live_refusal.reason == (
+                    "vapour_batch_no_debiting_pressure_outcome"
+                ), case_name
+                assert capacity_refusal.reason == (
+                    "vapour_batch_no_debiting_pressure_outcome"
+                ), case_name
+            else:
+                assert live_flux is not None, case_name
+                assert capacity_result is not None, case_name
         if "unavailable_parent" in state_by_species.values():
             excluded_species = next(
                 species
@@ -830,6 +857,14 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                 excluded_species not in publication
                 for publication in closure_publications
             ), (case_name, closure_publications)
+            assert all(
+                excluded_species not in membership
+                for membership in provider_stoich_memberships
+            ), (case_name, provider_stoich_memberships)
+            assert all(
+                excluded_species not in request_species
+                for request_species in provider_request_maps
+            ), (case_name, provider_request_maps)
         if should_refuse:
             for refusal in (live_refusal, capacity_refusal):
                 assert refusal.reason == (
@@ -977,24 +1012,15 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                 assert batch is not None
                 assert species not in batch.requested_species_ids, case_name
 
-        if case_name in production_booking_cases:
-            excluded_booking_species = set(unavailable)
-            if "Fe" in unavailable:
-                excluded_booking_species.add("FeO")
-            if "Si" in unavailable:
-                excluded_booking_species.update({"SiO", "SiO2"})
-            for zero_species in zero_by_physics:
-                excluded_booking_species.add(zero_species)
-                if zero_species == "Fe":
-                    excluded_booking_species.add("FeO")
-                elif zero_species == "Si":
-                    excluded_booking_species.update({"SiO", "SiO2"})
-            assert excluded_booking_species.isdisjoint(
-                booked_by_production_step
-            ), (
-                case_name,
-                booked_by_production_step,
-            )
+            if state == "catalog_proven_zero":
+                assert sim._vapour_batch_hour_availability[
+                    "transport_eligibility_by_species"
+                ].get(species) == "zero_by_physics", case_name
+                authority = live_flux.carrier_authority_by_species[species]
+                assert authority["pressure"] == {
+                    "kind": "zero_by_physics",
+                    "evidence_ref": "b1318_narrow_catalog_zero_test_seam",
+                }, case_name
 
     for case_name, state_by_species in cases:
         unavailable = {

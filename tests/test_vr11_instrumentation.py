@@ -1972,6 +1972,30 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
     assert 'notice.kind === "vapour_batch_unresolved"' in report_labels_js
 
 
+def test_provider_flux_overlay_controls_pin_current_projection() -> None:
+    from simulator.vapour_rail.instrumentation import (
+        CONTROL_SHADOW_EQUAL_KEY,
+        CONTROL_SHADOW_OUTCOME_KEY,
+        provider_flux_overlay_controls,
+    )
+
+    overlay = {
+        "shadow_equal": True,
+        "shadow_outcome": SHADOW_PROVED,
+        "notices": [{"kind": "vapour_batch_unresolved", "species": "K"}],
+    }
+    assert provider_flux_overlay_controls(overlay) == {
+        "vapour_batch_flux_overlay": overlay,
+        CONTROL_SHADOW_EQUAL_KEY: True,
+        CONTROL_SHADOW_OUTCOME_KEY: SHADOW_PROVED,
+    }
+    assert provider_flux_overlay_controls({"shadow_outcome": SHADOW_MISMATCH}) == {
+        "vapour_batch_flux_overlay": {"shadow_outcome": SHADOW_MISMATCH},
+        CONTROL_SHADOW_OUTCOME_KEY: SHADOW_MISMATCH,
+    }
+    assert provider_flux_overlay_controls(None) == {}
+
+
 def test_absent_overlay_does_not_default_shadow_equal_true() -> None:
     from simulator.diagnostics import vapour_rail_instrumentation_diagnostic
     from web.advisory import vapour_rail_instrumentation_panel_payload
