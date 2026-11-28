@@ -16986,15 +16986,19 @@ def _predict_with_engine(
         # CaSiO3/SiO2 pair. The converter returns a(SiO2) from SiO2_Liq and
         # a(H2O) from H2O or H2O_Liq; element labels are not oxide activities.
         from engines.alphamelts.domain import (
+            MELTS_CASIO3_FUSION_CAVEAT_PHRASE,
             MELTS_CASIO3_HHR_CAVEAT_PHRASE,
+            MELTS_CASIO3_LIQUID_G0_FIELD,
             MELTS_ACTIVITY_BRIDGE_REFERENCES,
             MELTS_CAO_EXCHANGE_MU_FIELD,
+            MELTS_PWO_G0_FIELD,
             _canonical_oxide_activity_map_with_notices,
             melts_endmember_to_parent_oxide_activity,
         )
         from simulator.melt_backend.pure_phase_janaf_score import (
             MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL,
             cao_activity_from_melts_exchange_mu,
+            casio3_fusion_model_systematic_dex,
         )
 
         if engine is Engine.ALPHAMELTS:
@@ -17113,27 +17117,66 @@ def _predict_with_engine(
                         ),
                     )
                     if engine is Engine.ALPHAMELTS:
-                        notices = union_notices(
-                            notices,
-                            (
-                                Notice(
-                                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                                    affected_quantities=(Quantity.ACTIVITY,),
-                                    reason=(
-                                        'AlphaMELTS CaSiO3 fusion residual band '
-                                        'is not computed because its cell does '
-                                        'not expose liquid/pWo pure-phase G0. '
-                                        'Both engines use the shared MELTS '
-                                        'database; the ThermoEngine CaO fusion '
-                                        'band at the same T is the reference.'
-                                    ),
-                                    origin=(
-                                        'simulator.battery.score.'
-                                        'd476_alphamelts_fusion_band_gap'
-                                    ),
-                                ),
-                            ),
+                        g0_casio3_liquid = finite_float(
+                            getattr(cell, MELTS_CASIO3_LIQUID_G0_FIELD, None)
                         )
+                        g0_pwo = finite_float(
+                            getattr(cell, MELTS_PWO_G0_FIELD, None)
+                        )
+                        fusion_residual_dex = None
+                        if (
+                            g0_casio3_liquid is not None
+                            and g0_pwo is not None
+                        ):
+                            try:
+                                fusion_residual_dex = (
+                                    casio3_fusion_model_systematic_dex(
+                                        g0_casio3_liquid - g0_pwo,
+                                        float(T),
+                                    )
+                                )
+                            except (OverflowError, TypeError, ValueError):
+                                fusion_residual_dex = None
+                        if fusion_residual_dex is not None:
+                            # Both G0 values share the MELTS apparent basis.
+                            # Their difference cancels element reference terms;
+                            # the signed calorimetric residual is disclosure
+                            # only and never changes μ_CaO or the scored value.
+                            fusion_notice = Notice(
+                                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                                affected_quantities=(Quantity.ACTIVITY,),
+                                reason=(
+                                    f'AlphaMELTS '
+                                    f'{MELTS_CASIO3_FUSION_CAVEAT_PHRASE} '
+                                    'against Adamkovičová et al. (1980), Eq. (8)'
+                                ),
+                                origin=(
+                                    'simulator.battery.score.'
+                                    'd476_alphamelts_fusion_model_caveat'
+                                ),
+                                band=(
+                                    f'{fusion_residual_dex:+.8g} dex at '
+                                    f'{float(T):g} K'
+                                ),
+                            )
+                        else:
+                            fusion_notice = Notice(
+                                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                                affected_quantities=(Quantity.ACTIVITY,),
+                                reason=(
+                                    'AlphaMELTS CaSiO3 fusion residual band '
+                                    'is not computed because its cell does '
+                                    'not expose liquid/pWo pure-phase G0. '
+                                    'Both engines use the shared MELTS '
+                                    'database; the ThermoEngine CaO fusion '
+                                    'band at the same T is the reference.'
+                                ),
+                                origin=(
+                                    'simulator.battery.score.'
+                                    'd476_alphamelts_fusion_band_gap'
+                                ),
+                            )
+                        notices = union_notices(notices, (fusion_notice,))
         else:
             value, converter_reason = melts_endmember_to_parent_oxide_activity(
                 reported, compared,

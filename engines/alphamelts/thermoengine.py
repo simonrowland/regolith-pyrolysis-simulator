@@ -2514,7 +2514,14 @@ print('ok')
                         else 'nonpositive_computed_activity'
                     ),
                 ))
-        if cao_exchange_out is not None:
+        calcium_present = (
+            float(comp_wt.get('CaO', 0.0) or 0.0) > 0.0
+            or any(
+                'Ca' in name and amount > 0.0
+                for name, amount in zip(endmember_names, mol)
+            )
+        )
+        if cao_exchange_out is not None and calcium_present:
             pair = ('CaSiO3', 'SiO2')
             if all(
                 activities.get(name, 0.0) > 0.0

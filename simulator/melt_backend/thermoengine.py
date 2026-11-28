@@ -8,7 +8,9 @@ import warnings
 
 from engines.alphamelts.domain import (
     MELTS_CASIO3_FUSION_CAVEAT_PHRASE,
+    MELTS_CASIO3_LIQUID_G0_FIELD,
     MELTS_CAO_EXCHANGE_MU_FIELD,
+    MELTS_PWO_G0_FIELD,
 )
 from engines.alphamelts.thermoengine import (
     THERMOENGINE_HEALTH_TIMEOUT_S,
@@ -596,6 +598,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     )
                 )
             cao_model_systematic_notices = []
+            cao_fusion_reference_values: dict[str, float] = {}
             cao_exchange_mu = (
                 payload.mu_CaO_J_per_mol_melts_berman_apparent
             )
@@ -653,6 +656,10 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         g0_casio3_liquid - float(pwo.G_J_mol),
                         temperature_K,
                     )
+                    cao_fusion_reference_values = {
+                        MELTS_CASIO3_LIQUID_G0_FIELD: g0_casio3_liquid,
+                        MELTS_PWO_G0_FIELD: float(pwo.G_J_mol),
+                    }
                     fusion_notice = {
                         'kind': 'engine_model_caveat',
                         'reason': (
@@ -730,6 +737,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         **dict(commissioning_diagnostics or {}),
                         **clamp_diagnostics,
                         **vaporock_envelope_diagnostics,
+                        **cao_fusion_reference_values,
                         **(
                             {
                                 MELTS_CAO_EXCHANGE_MU_FIELD:

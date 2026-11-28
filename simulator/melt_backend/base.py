@@ -44,6 +44,8 @@ REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
 ANTOINE_FALLBACK_SOURCE_PREFIX = 'antoine_fallback_from_vaporock'
 _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'mu_CaO_J_per_mol_melts_berman_apparent',
+    'g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent',
+    'g0_pWo_J_per_mol_melts_berman_apparent',
     'authority',
     'authoritative_for_requested_vapor_pressure',
     'vapor_pressure_backend_status',

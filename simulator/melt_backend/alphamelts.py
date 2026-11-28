@@ -51,7 +51,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from engines.alphamelts.domain import (
+    MELTS_CASIO3_LIQUID_G0_FIELD,
     MELTS_CAO_EXCHANGE_MU_FIELD,
+    MELTS_PWO_G0_FIELD,
     _canonical_oxide_activity_map_with_notices,
     canonical_melt_oxide_activity_name,
 )
@@ -1143,6 +1145,8 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_import_error: tuple[str, str] | None = None
         self._pet_payload_preloaded = False
         self._pet_worker: Optional[WarmEngineWorker] = None
+        self._fusion_reference_transport = None
+        self._fusion_reference_unavailable: str | None = None
         self._pet_warm_enabled = False
         self._pet_warm_timeout_s = PETTHERMOTOOLS_WARM_CALL_TIMEOUT_S
         self._engine_version: Optional[str] = None
@@ -1369,6 +1373,10 @@ class _MELTSBackendSupport(MeltBackend):
         if self._pet_worker is not None:
             self._pet_worker.close()
             self._pet_worker = None
+        if self._fusion_reference_transport is not None:
+            self._fusion_reference_transport.close()
+            self._fusion_reference_transport = None
+        self._fusion_reference_unavailable = None
 
     def _initialize_petthermotools(
         self,
@@ -5763,12 +5771,41 @@ class _MELTSBackendSupport(MeltBackend):
                 'gamma*x, phase field, or mu/mu0 path); '
                 'activity-scaled Antoine fallback skipped'
             )
+        cao_fusion_values: dict[str, float] = {}
         cao_exchange_mu = self._cao_exchange_mu_from_chemical_potentials(
             run_result,
             temperature_C=temperature_C,
+            pure_g0_out=cao_fusion_values,
         )
         if cao_exchange_mu is not None:
             activity_diagnostics[MELTS_CAO_EXCHANGE_MU_FIELD] = cao_exchange_mu
+            g0_casio3_liquid = cao_fusion_values.get(
+                MELTS_CASIO3_LIQUID_G0_FIELD
+            )
+            if g0_casio3_liquid is not None:
+                try:
+                    g0_pwo = self._pwo_g0_for_cao_fusion(
+                        temperature_K=(
+                            float(temperature_C)
+                            + CELSIUS_TO_KELVIN_OFFSET
+                        ),
+                        pressure_bar=solved_pressure_bar,
+                    )
+                except (
+                    ImportError,
+                    RuntimeError,
+                    ValueError,
+                    EngineWorkerTimeout,
+                    TimeoutError,
+                ):
+                    # Missing references stay absent; score.py emits the
+                    # scoped fusion-gap caveat on a scoreable CaO activity.
+                    pass
+                else:
+                    activity_diagnostics[MELTS_PWO_G0_FIELD] = g0_pwo
+                    activity_diagnostics[
+                        MELTS_CASIO3_LIQUID_G0_FIELD
+                    ] = g0_casio3_liquid
         selected_activity_source = str(
             activity_diagnostics.get('diagnostic_activity_source') or 'none'
         )
@@ -6283,6 +6320,7 @@ class _MELTSBackendSupport(MeltBackend):
         results: Mapping[str, object],
         *,
         temperature_C: float,
+        pure_g0_out: dict[str, float] | None = None,
     ) -> float | None:
         """Return μ(CaSiO3)-μ(SiO2) only for a positive provider pair.
 
@@ -6322,8 +6360,47 @@ class _MELTSBackendSupport(MeltBackend):
                 return None
             if not math.isfinite(activity) or activity <= 0.0:
                 return None
+        if pure_g0_out is not None:
+            pure_g0_out[MELTS_CASIO3_LIQUID_G0_FIELD] = float(
+                mu0['CaSiO3']
+            )
         mu_cao = mu['CaSiO3'] - mu['SiO2']
         return mu_cao if math.isfinite(mu_cao) else None
+
+    def _pwo_g0_for_cao_fusion(
+        self,
+        *,
+        temperature_K: float,
+        pressure_bar: float,
+    ) -> float:
+        """Read Berman pWo G0 through the isolated shared MELTS worker."""
+        if self._fusion_reference_unavailable is not None:
+            raise ImportError(self._fusion_reference_unavailable)
+        transport = self._fusion_reference_transport
+        if transport is None:
+            from engines.alphamelts.thermoengine import ThermoEngineTransport
+
+            transport = ThermoEngineTransport(
+                model_name=self._model,
+                activity_converter=activity_from_chem_potential,
+            )
+            try:
+                transport.initialize()
+            except (ImportError, RuntimeError, ValueError) as exc:
+                self._fusion_reference_unavailable = (
+                    f'{type(exc).__name__}: {exc}'
+                )
+                transport.close()
+                raise
+            self._fusion_reference_transport = transport
+        pwo = transport.pure_phase_properties(
+            'pWo',
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+        )
+        if pwo.G_J_mol is None or not math.isfinite(float(pwo.G_J_mol)):
+            raise ValueError('ThermoEngine pWo G is absent or nonfinite')
+        return float(pwo.G_J_mol)
 
     def _extract_potential_mapping(
         self,
