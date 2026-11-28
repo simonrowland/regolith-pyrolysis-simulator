@@ -38,7 +38,6 @@ from simulator.fe_redox import (
 from simulator.metal_saturation_floor import (
     _oxide_liquid_standard_log10_factor_per_oxide,
     activities_for_metal_saturation_floor,
-    apply_melt_metal_saturation_floor,
 )
 from simulator.environment import (
     controlled_background_partial_pressure,
@@ -416,8 +415,8 @@ class EquilibriumMixin:
             _range_tuple,
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
+            _solve_surface_pO2_bar,
             _vapor_pressure_temperature_extrapolation_notice,
-            physical_melt_dissociation_pO2_bar,
             reject_noncertifying_vapor_pressure_row,
             require_antoine_source_certified_temperature,
             vapor_pressure_authority_diagnostic,
@@ -636,16 +635,20 @@ class EquilibriumMixin:
         a_feo_stoich = float(
             feo_activity_diagnostic.get("a_FeO_authoritative", 0.0) or 0.0
         )
-        dissociation_fO2_log, metal_saturation_floor_notice = (
-            apply_melt_metal_saturation_floor(
-                intrinsic_fO2_log,
-                T_K,
-                activities_for_metal_saturation_floor(
-                    melt_account_mol,
-                    T_K,
-                    a_feo_stoich=a_feo_stoich,
-                ),
-            )
+        floor_activities = activities_for_metal_saturation_floor(
+            melt_account_mol,
+            T_K,
+            a_feo_stoich=a_feo_stoich,
+        )
+        (
+            dissociation_fO2_log,
+            melt_dissociation_pO2_bar,
+            melt_pO2_clamped,
+            metal_saturation_floor_notice,
+        ) = _solve_surface_pO2_bar(
+            intrinsic_fO2_log,
+            T_K,
+            floor_activities,
         )
         if metal_saturation_floor_notice is not None:
             warnings.append(
@@ -657,9 +660,6 @@ class EquilibriumMixin:
                 "unfloored_log10_fO2_bar="
                 f"{float(metal_saturation_floor_notice['unfloored_log10_fO2_bar']):.6g}"
             )
-        melt_dissociation_pO2_bar, melt_pO2_clamped = (
-            physical_melt_dissociation_pO2_bar(dissociation_fO2_log)
-        )
         # Premise: all gas laws formed on this evaporating surface consume the
         # one pO2 represented by the congruent oxygen-balance solution; the
         # headspace transport reservoir is not a second surface potential.

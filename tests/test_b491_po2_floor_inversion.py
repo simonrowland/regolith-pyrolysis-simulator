@@ -120,10 +120,10 @@ def test_b984_sio_uses_actual_oxygen_beyond_evaluator_band(observation):
     for oxygen, answer in receipts.items():
         provenance = answer.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
         notice = provenance.get("extrapolation_notice")
-        if oxygen in (1e-31, 1000.0):
+        if oxygen < 1e-12 or oxygen > 100.0:
             assert notice["reason"] == "pO2_outside_evaluator_band"
             assert notice["pO2_bar_used"] == oxygen
-            assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
+            assert notice["certified_band"]["pO2_bar"] == (1e-12, 100.0)
             assert notice["was_clamped"] is False
             assert any(
                 "pO2_outside_evaluator_band" in warning
@@ -210,9 +210,9 @@ def test_provider_flags_floor_inversion_and_completes(monkeypatch) -> None:
     assert "Mg" in notices
     assert "Na" in notices
     assert "Fe" not in notices
-    assert "SiO" not in notices
+    assert "SiO" in notices
 
-    for species in ("Si", "Mg", "Na"):
+    for species in ("Si", "Mg", "Na", "SiO"):
         notice = notices[species]
         assert notice["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
         assert notice["authority_level"] == "extrapolated"

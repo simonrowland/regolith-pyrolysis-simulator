@@ -276,7 +276,7 @@ def _ca_range_extrapolation_request() -> IntentRequest:
         ),
         temperature_C=_CA_RANGE_EXTRAPOLATION_T_K - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
     )
 
 
@@ -617,6 +617,12 @@ def test_t622_builtin_provider_retains_flagged_ood_evaluation(
     accepted = provider.dispatch(request_factory(in_domain_K))
     assert species_id in accepted.diagnostic["vapor_pressures_Pa"]
     assert species_id not in accepted.diagnostic["extrapolated_beyond_valid_range_K"]
+    if species_id == "CoO_gas":
+        caveat = accepted.diagnostic["activity_standard_state_flags"][
+            species_id
+        ]
+        assert caveat["kind"] == "engine_model_caveat"
+        assert caveat["conversion_applied"] is False
 
 
 class _CaOnlyMelt:
@@ -2214,16 +2220,16 @@ def test_equilibrium_raises_public_error_for_invalid_antoine_coefficients(
         model._internal_analytical_equilibrium()
 
 
-def test_legacy_sio_continues_below_reference(vapor_pressure_data, monkeypatch):
+def test_legacy_sio_uses_surface_po2_not_transport(vapor_pressure_data, monkeypatch):
     model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_SiOnlyMelt())
     monkeypatch.setattr(model, "_vacuum_floor_bar", lambda: 1.3e-12)
     answers = {}
     for oxygen in (1.3e-12, 1e-9):
         monkeypatch.setattr(model, "_headspace_transport_pO2_bar", lambda: oxygen)
         answers[oxygen] = model._internal_analytical_equilibrium().vapor_pressures_Pa["SiO"]
-    # Fixed source/temperature: the SiO reaction's -1/2 oxygen exponent must
-    # continue below the reference, independently of the simulated body floor.
-    assert answers[1.3e-12] / answers[1e-9] == pytest.approx((1.3e-12 / 1e-9) ** -0.5)
+    # The fallback melt's intrinsic fO2 owns surface equilibrium. Changing
+    # headspace transport pO2 alone must not retune SiO evaporation.
+    assert answers[1.3e-12] == pytest.approx(answers[1e-9])
 
 
 def test_legacy_internal_analytical_oxide_antoine_pressure_pin(
@@ -2305,14 +2311,17 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
         vapor_pressure_data,
         melt=_CaOnlyMelt(),
     )._internal_analytical_equilibrium()
-    assert legacy.vapor_pressures_Pa["Ca"].hex() == "0x1.a2f3f64f221b0p-15"
+    assert legacy.vapor_pressures_Pa["Ca"].hex() == "0x1.529acc48a7af1p-11"
     ca_reference = result.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]["Ca"]["P_reference_Antoine_Pa"]
     assert ca_reference.hex() == "0x1.811d48ae3e8dbp+16"
     assert result.diagnostic["vapor_pressures_Pa"]["Ca"] > 0.0
+    # Ca-029 consumes two CaO(cr) units while the melt reports CaO(l).
+    # JANAF Ca-027/Ca-028 shifts K by 10**(2 ΔG_fus°/(RT ln 10)); the pure
+    # Antoine reference stays fixed while the equilibrium pressure moves.
     assert result.diagnostic["vapor_pressures_Pa"]["Ca"].hex() == (
-        "0x1.a2f3f64f221b0p-15"
+        "0x1.529acc48a7af1p-11"
     )
     extrapolation = result.diagnostic[
         "extrapolated_beyond_valid_range_K"
@@ -2591,7 +2600,9 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
         vapor_pressure_data,
         melt=_MgOnlyMelt(1360.999),
     )._internal_analytical_equilibrium()
-    assert result.vapor_pressures_Pa["Mg"].hex() == "0x1.10315b6351d19p-26"
+    # Mg-010 consumes two MgO(cr) formula units; the liquid-standard activity
+    # carries the JANAF Mg-008/Mg-009 conversion on both units.
+    assert result.vapor_pressures_Pa["Mg"].hex() == "0x1.15cc0c31f43bdp-21"
     assert result.diagnostics["vapor_pressure_authority"][
         VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
     ] is False
@@ -3108,7 +3119,7 @@ def test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo(
         ),
         temperature_C=_FeOnlyHighTMelt.temperature_C,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
     )
 
     provider_result = provider.dispatch(request)
@@ -3128,6 +3139,7 @@ def test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo(
         "vapor_pressure_numerator_provenance"
     ]["FeO_association_gas"]
     assert feo_provenance["authority_class"] == "analytical_non_authoritative"
+    assert feo_provenance["pO2_exponent"] == 0.5
     assert provider_result.diagnostic["species_authority"]["FeO_association_gas"][
         "authority_class"
     ] == "analytical_non_authoritative"
@@ -3562,7 +3574,7 @@ def test_active_si_composite_supersedes_legacy_pure_component_sidecar(
     assert set(kernel_vp) - set(legacy_vp) == {"Si2", "Si3", "SiO2_gas"}
 
 
-def test_transport_po2_and_intrinsic_melt_fo2_are_independent(
+def test_transport_po2_is_independent_of_shared_surface_po2(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
@@ -3597,7 +3609,12 @@ def test_transport_po2_and_intrinsic_melt_fo2_are_independent(
 
     assert reduced_diag["pO2_bar"] == pytest.approx(1e-6)
     assert oxidized_diag["pO2_bar"] == pytest.approx(1e-6)
-    assert reduced_vp["SiO"] == pytest.approx(oxidized_vp["SiO"])
+    reduced_surface_pO2 = reduced_diag["surface_oxygen_potential_bar"]
+    oxidized_surface_pO2 = oxidized_diag["surface_oxygen_potential_bar"]
+    assert reduced_surface_pO2 != oxidized_surface_pO2
+    assert reduced_vp["SiO"] / oxidized_vp["SiO"] == pytest.approx(
+        math.sqrt(oxidized_surface_pO2 / reduced_surface_pO2)
+    )
 
     lower_transport = _si_only_transport_redox_request(
         transport_pO2_bar=1e-9,
@@ -3615,7 +3632,11 @@ def test_transport_po2_and_intrinsic_melt_fo2_are_independent(
     )
 
     assert lower_transport_diag["pO2_bar"] == pytest.approx(1e-9)
-    assert lower_transport_vp["SiO"] > reduced_vp["SiO"]
+    assert (
+        lower_transport_diag["surface_oxygen_potential_bar"]
+        == reduced_surface_pO2
+    )
+    assert lower_transport_vp["SiO"] == pytest.approx(reduced_vp["SiO"])
 
 
 def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(

@@ -12,9 +12,9 @@ The provider:
   payload passed at construction time,
 - combines Ellingham oxide-decomposition equilibrium with phase-correct
   reference terms to compute per-species effective equilibrium pressures at the
-  request's ``temperature_C``. Non-FeO metal release reads the independently
-  supplied intrinsic-melt fO2; overhead ``pO2_bar`` remains the gas-side
-  transport/backpressure channel (and the explicit SiO lever). Only
+  request's ``temperature_C``. Every oxygen-dependent channel reads one resolved
+  melt-surface pO2; overhead ``pO2_bar`` remains the separate gas-side
+  transport/backpressure channel. Only
   ``pure_component_antoine`` sidecars are used for pure-component reference
   pressures when present; legacy ``antoine`` rows are used only when no
   sidecar exists. ``pseudo_psat_backsolved_from_vaporock`` rows are backsolved
@@ -112,6 +112,7 @@ from simulator.chemistry.ellingham_thermo import (  # noqa: E402
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_range_K,
     ellingham_metal_phase_kind,
+    ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
 from simulator.chemistry.melt_activity import (  # noqa: E402
@@ -187,6 +188,51 @@ def physical_melt_dissociation_pO2_bar(fO2_log: float) -> tuple[float, bool]:
     return raw, False
 
 
+def _solve_surface_pO2_bar(
+    intrinsic_fO2_log: float | None,
+    temperature_K: float,
+    floor_activities: Mapping[str, float] | None,
+    *,
+    fallback_pO2_bar: float | None = None,
+    apply_metal_saturation_floor: bool = True,
+) -> tuple[float | None, float, bool, dict[str, object] | None]:
+    """Resolve the one oxygen potential used by all channels on a surface.
+
+    Premise: a single evaporating surface has one melt-side oxygen potential;
+    headspace pO2 remains a transport input, not a second equilibrium value.
+    Algebra: when intrinsic fO2 is present, apply the liquid-standard metal
+    saturation floor once, then map its log10(bar) value through the physical
+    melt envelope. Without intrinsic fO2, retain the caller's legacy pO2 input.
+    Unit check: both the input fO2 logarithm and output pO2 are referenced to
+    bar; pressure laws consume the returned absolute bar value. Sanity: a
+    binding floor changes every oxygen-dependent channel through this shared
+    value, while a floor that does not bind leaves the candidate unchanged.
+
+    Returns ``(resolved_fO2_log, surface_pO2_bar, was_clamped, floor_notice)``.
+    The log and notice are ``None`` on the legacy no-intrinsic-fO2 path.
+    """
+
+    if intrinsic_fO2_log is None:
+        if fallback_pO2_bar is None:
+            raise ValueError(
+                "surface pO2 requires intrinsic fO2 or a fallback pO2"
+            )
+        return None, float(fallback_pO2_bar), False, None
+
+    resolved_fO2_log = float(intrinsic_fO2_log)
+    floor_notice: dict[str, object] | None = None
+    if apply_metal_saturation_floor:
+        resolved_fO2_log, floor_notice = apply_melt_metal_saturation_floor(
+            resolved_fO2_log,
+            float(temperature_K),
+            floor_activities,
+        )
+    surface_pO2_bar, was_clamped = physical_melt_dissociation_pO2_bar(
+        resolved_fO2_log
+    )
+    return resolved_fO2_log, surface_pO2_bar, was_clamped, floor_notice
+
+
 MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON = (
     "melt_dissociation_pO2_floor_inverted_through_mass_action"
 )
@@ -239,8 +285,9 @@ def melt_dissociation_pO2_floor_inversion_notice(
     Sanity: catalog envelope at 1e-12 bar keeps Si ~1e-8 Pa; the floor
     lands Si at ~7e9 Pa (above CATALOG_PHYSICAL_PRESSURE_CEILING_PA).
     Positive-n carriers (AlO2 n=+0.25) shrink at the floor — not inversion.
-    Transport-channel species (Fe, SiO) keep overhead pO2 and are skipped
-    when that pO2 is not the floor.
+    Every oxygen-dependent provider channel now uses the same surface pO2,
+    including Fe and SiO. They receive this notice when the shared surface
+    value reaches the floor, regardless of overhead transport pO2.
 
     Predict-and-flag: the number stays; the notice carries the original
     reason, authority_level, and certified pO2 band. Do not retune MIN.
@@ -308,7 +355,7 @@ def _attach_pO2_floor_inversion_notices(
     fO2_log: float | None,
     was_clamped: bool,
 ) -> dict[str, dict[str, Any]]:
-    """Single choke: flag published metal P that used the pO2 floor."""
+    """Single choke: flag published channel pressures that used the pO2 floor."""
 
     notices: dict[str, dict[str, Any]] = {}
     token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
@@ -2955,12 +3002,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if intrinsic_fO2_log_supplied
             else None
         )
-        # Dissociation pO2 is filled in after the oxide activities exist.
-        # The metal-saturation floor has to see them; the 1e-30 float
-        # guard stays behind that floor and is not the melt state.
-        melt_dissociation_pO2_bar = transport_pO2_bar
-        melt_dissociation_pO2_clamped = False
-        metal_saturation_floor_notice: dict[str, object] | None = None
+        # The shared surface pO2 is resolved after melt activities exist.
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
@@ -3030,6 +3072,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     f"{notice.get('message', '')}"
                 )
         feo_activity_diagnostic = None
+        floor_activities: dict[str, float] | None = None
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
                 calphad_ferrous_feo_activity_diagnostic,
@@ -3043,46 +3086,40 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 floor_bar=vacuum_floor_bar,
                 liquid_domain=liquid_domain,
             )
-            # a_FeO above was evaluated at the unfloored log. Flooring
-            # first would hide a collapsed shuttle state inside Kress.
-            # dissociation_at_printed_fO2 is the vapour-rail comparison
-            # only. VapoRock equilibrated at the printed log, so this
-            # cell must use that same log. The floor is the published
-            # melt bound (a_M would exceed 1 below it). It still applies
-            # to every caller that does not set the flag. At 1950 K and
-            # log10(fO2/bar) = -9 the Fe floor is 0.075286 dex more
-            # oxidizing; p_Al then moves by -3/4 of that and p_Ti by -1.
-            if controls.get("dissociation_at_printed_fO2") is True:
-                dissociation_fO2_log = float(intrinsic_fO2_log)
-                metal_saturation_floor_notice = None
-            else:
-                dissociation_fO2_log, metal_saturation_floor_notice = (
-                    apply_melt_metal_saturation_floor(
-                        float(intrinsic_fO2_log),
-                        T_K,
-                        _dissociation_metal_floor_activities(
-                            melt_account_mol,
-                            temperature_K=T_K,
-                            authority=vapour_activity_authority,
-                            a_feo_stoich=float(below_cap_fe_activity),
-                        ),
-                    )
-                )
-            if metal_saturation_floor_notice is not None:
-                warnings.append(
-                    f"{metal_saturation_floor_notice['kind']}: "
-                    f"metal={metal_saturation_floor_notice['metal']} "
-                    f"T_K={float(metal_saturation_floor_notice['temperature_K']):.6g} "
-                    "floor_log10_fO2_bar="
-                    f"{float(metal_saturation_floor_notice['floor_log10_fO2_bar']):.6g} "
-                    "unfloored_log10_fO2_bar="
-                    f"{float(metal_saturation_floor_notice['unfloored_log10_fO2_bar']):.6g}"
-                )
-            (
-                melt_dissociation_pO2_bar,
-                melt_dissociation_pO2_clamped,
-            ) = physical_melt_dissociation_pO2_bar(
-                float(dissociation_fO2_log)
+            # a_FeO above was evaluated at the unfloored log. Flooring first
+            # would hide a collapsed shuttle state inside Kress. The common
+            # surface owner applies the saturation floor only after these
+            # liquid-standard activities have been resolved.
+            floor_activities = _dissociation_metal_floor_activities(
+                melt_account_mol,
+                temperature_K=T_K,
+                authority=vapour_activity_authority,
+                a_feo_stoich=float(below_cap_fe_activity),
+            )
+
+        (
+            dissociation_fO2_log,
+            melt_dissociation_pO2_bar,
+            melt_dissociation_pO2_clamped,
+            metal_saturation_floor_notice,
+        ) = _solve_surface_pO2_bar(
+            intrinsic_fO2_log,
+            T_K,
+            floor_activities,
+            fallback_pO2_bar=transport_pO2_bar,
+            apply_metal_saturation_floor=(
+                controls.get("dissociation_at_printed_fO2") is not True
+            ),
+        )
+        if metal_saturation_floor_notice is not None:
+            warnings.append(
+                f"{metal_saturation_floor_notice['kind']}: "
+                f"metal={metal_saturation_floor_notice['metal']} "
+                f"T_K={float(metal_saturation_floor_notice['temperature_K']):.6g} "
+                "floor_log10_fO2_bar="
+                f"{float(metal_saturation_floor_notice['floor_log10_fO2_bar']):.6g} "
+                "unfloored_log10_fO2_bar="
+                f"{float(metal_saturation_floor_notice['unfloored_log10_fO2_bar']):.6g}"
             )
 
         vapor_pressures: dict[str, float] = {}
@@ -3094,6 +3131,87 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
         vapor_pressure_authority_limits: dict[str, dict[str, Any]] = {}
+        activity_standard_state_flags: dict[str, dict[str, Any]] = {}
+        surface_pO2_inputs_bar: dict[str, float] = {}
+
+        def _surface_pO2_for_channel(channel: str) -> float:
+            surface_pO2_inputs_bar[channel] = melt_dissociation_pO2_bar
+            return melt_dissociation_pO2_bar
+
+        def _standard_state_caveat(
+            *,
+            channel: str,
+            K_reference_phase: str,
+            activity_reference_phase: str,
+            reason: str,
+            activity_exponent: float | None = None,
+        ) -> dict[str, Any]:
+            from simulator.equilibrium import _engine_model_standard_state_caveat
+
+            flag = _engine_model_standard_state_caveat(
+                K_reference_phase=K_reference_phase,
+                activity_reference_phase=activity_reference_phase,
+                temperature_K=T_K,
+                reason=reason,
+            )
+            flag["species"] = channel
+            if activity_exponent is not None:
+                flag["oxide_formula_unit_exponent"] = float(activity_exponent)
+            activity_standard_state_flags[channel] = flag
+            return flag
+
+        def _liquid_standard_log10_factor(
+            *,
+            channel: str,
+            oxide: str,
+            K_reference_phase: str,
+            activity_exponent: float,
+        ) -> float | None:
+            """Return the K shift per liquid oxide formula unit or flag it."""
+
+            from simulator.equilibrium import (
+                _oxide_liquid_standard_log10_factor_per_oxide,
+            )
+
+            try:
+                return _oxide_liquid_standard_log10_factor_per_oxide(
+                    oxide, T_K
+                )
+            except ValueError as exc:
+                _standard_state_caveat(
+                    channel=channel,
+                    K_reference_phase=K_reference_phase,
+                    activity_reference_phase=(
+                        f"{oxide}(l), raoultian pure-liquid melt activity"
+                    ),
+                    reason=(
+                        "JANAF crystal/liquid Gibbs data do not cover this "
+                        f"temperature; the {K_reference_phase} K is retained "
+                        "with the liquid-standard activity and the prediction "
+                        f"is unchanged: {exc}"
+                    ),
+                    activity_exponent=activity_exponent,
+                )
+                return None
+
+        def _liquid_standard_multiplier(
+            *,
+            channel: str,
+            oxide: str,
+            K_reference_phase: str,
+            activity_exponent: float,
+        ) -> float:
+            per_formula_log10 = _liquid_standard_log10_factor(
+                channel=channel,
+                oxide=oxide,
+                K_reference_phase=K_reference_phase,
+                activity_exponent=activity_exponent,
+            )
+            if per_formula_log10 is None:
+                return 1.0
+            total_log10 = float(activity_exponent) * per_formula_log10
+            return 10.0 ** total_log10
+
         transport_o2 = o2_potential_from_pO2_bar(
             pO2_bar=transport_pO2_bar,
             temperature_K=T_K,
@@ -3335,7 +3453,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=_surface_pO2_for_channel(species),
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -3407,7 +3525,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "pressure_rail": "liquid_oxide_standard_reaction",
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": _surface_pO2_for_channel(species),
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -3508,7 +3626,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=_surface_pO2_for_channel(species),
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -3554,7 +3672,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "oxide_standard_state": "liquid",
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": _surface_pO2_for_channel(species),
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -3672,7 +3790,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=_surface_pO2_for_channel(species),
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -3730,7 +3848,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "P_standard_Pa": ELLINGHAM_STANDARD_PRESSURE_PA,
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": _surface_pO2_for_channel(species),
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -3860,23 +3978,59 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="K_decomp",
             )
-            dissociation_pO2_bar = (
-                transport_pO2_bar
-                if parent_oxide == 'FeO'
-                else melt_dissociation_pO2_bar
+            segment = ellingham_segment_for_temperature(species, T_K)
+            # The active Ellingham rails for Ca, Fe, and Mg name crystalline
+            # parent oxides explicitly in their phase basis.
+            crystalline_parent_markers = (
+                f"{parent_oxide}(s)",
+                f"{parent_oxide}(cr)",
             )
-            if parent_oxide != 'FeO':
-                # t-571: the Ellingham O2 denominator is sourced from the
-                # owner-gated O2 channel potential (melt_interface plane).
-                # The potential retains the actual oxygen, including a domain
-                # notice beyond the evaluator band. FeO retains its transport
-                # denominator (Kress91 activity already carries melt redox).
-                dissociation_pO2_bar = o2_potential_from_pO2_bar(
-                    pO2_bar=dissociation_pO2_bar,
-                    temperature_K=T_K,
-                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
-                    pO2_reference_bar=1.0,
-                ).legacy_pO2_bar
+            K_uses_crystalline_oxide = parent_oxide and any(
+                marker in segment.phase_basis
+                for marker in crystalline_parent_markers
+            )
+            if parent_oxide == "FeO" and fe_degraded_activity_basis is not None:
+                # This legacy no-intrinsic-fO2 path uses FeO wt%/100 rather
+                # than a liquid-standard thermodynamic activity. Retain its
+                # estimate, but do not claim JANAF converts that proxy.
+                _standard_state_caveat(
+                    channel=species,
+                    K_reference_phase=(
+                        f"{segment.phase_basis}, {segment.janaf_anchor}"
+                    ),
+                    activity_reference_phase=(
+                        "FeO wt%/100 degraded public-caller activity proxy"
+                    ),
+                    reason=(
+                        "The FeO wt%/100 degraded activity is not a liquid-"
+                        "standard thermodynamic activity; the best available "
+                        "Fe Ellingham prediction is retained without a JANAF "
+                        "standard-state conversion."
+                    ),
+                )
+            elif K_uses_crystalline_oxide:
+                # Premise: the Ellingham K consumes n_ox crystalline oxide
+                # formula units while this provider supplies a liquid-standard
+                # activity. Algebra: log10(K_liquid/K_crystal) per formula is
+                # ΔG_fus°/(R T ln 10), so K gains n_ox times that shift before
+                # the 1/n_M metal root. Units: n_ox and the logarithmic shift
+                # are dimensionless. Sanity: the JANAF shift is positive below
+                # the crystal/liquid crossing and zero at that crossing.
+                K_decomp *= _liquid_standard_multiplier(
+                    channel=species,
+                    oxide=parent_oxide,
+                    K_reference_phase=(
+                        f"{segment.phase_basis}, {segment.janaf_anchor}"
+                    ),
+                    activity_exponent=n_ox,
+                )
+            dissociation_pO2_bar = _surface_pO2_for_channel(species)
+            dissociation_pO2_bar = o2_potential_from_pO2_bar(
+                pO2_bar=dissociation_pO2_bar,
+                temperature_K=T_K,
+                reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                pO2_reference_bar=1.0,
+            ).legacy_pO2_bar
             # Premise: this value is the melt-supported metal source pressure,
             # not the later surface-flux boundary condition. For MgO(l) ->
             # Mg(g) + 1/2 O2, K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The JANAF row
@@ -3891,8 +4045,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # preserving the surface metal-transport path. Pure-MgO congruent
             # co-evolution is a separate reaction-basis validation, not a
             # runtime boundary condition solved by that subtraction.
-            # FeO already carries melt redox through its Kress91 activity and
-            # intentionally retains the legacy transport denominator here.
+            # FeO's Kress91 activity and every other carrier share the same
+            # surface pO2 denominator; transport pO2 is not a second surface.
             numerator = _require_finite_vapor_value(
                 K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar,
                 species=species,
@@ -4138,9 +4292,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 retain_analytical_channel = compiled_evaluator is not None or bool(
                     data.get("retain_analytical_pressure_channel", False)
                 )
-                activity_exponent = float(
-                    data.get('oxide_activity_exponent', 1.0)
-                )
+                activity_exponent_value = data.get('oxide_activity_exponent')
+                if activity_exponent_value is None:
+                    activity_exponent = (
+                        0.0 if name == "FeO_association_gas" else 1.0
+                    )
+                else:
+                    activity_exponent = float(activity_exponent_value)
                 oxide_activity = _high_t_activity_for_parent(
                     parent_oxide,
                     melt_account_mol,
@@ -4153,12 +4311,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     a_ox = oxide_activity.thermodynamic_parent_activity()
                     reported_activity = a_ox
                 else:
-                    # Legacy single-cation reaction fits declare their own
-                    # exponent-adjusted compatibility basis.
-                    a_ox = oxide_activity.equivalent_parent_activity(
-                        activity_exponent
-                    )
+                    # These rows declare activity on the single-cation
+                    # formula unit used by their source reaction. If that
+                    # reaction consumes n such units, mass action is
+                    # a_single**n; converting to a^(1/n) and raising it back
+                    # would erase the reaction stoichiometry.
                     reported_activity = oxide_activity.activity
+                    a_ox = reported_activity
                 if oxide_activity.activity <= 0.0 or (
                     not retain_analytical_channel
                     and oxide_activity.activity <= 1e-10
@@ -4197,6 +4356,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"valid_range_K [{valid_low:g}, {valid_high:g}] at {T_K:.2f} K"
                     )
             source_activity_floor_notice = None
+            surface_oxygen_notice = None
             if compiled_evaluator is not None:
                 assert compiled_species is not None
                 if (
@@ -4237,9 +4397,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     source_activity=1.0,
                     pO2_bar=compiled_evaluator.pO2_reference_bar,
                 )
-                evaluator_pO2_bar = transport_pO2_bar
-                if compiled_evaluator.oxygen_fugacity_channel == "intrinsic_melt":
-                    evaluator_pO2_bar = melt_dissociation_pO2_bar
+                evaluator_pO2_bar = _surface_pO2_for_channel(name)
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
                     source_activity=(
@@ -4252,6 +4410,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     ),
                     pO2_bar=evaluator_pO2_bar,
                 )
+                surface_oxygen_notice = evaluation.extrapolation_notice
                 P_reference_Pa = reference_evaluation.pressure_pa
                 P_eq_Pa = evaluation.pressure_pa
                 pO2_exponent = compiled_evaluator.pO2_exponent
@@ -4312,21 +4471,32 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         field="P_eq_activity",
                     )
 
-                pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
+                pO2_exponent_value = data.get('pO2_exponent')
+                if pO2_exponent_value is None:
+                    pO2_exponent = (
+                        0.5 if name == "FeO_association_gas" else 0.0
+                    )
+                else:
+                    pO2_exponent = float(pO2_exponent_value)
             if compiled_evaluator is None and pO2_exponent:
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
-                # t-571: transport-plane O2 through channel #1.  The legacy
-                # form uses the actual transport oxygen; the channel factory
-                # records a notice outside its stated evaluator band.
+                # Legacy reaction rows consume the same surface pO2 as the
+                # compiled and Ellingham channels.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=transport_pO2_bar,
+                    pO2_bar=_surface_pO2_for_channel(name),
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
-                    reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
                 )
+                if o2_potential is not None:
+                    notice = o2_potential.observation_or_setpoint_receipt.get(
+                        "extrapolation_notice"
+                    )
+                    if isinstance(notice, Mapping):
+                        surface_oxygen_notice = dict(notice)
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa
                     * channel_linear_mass_action_factor(o2_term, o2_potential),
@@ -4335,7 +4505,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 pO2_scaled = True
 
-            # SiO mass-action by pO2: p(SiO) scales as 1/sqrt(pO2).
+            # SiO mass-action by the shared surface pO2:
+            # p(SiO) scales as 1/sqrt(pO2).
             # Premise: the fitted SiO Antoine row is the standard-reaction
             # term at declared pO2_reference_bar (1e-9 bar), not at the body
             # vacuum floor. Algebra for SiO2(l)->SiO(g)+0.5 O2(g):
@@ -4344,10 +4515,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # above). Unit check: bar/bar is dimensionless. Sanity: at
             # pO2=p_ref the factor is 1; at the legal lunar floor 1.3e-12 bar
             # the factor is sqrt(1e-9/1.3e-12)≈27.735 — a silent clip to
-            # unity below p_ref was an under-extraction bug. Transport pO2
-            # is already fail-loud gated at the body/request vacuum floor
-            # (resolve_transport_pO2_bar); no additional silent pO2 floor
-            # belongs here. Body floors must not retune the SiO fit itself.
+            # unity below p_ref was an under-extraction bug. The shared
+            # surface owner supplies physical melt pO2; the transport
+            # headspace value does not alter the equilibrium pressure.
             if name == 'SiO' and not pO2_exponent:
                 sio_reference_bar = max(
                     1e-30,
@@ -4356,16 +4526,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         or vacuum_floor_bar
                     ),
                 )
-                # t-571: the sqrt mass action consumes the owner-gated O2
-                # channel potential (transport_headspace plane).  The exact
-                # legacy expression sqrt(p_ref / p) is preserved — only the
-                # scalar source is validated and receipted without substitution.
+                # The sqrt mass action consumes the shared surface potential.
                 sio_o2_potential = o2_potential_from_pO2_bar(
-                    pO2_bar=transport_pO2_bar,
+                    pO2_bar=_surface_pO2_for_channel(name),
                     temperature_K=T_K,
-                    reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
                     pO2_reference_bar=sio_reference_bar,
                 )
+                notice = sio_o2_potential.observation_or_setpoint_receipt.get(
+                    "extrapolation_notice"
+                )
+                if isinstance(notice, Mapping):
+                    surface_oxygen_notice = dict(notice)
                 from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
 
                 mass_action = _sio_oxygen_pressure_factor(
@@ -4378,6 +4550,46 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     field="P_eq_mass_action",
                 )
                 pO2_scaled = True
+
+            reaction = data.get('reaction')
+            reaction_formula = (
+                reaction.get('formula', '')
+                if isinstance(reaction, Mapping)
+                else ''
+            )
+            if parent_oxide and (
+                f"{parent_oxide}(cr)" in reaction_formula
+                or f"{parent_oxide}(s)" in reaction_formula
+            ):
+                # The source K consumes the displayed crystalline parent
+                # formula unit, but the provider reports a liquid-standard
+                # activity. For q parent units, Δlog10(K)=q ΔG_fus°/(RT ln10).
+                # Units: q and the log shift are dimensionless. Sanity: the
+                # shift is positive below Tm and zero at the JANAF crossing.
+                activity_exponent_for_standard_state = (
+                    float(compiled_evaluator.activity_exponent)
+                    if compiled_evaluator is not None
+                    else float(activity_exponent)
+                )
+                if activity_exponent_for_standard_state > 0.0:
+                    multiplier = _liquid_standard_multiplier(
+                        channel=name,
+                        oxide=parent_oxide,
+                        K_reference_phase=(
+                            f"{reaction_formula}; crystalline {parent_oxide}"
+                        ),
+                        activity_exponent=activity_exponent_for_standard_state,
+                    )
+                    P_reference_Pa = _require_finite_vapor_value(
+                        P_reference_Pa * multiplier,
+                        species=name,
+                        field="P_reference_liquid_standard_state",
+                    )
+                    P_eq_Pa = _require_finite_vapor_value(
+                        P_eq_Pa * multiplier,
+                        species=name,
+                        field="P_eq_liquid_standard_state",
+                    )
 
             retain_analytical_channel = compiled_evaluator is not None or bool(
                 data.get("retain_analytical_pressure_channel", False)
@@ -4426,22 +4638,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     ),
                     "P_reference_Antoine_Pa": P_reference_Pa,
                     "P_eq_Pa": P_eq_Pa,
-                    "pO2_bar": (
-                        evaluator_pO2_bar
-                        if (
-                            compiled_evaluator is not None
-                            and parent_oxide == "P2O5"
-                        )
-                        else transport_pO2_bar
+                    "pO2_bar": _surface_pO2_for_channel(name),
+                    "pO2_exponent": (
+                        -0.5
+                        if compiled_evaluator is None
+                        and name == "SiO"
+                        and not pO2_exponent
+                        else pO2_exponent
                     ),
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
-                oxygen_notice = (
-                    evaluation.extrapolation_notice
-                    if compiled_evaluator is not None
-                    else transport_notice if pO2_scaled else None
-                )
+                oxygen_notice = surface_oxygen_notice
                 if oxygen_notice is not None:
                     vapor_pressure_provenance[name].setdefault(
                         "extrapolation_notice", dict(oxygen_notice)
@@ -4593,6 +4801,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "melt_dissociation_pO2_clamped_to_physical_envelope": (
                 melt_dissociation_pO2_clamped
             ),
+            "surface_oxygen_potential_bar": melt_dissociation_pO2_bar,
+            "surface_oxygen_potential_inputs_bar": dict(
+                surface_pO2_inputs_bar
+            ),
+            "activity_standard_state_flags": activity_standard_state_flags,
             "pO2_floor_inversion_notices_by_species": floor_inversion_notices,
             "pO2_bar": transport_pO2_bar,
             "vacuum_floor_bar": vacuum_floor_bar,

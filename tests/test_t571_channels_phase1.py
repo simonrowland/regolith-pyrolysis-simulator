@@ -1063,12 +1063,9 @@ def test_o2_resolver_unknown_plane_is_typed_refusal():
 # provider's emitted pressures — including clamp-edge redox states.
 #
 # Re-review fold ("Ca/Mg/SiO thin"): beyond the shared T × fO2 × transport
-# grid, targeted sweeps widen the channel-relevant dimension of the three
-# flagged rails — an 8-point in-envelope transport sweep for the SiO sqrt
-# (the main grid samples only 2 distinct sqrt factors), a 12-point fO2
-# sweep for the Ca/Mg Ellingham denominator (clamped-below, both exact
-# envelope edges, dense interior, clamped-above), and a final emitted-
-# pressure comparison for Ca/Mg in addition to the intermediate root.
+# grid, targeted sweeps widen the channel-relevant dimensions — a 12-point
+# fO2 sweep for both SiO and the Ca/Mg Ellingham denominator, including
+# clamped-below, exact envelope edges, dense interior, and clamped-above.
 # Distinct-value gates assert the widened population is real.
 
 
@@ -1114,6 +1111,136 @@ def _provider_and_request(
     return provider, request, melt_mol, payload
 
 
+def test_builtin_provider_uses_one_surface_pO2_for_every_channel():
+    first_provider, first_request, _, _ = _provider_and_request(
+        1600.0,
+        intrinsic_fO2_log=-45.0,
+        transport_pO2_bar=1.0e-3,
+    )
+    second_provider, second_request, _, _ = _provider_and_request(
+        1600.0,
+        intrinsic_fO2_log=-45.0,
+        transport_pO2_bar=1.0e-8,
+    )
+    first = first_provider.dispatch(first_request)
+    second = second_provider.dispatch(second_request)
+
+    diagnostic = first.diagnostic
+    common_surface_pO2 = diagnostic["surface_oxygen_potential_bar"]
+    channel_inputs = diagnostic["surface_oxygen_potential_inputs_bar"]
+    assert diagnostic["melt_metal_saturation_floor_notice"]
+    assert diagnostic["source_reaction_fO2_bar"] == common_surface_pO2
+    assert diagnostic["pO2_bar"] != common_surface_pO2
+    assert {"SiO", "Mg"} <= set(channel_inputs)
+    assert set(channel_inputs.values()) == {common_surface_pO2}
+    output_channels = set(diagnostic["vapor_pressures_Pa"])
+    provenance_channels = set(
+        diagnostic["vapor_pressure_numerator_provenance"]
+    )
+    assert output_channels == provenance_channels
+    assert provenance_channels <= set(channel_inputs)
+    assert all(
+        row["pO2_bar"] == common_surface_pO2
+        for row in diagnostic["vapor_pressure_numerator_provenance"].values()
+    )
+    assert first.diagnostic["vapor_pressures_Pa"] == (
+        second.diagnostic["vapor_pressures_Pa"]
+    )
+
+
+def test_legacy_oxide_pressure_keeps_full_parent_activity_power():
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+    from simulator.chemistry.kernel.dto import ProviderAccountView
+
+    provider = BuiltinVaporPressureProvider(
+        {
+            "oxide_vapors": {
+                "Ca2": {
+                    "antoine": {"A": 1.0, "B": 0.0, "C": 0.0},
+                    "valid_range_K": [100.0, 4000.0],
+                    "parent_oxide": "CaO",
+                    "oxide_activity_exponent": 2.0,
+                    "pO2_exponent": 0.0,
+                    "reaction": {
+                        "formula": "2 CaO(cr) -> Ca2(g) + O2(g)"
+                    },
+                }
+            }
+        }
+    )
+
+    def predict(cao_mol: float):
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": {"CaO": cao_mol, "SiO2": 1.0}
+                },
+                species_formula_registry={},
+            ),
+            temperature_C=1800.0 - 273.15,
+            pressure_bar=1.0e-6,
+            control_inputs={"pO2_bar": 1.0e-9, "intrinsic_fO2_log": -9.0},
+        )
+        return provider.dispatch(request)
+
+    first = predict(1.0)
+    second = predict(0.5)
+    first_pressure = first.diagnostic["vapor_pressures_Pa"]["Ca2"]
+    second_pressure = second.diagnostic["vapor_pressures_Pa"]["Ca2"]
+    first_activity = first.diagnostic["activities"]["Ca2"]
+    second_activity = second.diagnostic["activities"]["Ca2"]
+    second_provenance = second.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["Ca2"]
+
+    assert second_pressure == pytest.approx(
+        second_provenance["P_reference_Antoine_Pa"] * second_activity**2
+    )
+    assert second_pressure / first_pressure == pytest.approx(
+        (second_activity / first_activity) ** 2
+    )
+def test_provider_retains_prediction_with_typed_caveat_outside_janaf_range():
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+    from simulator.chemistry.kernel.dto import ProviderAccountView
+
+    provider = BuiltinVaporPressureProvider(
+        {
+            "oxide_vapors": {
+                "CaO_gas": {
+                    "antoine": {"A": 1.0, "B": 0.0, "C": 0.0},
+                    "valid_range_K": [100.0, 4000.0],
+                    "parent_oxide": "CaO",
+                    "oxide_activity_exponent": 1.0,
+                    "pO2_exponent": 0.0,
+                    "reaction": {"formula": "CaO(cr) -> CaO(g)"},
+                }
+            }
+        }
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {"CaO": 1.0, "SiO2": 1.0}
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=3700.0 - 273.15,
+        pressure_bar=1.0e-6,
+        control_inputs={"pO2_bar": 1.0e-9, "intrinsic_fO2_log": -9.0},
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.diagnostic["vapor_pressures_Pa"]["CaO_gas"] > 0.0
+    caveat = result.diagnostic["activity_standard_state_flags"]["CaO_gas"]
+    assert caveat["kind"] == "engine_model_caveat"
+    assert caveat["conversion_applied"] is False
+
+
 def test_builtin_linear_rail_o2_bit_identity_differential():
     from engines.builtin.vapor_pressure import (
         BUILTIN_VAPOUR_CHANNEL_SWITCH_K,
@@ -1121,6 +1248,7 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
     )
     from simulator.chemistry.ellingham_thermo import (
         ellingham_delta_g_kj_per_mol_o2,
+        ellingham_segment_for_temperature,
         ellingham_stoichiometry,
     )
     from simulator.chemistry.melt_activity import melt_oxide_activity
@@ -1238,6 +1366,10 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                 record(species, legacy, "liquid_rail")
 
         if "ellingham" in rails:
+            from simulator.equilibrium import (
+                _oxide_liquid_standard_log10_factor_per_oxide,
+            )
+
             for species, parent in ellingham_rail.items():
                 if species not in pressures:
                     continue
@@ -1273,6 +1405,17 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                 K_decomp = math.exp(
                     dG * 1000.0 / (PROVIDER_GAS_CONSTANT * T_K)
                 )
+                segment = ellingham_segment_for_temperature(species, T_K)
+                if any(
+                    marker in segment.phase_basis
+                    for marker in (f"{parent}(s)", f"{parent}(cr)")
+                ):
+                    K_decomp *= 10.0 ** (
+                        n_ox
+                        * _oxide_liquid_standard_log10_factor_per_oxide(
+                            parent, T_K
+                        )
+                    )
                 # Exact pre-migration numerator/root expression.
                 numerator = K_decomp * (a_oxide ** n_ox) / melt_pO2
                 legacy_root = numerator ** (1.0 / n_M)
@@ -1307,11 +1450,11 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                         row.get("pO2_reference_bar", 1.0e-9) or 1.0e-9
                     ),
                 )
-                sio_sqrt_factors.add(math.sqrt(sio_ref / transport_pO2))
+                sio_sqrt_factors.add(math.sqrt(sio_ref / melt_pO2))
                 legacy = (
                     float(prov["P_reference_Antoine_Pa"])
                     * float(prov["activity_factor"])
-                    * math.sqrt(sio_ref / transport_pO2)
+                    * math.sqrt(sio_ref / melt_pO2)
                 )
                 record("SiO", legacy, "sio_sqrt")
 
@@ -1321,29 +1464,18 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
             for transport_pO2 in grid_transport:
                 probe_point(T_C, fO2_log, transport_pO2, rails=all_rails)
 
-    # Re-review fold ("Ca/Mg/SiO thin"): targeted sweeps that widen the
-    # channel-relevant dimension of the three flagged rails.  All sweep
-    # values stay inside the b-148 envelope, so the recomputed
-    # pre-migration expressions remain the exact legacy forms.
-    #
-    # SiO: the sqrt mass action depends ONLY on transport pO2; the main
-    # grid samples it at just 2 distinct factors.  Sweep 8 in-envelope
-    # transport values -> 8 distinct sqrt factors over ~7.5 orders of
-    # magnitude (the request vacuum floor fail-loud rejects transport pO2
-    # below 1e-9 bar, so the sweep starts at the floor).
-    for transport_pO2 in (
-        1.0e-9, 1.0e-7, 1.0e-5, 1.0e-3, 1.0e-1, 1.0, 10.0, 50.0,
-    ):
-        probe_point(1600.0, -9.0, transport_pO2, rails=frozenset({"sio"}))
-    #
-    # Ca/Mg: the Ellingham division depends ONLY on (T, melt pO2); sweep
-    # 12 fO2 values covering the clamped-below edge, the exact envelope
-    # edges, a dense in-envelope interior, and the clamped-above edge.
+    # The shared surface pO2 drives both SiO and Ca/Mg. Sweep its redox input
+    # across the clamped-below edge, exact envelope edges, interior, and above.
     for fO2_log in (
         -45.0, -30.0, -25.0, -20.0, -15.0, -12.0,
         -9.0, -6.0, -3.0, 0.0, 2.0, 5.0,
     ):
-        probe_point(1600.0, fO2_log, 1.0e-9, rails=frozenset({"ellingham"}))
+        probe_point(
+            1600.0,
+            fO2_log,
+            1.0e-9,
+            rails=frozenset({"ellingham", "sio"}),
+        )
 
     expected = (
         set(standard_rail) | set(liquid_rail) | set(ellingham_rail) | {"SiO"}
