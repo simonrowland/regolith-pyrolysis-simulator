@@ -1678,6 +1678,9 @@ def test_silicon_transport_row_computes_with_sodium_in_mixed_batch():
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=1000.0,
+        # Keep the peer on its explicit HKL upper-bound path while this test
+        # removes Si's continuum transport data.
+        hkl_upper_bound_transport_species=("Na",),
         vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
         molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
         stoich_by_species={
@@ -1885,6 +1888,9 @@ def test_missing_transport_channel_is_unavailable_downstream(
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=1000.0,
+        # Resolve the peer via its explicit HKL bound; Si remains on the
+        # continuum path whose missing collision data this case exercises.
+        hkl_upper_bound_transport_species=("Na",),
         vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
         molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
         stoich_by_species={
@@ -1894,7 +1900,11 @@ def test_missing_transport_channel_is_unavailable_downstream(
         available_oxide_kg={"Na": 10.0, "Si": 10.0},
         alpha={"Na": 0.5, "Si": 0.5},
     )
-    na_only = _w3_result_with_controls(1.0, overhead_pressure_pa=1000.0)
+    na_only = _w3_result_with_controls(
+        1.0,
+        overhead_pressure_pa=1000.0,
+        hkl_upper_bound_transport_species=("Na",),
+    )
     assert result.status == "ok"
     assert "Si" not in result.diagnostic["evaporation_flux_kg_hr"]
     assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] == (
