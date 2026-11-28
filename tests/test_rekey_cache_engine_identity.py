@@ -238,6 +238,7 @@ def test_rekey_current_layout_admits_full_row_for_count_and_write(
 
 def test_rekey_current_layout_rejects_null_controls_with_carried_indexes(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
     target_corpus_version: str,
 ) -> None:
     db_path = tmp_path / "current-layout-null-controls-rekey.db"
@@ -255,36 +256,43 @@ def test_rekey_current_layout_rejects_null_controls_with_carried_indexes(
             "WHERE key_hash = ?",
             (original_hash,),
         ).fetchone()
-        carried_indexes = conn.execute(
-            f"SELECT physics_bucket_h40_sha256, physics_bucket_h40_distance "
-            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
-            (original_hash,),
-        ).fetchone()
-        assert all(value is not None for value in carried_indexes)
         key = json.loads(bytes(key_bytes))
         key["controls"] = None
         stored_key_bytes = rrd.canonical_json_bytes(key)
         stored_key_hash = rrd._sha256(stored_key_bytes)
+        indexes = rekey._physics_columns(key)
+        assignments = ["key_hash = ?", "key_sha256 = ?", "key_bytes = ?"]
+        values: list[object] = [
+            stored_key_hash,
+            stored_key_hash,
+            sqlite3.Binary(stored_key_bytes),
+        ]
+        for column, value in indexes.items():
+            assignments.append(f"{column} = ?")
+            values.append(value)
         conn.execute(
             f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
-            "SET key_hash = ?, key_sha256 = ?, key_bytes = ? "
-            "WHERE key_hash = ?",
-            (
-                stored_key_hash,
-                stored_key_hash,
-                sqlite3.Binary(stored_key_bytes),
-                original_hash,
-            ),
+            f"SET {', '.join(assignments)} WHERE key_hash = ?",
+            (*values, original_hash),
         )
 
     exact_reader = rrd.PT1PersistentEquilibriumStore(db_path)
-    assert exact_reader.get(
-        artifact="freeze_gate_curve",
-        key=key,
-        key_bytes=stored_key_bytes,
-        key_hash=stored_key_hash,
-    ) is None
-    with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+    with monkeypatch.context() as query_guard:
+        query_guard.setattr(rrd, "_ladder_indexability", lambda *_a, **_kw: None)
+        with pytest.raises(
+            rrd.PT1PersistentStoreCorrupt,
+            match="invalid stored equilibrium replay key controls",
+        ):
+            exact_reader.get(
+                artifact="freeze_gate_curve",
+                key=key,
+                key_bytes=stored_key_bytes,
+                key_hash=stored_key_hash,
+            )
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="invalid stored equilibrium replay key controls",
+    ):
         rekey.rekey_cache(
             db_path,
             target_corpus_version=target_corpus_version,

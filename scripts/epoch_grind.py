@@ -77,6 +77,7 @@ from simulator.reduced_real_determinism import (
     PT1PersistentEquilibriumStore,
     _admit_stored_row,
     _copy_pt1_equilibrium_rows,
+    _pt1_has_current_layout,
 )
 from simulator.interpolation_uncertainty import (
     DEFAULT_RANK_LIMIT as DEFAULT_INTERPOLATION_RANK_LIMIT,
@@ -1116,6 +1117,9 @@ def _seed_cache_rows_from_base(
                 row,
                 store_kind="pt1",
                 strict_source_validation=True,
+                validate_store_schema_version=_pt1_has_current_layout(
+                    source_columns
+                ),
             )
             assert admitted is not None
             key_payload = admitted.entry["key"]

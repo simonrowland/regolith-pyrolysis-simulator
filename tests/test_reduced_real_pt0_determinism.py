@@ -2607,6 +2607,29 @@ def test_strict_preflight_rejects_current_pt1_bad_payload_checksum(
         )
 
 
+def test_strict_preflight_rejects_pre_codec_pt1_bad_payload_checksum(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "strict-pt1-pre-codec-bad-payload-checksum.sqlite"
+    _put_strict_pt1_equilibrium_row(db_path, source="builtin_authoritative")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN payload_codec_version"
+        )
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET payload_sha256 = ?",
+            ("0" * 64,),
+        )
+
+    with pytest.raises(GrindSourceGateError, match="stored row is corrupt"):
+        assert_strict_vapor_result_store(
+            db_path,
+            lambda _path, _payload: (None, None),
+            strict_vapor_gate=True,
+        )
+
+
 def _put_strict_pt1_equilibrium_row(db_path: Path, *, source: str) -> dict[str, Any]:
     capture = PT0DeterminismStore("capture")
     sim, result = _pt0_equilibrium_capture_context(capture)
@@ -6301,6 +6324,47 @@ def test_epoch_seed_migrates_b265_columns_and_legacy_row_still_misses(
             fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
         )
     assert replay.hits == 0
+
+
+@pytest.mark.parametrize("path", ("epoch-seed", "shared-copy"))
+def test_epoch_seed_rejects_current_layout_source_with_invalid_store_stamp(
+    tmp_path: Path,
+    path: str,
+) -> None:
+    from scripts import epoch_grind
+
+    base_db = tmp_path / f"invalid-stamp-{path}-base.sqlite"
+    _capture, _capture_sim, _capture_fO2, _curve = _capture_pt0_gate_curve(
+        base_db,
+        solidus_T_C=1100.0,
+        law_disclosures=[],
+    )
+    with sqlite3.connect(base_db) as conn:
+        (key_hash,) = conn.execute(
+            f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = 'pt1'"
+        )
+
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="store schema version drift",
+    ):
+        if path == "epoch-seed":
+            epoch_grind.seed_job_cache(
+                tmp_path / "invalid-stamp-epoch-seed-shard.sqlite",
+                base_db,
+                point_sources=[{"point_id": key_hash, "source": "ladder_polish"}],
+                job_id="job-a",
+            )
+        else:
+            rrd._copy_pt1_equilibrium_rows(
+                (base_db,),
+                tmp_path / "invalid-stamp-shared-copy-target.sqlite",
+                require_capture_epoch_match=False,
+            )
 
 
 @pytest.mark.parametrize(

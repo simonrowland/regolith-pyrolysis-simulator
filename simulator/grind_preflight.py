@@ -544,22 +544,11 @@ def _strict_vapor_pt1_store_summary(
             f"PRAGMA table_info({_PT1_EQUILIBRIUM_TABLE})"
         ).fetchall()
     }
-    current_preflight_columns = {
-        "store_schema_version",
-        "request_schema_version",
-        "key_sha256",
-        "payload_sha256",
-        "payload_codec_version",
-        "code_version",
-        "engine_version",
-        "data_digests_json",
-        "created_at",
-        "git_dirty",
-    }
-    current_table = current_preflight_columns.issubset(table_columns)
+    checksum_columns = {"key_sha256", "payload_sha256"}
+    has_checksums = checksum_columns <= table_columns
     selected_columns = (
         "*"
-        if current_table and strict_vapor_gate
+        if has_checksums and strict_vapor_gate
         else "key_hash, artifact, key_bytes, payload_bytes"
     )
     rows = conn.execute(
@@ -579,14 +568,17 @@ def _strict_vapor_pt1_store_summary(
         row = dict(stored_row)
         row_context = f"{context}:{row.get('key_hash', '<missing>')}"
         try:
-            if current_table:
+            if has_checksums:
                 try:
                     admitted = _admit_stored_row(
                         row,
                         store_kind="pt1",
-                        validate_store_schema_version=True,
+                        validate_store_schema_version=(
+                            "store_schema_version" in table_columns
+                        ),
                         strict_source_validation=True,
                         approved_sources=approved_sources,
+                        validate_unselected_ladder_indexes=False,
                     )
                 except PT1PersistentStoreCorrupt as exc:
                     raise GrindSourceGateError(

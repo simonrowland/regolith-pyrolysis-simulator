@@ -92,6 +92,15 @@ _PT1_SOURCE_REQUIRED_TEXT_FIELDS = (
     "data_digests_json",
     "created_at",
 )
+_PT1_CURRENT_LAYOUT_REQUIRED_COLUMNS = frozenset(
+    (*_PT1_SOURCE_REQUIRED_TEXT_FIELDS, "key_bytes", "payload_bytes", "git_dirty")
+)
+
+
+def _pt1_has_current_layout(columns: Iterable[str]) -> bool:
+    return _PT1_CURRENT_LAYOUT_REQUIRED_COLUMNS <= set(columns)
+
+
 REPAIR_NOTICE_COLLECTOR_ATTRIBUTE = "_reduced_real_repair_notices"
 REPAIR_NOTICES_UNAVAILABLE_NOTICE = {
     "kind": "repair_notices_unavailable_for_legacy_row"
@@ -2676,9 +2685,10 @@ def _validate_pt1_key_indexes(
     expected_replay_scope_sha256: str | None = None,
     check_key_dependencies: bool = True,
     require_indexable: bool = False,
+    validate_unselected_ladder_indexes: bool = True,
     derived_indexes: _PT1DerivedKeyIndexes | None = None,
 ) -> _PT1KeyIndexValidation:
-    """Validate PT1 row key and index integrity for both writes and reads."""
+    """Validate PT1 row key and the index fields selected by its caller."""
 
     row_hash = str(row.get("key_hash", ""))
     row_artifact = str(row.get("artifact", artifact or "unknown"))
@@ -2904,6 +2914,8 @@ def _validate_pt1_key_indexes(
     for stored_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
         if stored_rung_tag == rung_tag:
             continue
+        if not validate_unselected_ladder_indexes:
+            continue
         hash_column = _physics_ladder_hash_column(stored_rung_tag)
         distance_column = _physics_ladder_distance_column(stored_rung_tag)
         if hash_column not in row and distance_column not in row:
@@ -2989,6 +3001,7 @@ def _admit_stored_row(
     validate_source_provenance: bool = False,
     approved_sources: frozenset[str] = APPROVED_LIVE_VAPOR_SOURCES,
     validate_interpolation_domain: bool = False,
+    validate_unselected_ladder_indexes: bool = True,
     reader_context_policy: bool = True,
     strict_vapor_gate: bool = False,
 ) -> _AdmittedStoredRow | None:
@@ -2997,7 +3010,7 @@ def _admit_stored_row(
     PT1 checks schema and artifact; stored physics-bucket byte type; query
     bucket/ladder identity and scope; requested rung distance shape; key-byte
     type and hashes; canonical key decoding; derived bucket/ladder indexes
-    (validating every stored distance before comparison); payload-byte type,
+    (all ladder fields unless the reader selects a subset); payload-byte type,
     checksum, and canonical decoding;
     interpolation domain; repair notices and provenance storage types; strict
     source rules; codec and dependency shape; then a non-finite derived
@@ -3191,6 +3204,7 @@ def _admit_stored_row(
                 _payload_codec_version(row_artifact),
                 row.get("payload_codec_version"),
             ),
+            validate_unselected_ladder_indexes=validate_unselected_ladder_indexes,
         )
         row_key_bytes = index_validation.key_bytes
         row_key = index_validation.key
@@ -4147,6 +4161,7 @@ class PT1PersistentEquilibriumStore:
                         admission_keys=(query_key,) if query_key is not None else (),
                         validate_store_schema_version=True,
                         validate_interpolation_domain=True,
+                        validate_unselected_ladder_indexes=False,
                         strict_vapor_gate=self.strict_vapor_gate,
                     )
                     assert admitted is not None
@@ -4286,6 +4301,7 @@ class PT1PersistentEquilibriumStore:
             rung_key=rung_key,
             rung_hash=rung_hash,
             validate_interpolation_domain=True,
+            validate_unselected_ladder_indexes=False,
             strict_vapor_gate=strict_vapor_gate,
         )
         assert admitted is not None
@@ -4653,6 +4669,7 @@ class PT1PersistentEquilibriumStore:
             expected_replay_scope_sha256=expected_replay_scope_sha256,
             validate_store_schema_version=True,
             validate_interpolation_domain=True,
+            validate_unselected_ladder_indexes=False,
             strict_vapor_gate=strict_vapor_gate,
         )
         assert admitted is not None
@@ -4683,6 +4700,7 @@ class PT1PersistentEquilibriumStore:
             physics_bucket_hash=physics_bucket_hash,
             validate_store_schema_version=True,
             validate_interpolation_domain=True,
+            validate_unselected_ladder_indexes=False,
             strict_vapor_gate=strict_vapor_gate,
         )
         assert admitted is not None
@@ -4799,6 +4817,9 @@ def _copy_pt1_equilibrium_rows(
                     output_columns=target_columns,
                     strict_source_validation=strict_source_validation,
                     validate_interpolation_domain=True,
+                    validate_store_schema_version=_pt1_has_current_layout(
+                        source_row.keys()
+                    ),
                 )
                 assert (
                     incoming_admission is not None

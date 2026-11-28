@@ -176,6 +176,99 @@ def _put_interpolation_row(
     )
 
 
+def test_partial_pt1_layout_validates_only_the_indexes_each_reader_uses(
+    tmp_path: Path,
+) -> None:
+    key = _interpolation_key(
+        "partial-ladder-indexes",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    db_path = tmp_path / "partial-ladder-indexes.sqlite"
+    _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
+    with sqlite3.connect(db_path) as conn:
+        for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+            conn.execute(
+                f"DROP INDEX IF EXISTS idx_{rrd.PT1_EQUILIBRIUM_TABLE}_{rung_tag}"
+            )
+            for column in (
+                rrd._physics_ladder_hash_column(rung_tag),
+                rrd._physics_ladder_distance_column(rung_tag),
+            ):
+                conn.execute(
+                    f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+                    f"DROP COLUMN {column}"
+                )
+
+    key_bytes = canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    store = PT1PersistentEquilibriumStore(db_path)
+    with store._connect() as conn:
+        store._initialize(conn)
+        full_row = conn.execute(
+            f"SELECT * FROM {rrd.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert full_row is not None
+    assert store._entry_from_row(
+        full_row,
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+    ) is not None
+    assert store.get(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+    ) is not None
+
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    bucket_hash = hashlib.sha256(bucket_bytes).hexdigest()
+    assert store.get_by_physics_bucket(
+        artifact="equilibrium_post_record",
+        physics_bucket_key=bucket_key,
+        physics_bucket_bytes=bucket_bytes,
+        physics_bucket_hash=bucket_hash,
+        query_key=key,
+    ) is not None
+    assert len(
+        store._list_interpolation_candidates(
+            artifact="equilibrium_post_record",
+            replay_scope_sha256=rci.replay_scope_for_interpolation(key),
+            query_key=key,
+        )
+    ) == 1
+
+    rung_tag = "h40"
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    rung_hash = hashlib.sha256(canonical_json_bytes(rung_key)).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            f"SET {rrd._physics_ladder_hash_column(rung_tag)} = ? "
+            "WHERE key_hash = ?",
+            (rung_hash, key_hash),
+        )
+
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="h40 distance is missing",
+    ):
+        store.get_by_physics_ladder_bucket(
+            artifact="equilibrium_post_record",
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rung_hash,
+            query_key=key,
+        )
+
+
 def test_pt1_exact_lookup_rejects_legacy_stamp_on_current_layout(
     tmp_path: Path,
 ) -> None:
