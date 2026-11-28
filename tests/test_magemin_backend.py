@@ -3262,6 +3262,36 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert any("H2O" in warning and "MnO" in warning for warning in igad.warnings)
 
 
+@pytest.mark.parametrize("database", ("ig", "igad"))
+def test_magemin_db_projection_is_source_of_truth_for_oxide_membership(database):
+    backend = MAGEMinBackend()
+    composition = {
+        "SiO2": 50.0,
+        "Al2O3": 20.0,
+        "MgO": 10.0,
+        "CaO": 10.0,
+        "FeO": 5.0,
+        "Na2O": 1.0,
+        "K2O": 1.0,
+        "TiO2": 1.0,
+        "CoO": 1.0,
+        "MnO": 1.0,
+    }
+
+    valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(composition)
+    projection = backend._build_db_bulk_projection(
+        composition,
+        database=database,
+    )
+
+    assert valid is True
+    assert warnings == []
+    assert reason is None
+    assert projection.dropped_components == ("CoO", "MnO")
+    assert "CoO" not in projection.composition_wt_pct
+    assert "MnO" not in projection.composition_wt_pct
+
+
 def test_magemin_db_projection_preserves_native_feot_input():
     backend = MAGEMinBackend()
 
