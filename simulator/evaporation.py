@@ -1494,6 +1494,34 @@ def _zero_liquid_precedes_interpolation(equilibrium: Any) -> bool:
     )
 
 
+def _vapour_batch_hour_key(host: Any) -> tuple[Any, int | None]:
+    raw_hour = getattr(getattr(host, 'melt', None), 'hour', None)
+    try:
+        hour = int(raw_hour)
+    except (TypeError, ValueError, OverflowError):
+        hour = None
+    batch_identity = getattr(host, '_vapour_batch_identity', None)
+    if batch_identity is None:
+        batch_identity = id(getattr(host, 'inventory', host))
+    return batch_identity, hour
+
+
+def _current_vapour_batch_hour_availability(
+    host: Any,
+) -> Mapping[str, Any] | None:
+    """Return availability only for the host's current batch and hour."""
+    cached = getattr(host, '_vapour_batch_hour_availability', None)
+    if not isinstance(cached, Mapping):
+        return None
+    batch_identity, hour = _vapour_batch_hour_key(host)
+    if (
+        cached.get('batch_identity') != batch_identity
+        or cached.get('hour') != hour
+    ):
+        return None
+    return cached
+
+
 def _is_interpolated_vapour_equilibrium(
     equilibrium: Any,
     vapor_pressure_diagnostic: Mapping[str, Any] | None,
@@ -1543,23 +1571,15 @@ def _append_vapour_batch_unresolved_notice(
 def _provider_resolved_flux_species(
     diagnostic: Mapping[str, Any],
     flux_overlay: Mapping[str, Any] | None = None,
-    *,
-    flux_pressures: Mapping[str, Any] | None = None,
 ) -> frozenset[str]:
-    """Return computed provider channels plus resolved selector outcomes."""
-    below = diagnostic.get('below_threshold_evaporation_flux', {})
-    below_rates = below.get('fluxes_kg_hr', {}) if isinstance(below, Mapping) else {}
-    resolved: set[str] = set()
-    for key in (
-        'evaporation_flux_kg_hr',
-        'zero_net_evaporation_flux',
-        'evaporation_series_resistance',
-    ):
-        channels = diagnostic.get(key, {})
-        if isinstance(channels, Mapping):
-            resolved.update(str(species) for species in channels)
-    if isinstance(below_rates, Mapping):
-        resolved.update(str(species) for species in below_rates)
+    """Return publisher debits and exact zero proofs, plus selector zeros."""
+    projected = project_publisher_vapour_rates(diagnostic)
+    resolved = {str(species) for species in projected.debit_kg_hr}
+    resolved.update(
+        str(species)
+        for species, rate in projected.supply_kg_hr.items()
+        if rate == 0.0
+    )
     channel_states = (flux_overlay or {}).get('batch_channel_states', {})
     unavailable_species = {
         str(notice.get('species'))
@@ -1575,17 +1595,6 @@ def _provider_resolved_flux_species(
             for species, state in channel_states.items()
             if state == 'zero_by_physics'
             and str(species) not in unavailable_species
-        )
-    if isinstance(flux_pressures, Mapping) and isinstance(channel_states, Mapping):
-        resolved.update(
-            str(species)
-            for species, pressure in flux_pressures.items()
-            if str(species) not in unavailable_species
-            and channel_states.get(species) == 'eligible'
-            and isinstance(pressure, Real)
-            and not isinstance(pressure, bool)
-            and math.isfinite(float(pressure))
-            and float(pressure) > 0.0
         )
     return frozenset(resolved)
 
@@ -1870,8 +1879,6 @@ def _append_capacity_solve_exclusion_notice(
 @dataclass(frozen=True)
 class _CapacityProviderTrialDecision:
     unavailable_by_species: Mapping[str, str]
-    resolved_species: frozenset[str]
-    bound_notice: Mapping[str, Any] | None
     refusal: EvaporationFluxRefusal | None
 
 
@@ -1920,11 +1927,6 @@ def _capacity_provider_trial_decision(
         provider_status=status,
     )
     resolved = _provider_resolved_flux_species(diagnostic, overlay)
-    bound = _append_capacity_solve_exclusion_notice(
-        host,
-        overlay,
-        resolved_species=resolved,
-    )
     refusal = _provider_flux_outcome_refusal(
         host,
         status,
@@ -1960,10 +1962,14 @@ def _capacity_provider_trial_decision(
             include_unresolved_notices=True,
         )
         refusal = outcome.refusal
+    if refusal is None and not unavailable:
+        _append_capacity_solve_exclusion_notice(
+            host,
+            overlay,
+            resolved_species=resolved,
+        )
     return _CapacityProviderTrialDecision(
         unavailable_by_species=dict(unavailable),
-        resolved_species=resolved,
-        bound_notice=bound,
         refusal=refusal,
     )
 
@@ -2215,9 +2221,7 @@ class EvaporationMixin:
             campaign = None
         else:
             campaign = campaign.strip()
-        transport_cache = getattr(
-            self, '_vapour_batch_hour_availability', None
-        )
+        transport_cache = _current_vapour_batch_hour_availability(self)
         cached_property_rows = (
             transport_cache.get('lennard_jones_property_rows_by_species', {})
             if isinstance(transport_cache, Mapping)
@@ -2516,7 +2520,7 @@ class EvaporationMixin:
         )
         pressures = flux_pressures if isinstance(flux_pressures, Mapping) else {}
         resolved_species = _provider_resolved_flux_species(
-            provider_diagnostic or {}, overlay, flux_pressures=pressures
+            provider_diagnostic or {}, overlay
         )
         notices = [
             notice
@@ -2528,10 +2532,26 @@ class EvaporationMixin:
         refusal_codes = dict(
             overlay.get('batch_channel_refusal_codes', {}) or {}
         )
+        unavailable_species = {
+            str(notice.get('species'))
+            for notice in notices
+            if notice.get('species') is not None
+        }
+        dispatchable_species = frozenset(
+            str(species)
+            for species, pressure in pressures.items()
+            if channel_states.get(str(species), 'eligible') == 'eligible'
+            and str(species) not in unavailable_species
+            and isinstance(pressure, Real)
+            and not isinstance(pressure, bool)
+            and math.isfinite(float(pressure))
+            and float(pressure) >= 0.0
+        )
         provider_zero_reason = (
             effective_pressure_zero_reason
             or overlay.get('effective_pressure_zero_reason')
         )
+        provider_was_called = provider_diagnostic is not None
         evidence = {
             'batch_channel_states': channel_states,
             'net_driving_force_by_species': dict(
@@ -2597,10 +2617,18 @@ class EvaporationMixin:
                 return _VapourBatchResolutionOutcome(
                     resolved_species, 'below_400K', evidence, None
                 )
+            if not provider_was_called and dispatchable_species:
+                return _VapourBatchResolutionOutcome(
+                    resolved_species,
+                    'provider_dispatch_pending',
+                    evidence,
+                    None,
+                )
             if (
                 not pressures
                 and provider_zero_reason
                 and overlay.get('batch_pa_by_species')
+                and not notices
             ):
                 return _VapourBatchResolutionOutcome(
                     resolved_species,
@@ -2714,6 +2742,20 @@ class EvaporationMixin:
         refusal_codes = getattr(surface, 'refusal_codes_by_species', {}) or {}
         if not isinstance(refused_species, Mapping):
             refused_species = {}
+        surface_report_method = getattr(surface, 'as_diagnostic', None)
+        surface_report = (
+            dict(surface_report_method())
+            if callable(surface_report_method)
+            else dict(surface)
+            if isinstance(surface, Mapping)
+            else {}
+        )
+        if not refused_species:
+            refused_species = surface_report.get('refused_species', {}) or {}
+        if not refusal_codes:
+            refusal_codes = (
+                surface_report.get('refusal_codes_by_species', {}) or {}
+            )
         if not isinstance(states, Mapping):
             return {}
         if isinstance(vapor_pressure_diagnostic, Mapping):
@@ -3575,15 +3617,8 @@ class EvaporationMixin:
         membership before surface closure. The same frozen exclusions are then
         reused by capacity trials and the final live publication.
         """
-        raw_hour = getattr(getattr(self, 'melt', None), 'hour', None)
-        try:
-            hour = int(raw_hour)
-        except (TypeError, ValueError, OverflowError):
-            hour = None
-        batch_identity = getattr(self, '_vapour_batch_identity', None)
-        if batch_identity is None:
-            batch_identity = id(getattr(self, 'inventory', self))
-        cached = getattr(self, '_vapour_batch_hour_availability', None)
+        batch_identity, hour = _vapour_batch_hour_key(self)
+        cached = _current_vapour_batch_hour_availability(self)
         channel_states = flux_overlay.get('batch_channel_states', {})
         channel_states = (
             channel_states if isinstance(channel_states, Mapping) else {}
@@ -3859,7 +3894,7 @@ class EvaporationMixin:
         batch hour. Frozen membership, rather than a current pressure map,
         decides which late failures can trigger that restart.
         """
-        cache = getattr(self, '_vapour_batch_hour_availability', None)
+        cache = _current_vapour_batch_hour_availability(self)
         restarted = set(
             cache.get('restarted_unavailable_species', ())
             if isinstance(cache, Mapping)
@@ -3896,7 +3931,7 @@ class EvaporationMixin:
             {},
             observed_unavailable_by_species=fresh,
         )
-        cache = getattr(self, '_vapour_batch_hour_availability', None)
+        cache = _current_vapour_batch_hour_availability(self)
         if isinstance(cache, dict):
             restarted.update(fresh)
             cache['restarted_unavailable_species'] = tuple(sorted(restarted))
@@ -3912,18 +3947,8 @@ class EvaporationMixin:
         *,
         capacity_restart_used: bool,
         detail_key: str,
-        resolved_species: Iterable[str],
         capacity_solve: bool = True,
     ) -> dict[str, str]:
-        bound_notice = (
-            _append_capacity_solve_exclusion_notice(
-                self,
-                flux_overlay,
-                resolved_species=resolved_species,
-            )
-            if capacity_solve
-            else None
-        )
         fresh = EvaporationMixin._restart_for_late_unavailability(
             self,
             equilibrium,
@@ -3941,9 +3966,6 @@ class EvaporationMixin:
             'reason': 'capacity_member_closure_failure',
             detail_key: dict(unavailable_by_species),
             'vapour_batch_flux_overlay': flux_overlay,
-            'bound_direction': dict(
-                (bound_notice or {}).get('bound_direction', {})
-            ),
         }
         raise EvaporationFluxRefusal(
             'capacity_member_closure_failure', diagnostic
@@ -4146,6 +4168,30 @@ class EvaporationMixin:
         if outcome is None:
             # Resolver test doubles retain the public six-value seam. The
             # production resolver stores its initial closure decision above.
+            langmuir_surface = getattr(
+                self, '_last_langmuir_surface_oxygen', None
+            )
+            if langmuir_surface is not None:
+                as_diagnostic = getattr(
+                    langmuir_surface, 'as_diagnostic', None
+                )
+                surface_diagnostic = (
+                    dict(as_diagnostic())
+                    if callable(as_diagnostic)
+                    else dict(langmuir_surface)
+                    if isinstance(langmuir_surface, Mapping)
+                    else {}
+                )
+                EvaporationMixin._record_langmuir_refusal_notices(
+                    self,
+                    flux_overlay_report,
+                    langmuir_surface,
+                    final_pressures=vapor_pressures,
+                    vapor_pressure_diagnostic=vapor_pressure_diagnostic,
+                    overhead_partials_Pa=surface_diagnostic.get(
+                        'overhead_partials_Pa', {}
+                    ),
+                )
             outcome = EvaporationMixin._vapour_batch_resolution_outcome(
                 self,
                 resolve_error,
@@ -4226,6 +4272,16 @@ class EvaporationMixin:
         self._last_vapour_batch = vapour_batch
         self._last_vapour_batch_report = batch_report
         self._last_vapour_batch_flux_overlay = flux_overlay_report
+        availability = _current_vapour_batch_hour_availability(self)
+        if isinstance(availability, Mapping):
+            _publish_transport_parameter_notices(
+                flux_overlay_report,
+                {
+                    'transport_parameter_notices_by_species': availability.get(
+                        'transport_parameter_notices_by_species', {}
+                    )
+                },
+            )
         imcc_shadow = None
         batch_shadow = getattr(vapour_batch, "melt_activity_shadow", None)
         if hasattr(batch_shadow, "as_mapping"):
@@ -4479,7 +4535,6 @@ class EvaporationMixin:
                 new_aux_parent_failures,
                 capacity_restart_used=False,
                 detail_key='auxiliary_map_unavailable',
-                resolved_species=vapor_pressures,
                 capacity_solve=False,
             )
             if late_parent_species:
@@ -4492,10 +4547,6 @@ class EvaporationMixin:
                     ),
                     capacity_bound_notice=capacity_bound_notice,
                 )
-        _publish_transport_parameter_notices(
-            flux_overlay_report,
-            getattr(control_result, 'transport_sidecar', {}),
-        )
         vapor_pressures = control_vapor_pressures
         kernel_result = self._dispatch_only(
             ChemistryIntent.EVAPORATION_FLUX,
@@ -4544,9 +4595,6 @@ class EvaporationMixin:
                     provider_unavailable,
                     capacity_restart_used=False,
                     detail_key='provider_unavailable',
-                    resolved_species=flux_overlay_report.get(
-                        'batch_channel_states', {}
-                    ),
                     capacity_solve=False,
                 )
             )
@@ -7304,8 +7352,8 @@ class EvaporationMixin:
         ``vapor_pressures.yaml`` payload plus the simulator's stoichiometric
         validation.
 
-        Missing parent metadata makes only that species unavailable. Missing
-        molar mass or inconsistent stoichiometry still raises.
+        Missing parent or molar-mass metadata makes only that species
+        unavailable. Inconsistent stoichiometry still raises.
         """
 
         molar_masses_kg_mol: dict[str, float] = {}
@@ -7332,12 +7380,14 @@ class EvaporationMixin:
             M_g_mol = production_vapor_molar_mass_g_per_mol(
                 self.vapor_pressures, species
             )
-            if M_g_mol is None:
-                raise AccountingError(
-                    f"vapor species {species!r} requires "
-                    "molar_mass_g_mol metadata before evaporation flux "
-                    "can be emitted"
-                )
+            if not (
+                isinstance(M_g_mol, Real)
+                and not isinstance(M_g_mol, bool)
+                and math.isfinite(float(M_g_mol))
+                and float(M_g_mol) > 0.0
+            ):
+                unavailable_by_species[str(species)] = 'missing_molar_mass'
+                continue
             molar_masses_kg_mol[species] = M_g_mol / 1000.0
 
             parent_oxide = str(sp_data['parent_oxide'])
@@ -7687,9 +7737,7 @@ class EvaporationMixin:
             vapor_pressures = dict(vapour_batch_flux_pressures_Pa)
         else:
             vapor_pressures = {}
-        transport_cache = getattr(
-            self, '_vapour_batch_hour_availability', None
-        )
+        transport_cache = _current_vapour_batch_hour_availability(self)
         cached_members = (
             transport_cache.get('admitted_member_species')
             if isinstance(transport_cache, Mapping)
@@ -7740,6 +7788,13 @@ class EvaporationMixin:
         surface_oxygen_bound = bool(
             isinstance(closure_context, Mapping)
             and closure_context.get("root_closed")
+        )
+        free_molecular_upper_bound = (
+            transport_cache.get('hkl_upper_bound_transport_species', ())
+            if isinstance(transport_cache, Mapping)
+            else _load_hkl_upper_bound_transport_species(
+                self.vapor_pressures
+            )
         )
         controls: dict[str, Any] = {
             # Reporting / shadow projection only — kernel must NOT read this
@@ -7820,13 +7875,6 @@ class EvaporationMixin:
             transport_cache.get('transport_parameter_notices_by_species', {})
             if isinstance(transport_cache, Mapping)
             else {}
-        )
-        free_molecular_upper_bound = (
-            transport_cache.get('hkl_upper_bound_transport_species', ())
-            if isinstance(transport_cache, Mapping)
-            else _load_hkl_upper_bound_transport_species(
-                self.vapor_pressures
-            )
         )
         transport_sidecar = {
             'lennard_jones_property_rows_by_species': {
