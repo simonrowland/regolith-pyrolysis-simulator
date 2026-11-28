@@ -49,6 +49,7 @@ def _put_cache_row(
         key.update(
             {
                 "namespace_id": "test:freeze_gate_curve",
+                "engine_chemistry_versions": {},
                 "vapor_pressure_provider_selection": "test-vapor-pressure",
                 "sulfur_side": {
                     "S_input_ppm": 0.0,

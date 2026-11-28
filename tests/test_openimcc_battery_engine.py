@@ -537,6 +537,11 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    # KO0.5 is present in the reported activity map. It must match itself
+    # before its malformed coefficient metadata is rejected by this consumer.
+    assert residual.refusal.detail["reason"] == (
+        RefusalReason.COEFFICIENT_BASIS_MISMATCH.value
+    )
 
 
 def test_openimcc_engine_is_registered() -> None:

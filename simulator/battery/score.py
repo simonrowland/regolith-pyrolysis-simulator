@@ -1390,7 +1390,19 @@ def _match_reported_species_with_notices(
     if oxide_activity:
         from engines.alphamelts.domain import (
             _canonical_oxide_value_map_with_notices,
+            canonical_melt_oxide_activity_name,
         )
+
+        # Components outside the parent-oxide basis (for example OpenIMCC's
+        # KO0.5 endmember) retain exact formula matching. Canonical oxide
+        # labels still go through the shared first-reported alias projection.
+        if canonical_melt_oxide_activity_name(formula) is None:
+            for name, value in reported.items():
+                if (
+                    canonical_melt_oxide_activity_name(name) is None
+                    and parse_species_formula(str(name), species=species) == target
+                ):
+                    return (str(name), float(value)), ()
 
         oxide_activities, repair_notices = (
             _canonical_oxide_value_map_with_notices(

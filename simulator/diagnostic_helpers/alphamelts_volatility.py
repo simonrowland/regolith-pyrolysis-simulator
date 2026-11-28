@@ -27,7 +27,7 @@ from engines.antoine import (
 )
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
-    canonical_melt_oxide_activity_name,
+    canonical_oxide_activity_map,
 )
 from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from engines.builtin.vapor_pressure import (
@@ -908,18 +908,7 @@ def _coerce_activity_sample(value: Any) -> dict[str, Any]:
 
 
 def _canonical_activity_mapping(values: Mapping[str, float]) -> dict[str, float]:
-    result: dict[str, float] = {}
-    for raw_name, raw_value in dict(values or {}).items():
-        oxide = canonical_melt_oxide_activity_name(raw_name)
-        if oxide is None:
-            continue
-        try:
-            value = float(raw_value)
-        except (TypeError, ValueError):
-            continue
-        if value > 0.0 and math.isfinite(value):
-            result[oxide] = value
-    return result
+    return canonical_oxide_activity_map(values)
 
 
 def _finite_positive_mapping(values: Mapping[str, float]) -> dict[str, float]:

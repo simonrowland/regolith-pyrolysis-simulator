@@ -6926,6 +6926,9 @@ def test_petthermotools_activity_alias_conflict_keeps_first_for_antoine_and_cach
 def test_suffix_first_oxide_alias_order_matches_score_and_antoine_consumers():
     from engines.alphamelts.domain import melts_endmember_to_parent_oxide_activity
     from simulator.battery.score import match_reported_species
+    from simulator.diagnostic_helpers.alphamelts_volatility import (
+        _canonical_activity_mapping,
+    )
 
     backend = AlphaMELTSBackend()
     aliases = {'SiO2_Liq': 0.6, 'SiO2': 0.4}
@@ -6936,6 +6939,9 @@ def test_suffix_first_oxide_alias_order_matches_score_and_antoine_consumers():
     )
 
     assert activities == {'SiO2': pytest.approx(0.6)}
+    assert _canonical_activity_mapping(aliases) == {
+        'SiO2': pytest.approx(0.6)
+    }
     assert match_reported_species(
         'SiO2', aliases, oxide_activity=True
     ) == ('SiO2', pytest.approx(0.6))
