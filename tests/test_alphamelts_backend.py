@@ -1705,6 +1705,17 @@ def test_activity_from_coefficients_pins_mixed_oxide_projection():
     assert gammas == {'SiO2': 1.0, 'FeO': 1.0}
 
 
+def test_activity_from_suffixed_coefficients_uses_canonical_oxide_key():
+    activities, gammas = AlphaMELTSBackend()._activities_from_coefficients(
+        {'SiO2_Liq': 0.5},
+        {'SiO2': 100.0},
+    )
+
+    assert activities == {'SiO2': pytest.approx(0.5)}
+    assert 'SiO2_Liq' not in activities
+    assert gammas == {'SiO2_Liq': 0.5}
+
+
 def test_activities_from_coefficients_propagates_formula_resolution_key_error(
     monkeypatch,
 ):

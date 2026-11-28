@@ -6126,7 +6126,7 @@ class _MELTSBackendSupport(MeltBackend):
             # activity is dimensionless. Sanity: gamma=0.5 and x=0.02 gives
             # a=0.01, not the 0.5 value that inflated vapor flux by 50x.
             gammas[str(raw_name)] = gamma
-            activities[str(raw_name)] = gamma * mole_fraction
+            activities[oxide] = gamma * mole_fraction
         return activities, gammas
 
     def _finite_activity_mapping(
