@@ -867,6 +867,16 @@ def test_pt1_replay_indexes_expire_when_a_producer_chemistry_version_changes(
         ],
         "openimcc": rrd.ENGINE_CHEMISTRY_VERSION["openimcc"],
     }
+    assert rrd._pt1_engine_chemistry_versions(
+        "internal-analytical:equilibrium-composite",
+        artifact="equilibrium_post_record",
+        vapor_provider_id="builtin-vapor-pressure",
+        non_backend_producers=("sulfsat",),
+    ) == {
+        "internal-analytical": rrd.ENGINE_CHEMISTRY_VERSION[
+            "internal-analytical"
+        ],
+    }
 
     db_path = tmp_path / "producer-chemistry-version.sqlite"
     capture = PT0DeterminismStore("capture", db_path=db_path)
@@ -918,6 +928,16 @@ def test_pt1_replay_indexes_expire_when_a_producer_chemistry_version_changes(
         after,
         physics_bucket_key=after_bucket,
     ) is None
+
+
+def test_pt1_chemistry_versions_reject_unknown_producer() -> None:
+    with pytest.raises(rrd.PT1UnknownChemistryProducer, match="unregistered"):
+        rrd._pt1_engine_chemistry_versions(
+            "unregistered:equilibrium",
+            artifact="freeze_gate_curve",
+            vapor_provider_id=None,
+            non_backend_producers=(),
+        )
 
 
 def test_equilibrium_key_tracks_inert_and_refuses_cross_replay() -> None:
@@ -1394,8 +1414,8 @@ def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
 
 
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
-    # Studio-2 canonical bytes at 35c987e96 after gate keys began embedding the
-    # owner freeze-gate provider-input identity.
+    # Studio-2 exact-request bytes at 35c987e96 before PT-1 began embedding
+    # engine chemistry owner versions. Full key pins below cover the new map.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -1403,7 +1423,8 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     provider = sim._chem_registry.fallback_for(
         ChemistryIntent.GATE_LIQUID_FRACTION
     )
-    provider._backend = SimpleNamespace(_database="ig")
+    provider._backend = MAGEMinBackend()
+    provider._backend._database = "ig"
     magemin_key = canonical_replay_key(
         sim,
         artifact="freeze_gate_curve",
@@ -1414,16 +1435,10 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     assert magemin_key["engine_chemistry_versions"]["magemin"] == (
         rrd.ENGINE_CHEMISTRY_VERSION["magemin"]
     )
-    magemin_bytes = canonical_json_bytes(
-        {
-            key: value
-            for key, value in magemin_key.items()
-            if key != "engine_chemistry_versions"
-        }
-    )
-    assert len(magemin_bytes) == 1319
+    magemin_bytes = canonical_json_bytes(magemin_key)
+    assert len(magemin_bytes) == 1322
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
-        "00f40658d0a344757029e661d4574a75c72b13521066689f205e6194a5dcea0a"
+        "e21e8a8395198f266fd2e8df18808aae65ebf1cb2fc915d11cac4a6a7c4249c5"
     )
 
     generic_store = PT0DeterminismStore("capture")
@@ -1432,17 +1447,11 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     assert generic_key["engine_chemistry_versions"]["internal-analytical"] == (
         rrd.ENGINE_CHEMISTRY_VERSION["internal-analytical"]
     )
-    generic_bytes = canonical_json_bytes(
-        {
-            key: value
-            for key, value in generic_key.items()
-            if key != "engine_chemistry_versions"
-        }
-    )
+    generic_bytes = canonical_json_bytes(generic_key)
     assert generic_key["namespace_id"] == "internal-analytical:equilibrium-composite"
-    assert len(generic_bytes) == 1687
+    assert len(generic_bytes) == 1741
     assert hashlib.sha256(generic_bytes).hexdigest() == (
-        "f23032fcd2ddba188fccad867d238b352c63e4ca53b77c3dc643baae0af422f9"
+        "8a1b2f385ace29c63dd8781c3c993b6a4a238eca8365d23d7a489d60b3e62f44"
     )
 
 

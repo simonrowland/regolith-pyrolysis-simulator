@@ -303,6 +303,10 @@ class PT1PersistentStoreCorrupt(PT0CacheCollision):
     """Persistent PT-1 row failed verify-on-hit integrity checks."""
 
 
+class PT1UnknownChemistryProducer(ValueError):
+    """PT-1 producer has no owner chemistry version for replay identity."""
+
+
 class PT0InvalidControls(RuntimeError):
     """PT-0 control quantization received a non-finite process value."""
 
@@ -2670,23 +2674,38 @@ def _pt1_engine_chemistry_versions(
     non_backend_producers: Sequence[str],
 ) -> dict[str, int]:
     """Read current versions for every engine producing a PT-1 payload."""
-    engines = {str(namespace_id).partition(":")[0]}
+    producers = {str(namespace_id).partition(":")[0]}
     if artifact == "equilibrium_post_record":
         if vapor_provider_id == "builtin-vapor-pressure":
             # Builtin melt vapor pressure is owned by the analytical engine
             # chemistry epoch; the provider label itself is not an engine id.
-            engines.add("internal-analytical")
-        elif str(vapor_provider_id or "") in ENGINE_CHEMISTRY_VERSION:
-            engines.add(str(vapor_provider_id))
-        engines.update(
-            producer
-            for producer in non_backend_producers
-            if producer in ENGINE_CHEMISTRY_VERSION
-        )
+            producers.add("internal-analytical")
+        elif vapor_provider_id:
+            producers.add(str(vapor_provider_id))
+        producers.update(str(producer) for producer in non_backend_producers)
+    owner_aliases = {
+        "builtin-vapor-pressure": "internal-analytical",
+        # The gate provider is named for its role; the backend chemistry owner
+        # recorded by engine_cache is MAGEMin.
+        "magemin-shadow": "magemin",
+    }
+    engines: set[str] = set()
+    for producer in producers:
+        if producer == "sulfsat":
+            # SulfSat is an auxiliary binding with its own package and
+            # calibration provenance in binding admission, not an engine-cache
+            # chemistry-version owner.
+            continue
+        engine = owner_aliases.get(producer, producer)
+        if engine not in ENGINE_CHEMISTRY_VERSION:
+            raise PT1UnknownChemistryProducer(
+                f"PT-1 producer {producer!r} has no owner entry in "
+                "engine_cache.ENGINE_CHEMISTRY_VERSION"
+            )
+        engines.add(engine)
     return {
         engine: int(ENGINE_CHEMISTRY_VERSION[engine])
         for engine in sorted(engines)
-        if engine in ENGINE_CHEMISTRY_VERSION
     }
 
 
