@@ -358,6 +358,7 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
     assert refusal["site"] == "evaporation.partial_channel_refusal"
     assert refusal["species"] == "K"
     assert refusal["field"] == "batch_channel_state"
+
     # Host list carries the refusal note as well.
     assert any(
         n.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
