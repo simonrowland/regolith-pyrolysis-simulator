@@ -954,9 +954,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             ), (case_name, provider_request_maps)
         if should_refuse:
             for refusal in (live_refusal, capacity_refusal):
-                assert refusal.reason == (
-                    "vapour_batch_no_debiting_pressure_outcome"
-                ), case_name
+                assert refusal.reason == expected_refusal_reason, case_name
                 refusal_overlay = refusal.diagnostic[
                     "vapour_batch_flux_overlay"
                 ]
@@ -1288,7 +1286,7 @@ def test_nonfinite_effective_pressure_is_unresolved_per_species():
         "backend_vapor_pressures_Pa"
     ] = dict(equilibrium.vapor_pressures_Pa)
 
-    pressures, overlay, batch, error, _diagnostic, _source, _selection = (
+    pressures, overlay, batch, error, _diagnostic, _source = (
         sim._resolve_evaporation_batch_flux_state(
             equilibrium,
             temperature_K=equilibrium.temperature_C + 273.15,
@@ -1709,10 +1707,15 @@ def test_disabled_gas_resistance_keeps_missing_lj_carrier_available(monkeypatch)
 @pytest.mark.xdist_group("serial")
 def test_live_langmuir_and_provider_share_lj_collision_converter(monkeypatch):
     from simulator import condensation
+    from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 
     sim = _real_capacity_sim()
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = math.log10(
+        DEFAULT_VACUUM_FLOOR_BAR
+    )
+    sim._sync_oxygen_reservoir_mirror()
     sim.vapor_pressures["metals"]["Fe"].update({
         "critical_temperature_K": 6000.0,
         "critical_pressure_atm": 500.0,
@@ -2518,10 +2521,18 @@ def test_estimated_lennard_jones_inputs_drive_continuum_hour_with_flag(
     monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Fe")
     equilibrium = sim._get_equilibrium()
     provider_controls = []
+    provider_transport_sidecars = []
     real_dispatch = BuiltinEvaporationFluxProvider.dispatch
 
     def capture_estimated_transport(provider, request):
         provider_controls.append(dict(request.control_inputs))
+        provider_transport_sidecars.append(
+            getattr(
+                request.control_inputs.get("vapour_batch_flux_overlay"),
+                "transport_sidecar",
+                {},
+            )
+        )
         return real_dispatch(provider, request)
 
     monkeypatch.setattr(
@@ -2538,7 +2549,8 @@ def test_estimated_lennard_jones_inputs_drive_continuum_hour_with_flag(
     assert isinstance(flux, EvaporationFlux)
     assert flux.species_kg_hr.get("Fe", 0.0) > 0.0
     assert provider_controls
-    property_row = provider_controls[0][
+    transport_sidecar = provider_transport_sidecars[0]
+    property_row = transport_sidecar[
         "lennard_jones_property_rows_by_species"
     ]["Fe"]
     expected = _resolve_lennard_jones_parameters(
@@ -2549,6 +2561,14 @@ def test_estimated_lennard_jones_inputs_drive_continuum_hour_with_flag(
     assert property_row["critical_temperature_K"] == 6000.0
     assert property_row["critical_pressure_atm"] == 500.0
     overlay = provider_controls[0]["vapour_batch_flux_overlay"]
+    assert "lennard_jones_property_rows_by_species" not in provider_controls[0]
+    assert "lennard_jones_parameters_by_species" not in provider_controls[0]
+    assert "transport_eligibility_by_species" not in provider_controls[0]
+    assert not any(
+        notice.get("kind") == "transport_parameters_estimated"
+        for notice in overlay.get("notices", ())
+        if isinstance(notice, dict)
+    )
     assert any(
         notice.get("kind") == "transport_parameters_estimated"
         and notice.get("species") == "Fe"
@@ -2556,7 +2576,7 @@ def test_estimated_lennard_jones_inputs_drive_continuum_hour_with_flag(
         and notice.get("flag") == "lj_estimated:tc_pc"
         and notice.get("inputs", {}).get("critical_temperature_K") == 6000.0
         and notice.get("inputs", {}).get("critical_pressure_atm") == 500.0
-        for notice in overlay.get("notices", ())
+        for notice in sim._last_vapour_batch_flux_overlay.get("notices", ())
         if isinstance(notice, dict)
     )
     series = (
@@ -3608,7 +3628,7 @@ def test_abandoned_capacity_attempt_does_not_publish_before_restart(monkeypatch)
             for species, pressure in {"Fe": 50.0, "Na": 25.0}.items()
             if species not in unavailable
         }
-        return pressures, overlay, None, {}, {}, None, overlay
+        return pressures, overlay, None, {}, {}, None
 
     monkeypatch.setattr(sim, "_resolve_evaporation_batch_flux_state", resolve_batch)
     monkeypatch.setattr(sim, "_reclose_langmuir_pressures", lambda _partials: None)
@@ -4774,6 +4794,110 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
 
 
+def test_live_and_picard_transport_sidecar_match_at_same_state(monkeypatch):
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+    from simulator.capacity_coupling import _headspace_partial_pressures_Pa
+    from simulator.condensation import _LENNARD_JONES_PARAMS
+
+    monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Fe")
+    captures = {"live": [], "capacity": []}
+    active_path = ["live"]
+    real_dispatch = BuiltinEvaporationFluxProvider.dispatch
+
+    def capture_sidecar(provider, request):
+        control_inputs = request.control_inputs
+        overlay = control_inputs.get("vapour_batch_flux_overlay")
+        captures[active_path[0]].append({
+            "controls": dict(control_inputs),
+            "sidecar": copy.deepcopy(
+                getattr(overlay, "transport_sidecar", {})
+            ),
+        })
+        return real_dispatch(provider, request)
+
+    monkeypatch.setattr(
+        BuiltinEvaporationFluxProvider,
+        "dispatch",
+        capture_sidecar,
+    )
+
+    simulators = {}
+    equilibria = {}
+    for path in ("live", "capacity"):
+        sim = _real_capacity_sim()
+        sim.start_campaign(CampaignPhase.C0)
+        sim.melt.temperature_C = 1600.0
+        sim.vapor_pressures["metals"]["Fe"].update({
+            "critical_temperature_K": 6000.0,
+            "critical_pressure_atm": 500.0,
+        })
+        overhead_mol = {"N2": 0.1}
+        sim.atom_ledger.load_external(
+            "process.overhead_gas",
+            {"N2": overhead_mol["N2"] * M_N2 / 1000.0},
+            source="b1318 live/Picard sidecar parity fixture",
+            material_origin="feedstock",
+        )
+        partials = _headspace_partial_pressures_Pa(
+            overhead_mol,
+            species=overhead_mol,
+            temperature_K=sim._headspace_temperature_K(),
+            volume_m3=sim._headspace_volume_m3(),
+        )
+        sim._melt_headspace_composition_mbar = {
+            species: pressure_pa / 100.0
+            for species, pressure_pa in partials.items()
+        }
+        simulators[path] = sim
+        equilibria[path] = sim._get_equilibrium()
+
+    active_path[0] = "live"
+    live_flux = simulators["live"]._calculate_evaporation(
+        equilibria["live"]
+    )
+    active_path[0] = "capacity"
+    capacity_result = simulators[
+        "capacity"
+    ]._compute_capacity_coupling_shadow_impl(
+        equilibria["capacity"]
+    )
+
+    assert isinstance(live_flux, EvaporationFlux)
+    assert isinstance(capacity_result, CapacityShadowResult)
+    assert captures["live"]
+    assert captures["capacity"]
+    live_request = captures["live"][0]
+    capacity_request = captures["capacity"][0]
+    assert live_request["sidecar"] == capacity_request["sidecar"]
+    sidecar = live_request["sidecar"]
+    assert sidecar["transport_eligibility_by_species"]["Fe"] == (
+        "chapman_enskog"
+    )
+    assert sidecar["lennard_jones_parameters_by_species"]["Fe"]["flag"] == (
+        "lj_estimated:tc_pc"
+    )
+    for request in (live_request, capacity_request):
+        assert "lennard_jones_property_rows_by_species" not in request[
+            "controls"
+        ]
+        assert "transport_eligibility_by_species" not in request["controls"]
+        overlay = request["controls"]["vapour_batch_flux_overlay"]
+        assert not any(
+            notice.get("kind") == "transport_parameters_estimated"
+            for notice in overlay.get("notices", ())
+            if isinstance(notice, dict)
+        )
+    for path in ("live", "capacity"):
+        published_overlay = simulators[path]._last_vapour_batch_flux_overlay
+        assert any(
+            notice.get("kind") == "transport_parameters_estimated"
+            and notice.get("species") == "Fe"
+            and notice.get("flag") == "lj_estimated:tc_pc"
+            for notice in published_overlay.get("notices", ())
+            if isinstance(notice, dict)
+        )
+
+
 def test_no_cold_train_reuses_head_bleed_without_evaluating_shadow_flux():
     head = {"O2": 1.25, "N2": 0.75}
 
@@ -5563,6 +5687,8 @@ def test_capacity_zero_liquid_checks_interpolation_before_equilibrium_vapour():
 
 
 def test_free_molecular_legacy_lj_estimate_still_publishes_its_notice():
+    from simulator.evaporation import _publish_transport_parameter_notices
+
     sim = _real_capacity_sim()
     capacity, cold_train = sim._cold_train_capacity_policy()
     relief = dict(cold_train.relief)
@@ -5589,6 +5715,12 @@ def test_free_molecular_legacy_lj_estimate_still_publishes_its_notice():
     assert availability["transport_eligibility_by_species"]["Fe"] == (
         "free_molecular"
     )
+    estimate_notice = availability[
+        "transport_parameter_notices_by_species"
+    ]["Fe"]
+    assert estimate_notice["kind"] == "transport_parameters_estimated"
+    assert estimate_notice["flag"] == "lj_estimated:legacy_code_proxy"
+    _publish_transport_parameter_notices(overlay, availability)
     assert any(
         notice.get("kind") == "transport_parameters_estimated"
         and notice.get("species") == "Fe"

@@ -7961,6 +7961,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _provider_resolved_flux_species,
             _capacity_provider_trial_decision,
             _take_vapour_batch_selector_overlay,
+            _publish_transport_parameter_notices,
             _is_interpolated_vapour_equilibrium,
             _zero_liquid_precedes_interpolation,
         )
@@ -8045,7 +8046,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         vapor_pressure_diagnostic: dict[str, Any] = {}
         vapour_batch = None
         outcome = None
-        capacity_bound_notice = None
         if not zero_liquid and temperature_K >= 400.0:
             self._last_vapour_batch_selector_overlay = None
             (
@@ -8130,7 +8130,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         controls, provider_molar_masses = control_result
         if batch_flux_pressures is not None:
             batch_flux_pressures = dict(
-                controls.get(CONTROL_FLUX_PRESSURES_KEY, {}) or {}
+                controls[CONTROL_FLUX_PRESSURES_KEY] or {}
+                if CONTROL_FLUX_PRESSURES_KEY in controls
+                else pre_aux_batch_flux_pressures
             )
         late_parent_unavailable = dict(
             getattr(control_result, 'unavailable_by_species', {}) or {}
@@ -8151,6 +8153,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     equilibrium,
                     capacity_restart_used=True,
                 )
+        zero_load_evidence = (
+            'zero_liquid'
+            if zero_liquid
+            else outcome.reason
+            if outcome is not None
+            and outcome.reason in {
+                'below_400K',
+                'internal_analytical_below_400K',
+                'proven_empty_inventory',
+            }
+            else 'below_400K'
+            if temperature_K < 400.0
+            else None
+        )
         solver_molar_masses = dict(provider_molar_masses)
         availability = getattr(
             self, '_vapour_batch_hour_availability', None
@@ -8223,7 +8239,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         rates_cache = {}
 
         def flux_at_partials(partials_Pa):
-            nonlocal capacity_bound_notice, capacity_flux_overlay
+            nonlocal capacity_flux_overlay
             cache_key = tuple(sorted(
                 (str(species), float(pressure))
                 for species, pressure in partials_Pa.items()
@@ -8256,26 +8272,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     for species, pressure in reclosed.pressures_Pa.items()
                     if str(species) in flux_species
                 }
-                closure_failures = EvaporationMixin._record_langmuir_refusal_notices(
+                (
+                    reclosed_pressures,
+                    closure_failures,
+                    trial_outcome,
+                ) = EvaporationMixin._classify_langmuir_trial_channels(
                     self,
                     iteration_overlay,
                     reclosed,
                     final_pressures=reclosed_pressures,
                     vapor_pressure_diagnostic=vapor_pressure_diagnostic,
                     overhead_partials_Pa=partials_Pa,
-                )
-                EvaporationMixin._include_cap_proven_zero_pressure_values(
-                    reclosed_pressures,
-                    iteration_overlay,
-                    admitted_species=flux_species,
-                )
-                trial_outcome = EvaporationMixin._vapour_batch_resolution_outcome(
-                    self,
-                    {},
-                    iteration_overlay,
                     selector_overlay=selection_flux_overlay,
-                    flux_pressures=reclosed_pressures,
-                    include_unresolved_notices=True,
                     requested_species_ids=(
                         getattr(vapour_batch, 'requested_species_ids', None)
                         if vapour_batch is not None
@@ -8285,6 +8293,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         equilibrium, 'liquid_fraction', None
                     ),
                     temperature_K=temperature_K,
+                    include_cap_proven_zero=True,
+                    admitted_species=flux_species,
                 )
                 trial_resolved_species = trial_outcome.resolved_species
                 if closure_failures:
@@ -8333,6 +8343,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 iteration_overlay,
                 expected_species=iteration_flux_pressures or {},
                 selector_overlay=selection_flux_overlay,
+                zero_load_evidence=zero_load_evidence,
             )
             provider_unavailable = dict(
                 provider_decision.unavailable_by_species
@@ -8348,12 +8359,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         'Picard provider member became unavailable'
                     ),
                 )
-            capacity_bound_notice = provider_decision.bound_notice
             diagnostic['vapour_batch_flux_overlay'] = iteration_overlay
-            capacity_flux_overlay = copy.deepcopy(iteration_overlay)
             provider_refusal = provider_decision.refusal
             if provider_refusal is not None:
                 raise provider_refusal
+            _publish_transport_parameter_notices(
+                iteration_overlay,
+                getattr(iteration_controls, 'transport_sidecar', {}),
+            )
+            diagnostic['vapour_batch_flux_overlay'] = iteration_overlay
+            capacity_flux_overlay = copy.deepcopy(iteration_overlay)
             # Debit vector only. Rates at or below the 1e-12 kg/h floor
             # stay out of this solve so the partials stay on the published
             # flux closure. Wall supply reads the live publisher diagnostic

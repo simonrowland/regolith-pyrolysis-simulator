@@ -1378,6 +1378,17 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         # Kinetic flux math runs against the request's T/P/fO2 directly;
         # no independent feedback. Diagnostic-only audit.
         control_audit = diagnostic_control_audit(request)
+        transport_sidecar = getattr(
+            request.control_inputs, 'transport_sidecar', {}
+        )
+        if not transport_sidecar:
+            transport_sidecar = getattr(
+                request.control_inputs.get('vapour_batch_flux_overlay'),
+                'transport_sidecar',
+                {},
+            )
+        if not isinstance(transport_sidecar, Mapping):
+            transport_sidecar = {}
 
         T_C = request.temperature_C
         T_K = T_C + 273.15
@@ -1574,21 +1585,27 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         hkl_upper_bound_transport_species = frozenset(
             str(species)
             for species in (
-                controls.get("hkl_upper_bound_transport_species", ()) or ()
+                transport_sidecar.get(
+                    "hkl_upper_bound_transport_species",
+                    controls.get("hkl_upper_bound_transport_species", ()),
+                ) or ()
             )
         )
-        transport_property_rows_by_species = controls.get(
-            "lennard_jones_property_rows_by_species", {}
+        transport_property_rows_by_species = transport_sidecar.get(
+            "lennard_jones_property_rows_by_species",
+            controls.get("lennard_jones_property_rows_by_species", {}),
         )
         if not isinstance(transport_property_rows_by_species, Mapping):
             transport_property_rows_by_species = {}
-        transport_parameters_by_species = controls.get(
-            "lennard_jones_parameters_by_species", {}
+        transport_parameters_by_species = transport_sidecar.get(
+            "lennard_jones_parameters_by_species",
+            controls.get("lennard_jones_parameters_by_species", {}),
         )
         if not isinstance(transport_parameters_by_species, Mapping):
             transport_parameters_by_species = {}
-        transport_eligibility_by_species = controls.get(
-            "transport_eligibility_by_species", {}
+        transport_eligibility_by_species = transport_sidecar.get(
+            "transport_eligibility_by_species",
+            controls.get("transport_eligibility_by_species", {}),
         )
         if not isinstance(transport_eligibility_by_species, Mapping):
             transport_eligibility_by_species = {}
