@@ -99,10 +99,10 @@ def _install_interpolation_test_binding_receipt(
         monkeypatch,
         bind_direct_backend=True,
         identity_override=BindingIdentity(
-            "magemin",
-            "ig",
-            "magemin-ig-r1",
-            "subprocess",
+            "thermoengine",
+            "MELTSv1.0.2",
+            "thermoengine-r1",
+            "native",
         ),
         provenance_override={
             "binding_provenance_verifiable": True,
@@ -111,7 +111,7 @@ def _install_interpolation_test_binding_receipt(
             ),
             "runtime_version": {
                 "tag": "value",
-                "value": "magemin-deterministic-test-stub",
+                "value": "thermoengine-deterministic-test-stub",
             },
         },
     )
@@ -7990,15 +7990,15 @@ def _run_interpolation_class_guard_hour(
 ) -> tuple[Any, Any, int]:
     sim = _build_pt0_sim(store)
     class CappedDeterministicBackend(RealBackendAuthority):
-        real_backend_family = RealBackendFamily.MAGEMIN
-        name = "magemin"
+        real_backend_family = RealBackendFamily.THERMOENGINE
+        name = "thermoengine"
         calls = 0
 
         def is_available(self):
             return True
 
         def get_engine_version(self) -> str:
-            return "magemin-deterministic-test-stub"
+            return "thermoengine-deterministic-test-stub"
 
         def equilibrate(
             self,
@@ -8024,7 +8024,7 @@ def _run_interpolation_class_guard_hour(
                     "K2O": 5.0,
                 },
                 fO2_log=float(fO2_log),
-                diagnostics={"deterministic_engine_stub": "magemin"},
+                diagnostics={"deterministic_engine_stub": "thermoengine"},
             )
 
     backend = CappedDeterministicBackend()
