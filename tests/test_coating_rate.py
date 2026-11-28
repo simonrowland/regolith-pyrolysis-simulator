@@ -691,7 +691,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
         # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
         # Recomputed with produce_coating_golden on the merged production tree.
-        "595292b4a57620732b2d70fe1d53f1b251127b820d851413a954449a61cb4294"
+        "a9790ba292cf9b3934fde3de26d8c1b2c6256bbc414e8761744a1dd12540d1c4"
     )
 
 

@@ -28,12 +28,12 @@ from tests.test_optimizer_evalspec import _c2a_window_profile
 # 14.7388 m2 area). Those moves change ledger bytes. This pin is not a
 # with/without check of the fog flag; the history assertion below is.
 _LEDGER_DIGEST = {
-    "lunar_c2a_18h": "bb88aafd93b3022d1692d30004c8e087ff554a0ed347314b962fd4a014730f14",
+    "lunar_c2a_18h": "b9cf25a1e3e07016cc96f21c823eac263fc120ff51e64d7edb05c1faf602ea0a",
     "mars_c2a_18h_declared_carbon": (
-        "ac611224a755ad99d474794ccc36c5ef73ea47748e75d6e3affd574c15207d9c"
+        "39e9b453fdd0e5cd76331bbf66c09a6752032789dec7e11a69b044918075161d"
     ),
-    "ci_c2a_18h": "4a46c2783fa6027b1a70d5c8283ce74c98e5c0e492f87d7221af1d87cedcd748",
-    "lunar_c0_24h": "4cc08d07f14f337cf710ebe4dce80dffa4f46ae9f68193fd0dd1d70b2ad74038",
+    "ci_c2a_18h": "3e67bdefec6c6ccd06b7ead967d11366d7e25fe6cf0789002d6a37c79b0ab07c",
+    "lunar_c0_24h": "851558077b62123f56f493080f7888f1edd330a2e53424b39bf046a2ae9633cb",
 }
 
 
