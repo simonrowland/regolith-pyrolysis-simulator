@@ -535,16 +535,35 @@ def _strict_vapor_pt1_store_summary(
 ) -> dict[str, int]:
     from simulator.reduced_real_determinism import (
         PT1PersistentStoreCorrupt,
-        _PT1RowLayout,
         _admit_stored_row,
-        _pt1_row_layout,
     )
 
+    table_columns = {
+        str(column["name"])
+        for column in conn.execute(
+            f"PRAGMA table_info({_PT1_EQUILIBRIUM_TABLE})"
+        ).fetchall()
+    }
+    current_preflight_columns = {
+        "store_schema_version",
+        "request_schema_version",
+        "key_sha256",
+        "payload_sha256",
+        "payload_codec_version",
+        "code_version",
+        "engine_version",
+        "data_digests_json",
+        "created_at",
+        "git_dirty",
+    }
+    current_table = current_preflight_columns.issubset(table_columns)
+    selected_columns = (
+        "*"
+        if current_table and strict_vapor_gate
+        else "key_hash, artifact, key_bytes, payload_bytes"
+    )
     rows = conn.execute(
-        f"""
-        SELECT *
-        FROM {_PT1_EQUILIBRIUM_TABLE}
-        """
+        f"SELECT {selected_columns} FROM {_PT1_EQUILIBRIUM_TABLE}"
     ).fetchall()
     if not strict_vapor_gate:
         return {
@@ -554,30 +573,18 @@ def _strict_vapor_pt1_store_summary(
             "pt1_noop_rows": len(rows),
         }
 
-    table_columns = {
-        str(column["name"])
-        for column in conn.execute(
-            f"PRAGMA table_info({_PT1_EQUILIBRIUM_TABLE})"
-        ).fetchall()
-    }
-    row_layout = _pt1_row_layout(table_columns)
-
     vapor_active_rows = 0
     source_reports = 0
     for stored_row in rows:
         row = dict(stored_row)
         row_context = f"{context}:{row.get('key_hash', '<missing>')}"
         try:
-            if row_layout is _PT1RowLayout.UNSUPPORTED:
-                raise PT1PersistentStoreCorrupt(
-                    f"{row_context}: unsupported PT-1 physical layout"
-                )
-            if row_layout in (_PT1RowLayout.CURRENT, _PT1RowLayout.V2):
+            if current_table:
                 try:
                     admitted = _admit_stored_row(
                         row,
                         store_kind="pt1",
-                        source_layout=row_layout,
+                        validate_store_schema_version=True,
                         strict_source_validation=True,
                         approved_sources=approved_sources,
                     )

@@ -50,7 +50,6 @@ from simulator.corpus_version import current_corpus_version
 import simulator.reduced_real_determinism as rrd
 from simulator.reduced_real_determinism import (
     PT1PersistentStoreCorrupt,
-    UncacheableKey,
     validated_rekey_corpus_version,
 )
 from scripts import rekey_cache_engine_identity as rekey
@@ -2182,7 +2181,10 @@ def test_rekey_legacy_h40_index_rejects_subnormal_derived_distance(
             (key_hash, key_hash, key_bytes, "legacy-engine", None, None),
         )
 
-    with pytest.raises(UncacheableKey):
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="stored request key is not indexable during rekey",
+    ):
         rekey.rekey_cache(
             db_path,
             target_corpus_version=current_corpus_version(),

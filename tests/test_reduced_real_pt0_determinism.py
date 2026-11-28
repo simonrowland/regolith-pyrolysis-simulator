@@ -12315,124 +12315,219 @@ def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
     assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
 
 
-def test_pt1_row_layout_classifies_each_green_supported_shape(
-    tmp_path: Path,
-) -> None:
-    store = PT1PersistentEquilibriumStore(tmp_path / "pt1-layouts.sqlite")
-    with store._connect() as conn:
-        store._initialize(conn)
-        current_columns = frozenset(
-            str(row["name"])
-            for row in conn.execute(
-                f"PRAGMA table_info({rrd.PT1_EQUILIBRIUM_TABLE})"
-            )
+def _retain_pt1_table_columns(
+    db_path: Path,
+    columns: tuple[str, ...],
+    *,
+    store_schema_version: str | None = None,
+) -> bytes:
+    with sqlite3.connect(db_path) as conn:
+        (key_bytes,) = conn.execute(
+            f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        projection = ", ".join(f'"{column}"' for column in columns)
+        conn.execute(
+            f"CREATE TABLE pt1_subset AS SELECT {projection} "
+            f"FROM {PT1_EQUILIBRIUM_TABLE}"
         )
-    assert {
+        conn.execute(f"DROP TABLE {PT1_EQUILIBRIUM_TABLE}")
+        conn.execute(
+            f"ALTER TABLE pt1_subset RENAME TO {PT1_EQUILIBRIUM_TABLE}"
+        )
+        if store_schema_version is not None:
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                "SET store_schema_version = ?",
+                (store_schema_version,),
+            )
+    return bytes(key_bytes)
+
+
+@pytest.mark.parametrize(
+    "optional_indexes",
+    (
+        pytest.param((), id="exact-columns-only"),
+        pytest.param(
+            (
+                "physics_bucket_schema_version",
+                "physics_bucket_sha256",
+                "replay_scope_sha256",
+                "physics_key_bytes",
+                "physics_bucket_h40_sha256",
+                # This physically absent rung distance must not be fabricated
+                # as NULL by the exact-read projection.
+                "physics_bucket_h30_sha256",
+                "physics_bucket_h30_distance",
+                "physics_bucket_h40c_sha256",
+                "physics_bucket_h40c_distance",
+                "physics_bucket_h30c_sha256",
+                "physics_bucket_h30c_distance",
+            ),
+            id="bucket-columns-without-h40-distance",
+        ),
+    ),
+)
+def test_attached_pt1_exact_reader_hits_without_optional_indexes(
+    tmp_path: Path,
+    optional_indexes: tuple[str, ...],
+) -> None:
+    base_db = tmp_path / "attached-v3-without-indexes.sqlite"
+    local_db = tmp_path / "attached-v3-reader.sqlite"
+    capture, _sim, _fO2, _curve = _capture_pt0_gate_curve(
+        base_db,
+        solidus_T_C=1100.0,
+    )
+    key_hash = str(capture.capture_sequence[-1]["hash"])
+    expected_payload = capture._entries[key_hash]["payload"]
+    exact_columns = (
+        "key_hash",
+        "artifact",
+        "store_schema_version",
         "request_schema_version",
+        "key_sha256",
+        "payload_sha256",
         "payload_codec_version",
-        "repair_notices_json",
-        "law_disclosures_json",
+        "key_bytes",
+        "payload_bytes",
+        "code_version",
+        "corpus_version",
+        "engine_version",
+        "data_digests_json",
         "created_at",
         "git_dirty",
-    } <= current_columns
+        "repair_notices_json",
+        "law_disclosures_json",
+    )
+    key_bytes = _retain_pt1_table_columns(
+        base_db,
+        (*exact_columns, *optional_indexes),
+    )
 
-    legacy_cache_columns = frozenset(
-        {
-            "key_hash",
-            "artifact",
-            "store_schema_version",
-            "request_schema_version",
-            "key_sha256",
-            "payload_sha256",
-            "key_bytes",
-            "payload_bytes",
-            "code_version",
-            "engine_version",
-            "data_digests_json",
-            "created_at",
-            "git_dirty",
+    replay = PT0DeterminismStore(
+        "replay",
+        db_path=local_db,
+        read_only_base_db_path=base_db,
+    )
+
+    assert (
+        replay._lookup("freeze_gate_curve", json.loads(key_bytes))
+        == expected_payload
+    )
+    assert replay.hits == 1
+
+
+def test_attached_full_legacy_pt1_stamp_remains_corrupt_for_exact_reader(
+    tmp_path: Path,
+) -> None:
+    base_db = tmp_path / "attached-legacy-stamp.sqlite"
+    local_db = tmp_path / "attached-legacy-reader.sqlite"
+    capture, _sim, _fO2, _curve = _capture_pt0_gate_curve(
+        base_db,
+        solidus_T_C=1100.0,
+    )
+    key_hash = str(capture.capture_sequence[-1]["hash"])
+    exact_columns_without_codec = (
+        "key_hash",
+        "artifact",
+        "store_schema_version",
+        "request_schema_version",
+        "key_sha256",
+        "payload_sha256",
+        "key_bytes",
+        "payload_bytes",
+        "code_version",
+        "corpus_version",
+        "engine_version",
+        "data_digests_json",
+        "created_at",
+        "git_dirty",
+        "repair_notices_json",
+        "law_disclosures_json",
+    )
+    key_bytes = _retain_pt1_table_columns(
+        base_db,
+        exact_columns_without_codec,
+        store_schema_version="pt1",
+    )
+    assert capture._entries[key_hash]["key_bytes"].encode("utf-8") == key_bytes
+
+    replay = PT0DeterminismStore(
+        "replay",
+        db_path=local_db,
+        read_only_base_db_path=base_db,
+    )
+
+    with pytest.raises(PT1PersistentStoreCorrupt, match="store schema version drift"):
+        replay._lookup("freeze_gate_curve", json.loads(key_bytes))
+
+
+def test_pt1_shard_copy_validates_physical_partial_indexes_then_fills_target(
+    tmp_path: Path,
+) -> None:
+    source_path = tmp_path / "partial-index-source.sqlite"
+    target_path = tmp_path / "partial-index-target.sqlite"
+    _capture, _sim, _fO2, _curve = _capture_pt0_gate_curve(
+        source_path,
+        solidus_T_C=1100.0,
+    )
+    physical_bucket_columns = (
+        "physics_bucket_schema_version",
+        "physics_bucket_sha256",
+        "replay_scope_sha256",
+        "physics_key_bytes",
+    )
+    with sqlite3.connect(source_path) as conn:
+        (source_key_bytes,) = conn.execute(
+            f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        source_columns = tuple(
+            str(row["name"])
+            for row in conn.execute(
+                f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+            )
+        )
+        missing_ladder = {
+            column
+            for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+            for column in (
+                rrd._physics_ladder_hash_column(rung_tag),
+                rrd._physics_ladder_distance_column(rung_tag),
+            )
         }
-    )
-    rekey_core = frozenset(
-        {"key_hash", "key_sha256", "key_bytes", "engine_version"}
-    )
-    layout_cases = {
-        "current store schema": (
-            current_columns,
-            rrd._PT1RowLayout.CURRENT,
-        ),
-        "current schema with ignored source metadata": (
-            current_columns | {"source_only_metadata"},
-            rrd._PT1RowLayout.CURRENT,
-        ),
-        "current schema without optional disclosures": (
-            current_columns - {"law_disclosures_json"},
-            rrd._PT1RowLayout.CURRENT,
-        ),
-        "v2 without repair notices": (
-            current_columns - {"repair_notices_json"},
-            rrd._PT1RowLayout.V2,
-        ),
-        "b265 schema without codec and disclosures": (
-            current_columns - {"payload_codec_version", "law_disclosures_json"},
-            rrd._PT1RowLayout.PARTIAL_BUCKET,
-        ),
-        "legacy cache table": (
-            legacy_cache_columns,
-            rrd._PT1RowLayout.LEGACY,
-        ),
-        "legacy cache table with corpus version": (
-            legacy_cache_columns | {"corpus_version"},
-            rrd._PT1RowLayout.LEGACY,
-        ),
-        "legacy cache with an index column added": (
-            legacy_cache_columns | {"physics_bucket_schema_version"},
-            rrd._PT1RowLayout.PARTIAL_BUCKET,
-        ),
-        "four-column rekey table": (
-            rekey_core,
-            rrd._PT1RowLayout.LEGACY,
-        ),
-        "rekey table with corpus version": (
-            rekey_core | {"corpus_version"},
-            rrd._PT1RowLayout.LEGACY,
-        ),
-        "rekey table with replay scope": (
-            rekey_core | {"corpus_version", "replay_scope_sha256"},
-            rrd._PT1RowLayout.PARTIAL_BUCKET,
-        ),
-        "rekey table with an index column added": (
-            rekey_core | {"physics_bucket_schema_version"},
-            rrd._PT1RowLayout.PARTIAL_BUCKET,
-        ),
-        "strict-vapour preflight table": (
-            {"key_hash", "artifact", "key_bytes", "payload_bytes"},
-            rrd._PT1RowLayout.PREFLIGHT,
-        ),
-        "minimal row-admission mapping": (
-            {
-                "artifact",
-                "key_hash",
-                "key_sha256",
-                "key_bytes",
-                "payload_sha256",
-                "payload_bytes",
-                "payload_codec_version",
-            },
-            rrd._PT1RowLayout.MINIMAL_ADMISSION,
-        ),
-        "converter-only value table": (
-            {"value"},
-            rrd._PT1RowLayout.UNSUPPORTED,
-        ),
-    }
+        selected_columns = tuple(
+            column for column in source_columns if column not in missing_ladder
+        )
+        projection = ", ".join(f'"{column}"' for column in selected_columns)
+        conn.execute(
+            f"CREATE TABLE pt1_partial AS SELECT {projection} "
+            f"FROM {PT1_EQUILIBRIUM_TABLE}"
+        )
+        conn.execute(f"DROP TABLE {PT1_EQUILIBRIUM_TABLE}")
+        conn.execute(
+            f"ALTER TABLE pt1_partial RENAME TO {PT1_EQUILIBRIUM_TABLE}"
+        )
+    assert set(physical_bucket_columns) <= set(selected_columns)
+    assert "physics_bucket_h40_distance" not in selected_columns
+    expected_h40 = rrd._derive_pt1_key_indexes(
+        json.loads(bytes(source_key_bytes))
+    ).ladder_values["h40"]
 
-    for name, (columns, expected) in layout_cases.items():
-        assert rrd._pt1_row_layout(columns) is expected, name
-        if expected is not rrd._PT1RowLayout.UNSUPPORTED:
-            assert rrd._pt1_row_layout(
-                frozenset(columns) | {"nullable_unrelated_metadata"}
-            ) is expected, f"{name} with an unrelated nullable column"
+    result = rrd._copy_pt1_equilibrium_rows(
+        (source_path,),
+        target_path,
+        require_capture_epoch_match=False,
+    )
+
+    assert result["sources"][0]["inserted_rows"] == 1
+    with sqlite3.connect(target_path) as conn:
+        row = conn.execute(
+            f"SELECT physics_bucket_h40_sha256, physics_bucket_h40_distance "
+            f"FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert tuple(row) == (
+        expected_h40["sha256"],
+        expected_h40["distance"],
+    )
 
 
 def test_pt1_attached_partial_layout_rejects_legacy_stamp_as_corrupt(
@@ -12468,6 +12563,6 @@ def test_pt1_attached_partial_layout_rejects_legacy_stamp_as_corrupt(
     )
     with pytest.raises(
         PT1PersistentStoreCorrupt,
-        match="legacy stamp is invalid for this physical layout",
+        match="store schema version drift",
     ):
         replay._lookup("freeze_gate_curve", json.loads(bytes(key_bytes)))

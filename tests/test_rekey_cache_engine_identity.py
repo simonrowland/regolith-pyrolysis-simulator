@@ -150,9 +150,8 @@ def test_rekey_locks_identity_decision_before_backup(
     assert rekey._json_loads(bytes(backup_key_bytes))["engine_version"] == "one"
 
 
-def test_rekey_deep_stored_key_fails_through_admission(
+def test_rekey_deep_stored_key_is_typed_corruption(
     tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
     target_corpus_version: str,
 ) -> None:
     db_path = tmp_path / "deep-key-cache.db"
@@ -191,63 +190,101 @@ def test_rekey_deep_stored_key_fails_through_admission(
             ),
         )
 
-    admission_calls: list[dict[str, object]] = []
-    original_admission = rekey._admit_stored_row
-
-    def record_admission(row: object, **kwargs: object) -> object:
-        admission_calls.append(dict(kwargs))
-        return original_admission(row, **kwargs)  # type: ignore[arg-type]
-
-    monkeypatch.setattr(rekey, "_admit_stored_row", record_admission)
     with pytest.raises(rrd.PT1PersistentStoreCorrupt):
         rekey.rekey_cache(
             db_path,
             target_corpus_version=target_corpus_version,
             dry_run=True,
         )
-    assert admission_calls
-    assert admission_calls[0]["store_kind"] == "pt1"
 
 
-def test_rekey_rejects_legacy_stamp_on_current_physical_layout(
+def test_rekey_legacy_stamp_with_h40_column_preserves_stamp_and_payload(
     tmp_path: Path,
     target_corpus_version: str,
 ) -> None:
-    db_path = tmp_path / "current-layout-legacy-stamp.db"
-    key_hash, _payload_bytes = put_rekey_gate_row(
-        db_path,
-        {
-            "backend": {"backend_name": "alphamelts"},
-            "engine_version": "one",
-        },
-        engine_version="one",
-    )
+    db_path = tmp_path / "legacy-pt1-h40-rekey.db"
+    _write_rekeyable_rows(db_path, ("one",))
     with sqlite3.connect(db_path) as conn:
         conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN store_schema_version TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN artifact TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN payload_bytes BLOB"
+        )
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN physics_bucket_h40_distance REAL"
+        )
+        conn.execute(
             f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
-            "SET store_schema_version = 'pt1' WHERE key_hash = ?",
-            (key_hash,),
+            "SET store_schema_version = 'pt1', artifact = ?, payload_bytes = ?",
+            ("equilibrium_post_record", sqlite3.Binary(b"opaque legacy payload")),
         )
         before = conn.execute(
-            f"SELECT store_schema_version, key_bytes, payload_bytes "
-            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
-            (key_hash,),
+            f"SELECT key_hash, key_bytes, payload_bytes "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
 
-    with pytest.raises(rrd.PT1PersistentStoreCorrupt, match="current-layout"):
-        rekey.rekey_cache(
-            db_path,
-            target_corpus_version=target_corpus_version,
-            dry_run=True,
-        )
+    result = rekey.rekey_cache(
+        db_path,
+        target_corpus_version=target_corpus_version,
+    )
 
+    assert result.rows_updated == 1
     with sqlite3.connect(db_path) as conn:
         after = conn.execute(
-            f"SELECT store_schema_version, key_bytes, payload_bytes "
-            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
-            (key_hash,),
+            f"SELECT key_hash, store_schema_version, payload_bytes, "
+            "physics_bucket_h40_distance, key_bytes "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
-    assert after == before
+    assert after[0] != before[0]
+    assert after[1:3] == ("pt1", before[2])
+    rekeyed_key = json.loads(bytes(after[4]))
+    expected_h40 = rrd._derive_pt1_key_indexes(rekeyed_key).ladder_values[
+        "h40"
+    ]["distance"]
+    assert after[3] == expected_h40
+
+
+def test_rekey_compact_table_overlapping_preflight_signature(
+    tmp_path: Path,
+    target_corpus_version: str,
+) -> None:
+    db_path = tmp_path / "compact-preflight-overlap-rekey.db"
+    _write_rekeyable_rows(db_path, ("one",))
+    opaque_payload = b"opaque compact rekey payload"
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN artifact TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN payload_bytes BLOB"
+        )
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET artifact = ?, payload_bytes = ?",
+            ("equilibrium_post_record", sqlite3.Binary(opaque_payload)),
+        )
+
+    result = rekey.rekey_cache(
+        db_path,
+        target_corpus_version=target_corpus_version,
+    )
+
+    assert result.rows_updated == 1
+    with sqlite3.connect(db_path) as conn:
+        (stored_payload,) = conn.execute(
+            f"SELECT payload_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert bytes(stored_payload) == opaque_payload
 
 
 def test_rekey_legacy_stamp_rejects_overflowing_key_as_corrupt(

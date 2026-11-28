@@ -132,6 +132,60 @@ def test_backfill_accepts_new_schema_equilibrium_authority(tmp_path):
     assert stats.rows_updated == 1
 
 
+def test_backfill_partial_bucket_row_does_not_fabricate_missing_rung_columns(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "partial-bucket.db"
+    _create_legacy_db(db_path)
+    key = _replay_key("partial-bucket", setpoints_digest="partial-setpoints")
+    _insert_legacy_row(db_path, key)
+    values = backfill._physics_values_from_replay_key(key)
+    key_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN physics_bucket_schema_version TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN physics_bucket_sha256 TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN replay_scope_sha256 TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN physics_key_bytes BLOB"
+        )
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET physics_bucket_schema_version = ?, physics_bucket_sha256 = ?, "
+            "replay_scope_sha256 = ?, physics_key_bytes = ? "
+            "WHERE key_hash = ?",
+            (
+                values.schema_version,
+                values.physics_bucket_sha256,
+                values.replay_scope_sha256,
+                sqlite3.Binary(values.physics_key_bytes),
+                key_hash,
+            ),
+        )
+
+    stats = backfill.run_backfill(db_path, dry_run=False)
+
+    assert stats.invalid_rows == 0
+    assert stats.rows_needing_backfill == 1
+    assert stats.rows_updated == 1
+    with sqlite3.connect(db_path) as conn:
+        (h40_distance,) = conn.execute(
+            f"SELECT physics_bucket_h40_distance "
+            f"FROM {rrd.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert h40_distance == values.physics_bucket_h40_distance
+
+
 @pytest.mark.parametrize(
     "repair_notices_json",
     ['[{"kind":"backfill_repair"}]', "[]", None],

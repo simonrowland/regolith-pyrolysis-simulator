@@ -124,6 +124,7 @@ def run_backfill(
         if not _table_exists(conn):
             raise RuntimeError(f"missing table: {PT1_EQUILIBRIUM_TABLE}")
         columns = _table_columns(conn)
+        source_columns = columns.copy()
         stats.missing_columns_before = tuple(
             column for column in PHYSICS_COLUMNS if column not in columns
         )
@@ -145,7 +146,12 @@ def run_backfill(
             for row in rows:
                 stats.total_rows += 1
                 try:
-                    values = _physics_values_from_admitted_row(row)
+                    physical_row = {
+                        column: row[column]
+                        for column in row.keys()
+                        if column in source_columns
+                    }
+                    values = _physics_values_from_admitted_row(physical_row)
                 except (json.JSONDecodeError, UnicodeDecodeError, TypeError, ValueError):
                     stats.invalid_rows += 1
                     continue
@@ -303,21 +309,34 @@ def _ensure_backfill_columns(conn: sqlite3.Connection, columns: set[str]) -> Non
 
 
 def _select_rows_sql(columns: set[str]) -> str:
-    missing_physics = [
-        f"NULL AS {column}"
+    required = [
+        column if column in columns else f"NULL AS {column}"
+        for column in (
+            "artifact",
+            "key_hash",
+            "key_sha256",
+            "payload_sha256",
+            "key_bytes",
+            "payload_bytes",
+        )
+    ]
+    optional = [
+        column if column in columns else f"NULL AS {column}"
         for column in PHYSICS_COLUMNS
-        if column not in columns
     ]
     order_by = "key_hash" if "key_hash" in columns else "rowid"
-    projections = ["*"] + missing_physics
     return f"""
-        SELECT {", ".join(projections)}
+        SELECT
+            {", ".join(required)},
+            {", ".join(optional)}
         FROM {PT1_EQUILIBRIUM_TABLE}
         ORDER BY {order_by}
     """
 
 
-def _physics_values_from_admitted_row(row: sqlite3.Row) -> PhysicsBucketValues:
+def _physics_values_from_admitted_row(
+    row: Mapping[str, Any],
+) -> PhysicsBucketValues:
     admitted = _admit_stored_row(row, store_kind="pt1")
     assert admitted is not None
     key = admitted.entry["key"]

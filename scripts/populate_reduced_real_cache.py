@@ -45,10 +45,8 @@ from simulator.reduced_real_determinism import (
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
-    _PT1RowLayout,
     _admit_stored_row,
     _copy_pt1_equilibrium_rows,
-    _pt1_row_layout,
 )
 from simulator.grind_preflight import (
     GrindSourceGateError,
@@ -76,16 +74,6 @@ class WallCapExceeded(BaseException):
 
 class CacheShardCorpusVersionMismatch(ValueError):
     """Raised before merge when shard and accumulator corpora differ."""
-
-
-class _PT1CachePayloadRow(dict[str, Any]):
-    def __init__(
-        self,
-        row: Mapping[str, Any],
-        source_layout: _PT1RowLayout,
-    ) -> None:
-        super().__init__(row)
-        self.source_layout = source_layout
 
 
 @contextmanager
@@ -669,16 +657,16 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
         ).fetchone()
         if table is None:
             return []
-        rows: list[_PT1CachePayloadRow] = []
-        for stored_row in conn.execute(
-            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
-        ):
-            row = dict(stored_row)
-            source_layout = _pt1_row_layout(row.keys())
+        rows = [
+            dict(stored_row)
+            for stored_row in conn.execute(
+                f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
+            )
+        ]
+        for row in rows:
             row.setdefault("corpus_version", None)
             row.setdefault("repair_notices_json", None)
             row.setdefault("payload_codec_version", None)
-            rows.append(_PT1CachePayloadRow(row, source_layout))
         return rows
 
 
@@ -686,14 +674,13 @@ def _admit_cache_payload_row(
     row: Mapping[str, Any],
     *,
     strict_source_validation: bool = False,
+    validate_store_schema_version: bool = False,
 ) -> Any:
     return _admit_stored_row(
         row,
         store_kind="pt1",
-        source_layout=(
-            row.source_layout if isinstance(row, _PT1CachePayloadRow) else None
-        ),
         strict_source_validation=strict_source_validation,
+        validate_store_schema_version=validate_store_schema_version,
     )
 
 
@@ -701,6 +688,7 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
     admitted = _admit_cache_payload_row(
         row,
         strict_source_validation=True,
+        validate_store_schema_version=True,
     )
     assert admitted is not None and admitted.stored_columns is not None
     if admitted.stale_payload_codec:

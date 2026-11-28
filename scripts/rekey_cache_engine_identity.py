@@ -20,20 +20,16 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
-    _PT1RowLayout,
+    PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentStoreCorrupt,
     UncacheableKey,
-    _admit_stored_row,
     _derive_pt1_key_indexes,
-    _gate_row_for_write,
     _physics_ladder_distance_column,
     _physics_ladder_hash_column,
     _pt1_physics_index_columns,
-    _pt1_row_layout,
-    _validate_pt1_layout_stamp,
-    _payload_codec_stamp_matches,
-    _payload_codec_version,
+    _pt1_row_key,
+    _validate_pt1_key_indexes,
     _sha256,
     cache_row_needs_rekey,
     canonical_json_bytes,
@@ -82,79 +78,36 @@ def _json_loads(raw: bytes) -> dict[str, Any]:
 
 def _key_from_stored_row(
     row: sqlite3.Row,
-    *,
-    row_layout: _PT1RowLayout | None = None,
 ) -> dict[str, Any]:
-    row_columns = set(row.keys())
-    layout = row_layout or _pt1_row_layout(row_columns)
-    store_stamp = (
-        row["store_schema_version"]
-        if "store_schema_version" in row_columns
-        else None
-    )
-    if layout is _PT1RowLayout.CURRENT:
-        admitted = _admit_stored_row(
-            row,
-            store_kind="pt1",
-            source_layout=layout,
-        )
-        if admitted is None:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 cache row rejected during rekey: {row['key_hash']}"
-            )
-        return admitted.entry["key"]
-
-    if layout is _PT1RowLayout.V2:
-        admitted = _admit_stored_row(
-            row,
-            store_kind="pt1",
-            source_layout=layout,
-        )
-        if admitted is None:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 cache row rejected during rekey: {row['key_hash']}"
-            )
-        return admitted.entry["key"]
-
-    if layout in (_PT1RowLayout.LEGACY, _PT1RowLayout.PARTIAL_BUCKET):
-        _validate_pt1_layout_stamp(
-            layout,
-            store_stamp,
-            key_hash=str(row["key_hash"]),
-        )
-        try:
-            key_bytes = row["key_bytes"]
-            if not isinstance(key_bytes, (bytes, bytearray, memoryview)):
-                raise TypeError("legacy key_bytes must be bytes")
-            raw_key_bytes = bytes(key_bytes)
-            key = json.loads(raw_key_bytes.decode("utf-8"))
-            if not isinstance(key, dict):
-                raise PT1PersistentStoreCorrupt(
-                    "PT-1 legacy cache row request key is not an object: "
-                    f"{row['key_hash']}"
-                )
-            canonical_key_bytes = canonical_json_bytes(key)
-            key_hash = _sha256(canonical_key_bytes)
-            if (
-                canonical_key_bytes != raw_key_bytes
-                or row["key_hash"] != key_hash
-                or row["key_sha256"] != key_hash
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 legacy cache row key integrity mismatch: {row['key_hash']}"
-                )
-        except PT1PersistentStoreCorrupt:
-            raise
-        except (KeyError, TypeError, ValueError, RecursionError) as exc:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 legacy cache row has invalid key JSON: {row['key_hash']}"
-            ) from exc
-        return key
-
-    raise PT1PersistentStoreCorrupt(
-        "PT-1 cache row has an unsupported physical layout for rekey: "
-        f"{','.join(sorted(row_columns))}"
-    )
+    values = dict(row)
+    key_hash = str(values.get("key_hash", ""))
+    try:
+        stored_key_bytes = values["key_bytes"]
+        if not isinstance(stored_key_bytes, (bytes, bytearray, memoryview)):
+            raise TypeError("stored key bytes are not a blob")
+        raw_key_bytes = bytes(stored_key_bytes)
+        key = _pt1_row_key(raw_key_bytes, key_hash=key_hash)
+        if canonical_json_bytes(key) != raw_key_bytes:
+            raise ValueError("stored key bytes are not canonical")
+        computed_hash = _sha256(raw_key_bytes)
+        if "key_hash" in values and values["key_hash"] != computed_hash:
+            raise ValueError("stored key hash does not match key bytes")
+        if "key_sha256" in values and values["key_sha256"] != computed_hash:
+            raise ValueError("stored key_sha256 does not match key bytes")
+        return dict(key)
+    except PT1PersistentStoreCorrupt:
+        raise
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        OverflowError,
+        UnicodeDecodeError,
+        RecursionError,
+    ) as exc:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 cache row has invalid request key: {key_hash}"
+        ) from exc
 
 
 def _ensure_corpus_column(conn: sqlite3.Connection) -> None:
@@ -179,9 +132,10 @@ def _count_rows_needing_rekey(
     target_corpus_version: str,
 ) -> int:
     count = 0
-    row_layout = _pt1_row_layout(_table_columns(conn))
-    for row in conn.execute(f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"):
-        key = _key_from_stored_row(row, row_layout=row_layout)
+    for row in conn.execute(
+        f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+    ):
+        key = _key_from_stored_row(row)
         if not rekey_row_matches_engine(key, engine):
             continue
         if cache_row_needs_rekey(key, target_corpus_version):
@@ -270,14 +224,38 @@ def rekey_cache(
         _ensure_corpus_column(conn)
         updated = 0
         table_columns = _table_columns(conn)
-        row_layout = _pt1_row_layout(table_columns)
+        physics_index_columns = {
+            "physics_bucket_schema_version",
+            "physics_bucket_sha256",
+            "replay_scope_sha256",
+            "physics_key_bytes",
+            *(
+                column
+                for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                for column in (
+                    _physics_ladder_hash_column(rung_tag),
+                    _physics_ladder_distance_column(rung_tag),
+                )
+            ),
+        }
+        physics_columns_present = physics_index_columns & table_columns
+        selected_columns = ["key_hash", "key_bytes", "engine_version"]
+        selected_columns.extend(
+            column
+            for column in (
+                "key_sha256",
+                "store_schema_version",
+                "artifact",
+            )
+            if column in table_columns
+        )
+        selected_columns.extend(sorted(physics_columns_present))
+        selection = ", ".join(f'"{column}"' for column in selected_columns)
         for row in conn.execute(
-            f"""
-            SELECT *
-            FROM {PT1_EQUILIBRIUM_TABLE}
-            """
+            f"SELECT {selection} FROM {PT1_EQUILIBRIUM_TABLE}"
         ):
-            key = _key_from_stored_row(row, row_layout=row_layout)
+            row_values = dict(row)
+            key = _key_from_stored_row(row)
             if not rekey_row_matches_engine(key, engine):
                 continue
             if not cache_row_needs_rekey(key, target):
@@ -290,51 +268,27 @@ def rekey_cache(
             old_key_hash = str(row["key_hash"])
             row_columns = set(row.keys())
             artifact = row["artifact"] if "artifact" in row_columns else None
-            expected_codec_version = (
-                _payload_codec_version(artifact)
-                if isinstance(artifact, str)
-                else None
-            )
-            stored_codec_version = (
-                row["payload_codec_version"]
-                if "payload_codec_version" in row_columns
-                else None
-            )
             legacy_layout = (
-                row_layout is not _PT1RowLayout.CURRENT
-                or expected_codec_version is None
-                or not _payload_codec_stamp_matches(
-                    expected_codec_version, stored_codec_version
-                )
+                row_values.get("store_schema_version")
+                not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS
             )
-            rebuild_indexes = not legacy_layout
-            physics_columns_present = {
-                "physics_bucket_schema_version",
-                "physics_bucket_sha256",
-                "replay_scope_sha256",
-                "physics_key_bytes",
-                *(
-                    column
-                    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
-                    for column in (
-                        _physics_ladder_hash_column(rung_tag),
-                        _physics_ladder_distance_column(rung_tag),
-                    )
-                ),
-            } & table_columns
             physics_columns = (
                 _physics_columns(key) if physics_columns_present else {}
             )
             derived_indexes = getattr(physics_columns, "derived_indexes", None)
-            if legacy_layout:
-                candidate_row = dict(row)
-                candidate_row["corpus_version"] = target
-                candidate_row["engine_version"] = provenance
-                rebuild_indexes = bool(physics_columns_present)
-            else:
-                candidate_row = dict(row)
-                candidate_row["corpus_version"] = target
-                candidate_row["engine_version"] = provenance
+            candidate_row = dict(row_values)
+            key_bytes = canonical_json_bytes(key)
+            key_hash = _sha256(key_bytes)
+            candidate_row.update(
+                {
+                    "key_hash": key_hash,
+                    "key_bytes": sqlite3.Binary(key_bytes),
+                    "corpus_version": target,
+                    "engine_version": provenance,
+                }
+            )
+            if "key_sha256" in table_columns:
+                candidate_row["key_sha256"] = key_hash
             candidate_row.update(
                 {
                     column: value
@@ -342,23 +296,45 @@ def rekey_cache(
                     if column in table_columns
                 }
             )
-            candidate_row.update(
-                {
-                    "_write_key": key,
-                    "_write_replace_key": True,
-                    "_write_rebuild_indexes": rebuild_indexes,
-                    "_write_derived_indexes": derived_indexes,
-                }
-            )
             try:
-                candidate_row = _gate_row_for_write(candidate_row)
+                if derived_indexes is not None:
+                    _validate_pt1_key_indexes(
+                        candidate_row,
+                        artifact=artifact if isinstance(artifact, str) else None,
+                        key=key,
+                        key_hash=key_hash,
+                        expected_replay_scope_sha256=(
+                            derived_indexes.replay_scope_sha256
+                            if "replay_scope_sha256" in table_columns
+                            else None
+                        ),
+                        check_key_dependencies=not legacy_layout,
+                        require_indexable=bool(physics_columns_present),
+                        derived_indexes=derived_indexes,
+                    )
             except UncacheableKey as exc:
                 raise PT1PersistentStoreCorrupt(
                     "PT-1 stored request key is not indexable during rekey: "
                     f"{old_key_hash}"
                 ) from exc
+            except PT1PersistentStoreCorrupt:
+                raise
+            except (TypeError, ValueError, OverflowError, ZeroDivisionError, KeyError) as exc:
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 stored request key cannot derive indexes during rekey: "
+                    f"{old_key_hash}"
+                ) from exc
             update_columns = tuple(
-                column for column in table_columns if column in candidate_row
+                column
+                for column in (
+                    "key_bytes",
+                    "key_sha256",
+                    "key_hash",
+                    "corpus_version",
+                    "engine_version",
+                    *sorted(physics_columns_present),
+                )
+                if column in candidate_row
             )
             assignments = [f'"{column}" = ?' for column in update_columns]
             values = [candidate_row[column] for column in update_columns]
