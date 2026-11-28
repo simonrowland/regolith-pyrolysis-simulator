@@ -6298,14 +6298,27 @@ class _MELTSBackendSupport(MeltBackend):
         temperature_C: float,
     ) -> tuple[dict[str, float], str | None]:
         liquid_mu, liquid_mu0 = self._selected_liquid_potential_mappings(results)
-        legacy_mu = self._first_row_mapping(
-            results.get('chemical_potentials', {})
-        )
-        legacy_mu0 = self._first_row_mapping(
-            results.get('pure_chemical_potentials', {})
+        legacy_potential_pairs = tuple(
+            (
+                self._first_row_mapping(results.get(mu_name, {})),
+                self._first_row_mapping(results.get(mu0_name, {})),
+            )
+            for mu_name, mu0_name in (
+                ('chemical_potentials', 'pure_chemical_potentials'),
+                ('chem_potentials', 'reference_chemical_potentials'),
+                ('mu', 'mu0'),
+                ('mu_oxides', 'mu0_oxides'),
+                ('oxide_mu', 'oxide_mu0'),
+                (
+                    'standard_chemical_potentials',
+                    'reference_chemical_potentials',
+                ),
+            )
         )
         potential_source_seen = bool(
-            liquid_mu or liquid_mu0 or legacy_mu or legacy_mu0
+            liquid_mu
+            or liquid_mu0
+            or any(mu or mu0 for mu, mu0 in legacy_potential_pairs)
         )
         liquid_key = self._select_liquid_phase_key(results)
         liquid_prop_key = f'{liquid_key}_prop' if liquid_key else None
@@ -6338,9 +6351,9 @@ class _MELTSBackendSupport(MeltBackend):
         unpaired_source = False
         # Each producer is an independent potential basis. Never fill one
         # side of a liquid pair from the legacy maps, or vice versa.
-        for mu_source, mu0_source in (
-            (liquid_mu, liquid_mu0),
-            (legacy_mu, legacy_mu0),
+        for mu_source, mu0_source, is_selected_liquid in (
+            (liquid_mu, liquid_mu0, True),
+            *((mu, mu0, False) for mu, mu0 in legacy_potential_pairs),
         ):
             if set(mu_source) != set(mu0_source):
                 unpaired_source = True
@@ -6348,6 +6361,8 @@ class _MELTSBackendSupport(MeltBackend):
                 compound_parents = MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.get(
                     str(species), ()
                 )
+                if not is_selected_liquid and 'CaO' in compound_parents:
+                    continue
                 if not has_calcium and 'CaO' in compound_parents:
                     continue
                 try:

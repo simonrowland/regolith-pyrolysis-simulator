@@ -883,9 +883,13 @@ def test_thermoengine_fusion_query_failure_preserves_liquid_g0_for_scorer(
         ('alphamelts', 'ca-free'),
         ('alphamelts', 'ca-bearing-gap'),
         ('alphamelts', 'ca-bearing-band'),
+        ('alphamelts', 'engine-crash-ca-bearing'),
+        ('alphamelts', 'engine-crash-ca-free'),
         ('thermoengine', 'ca-free'),
         ('thermoengine', 'ca-bearing-gap'),
         ('thermoengine', 'ca-bearing-band'),
+        ('thermoengine', 'engine-crash-ca-bearing'),
+        ('thermoengine', 'engine-crash-ca-free'),
     ),
 )
 def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
@@ -927,6 +931,7 @@ def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
         row for row in activity_rows
         if row.identity.species.formula == 'SiO2'
     )
+    experiments = dict(migration.experiments)
     temperature_K = 1933.0
     engine = Engine(engine_name)
     g0_solid_kJ_mol, _ = melts_reference_g0_cao_kJ_mol(
@@ -936,7 +941,41 @@ def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
         g0_solid_kJ_mol * 1000.0
         + GAS_CONSTANT * temperature_K * math.log(0.4)
     )
-    ca_free = cell_mode == 'ca-free'
+    from dataclasses import replace
+    from simulator.battery.records import AmountBasis, Composition, State
+
+    crashed = cell_mode.startswith('engine-crash-')
+    ca_free = cell_mode.endswith('ca-free')
+    if cell_mode == 'engine-crash-ca-free':
+        ca_free_composition = Composition(
+            basis='ordered_complete_mole_inventory',
+            components=(
+                ('MgO', Decimal('0.5')),
+                ('SiO2', Decimal('0.5')),
+            ),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+        cao = replace(
+            cao,
+            identity=replace(
+                cao.identity,
+                composition=State.of(ca_free_composition),
+            ),
+            point_conditions={
+                key: value
+                for key, value in (cao.point_conditions or {}).items()
+                if key not in {'printed_composition', 'composition'}
+            },
+        )
+        experiment = experiments[cao.experiment_id]
+        experiments[cao.experiment_id] = replace(
+            experiment,
+            sample=replace(
+                experiment.sample,
+                initial_composition=None,
+                printed_composition=None,
+            ),
+        )
     g0_casio3_liquid = -900000.0
     g0_pwo = -800000.0
     cell = EquilibrateCell(
@@ -944,23 +983,25 @@ def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
         engine=engine.value,
         temperature_K=temperature_K,
         po2=Po2Request(mode='engine_default', po2_bar=None),
-        status='ok',
-        refusal_reason=None,
-        engine_status='ok',
-        engine_reason=None,
+        status='not_converged' if crashed else 'ok',
+        refusal_reason='engine_crash' if crashed else None,
+        engine_status='engine_crash' if crashed else 'ok',
+        engine_reason='AlphaMELTS subprocess exit -6' if crashed else None,
         melt_activities={'CaSiO3': 0.5, 'SiO2': 0.25},
         gas_partial_pressures_Pa={},
         liquid_fraction=1.0,
         wall_s=0.0,
         cpu_s=0.0,
         hostname='test',
+        exit_code=-6 if crashed else None,
+        exit_signal=6 if crashed else None,
         liquid_composition_wt_pct=(
             {'CaO': 0.0, 'SiO2': 100.0}
             if ca_free
             else {'CaO': 48.0, 'SiO2': 52.0}
         ),
         mu_CaO_J_per_mol_melts_berman_apparent=(
-            None if cell_mode == 'ca-bearing-gap' else raw_mu
+            None if cell_mode == 'ca-bearing-gap' or crashed else raw_mu
         ),
         g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent=(
             g0_casio3_liquid if cell_mode == 'ca-bearing-band' else None
@@ -987,7 +1028,7 @@ def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
     )
     context = ScoreContext(
         works=migration.works,
-        experiments=migration.experiments,
+        experiments=experiments,
         observations={cao.observation_id: cao, silica.observation_id: silica},
         benches=migration.benches,
         root=Path(migrated_root),
@@ -1006,14 +1047,39 @@ def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
         if residual.candidate == cao_candidate.observation_id
     )
     non_cao_candidate = next(
-        candidate for candidate in predictions.values()
-        if candidate.identity.species.formula == 'SiO2'
+        (
+            candidate for candidate in predictions.values()
+            if candidate.identity.species.formula == 'SiO2'
+        ),
+        None,
     )
     fusion_markers = (
         'CaSiO3(l)-pWo fusion residual',
         'Berman-vs-HHR CaSiO3(cr) reassessment',
     )
-    if ca_free:
+    if crashed:
+        assert cao_candidate.value.point is None
+        assert cao_candidate.value.unavailable_reason == 'engine_crash'
+        assert cao_refusal.refusal is not None
+        assert cao_refusal.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+        assert cao_refusal.refusal.detail['typed'] == 'engine_crash'
+        assert cao_refusal.refusal.detail['exit_code'] == -6
+        assert cao_refusal.refusal.detail['candidate_unavailable_reason'] == (
+            'engine_crash'
+        )
+        assert any(
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and MELTS_CAO_EXCHANGE_UNAVAILABLE in notice.reason
+            for notice in cao_candidate.notices
+        )
+        fusion_gap = next(
+            notice for notice in cao_candidate.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and 'CaSiO3(l)-pWo fusion residual' in notice.reason
+        )
+        assert fusion_gap.band is None
+        assert MELTS_CASIO3_FUSION_BAND_UNAVAILABLE in fusion_gap.reason
+    elif ca_free:
         assert cao_candidate.value.point is None
         assert cao_candidate.value.unavailable_reason == (
             MELTS_CAO_EXCHANGE_UNAVAILABLE
@@ -1091,11 +1157,12 @@ def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
             assert MELTS_CASIO3_FUSION_BAND_UNAVAILABLE in fusion_gap.reason
             assert 'liquid/pWo pure-phase G0' in fusion_gap.reason
             assert 'band could not be computed' in fusion_gap.reason
-    assert not any(
-        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-        and any(marker in notice.reason for marker in fusion_markers)
-        for notice in non_cao_candidate.notices
-    )
+    if non_cao_candidate is not None:
+        assert not any(
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and any(marker in notice.reason for marker in fusion_markers)
+            for notice in non_cao_candidate.notices
+        )
 
 
 @pytest.mark.parametrize('engine_name', ('alphamelts', 'thermoengine'))

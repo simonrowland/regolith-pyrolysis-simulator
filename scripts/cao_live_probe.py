@@ -9,11 +9,9 @@ from decimal import Decimal
 from pathlib import Path
 
 from engines.alphamelts.domain import (
-    MELTS_CASIO3_FUSION_BAND_UNAVAILABLE,
     MELTS_CASIO3_LIQUID_G0_FIELD,
     MELTS_CAO_EXCHANGE_MU_FIELD,
     MELTS_CAO_EXCHANGE_UNAVAILABLE,
-    MELTS_PWO_G0_FIELD,
 )
 from simulator.battery.enums import Engine, NoticeKind, Phase, Quantity
 from simulator.battery.identity import quantity_token
@@ -151,25 +149,19 @@ def main() -> None:
         None,
     )
     fusion_band = None if fusion_notice is None else fusion_notice.band
-    fusion_refusal = None
-    if fusion_notice is not None and fusion_band is None:
-        fusion_refusal = fusion_notice.reason
-    elif fusion_notice is None:
-        liquid_g0 = (
-            None if cell is None
-            else getattr(cell, MELTS_CASIO3_LIQUID_G0_FIELD, None)
-        )
-        pwo_g0 = (
-            None if cell is None
-            else getattr(cell, MELTS_PWO_G0_FIELD, None)
-        )
-        if liquid_g0 is None or pwo_g0 is None:
-            fusion_refusal = MELTS_CASIO3_FUSION_BAND_UNAVAILABLE
-        else:
-            fusion_refusal = (
-                f'{MELTS_CASIO3_FUSION_BAND_UNAVAILABLE}: '
-                'the scorer emitted no fusion notice for this prediction'
-            )
+    fusion_refusal = (
+        None
+        if fusion_notice is None or fusion_band is not None
+        else fusion_notice.reason
+    )
+    exchange_notice = next(
+        (
+            notice for notice in prediction.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and MELTS_CAO_EXCHANGE_UNAVAILABLE in notice.reason
+        ),
+        None,
+    )
 
     activity_refusal = None
     if prediction.value is None:
@@ -180,14 +172,6 @@ def main() -> None:
             ),
             'detail': dict(prediction.refusal_detail),
         }
-        exchange_mu = (
-            None if cell is None
-            else getattr(cell, MELTS_CAO_EXCHANGE_MU_FIELD, None)
-        )
-        if exchange_mu is None and not activity_refusal['detail'].get('converter'):
-            activity_refusal['detail']['converter'] = (
-                MELTS_CAO_EXCHANGE_UNAVAILABLE
-            )
 
     print(json.dumps({
         'engine': Engine.ALPHAMELTS.value,
@@ -196,14 +180,12 @@ def main() -> None:
         'run_mode': run_mode,
         'a_CaO': None if prediction.value is None else str(prediction.value),
         'a_CaO_refusal': activity_refusal,
+        'cao_exchange_unavailable_reason': (
+            None if exchange_notice is None else exchange_notice.reason
+        ),
         'fusion_band': fusion_band,
         'fusion_band_refusal': fusion_refusal,
         'liquid_mu_mu0_fields_found': _cell_values(cell),
-        'liquid_mu_CaSiO3_unavailable_reason': (
-            None
-            if _cell_values(cell)['mu_CaSiO3_J_per_mol'] is not None
-            else 'selected scorer cell does not expose native mu_CaSiO3'
-        ),
     }, sort_keys=True, allow_nan=False, default=str))
 
 

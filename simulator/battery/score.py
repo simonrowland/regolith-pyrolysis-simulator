@@ -16354,6 +16354,55 @@ def _predict_with_engine(
     if status != "ok":
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
+        melts_cao_activity = (
+            engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+            and quantity is Quantity.ACTIVITY
+            and formula == "CaO"
+        )
+        if melts_cao_activity:
+            from engines.alphamelts.domain import (
+                MELTS_CAO_EXCHANGE_UNAVAILABLE,
+                MELTS_CASIO3_FUSION_CAVEAT_PHRASE,
+                MELTS_CASIO3_FUSION_BAND_UNAVAILABLE,
+            )
+
+            engine_label = (
+                "AlphaMELTS"
+                if engine is Engine.ALPHAMELTS
+                else "ThermoEngine"
+            )
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            f"{MELTS_CAO_EXCHANGE_UNAVAILABLE}: "
+                            f"{engine_label} cell refused ({typed}); "
+                            "no CaO exchange potential is available"
+                        ),
+                        origin=(
+                            "simulator.battery.score."
+                            "d476_cao_exchange_unavailable"
+                        ),
+                    ),
+                    Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            f"{MELTS_CASIO3_FUSION_BAND_UNAVAILABLE}: "
+                            f"{engine_label} "
+                            f"{MELTS_CASIO3_FUSION_CAVEAT_PHRASE} band "
+                            f"is unavailable because the cell refused ({typed})"
+                        ),
+                        origin=(
+                            "simulator.battery.score."
+                            "d476_melts_casio3_fusion_band_gap"
+                        ),
+                    ),
+                ),
+            )
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
             cell_status = str(getattr(cell, "engine_status", "") or "")
             worker_failure = _engine_worker_lifecycle_failure(cell)
@@ -16428,6 +16477,11 @@ def _predict_with_engine(
                     "exit_code": getattr(cell, "exit_code", None),
                     "exit_signal": getattr(cell, "exit_signal", None),
                     "engine_reason": getattr(cell, "engine_reason", None),
+                    **(
+                        {"candidate_unavailable_reason": "engine_crash"}
+                        if melts_cao_activity
+                        else {}
+                    ),
                 },
                 identity=identity,
                 requested_composition=requested,
@@ -16469,6 +16523,11 @@ def _predict_with_engine(
             refusal_detail={
                 "refusal_reason": typed,
                 "engine_reason": engine_side_reason,
+                **(
+                    {"candidate_unavailable_reason": typed}
+                    if melts_cao_activity
+                    else {}
+                ),
                 **(
                     {"reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value}
                     if openimcc_outside_species
@@ -19039,21 +19098,21 @@ def _compile_residual_with_lineage(
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
         refusal_detail = dict(detail)
-        melts_cao_exchange_unavailable = False
+        melts_cao_candidate_unavailable_reason = None
         if (
             engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+            and quantity is Quantity.ACTIVITY
+            and formula == "CaO"
             and candidate is None
             and isinstance(detail.get('candidate_unavailable_reason'), str)
+            and detail.get('candidate_unavailable_reason')
         ):
-            from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_UNAVAILABLE
-
-            melts_cao_exchange_unavailable = (
-                detail.get('candidate_unavailable_reason')
-                == MELTS_CAO_EXCHANGE_UNAVAILABLE
+            melts_cao_candidate_unavailable_reason = str(
+                detail['candidate_unavailable_reason']
             )
-        if melts_cao_exchange_unavailable:
+        if melts_cao_candidate_unavailable_reason is not None:
             refusal_detail['candidate_unavailable_reason'] = (
-                MELTS_CAO_EXCHANGE_UNAVAILABLE
+                melts_cao_candidate_unavailable_reason
             )
             if candidate is None:
                 candidate_prediction = EnginePrediction(
@@ -19066,7 +19125,7 @@ def _compile_residual_with_lineage(
                     lineage_complete=False,
                     refusal_reason=reason,
                     refusal_detail={
-                        'reason': MELTS_CAO_EXCHANGE_UNAVAILABLE,
+                        'reason': melts_cao_candidate_unavailable_reason,
                     },
                     identity=(
                         reference.identity
