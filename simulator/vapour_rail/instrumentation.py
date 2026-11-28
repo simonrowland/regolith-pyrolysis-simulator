@@ -752,6 +752,19 @@ CONTROL_SHADOW_EQUAL_KEY = "vapour_batch_flux_shadow_equal"
 CONTROL_SHADOW_OUTCOME_KEY = "vapour_batch_flux_shadow_outcome"
 EFFECTIVE_PRESSURE_SOURCE_CONTEXT = "effective_pressure_source"
 
+
+def provider_flux_overlay_controls(overlay: Any) -> dict[str, Any]:
+    """Project the flux overlay and its provider control fields once."""
+    if not isinstance(overlay, Mapping):
+        return {}
+    controls: dict[str, Any] = {"vapour_batch_flux_overlay": dict(overlay)}
+    if "shadow_equal" in overlay:
+        controls[CONTROL_SHADOW_EQUAL_KEY] = bool(overlay["shadow_equal"])
+    if "shadow_outcome" in overlay:
+        controls[CONTROL_SHADOW_OUTCOME_KEY] = overlay["shadow_outcome"]
+    return controls
+
+
 _COMPATIBILITY_PRESSURE_READ_CONTEXT: ContextVar[str | None] = ContextVar(
     "compatibility_pressure_read_context",
     default=None,

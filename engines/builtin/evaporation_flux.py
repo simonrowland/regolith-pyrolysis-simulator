@@ -85,49 +85,6 @@ DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 0.0
 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
     "disabled:missing-species-state-dependent-melt-transfer-inputs"
 )
-# EVAPORATION-only class proxies: systematically composed refractory carriers borrow
-# the stored SiO collision parameters because direct high-temperature transport
-# data are absent, but each retains its formula molar mass. Their collision pair is
-# read from simulator.condensation; this table stores only each formula mass.
-# Sanity: SiO itself is the closest measured rail carrier; this proxy affects
-# only continuum gas resistance, never K(T), P_eq, stoichiometry, or the
-# condensation/deposition transport table. Outputs remain status-bearing and
-# direct collision data remain acquisition targets.
-_EVAPORATION_LJ_PROXY_MOLAR_MASSES = {
-    # t-609/t-622: keep the diagnostic monoxide upper-screen flux computable without
-    # pretending direct transport authority. The SiO collision class is a
-    # status-bearing continuum-resistance proxy; exact formula masses remain
-    # species-specific, and the request gate never admits inventory debit.
-    "FeO_association_gas": 71.8440,
-    "NiO_gas": 74.6924,
-    "MnO_gas": 70.937044,
-    "CoO_gas": 74.932194,
-    "CrO2": 83.9941,
-    "CrO": 67.9951,
-    "Al2": 53.9630770,
-    "AlO": 42.9805385,
-    "Al2O": 69.9620770,
-    "Al2O2": 85.9610770,
-    "Al2O3_gas": 101.9600770,
-    "AlO2": 58.9795385,
-    "Ca2": 80.1560,
-    "CaO_gas": 56.0770,
-    "TiO": 63.8660,
-    "TiO2_gas": 79.8650,
-    "CrO3": 99.9931,
-    "K2": 78.1966,
-    "K2O_gas": 94.1956,
-    "Mg2": 48.6100,
-    "MgO_gas": 40.3040,
-    "Na2": 45.97953856,
-    "Na2O_gas": 61.97853856,
-    "P2O5_gas": 141.942523996,
-    "Si2": 56.1700,
-    "Si3": 84.2550,
-    "SiO2_gas": 60.0830,
-}
-
-
 class EvaporationFluxConfigurationError(ValueError):
     """Invalid or unsupported transport inputs for authoritative flux."""
 
@@ -702,9 +659,9 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     from simulator.condensation import (
         DEFAULT_CARRIER_GAS,
         GAS_CONSTANT_J_MOL_K,
-        _LENNARD_JONES_PARAMS,
         _chapman_enskog_d_ab_m2_s,
         _knudsen_number,
+        _resolve_lennard_jones_parameters,
         _stirring_enhanced_sherwood,
     )
     from simulator.state import MAX_STIR_FACTOR, clamp_stir_factor
@@ -849,13 +806,12 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 "gas resistance requires positive overhead_pressure_pa"
             )
         if species_params is None:
-            proxy_molar_mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(species)
-            if proxy_molar_mass is not None:
-                sio_sigma, sio_epsilon, _sio_molar_mass = _LENNARD_JONES_PARAMS["SiO"]
+            parameters = _resolve_lennard_jones_parameters(species, {})
+            if parameters.get("status") in {"tabulated", "estimated"}:
                 species_params = (
-                    sio_sigma,
-                    sio_epsilon,
-                    proxy_molar_mass,
+                    float(parameters["sigma_angstrom"]),
+                    float(parameters["epsilon_over_k_K"]),
+                    float(parameters["molar_mass_g_mol"]),
                 )
         d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
             species,
@@ -1959,7 +1915,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                                 "missing Chapman-Enskog transport parameters "
                                 f"for sampled species: {species}"
                             ),
-                            "refusal_type": "missing_transport_parameters_possible_continuum",
+                            "refusal_type": "EvaporationFluxConfigurationError",
                             "status": "unavailable",
                             "authority_level": "unavailable",
                             "flag": (
@@ -1971,7 +1927,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     species_transport_params = (
                         float(parameters["sigma_angstrom"]),
                         float(parameters["epsilon_over_k_K"]),
-                        M_kg_mol * 1000.0,
+                        float(
+                            parameters.get("molar_mass_g_mol")
+                            or M_kg_mol * 1000.0
+                        ),
                     )
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                     species=species,

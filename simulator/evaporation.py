@@ -85,6 +85,7 @@ from simulator.vapour_rail.instrumentation import (
     _finite_live_map,
     finite_live_pressure_map,
     flux_pressures_from_batch,
+    provider_flux_overlay_controls,
     serialize_vapour_batch,
 )
 
@@ -2543,6 +2544,28 @@ class EvaporationMixin:
                 surface=surface,
                 overhead_partials_Pa=overhead_partials_Pa,
             )
+            availability = getattr(
+                self, '_vapour_batch_hour_availability', None
+            )
+            if proven_zero and isinstance(availability, dict):
+                zero_species = set(proven_zero)
+                availability['admitted_member_species'] = tuple(
+                    species
+                    for species in availability.get(
+                        'admitted_member_species', ()
+                    )
+                    if species not in zero_species
+                )
+                transport_eligibility = dict(
+                    availability.get(
+                        'transport_eligibility_by_species', {}
+                    ) or {}
+                )
+                for species in zero_species:
+                    transport_eligibility[species] = 'zero_by_physics'
+                availability['transport_eligibility_by_species'] = (
+                    transport_eligibility
+                )
             closure_unavailable = {
                 species: reason
                 for species, reason in closure_unavailable.items()
@@ -2586,7 +2609,12 @@ class EvaporationMixin:
                 record = rows.get(str(species))
                 if not isinstance(record, dict):
                     continue
-                record['pressure'] = dict(evidence)
+                current_pressure = record.get('pressure')
+                if not (
+                    isinstance(current_pressure, Mapping)
+                    and current_pressure.get('kind') == 'zero_by_physics'
+                ):
+                    record['pressure'] = dict(evidence)
                 record['extra'] = {**dict(record.get('extra') or {}), **extra}
 
     def _classify_proven_zero_langmuir_channels(
@@ -2644,6 +2672,7 @@ class EvaporationMixin:
         ) or {}
         channel_states = dict(flux_overlay.get('batch_channel_states', {}) or {})
         driving_forces: dict[str, dict[str, Any]] = {}
+        proven_zero: dict[str, dict[str, Any]] = {}
         if not isinstance(refused_species, Mapping):
             return driving_forces
         for species in refused_species:
@@ -2680,6 +2709,7 @@ class EvaporationMixin:
             # cap proves no outward flux at any possible surface pO2.
             if drive > 0.0:
                 continue
+            proven_zero[str(species)] = driving_forces[str(species)]
             channel_states[str(species)] = 'zero_by_physics'
             authorities = getattr(flux, 'carrier_authority_by_species', None)
             if isinstance(authorities, dict) and species in authorities:
@@ -2705,7 +2735,7 @@ class EvaporationMixin:
         if driving_forces:
             flux_overlay['net_driving_force_by_species'] = driving_forces
             flux_overlay['batch_channel_states'] = channel_states
-        return driving_forces
+        return proven_zero
 
     def _resolve_evaporation_batch_flux_state(
         self,
@@ -3124,6 +3154,10 @@ class EvaporationMixin:
         except (TypeError, ValueError, OverflowError):
             hour = None
         cached = getattr(self, '_vapour_batch_hour_availability', None)
+        channel_states = flux_overlay.get('batch_channel_states', {})
+        channel_states = (
+            channel_states if isinstance(channel_states, Mapping) else {}
+        )
         if (
             isinstance(cached, Mapping)
             and cached.get('hour') == hour
@@ -3184,18 +3218,27 @@ class EvaporationMixin:
             from simulator.transport_constants import (
                 FREE_MOLECULAR_KNUDSEN_MIN,
             )
-
             vapor_data = getattr(self, 'vapor_pressures', {}) or {}
             for species in sorted(member_species):
+                if (
+                    species in unavailable
+                    or channel_states.get(species) != 'eligible'
+                    or _evaporation_parent_oxide(vapor_data, species)
+                ):
+                    continue
+                unavailable[species] = 'missing_evaporation_stoichiometry'
+                transport_eligibility[species] = 'unavailable'
+
+            for species in sorted(member_species):
+                if channel_states.get(species) == 'zero_by_physics':
+                    transport_eligibility[species] = 'zero_by_physics'
+                    continue
+                if species in unavailable:
+                    continue
                 row = _evaporation_vapor_row(vapor_data, species)
                 if row is not None:
                     transport_property_rows[str(species)] = dict(row)
-                molar_mass = production_vapor_molar_mass_g_per_mol(
-                    vapor_data, species
-                )
                 parameters = _resolve_lennard_jones_parameters(species, row)
-                if molar_mass is not None:
-                    parameters['molar_mass_g_mol'] = molar_mass
                 transport_parameters[str(species)] = dict(parameters)
                 if parameters.get('status') == 'estimated':
                     estimated_transport[str(species)] = parameters
@@ -3249,80 +3292,6 @@ class EvaporationMixin:
                     hkl_upper_bound_species.add(str(species))
                     transport_eligibility[str(species)] = 'hkl_upper_bound'
 
-            # A missing parent matters to the Langmuir residual only when
-            # that same balance is active and this carrier is coupled to a
-            # peer. The debit helper remains the deciding source for whether
-            # this is a missing parent that would have raised before flux.
-            pressure_diagnostic = getattr(
-                self, '_last_vapor_pressure_diagnostic', {}
-            )
-            pressure_diagnostic = (
-                pressure_diagnostic
-                if isinstance(pressure_diagnostic, Mapping)
-                else {}
-            )
-            candidate_pressures = {
-                str(species): pressure
-                for species, pressure in flux_pressures.items()
-                if str(species) not in unavailable
-            }
-            from simulator.langmuir_surface_oxygen import (
-                langmuir_closure_participant_species,
-            )
-            capacity_reader = getattr(
-                self, '_langmuir_melt_redox_capacity_mol_per_ln_fO2', None
-            )
-            capacity = None
-            if callable(capacity_reader):
-                temperature_c = getattr(equilibrium, 'temperature_C', None)
-                if temperature_c is None:
-                    temperature_c = getattr(
-                        getattr(self, 'melt', None), 'temperature_C', None
-                    )
-                try:
-                    temperature_k = (
-                        float(temperature_c) + CELSIUS_TO_KELVIN_OFFSET
-                    )
-                except (TypeError, ValueError, OverflowError):
-                    temperature_k = None
-                if temperature_k is not None:
-                    try:
-                        capacity = capacity_reader(
-                            temperature_K=temperature_k,
-                            eval_pO2_bar=pressure_diagnostic.get(
-                                'source_reaction_fO2_bar'
-                            ),
-                        )
-                    except (AttributeError, TypeError, ValueError, OverflowError):
-                        capacity = None
-            closure_members = langmuir_closure_participant_species(
-                candidate_pressures,
-                provenance_by_species=pressure_diagnostic.get(
-                    'vapor_pressure_numerator_provenance', {}
-                ),
-                source_reaction_fO2_bar=pressure_diagnostic.get(
-                    'source_reaction_fO2_bar'
-                ),
-                transport_pO2_bar=pressure_diagnostic.get('pO2_bar'),
-                legacy_catalog=vapor_data,
-                compiled_catalog=getattr(self, 'vapour_rail_catalog', None),
-                melt_redox_capacity_mol_per_ln_fO2=capacity,
-            )
-            if len(closure_members) > 1:
-                from simulator.accounting.exceptions import AccountingError
-
-                for species in sorted(closure_members):
-                    if _evaporation_parent_oxide(vapor_data, species):
-                        continue
-                    row = _evaporation_vapor_row(vapor_data, species) or {}
-                    try:
-                        self._evaporation_stoich(species, dict(row))
-                    except AccountingError as exc:
-                        if 'requires parent_oxide metadata' in str(exc):
-                            unavailable[species] = (
-                                'missing_evaporation_stoichiometry'
-                            )
-                            transport_eligibility[species] = 'unavailable'
             for notice in flux_overlay.get('notices', ()) or ():
                 if (
                     isinstance(notice, Mapping)
@@ -3334,15 +3303,26 @@ class EvaporationMixin:
                         str(notice.get('reason') or 'unavailable'),
                     )
 
+        for species, state in channel_states.items():
+            if state == 'zero_by_physics':
+                unavailable.pop(str(species), None)
+                transport_eligibility[str(species)] = 'zero_by_physics'
         for species in unavailable:
             if species in member_species:
                 transport_eligibility[species] = 'unavailable'
         for species, reason in (observed_unavailable_by_species or {}).items():
             unavailable.setdefault(str(species), str(reason))
             transport_eligibility[str(species)] = 'unavailable'
+        admitted_member_species = tuple(sorted(
+            species
+            for species in member_species
+            if species not in unavailable
+            and channel_states.get(species, 'eligible') == 'eligible'
+        ))
         self._vapour_batch_hour_availability = {
             'hour': hour,
             'member_species': tuple(sorted(member_species)),
+            'admitted_member_species': admitted_member_species,
             'unavailable_by_species': dict(unavailable),
             'estimated_lennard_jones_params_by_species': dict(
                 estimated_transport
@@ -3364,7 +3344,15 @@ class EvaporationMixin:
             ),
         }
 
+        from simulator.condensation import _EVAPORATION_CLASS_PROXY_SOURCE
+
         for species, estimate in estimated_transport.items():
+            if (
+                estimate.get('method') == 'legacy_code_proxy'
+                and (estimate.get('provenance') or {}).get('source')
+                != _EVAPORATION_CLASS_PROXY_SOURCE
+            ):
+                continue
             _append_transport_parameters_estimated_notice(
                 flux_overlay,
                 species=str(species),
@@ -3390,6 +3378,7 @@ class EvaporationMixin:
         unavailable_by_species: Mapping[str, str],
         *,
         capacity_solve: bool = False,
+        capacity_restart_used: bool = False,
     ) -> dict[str, str]:
         """Exclude newly refused frozen members before deterministic re-close.
 
@@ -3403,6 +3392,8 @@ class EvaporationMixin:
             if isinstance(cache, Mapping)
             else ()
         )
+        if capacity_solve and capacity_restart_used:
+            return {}
         members = set(
             str(species)
             for species in (
@@ -3411,9 +3402,6 @@ class EvaporationMixin:
                 else flux_pressures
             )
         )
-        if capacity_solve and isinstance(cache, Mapping):
-            if cache.get('capacity_restart_used') is True:
-                return {}
         fresh = {
             str(species): str(reason)
             for species, reason in unavailable_by_species.items()
@@ -3433,8 +3421,6 @@ class EvaporationMixin:
         if isinstance(cache, dict):
             restarted.update(fresh)
             cache['restarted_unavailable_species'] = tuple(sorted(restarted))
-            if capacity_solve:
-                cache['capacity_restart_used'] = True
         return fresh
 
     def _evaporation_publisher_film(
@@ -6750,8 +6736,6 @@ class EvaporationMixin:
     def _build_evaporation_aux_maps(
         self,
         vapor_pressures: dict,
-        *,
-        vapour_batch_flux_overlay: dict[str, Any] | None = None,
     ) -> tuple[dict, dict, dict]:
         """Precompute per-species auxiliary inputs for EVAPORATION_FLUX.
 
@@ -6764,10 +6748,9 @@ class EvaporationMixin:
         validation.
 
         Side effects: This method invokes :meth:`_evaporation_stoich` for each
-        flux species. A missing parent oxide becomes a typed, species-local
-        unavailable notice when the caller supplies the current flux overlay;
-        direct legacy callers retain the base ``AccountingError``. Missing
-        molar mass and inconsistent stoichiometry still raise.
+        admitted flux species. The hourly availability classifier has already
+        excluded missing parent metadata; missing molar mass or inconsistent
+        stoichiometry still raises here.
         """
 
         molar_masses_kg_mol: dict[str, float] = {}
@@ -6800,22 +6783,7 @@ class EvaporationMixin:
                 self.vapor_pressures, species
             )
             if not parent_oxide:
-                try:
-                    self._evaporation_stoich(species, sp_data)
-                except AccountingError as exc:
-                    if vapour_batch_flux_overlay is None:
-                        raise
-                    if 'requires parent_oxide metadata' not in str(exc):
-                        raise
-                    _append_vapour_batch_unresolved_notice(
-                        self,
-                        vapour_batch_flux_overlay,
-                        species=species,
-                        reason='missing_evaporation_stoichiometry',
-                    )
-                    vapor_pressures.pop(species, None)
-                    molar_masses_kg_mol.pop(species, None)
-                    continue
+                self._evaporation_stoich(species, sp_data)
                 raise AccountingError(
                     f"vapor species {species!r} requires parent_oxide "
                     "metadata before ledger routing"
@@ -7170,7 +7138,7 @@ class EvaporationMixin:
             self, '_vapour_batch_hour_availability', None
         )
         cached_members = (
-            transport_cache.get('member_species')
+            transport_cache.get('admitted_member_species')
             if isinstance(transport_cache, Mapping)
             else None
         )
@@ -7184,15 +7152,9 @@ class EvaporationMixin:
             live_reporting = dict(
                 getattr(equilibrium, 'vapor_pressures_Pa', {}) or {}
             )
-        if isinstance(vapour_batch_flux_overlay, dict):
-            aux_maps = self._build_evaporation_aux_maps(
-                dict(auxiliary_flux_members),
-                vapour_batch_flux_overlay=vapour_batch_flux_overlay,
-            )
-        else:
-            aux_maps = self._build_evaporation_aux_maps(
-                dict(auxiliary_flux_members)
-            )
+        aux_maps = self._build_evaporation_aux_maps(
+            dict(auxiliary_flux_members)
+        )
         (
             molar_masses_kg_mol,
             stoich_by_species,
@@ -7331,15 +7293,9 @@ class EvaporationMixin:
         if vapour_batch_report is not None:
             controls[CONTROL_BATCH_REPORT_KEY] = dict(vapour_batch_report)
         if vapour_batch_flux_overlay is not None:
-            controls['vapour_batch_flux_overlay'] = dict(vapour_batch_flux_overlay)
-            if 'shadow_equal' in vapour_batch_flux_overlay:
-                controls[CONTROL_SHADOW_EQUAL_KEY] = bool(
-                    vapour_batch_flux_overlay['shadow_equal']
-                )
-            if 'shadow_outcome' in vapour_batch_flux_overlay:
-                controls['vapour_batch_flux_shadow_outcome'] = (
-                    vapour_batch_flux_overlay['shadow_outcome']
-                )
+            controls.update(
+                provider_flux_overlay_controls(vapour_batch_flux_overlay)
+            )
         from engines.builtin.evaporation_flux import alpha_policy_controls
 
         controls.update(alpha_policy_controls(kernel_config))

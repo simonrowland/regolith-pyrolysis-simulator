@@ -7931,7 +7931,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         finally:
             self._degraded_path_engagement = degraded_before
 
-    def _compute_capacity_coupling_shadow_impl(self, equilibrium):
+    def _compute_capacity_coupling_shadow_impl(
+        self, equilibrium, *, capacity_restart_used=False
+    ):
         # Drop the previous hour's publication. A skipped resolve must
         # not re-close this hour on that map.
         self._langmuir_flux_closure_context = None
@@ -7967,7 +7969,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.vapour_rail.instrumentation import serialize_vapour_batch
         from simulator.vapour_rail.instrumentation import (
             CONTROL_FLUX_PRESSURES_KEY,
-            CONTROL_SHADOW_EQUAL_KEY,
+            provider_flux_overlay_controls,
         )
 
         capacity, cold_train = self._cold_train_capacity_policy()
@@ -8098,12 +8100,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             control_equilibrium = equilibrium
             control_vapor_pressure_diagnostic = None
-        unresolved_before_controls = {
-            (notice.get('species'), notice.get('reason'))
-            for notice in capacity_flux_overlay.get('notices', ()) or ()
-            if isinstance(notice, Mapping)
-            and notice.get('kind') == 'vapour_batch_unresolved'
-        }
         controls, provider_molar_masses = self._evaporation_flux_control_inputs(
             control_equilibrium,
             overhead_partials_Pa=initial_partials,
@@ -8126,33 +8122,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             batch_flux_pressures = dict(
                 controls.get(CONTROL_FLUX_PRESSURES_KEY, {}) or {}
             )
-            unresolved_after_controls = {
-                (notice.get('species'), notice.get('reason'))
-                for notice in capacity_flux_overlay.get('notices', ()) or ()
-                if isinstance(notice, Mapping)
-                and notice.get('kind') == 'vapour_batch_unresolved'
-            }
-            if unresolved_after_controls != unresolved_before_controls:
-                outcome = EvaporationMixin._vapour_batch_resolution_outcome(
-                    self,
-                    resolve_error,
-                    capacity_flux_overlay,
-                    selector_overlay=selection_flux_overlay,
-                    flux_pressures=batch_flux_pressures,
-                    include_unresolved_notices=True,
-                    requested_species_ids=(
-                        getattr(vapour_batch, 'requested_species_ids', None)
-                        if vapour_batch is not None
-                        else None
-                    ),
-                    liquid_fraction=getattr(
-                        equilibrium, 'liquid_fraction', None
-                    ),
-                    temperature_K=temperature_K,
-                    equilibrium_status=getattr(equilibrium, 'status', None),
-                )
-                if outcome.refusal is not None:
-                    raise outcome.refusal
         capacity_bound_notice = _append_capacity_solve_exclusion_notice(
             self,
             capacity_flux_overlay,
@@ -8162,33 +8131,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             capacity_flux_overlay
         )
         solver_molar_masses = dict(provider_molar_masses)
-        selector_channel_states = selection_flux_overlay.get(
-            'batch_channel_states', {}
+        availability = getattr(
+            self, '_vapour_batch_hour_availability', None
         )
-        flux_species = {
-            str(species)
-            for species, state in selector_channel_states.items()
-            if state == 'eligible'
-        } if isinstance(selector_channel_states, Mapping) else set()
-        selector_unavailable = {
-            str(notice.get('species'))
-            for notice in selection_flux_overlay.get('notices', ()) or ()
-            if isinstance(notice, Mapping)
-            and notice.get('kind') == 'vapour_batch_unresolved'
-            and notice.get('species') is not None
-        }
-        flux_species.difference_update(selector_unavailable)
-        if isinstance(selector_channel_states, Mapping):
-            for species, state in selector_channel_states.items():
-                if (
-                    state != 'eligible'
-                    or species in solver_molar_masses
-                ):
-                    continue
-                solver_molar_masses[str(species)] = resolve_species_formula(
-                    str(species),
-                    self.species_formula_registry,
-                ).molar_mass_kg_per_mol()
+        admitted_members = (
+            availability.get('admitted_member_species', ())
+            if isinstance(availability, Mapping)
+            else ()
+        )
+        flux_species = {str(species) for species in admitted_members}
         for species in pre_holdup:
             solver_molar_masses.setdefault(
                 species,
@@ -8302,6 +8253,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             iteration_overlay,
                             closure_failures,
                             capacity_solve=True,
+                            capacity_restart_used=capacity_restart_used,
                         )
                     )
                     if not fresh_closure_failures:
@@ -8342,17 +8294,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 iteration_flux_pressures or {}
             )
             if iteration_flux_pressures is not None:
-                iteration_controls['vapour_batch_flux_overlay'] = (
-                    iteration_overlay
+                iteration_controls.update(
+                    provider_flux_overlay_controls(iteration_overlay)
                 )
-                if 'shadow_equal' in iteration_overlay:
-                    iteration_controls[CONTROL_SHADOW_EQUAL_KEY] = bool(
-                        iteration_overlay['shadow_equal']
-                    )
-                if 'shadow_outcome' in iteration_overlay:
-                    iteration_controls[
-                        'vapour_batch_flux_shadow_outcome'
-                    ] = iteration_overlay['shadow_outcome']
             iteration_controls['surface_oxygen_bound'] = owns_oxygen_drive
             request = IntentRequest(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
@@ -8386,6 +8330,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         iteration_overlay,
                         late_provider_unavailable,
                         capacity_solve=True,
+                        capacity_restart_used=capacity_restart_used,
                     )
                 )
                 capacity_bound_notice = _append_capacity_solve_exclusion_notice(
@@ -8539,7 +8484,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
             )
         except _RestartCapacitySolve:
-            return self._compute_capacity_coupling_shadow_impl(equilibrium)
+            if capacity_restart_used:
+                raise EvaporationFluxRefusal(
+                    'capacity_member_closure_failure',
+                    {
+                        'reason': 'capacity_member_closure_failure',
+                        'capacity_restart_used': True,
+                    },
+                )
+            return self._compute_capacity_coupling_shadow_impl(
+                equilibrium,
+                capacity_restart_used=True,
+            )
         finally:
             assert self.atom_ledger.mol_by_account() == ledger_before
             assert len(self.atom_ledger.transitions) == transition_count_before

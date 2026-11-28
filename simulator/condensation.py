@@ -318,6 +318,41 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
 }
 
 
+# Evaporation-only SiO-class proxies retain each carrier's collision mass.
+# They stay outside _LENNARD_JONES_PARAMS so condensation and deposition do
+# not inherit an evaporation-specific authority.
+_EVAPORATION_LJ_PROXY_MOLAR_MASSES = {
+    "FeO_association_gas": 71.8440,
+    "NiO_gas": 74.6924,
+    "MnO_gas": 70.937044,
+    "CoO_gas": 74.932194,
+    "CrO2": 83.9941,
+    "CrO": 67.9951,
+    "Al2": 53.9630770,
+    "AlO": 42.9805385,
+    "Al2O": 69.9620770,
+    "Al2O2": 85.9610770,
+    "Al2O3_gas": 101.9600770,
+    "AlO2": 58.9795385,
+    "Ca2": 80.1560,
+    "CaO_gas": 56.0770,
+    "TiO": 63.8660,
+    "TiO2_gas": 79.8650,
+    "CrO3": 99.9931,
+    "K2": 78.1966,
+    "K2O_gas": 94.1956,
+    "Mg2": 48.6100,
+    "MgO_gas": 40.3040,
+    "Na2": 45.97953856,
+    "Na2O_gas": 61.97853856,
+    "P2O5_gas": 141.942523996,
+    "Si2": 56.1700,
+    "Si3": 84.2550,
+    "SiO2_gas": 60.0830,
+}
+_EVAPORATION_CLASS_PROXY_SOURCE = "legacy evaporation-only SiO collision class"
+
+
 _LE_BAS_MOLAR_VOLUME_CM3_MOL = {
     "C": 14.8, "H": 3.7, "O": 7.4, "N": 15.6, "S": 25.6,
     "F": 8.7, "Cl": 24.6, "Br": 27.0, "I": 37.0,
@@ -470,6 +505,29 @@ def _resolve_lennard_jones_parameters(
                     "molar_mass_g_mol": legacy[2],
                     "inputs": {"legacy_row": legacy_row},
                 }
+            proxy_molar_mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(
+                str(species)
+            )
+            if proxy_molar_mass is not None:
+                legacy_row = (
+                    "simulator.condensation._EVAPORATION_LJ_PROXY_MOLAR_MASSES"
+                    f"[{str(species)!r}]"
+                )
+                sio_sigma, sio_epsilon = _LENNARD_JONES_PARAMS["SiO"][:2]
+                return {
+                    "species": str(species),
+                    "status": "estimated",
+                    "method": "legacy_code_proxy",
+                    "flag": "lj_estimated:legacy_code_proxy",
+                    "provenance": {
+                        "row": legacy_row,
+                        "source": _EVAPORATION_CLASS_PROXY_SOURCE,
+                    },
+                    "sigma_angstrom": sio_sigma,
+                    "epsilon_over_k_K": sio_epsilon,
+                    "molar_mass_g_mol": proxy_molar_mass,
+                    "inputs": {"legacy_row": legacy_row},
+                }
             return {
                 "species": str(species), "status": "missing", "method": "missing",
                 "flag": "missing_transport_parameters_possible_continuum",
@@ -568,10 +626,9 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     },
     # CrO2 deliberately has NO provenance row: condensation/deposition transport
     # for CrO2 uses the documented DEFAULT_BINARY_DIFFUSION_M2_S fallback (pinned
-    # by test_cro2_condensation_transport_uses_documented_default_fallback). The
-    # SiO-based CLASS-PROXY exists only on the evaporation path
-    # (engines/builtin/evaporation_flux.py::_EVAPORATION_LJ_PROXY_PARAMS); a row
-    # here would falsely report proxy authority for deposition transport.
+    # by test_cro2_condensation_transport_uses_documented_default_fallback). Its
+    # SiO-class proxy is owned by the evaporation resolver above and is not a
+    # condensation/deposition row.
 }
 
 DEFAULT_CARRIER_GAS = 'N2'  # Default carrier; CO2 for Mars feedstocks

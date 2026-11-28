@@ -1221,7 +1221,10 @@ def _publisher_net_law_with_transport(
     species_params = (
         float(parameters["sigma_angstrom"]),
         float(parameters["epsilon_over_k_K"]),
-        molar_mass_kg_per_mol * 1000.0,
+        float(
+            parameters.get("molar_mass_g_mol")
+            or molar_mass_kg_per_mol * 1000.0
+        ),
     )
 
     try:
