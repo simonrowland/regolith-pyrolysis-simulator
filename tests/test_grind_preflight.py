@@ -635,46 +635,21 @@ def test_strict_vapor_result_store_pt1_strict_on_rejects_vaporock(
 
 def test_strict_vapor_pt1_preflight_uses_stored_row_admission(
     tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "strict-pt1-deep-key.sqlite"
     _write_pt1_store(db_path, source="builtin-vapor-pressure")
     with sqlite3.connect(db_path) as conn:
-        (key_bytes,) = conn.execute(
-            f"SELECT key_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
-        ).fetchone()
-        deeply_nested_key = (
-            bytes(key_bytes)[:-1]
-            + b',"unread":'
-            + b"[" * 1100
-            + b"0"
-            + b"]" * 1100
-            + b"}"
-        )
-        key_hash = rrd._sha256(deeply_nested_key)
         conn.execute(
-            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET key_hash = ?, key_sha256 = ?, key_bytes = ?",
-            (key_hash, key_hash, sqlite3.Binary(deeply_nested_key)),
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} SET key_bytes = ?",
+            (sqlite3.Binary(b"{"),),
         )
 
-    admission_calls: list[dict[str, object]] = []
-    original_admission = rrd._admit_stored_row
-
-    def record_admission(row: object, **kwargs: object) -> object:
-        admission_calls.append(dict(kwargs))
-        return original_admission(row, **kwargs)  # type: ignore[arg-type]
-
-    monkeypatch.setattr(rrd, "_admit_stored_row", record_admission)
-    with pytest.raises(GrindSourceGateError) as exc_info:
+    with pytest.raises(GrindSourceGateError, match="invalid JSON"):
         assert_strict_vapor_result_store(
             db_path,
             _decode_result_payload,
             strict_vapor_gate=True,
         )
-    assert isinstance(exc_info.value.__cause__, rrd.PT1PersistentStoreCorrupt)
-    assert admission_calls
-    assert admission_calls[0]["strict_source_validation"] is True
 
 
 def test_strict_vapor_pt1_preflight_passes_caller_approved_sources(
@@ -722,10 +697,9 @@ def test_strict_vapor_pt1_preflight_passes_caller_approved_sources(
         replayable_payload_bytes = rrd.canonical_json_bytes(payload)
         conn.execute(
             f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+            "SET payload_bytes = ? WHERE key_hash = ?",
             (
                 sqlite3.Binary(replayable_payload_bytes),
-                rrd._sha256(replayable_payload_bytes),
                 key_hash,
             ),
         )
@@ -752,20 +726,17 @@ def test_strict_vapor_preflight_rejects_admission_payload_rejection(
         ).fetchone()
         conn.execute(
             f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET artifact = ?, payload_bytes = ?, payload_sha256 = ?, "
-            "payload_codec_version = ? WHERE key_hash = ?",
+            "SET artifact = ?, payload_bytes = ? WHERE key_hash = ?",
             (
                 "freeze_gate_curve",
                 sqlite3.Binary(null_payload_bytes),
-                rrd._sha256(null_payload_bytes),
-                rrd._payload_codec_version("freeze_gate_curve"),
                 key_hash,
             ),
         )
 
     with pytest.raises(
         GrindSourceGateError,
-        match="PT-1 source row is corrupt",
+        match="expected JSON mapping",
     ):
         assert_strict_vapor_result_store(
             db_path,

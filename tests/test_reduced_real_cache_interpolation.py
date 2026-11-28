@@ -1113,7 +1113,7 @@ def test_pt1_ladder_unsnappable_stored_temperature_is_not_a_neighbor(
         ("physics_bucket_hash", False, rrd.UncacheableKey),
         ("physics_bucket_hash", True, rrd.UncacheableKey),
         ("payload_hash", False, rrd.UncacheablePayload),
-        ("payload_collision", True, rrd.UncacheablePayload),
+        ("payload_collision", True, rrd.PT1PersistentStoreCorrupt),
     ),
 )
 def test_pt1_put_maps_fresh_candidate_integrity_rejections_to_typed_refusals(
@@ -1176,6 +1176,7 @@ def test_pt1_put_maps_fresh_candidate_integrity_rejections_to_typed_refusals(
         ("repair_notices_json", rrd.UncacheablePayload),
         ("key_bytes", rrd.UncacheableKey),
         ("physics_bucket_hash", rrd.UncacheableKey),
+        ("physics_bucket_bytes", rrd.UncacheableKey),
     ),
 )
 def test_pt1_put_preflights_fresh_inputs_before_attached_row_lookup(
@@ -1214,6 +1215,8 @@ def test_pt1_put_preflights_fresh_inputs_before_attached_row_lookup(
         kwargs["repair_notices_json"] = "["
     elif bad_input == "key_bytes":
         write_key_bytes = b"{}"
+    elif bad_input == "physics_bucket_bytes":
+        kwargs["physics_bucket_bytes"] = b"bad"
     else:
         kwargs.update(
             physics_bucket_key=bucket_key,

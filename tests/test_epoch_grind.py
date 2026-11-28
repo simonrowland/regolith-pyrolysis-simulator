@@ -195,10 +195,7 @@ def test_epoch_gate_curve_write_passes_artifact_decoder(
 
     def record_decode(artifact, payload, **kwargs):
         decoded = original_decode(artifact, payload, **kwargs)
-        if (
-            artifact == "freeze_gate_curve"
-            and kwargs.get("reader_context_policy") is False
-        ):
+        if artifact == "freeze_gate_curve":
             decoded_payloads.append(decoded)
         return decoded
 
@@ -206,11 +203,33 @@ def test_epoch_gate_curve_write_passes_artifact_decoder(
     monkeypatch.setattr(rrd, "_decode_payload_for_admission", record_decode)
 
     db_path = tmp_path / "epoch-gate-write-gate.sqlite"
-    _put_pt1_cache_row(db_path, "write-gate-trace")
+    key = _pt1_cache_key("write-gate-trace")
+    payload = _pt1_gate_payload("write-gate-trace")
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    store = PT1PersistentEquilibriumStore(db_path)
+    store.put(
+        artifact="freeze_gate_curve",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+        law_disclosures=[],
+    )
 
     assert gate_rows
-    assert any(decoded is not None for decoded in decoded_payloads)
+    assert decoded_payloads == []
     assert gate_rows[-1]["artifact"] == "freeze_gate_curve"
+    assert store.get(
+        artifact="freeze_gate_curve",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+    ) is not None
+    assert any(decoded is not None for decoded in decoded_payloads)
 
 
 def test_control_quantization_cli_parse_and_epoch_profile_overlay(

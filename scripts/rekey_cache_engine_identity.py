@@ -19,15 +19,19 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from simulator.reduced_real_determinism import (  # noqa: E402
+    PHYSICS_BUCKET_SCHEMA_VERSION,
     PT1_EQUILIBRIUM_TABLE,
     PT1_LEGACY_STORE_SCHEMA_VERSION,
     PT1_STORE_SCHEMA_VERSION,
     PT1PersistentStoreCorrupt,
     _admit_stored_row,
     _gate_row_for_write,
+    _physics_ladder_values_from_replay_key,
+    _replay_scope_hash,
     _sha256,
     cache_row_needs_rekey,
     canonical_json_bytes,
+    canonical_physics_bucket_key_from_replay_key,
     rekey_engine_version_provenance,
     rekey_row_matches_engine,
     replace_rekey_cache_identity,
@@ -44,6 +48,13 @@ class RekeyResult:
     def __iter__(self):
         yield self.rows_before
         yield self.rows_updated
+
+
+def _json_loads(raw: bytes) -> dict[str, Any]:
+    loaded = json.loads(raw.decode("utf-8"))
+    if not isinstance(loaded, dict):
+        raise ValueError("cache key root must be a JSON object")
+    return loaded
 
 
 def _key_from_stored_row(row: sqlite3.Row) -> dict[str, Any]:
@@ -120,6 +131,26 @@ def _table_columns(conn: sqlite3.Connection) -> set[str]:
     return {
         str(row["name"])
         for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+    }
+
+
+def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
+    physics_key = canonical_physics_bucket_key_from_replay_key(key)
+    physics_bytes = canonical_json_bytes(physics_key)
+    ladder_values = _physics_ladder_values_from_replay_key(key)
+    return {
+        "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
+        "physics_bucket_sha256": _sha256(physics_bytes),
+        "replay_scope_sha256": _replay_scope_hash(physics_key),
+        "physics_key_bytes": sqlite3.Binary(physics_bytes),
+        "physics_bucket_h40_sha256": ladder_values["h40"]["sha256"],
+        "physics_bucket_h40_distance": ladder_values["h40"]["distance"],
+        "physics_bucket_h30_sha256": ladder_values["h30"]["sha256"],
+        "physics_bucket_h30_distance": ladder_values["h30"]["distance"],
+        "physics_bucket_h40c_sha256": ladder_values["h40c"]["sha256"],
+        "physics_bucket_h40c_distance": ladder_values["h40c"]["distance"],
+        "physics_bucket_h30c_sha256": ladder_values["h30c"]["sha256"],
+        "physics_bucket_h30c_distance": ladder_values["h30c"]["distance"],
     }
 
 
@@ -237,17 +268,59 @@ def rekey_cache(
             if not replace_rekey_cache_identity(key, target):
                 continue
             old_key_hash = str(row["key_hash"])
-            candidate_row = dict(row)
-            candidate_row["corpus_version"] = target
-            candidate_row["engine_version"] = provenance
-            candidate_row.update(
-                {
-                    "_write_key": key,
-                    "_write_replace_key": True,
-                    "_write_rebuild_indexes": True,
+            row_columns = set(row.keys())
+            legacy_layout = not {
+                "artifact",
+                "payload_codec_version",
+                "payload_bytes",
+                "payload_sha256",
+                "store_schema_version",
+            }.issubset(row_columns)
+            if legacy_layout:
+                key_bytes = canonical_json_bytes(key)
+                key_hash = _sha256(key_bytes)
+                candidate_row = {
+                    "key_hash": key_hash,
+                    "key_bytes": sqlite3.Binary(key_bytes),
+                    "corpus_version": target,
+                    "engine_version": provenance,
                 }
-            )
-            candidate_row = _gate_row_for_write(candidate_row)
+                if "key_sha256" in row_columns:
+                    candidate_row["key_sha256"] = key_hash
+                physics_columns_present = {
+                    "physics_bucket_schema_version",
+                    "physics_bucket_sha256",
+                    "replay_scope_sha256",
+                    "physics_key_bytes",
+                    "physics_bucket_h40_sha256",
+                    "physics_bucket_h40_distance",
+                    "physics_bucket_h30_sha256",
+                    "physics_bucket_h30_distance",
+                    "physics_bucket_h40c_sha256",
+                    "physics_bucket_h40c_distance",
+                    "physics_bucket_h30c_sha256",
+                    "physics_bucket_h30c_distance",
+                } & table_columns
+                if physics_columns_present:
+                    candidate_row.update(
+                        {
+                            column: value
+                            for column, value in _physics_columns(key).items()
+                            if column in physics_columns_present
+                        }
+                    )
+            else:
+                candidate_row = dict(row)
+                candidate_row["corpus_version"] = target
+                candidate_row["engine_version"] = provenance
+                candidate_row.update(
+                    {
+                        "_write_key": key,
+                        "_write_replace_key": True,
+                        "_write_rebuild_indexes": True,
+                    }
+                )
+                candidate_row = _gate_row_for_write(candidate_row)
             update_columns = tuple(
                 column for column in table_columns if column in candidate_row
             )

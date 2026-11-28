@@ -48,6 +48,7 @@ import threading
 import time
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
@@ -68,7 +69,7 @@ from simulator.grind_preflight import (
     GrindSourceGateError,
     assert_grind_feedstock_stage0_route_coverage,
     assert_strict_vapor_config,
-    assert_strict_vapor_result_store,
+    assert_strict_vapor_result_store as _assert_strict_vapor_result_store,
 )
 from simulator.reduced_real_determinism import (
     ControlQuantization,
@@ -81,6 +82,11 @@ from simulator.interpolation_uncertainty import (
     DEFAULT_RANK_LIMIT as DEFAULT_INTERPOLATION_RANK_LIMIT,
     RANKED_TABLE_SCHEMA_VERSION,
     ranked_table_drain,
+)
+
+assert_strict_vapor_result_store = partial(
+    _assert_strict_vapor_result_store,
+    _decode_result_payload,
 )
 
 
@@ -1961,7 +1967,6 @@ def _run_prepared_job(
         try:
             assert_strict_vapor_result_store(
                 prepared.out_dir / "cache.sqlite",
-                _decode_result_payload,
                 context=f"{prepared.job.id}:cache.sqlite",
                 strict_vapor_gate=prepared.strict_vapor_gate,
             )

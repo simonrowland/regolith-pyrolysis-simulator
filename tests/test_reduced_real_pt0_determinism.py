@@ -2487,6 +2487,16 @@ def test_pt1_strict_vapor_policy_rejects_builtin_fallback_exact_hit(
         result,
     )
     payload["last_vapor_pressures_source"] = {"SiO": "builtin_fallback"}
+    key["vapor_pressure_provider_selection"] = "builtin_authoritative"
+    payload["authority"]["vapor_pressure"] = {
+        "resolved_provider_id": "builtin_authoritative",
+        "resolved_role": "authoritative",
+        "authoritative_provider_id": "builtin_authoritative",
+        "fallback_provider_id": None,
+        "fallback_allowed": False,
+        "model": None,
+        "mode": None,
+    }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     db_path = tmp_path / "strict-pt1.sqlite"
@@ -6587,6 +6597,41 @@ def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> 
     ]
 
 
+def test_production_gate_capture_replays_as_exact_pt1_hit(tmp_path: Path) -> None:
+    db_path = tmp_path / "production-gate-capture-hit.db"
+    curve = {
+        "source": "unit-test:production-capture-hit",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1600.0,
+        "path": ((1100.0, 0.0), (1600.0, 1.0)),
+    }
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim = _build_pt0_sim(capture)
+    capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(capture_sim)
+    fO2_log = capture_sim._compute_intrinsic_melt_fO2()
+    seed_gate_curve_memo_record(capture_sim, curve)
+    capture.capture_gate_curve(
+        capture_sim,
+        fO2_log=fO2_log,
+        curve=curve,
+        law_disclosures=[],
+    )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
+    replayed_curve = replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    )
+
+    assert replayed_curve == curve
+    assert replay.hits == 1
+    assert replay.last_cache_state == "cached_exact"
+
+
 def test_pt1_domain_gate_prediction_replays_with_qualification(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -7909,7 +7954,27 @@ def test_pt1_legacy_store_stamp_upgrade_preserves_reader_miss_payload(
     invalid_payload = copy.deepcopy(baseline)
     invalid_payload["curve"]["path"] = []
     _write_pt1_payload_for_invariant(db_path, key_hash, invalid_payload)
+    index_columns = (
+        "physics_bucket_schema_version",
+        "physics_bucket_sha256",
+        "replay_scope_sha256",
+        "physics_key_bytes",
+        "physics_bucket_h40_sha256",
+        "physics_bucket_h40_distance",
+        "physics_bucket_h30_sha256",
+        "physics_bucket_h30_distance",
+        "physics_bucket_h40c_sha256",
+        "physics_bucket_h40c_distance",
+        "physics_bucket_h30c_sha256",
+        "physics_bucket_h30c_distance",
+    )
+    index_select = ", ".join(index_columns)
     with sqlite3.connect(db_path) as conn:
+        original_indexes = conn.execute(
+            f"SELECT {index_select} FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET store_schema_version = ? "
             "WHERE key_hash = ?",
@@ -7938,7 +8003,7 @@ def test_pt1_legacy_store_stamp_upgrade_preserves_reader_miss_payload(
         key_bytes=key_bytes,
         key_hash=key_hash,
     ) is None
-    assert len(gate_calls) == 1
+    assert gate_calls == []
     with sqlite3.connect(db_path) as conn:
         store_stamp, payload_bytes = conn.execute(
             f"SELECT store_schema_version, payload_bytes "
@@ -7946,7 +8011,13 @@ def test_pt1_legacy_store_stamp_upgrade_preserves_reader_miss_payload(
             "WHERE key_hash = ?",
             (key_hash,),
         ).fetchone()
+        migrated_indexes = conn.execute(
+            f"SELECT {index_select} FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
     assert store_stamp == rrd.PT1_STORE_SCHEMA_VERSION
+    assert migrated_indexes == original_indexes
     assert bytes(payload_bytes) == canonical_json_bytes(invalid_payload)
 
 

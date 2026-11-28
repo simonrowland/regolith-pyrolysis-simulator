@@ -269,6 +269,7 @@ def _cache_distance_component(
         _finite_float(neighbor.get("interpolation_distance"))
         for neighbor in neighbors
     ]
+    distances = [value for value in distances if value is not None]
     if not distances:
         distances = _computed_neighbor_distances(query_key, neighbors)
     if not distances:
@@ -556,9 +557,7 @@ def _computed_neighbor_distances(
         vector = _coordinate_vector(key)
         if len(vector) != len(query_vector):
             continue
-        distance = _standardized_distance(query_vector, vector)
-        if math.isfinite(distance):
-            distances.append(distance)
+        distances.append(_standardized_distance(query_vector, vector))
     return distances
 
 
@@ -578,18 +577,11 @@ def _coordinate_vector(key: Mapping[str, Any]) -> list[float]:
 
 def _standardized_distance(left: Sequence[float], right: Sequence[float]) -> float:
     scales = [max(abs(value), 1.0e-9) for value in left]
-    try:
-        deltas = [
-            (float(a) - float(b)) / scale
+    return math.sqrt(
+        sum(
+            ((float(a) - float(b)) / scale) ** 2
             for a, b, scale in zip(left, right, scales, strict=False)
-        ]
-        squared_distance = sum(delta**2 for delta in deltas)
-    except OverflowError:
-        return math.inf
-    return (
-        math.sqrt(squared_distance)
-        if math.isfinite(squared_distance)
-        else math.inf
+        )
     )
 
 

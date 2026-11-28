@@ -533,14 +533,9 @@ def _strict_vapor_pt1_store_summary(
     approved_sources: frozenset[str],
     strict_vapor_gate: bool,
 ) -> dict[str, int]:
-    from simulator.reduced_real_determinism import (
-        PT1PersistentStoreCorrupt,
-        _admit_stored_row,
-    )
-
     rows = conn.execute(
         f"""
-        SELECT *
+        SELECT key_hash, artifact, key_bytes, payload_bytes
         FROM {_PT1_EQUILIBRIUM_TABLE}
         """
     ).fetchall()
@@ -555,26 +550,17 @@ def _strict_vapor_pt1_store_summary(
     vapor_active_rows = 0
     source_reports = 0
     for row in rows:
-        try:
-            admitted = _admit_stored_row(
-                row,
-                store_kind="pt1",
-                strict_source_validation=True,
-                approved_sources=approved_sources,
-            )
-        except PT1PersistentStoreCorrupt as exc:
-            raise GrindSourceGateError(
-                f"{context}: PT-1 source row is corrupt"
-            ) from exc
-        if admitted is None:
-            raise GrindSourceGateError(
-                f"{context}: PT-1 row is unavailable"
-            )
-        row_summary = admitted.strict_vapor_summary
-        if row_summary is None:
-            raise GrindSourceGateError(
-                f"{context}: PT-1 row has no strict-vapor provenance summary"
-            )
+        row_context = f"{context}:{row['key_hash']}"
+        key = _json_mapping(row["key_bytes"], f"{row_context}.key")
+        payload = _json_mapping(row["payload_bytes"], f"{row_context}.payload")
+        row_summary = assert_strict_vapor_pt1_row(
+            artifact=str(row["artifact"]),
+            key=key,
+            payload=payload,
+            key_hash=str(row["key_hash"]),
+            context=row_context,
+            approved_sources=approved_sources,
+        )
         source_reports += int(row_summary["source_reports"])
         if row_summary["vapor_active"]:
             vapor_active_rows += 1

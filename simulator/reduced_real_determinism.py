@@ -1386,9 +1386,6 @@ class PT0DeterminismStore:
         ):
             self._mark_uncacheable_capture(sim)
             return
-        if not self._cached_real_binding_eligible(sim):
-            self._mark_uncacheable_capture(sim)
-            return
         if not _is_cacheable_equilibrium_result(result):
             self._mark_uncacheable_capture(sim)
             return
@@ -1405,6 +1402,14 @@ class PT0DeterminismStore:
         payload = canonical_replay_output_projection(
             "equilibrium_post_record", sim, result
         )
+        validate_reduced_real_equilibrium_record_key(
+            "equilibrium_post_record",
+            key,
+            payload,
+        )
+        if not self._cached_real_binding_eligible(sim):
+            self._mark_uncacheable_capture(sim)
+            return
         readback_policy_miss = False
         try:
             readback_policy_miss = self._store(
@@ -3087,8 +3092,12 @@ def _admit_stored_row(
         raw_payload_bytes_are_bytes = isinstance(row.get("payload_bytes"), bytes)
         row_hash = str(row["key_hash"])
         row_artifact = str(row["artifact"])
-        store_schema_version = row["store_schema_version"]
-        if store_schema_version not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
+        store_schema_version = row.get("store_schema_version")
+        if (
+            store_schema_version is not None
+            and store_schema_version != "pt1"
+            and store_schema_version not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS
+        ):
             raise PT1PersistentStoreCorrupt(
                 "PT-1 row store schema version drift: "
                 f"{store_schema_version} != {PT1_STORE_SCHEMA_VERSION}"
@@ -3195,15 +3204,28 @@ def _admit_stored_row(
         law_disclosures = _law_disclosures_from_json(
             row.get("law_disclosures_json")
         )
-        invalid_types = [
-            field
-            for field in _PT1_SOURCE_REQUIRED_TEXT_FIELDS
-            if not isinstance(row.get(field), str)
-        ]
+        current_layout = store_schema_version == PT1_STORE_SCHEMA_VERSION
+        invalid_types = []
+        for field in _PT1_SOURCE_REQUIRED_TEXT_FIELDS:
+            if current_layout and not isinstance(row.get(field), str):
+                invalid_types.append(field)
+            elif (
+                not current_layout
+                and field in row
+                and row[field] is not None
+                and not isinstance(row[field], str)
+            ):
+                invalid_types.append(field)
         for field in ("corpus_version", "engine_version"):
             if row.get(field) is not None and not isinstance(row[field], str):
                 invalid_types.append(field)
-        if type(row.get("git_dirty")) is not int:
+        if (
+            current_layout and type(row.get("git_dirty")) is not int
+        ) or (
+            not current_layout
+            and row.get("git_dirty") is not None
+            and type(row.get("git_dirty")) is not int
+        ):
             invalid_types.append("git_dirty")
         if strict_source_validation:
             if not raw_key_bytes_are_bytes:
@@ -3225,11 +3247,16 @@ def _admit_stored_row(
             )
 
         provenance_mismatches: list[str] = []
-        try:
-            datetime.fromisoformat(row["created_at"].replace("Z", "+00:00"))
-        except (TypeError, ValueError, OverflowError):
+        if row.get("created_at") is not None:
+            try:
+                datetime.fromisoformat(row["created_at"].replace("Z", "+00:00"))
+            except (AttributeError, TypeError, ValueError, OverflowError):
+                provenance_mismatches.append("created_at")
+        elif current_layout:
             provenance_mismatches.append("created_at")
-        if row["git_dirty"] not in (0, 1):
+        if row.get("git_dirty") is not None and row["git_dirty"] not in (0, 1):
+            provenance_mismatches.append("git_dirty")
+        elif current_layout and "git_dirty" not in row:
             provenance_mismatches.append("git_dirty")
         if provenance_mismatches:
             raise PT1PersistentStoreCorrupt(
@@ -3405,6 +3432,19 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
         if not legacy_layout and not isinstance(artifact, str):
             raise TypeError("PT1 write row artifact must be a string")
 
+        if not legacy_layout:
+            try:
+                payload_bytes = _pt1_row_bytes(
+                    row.get("payload_bytes"),
+                    field="payload",
+                    key_hash=key_hash,
+                )
+                if _sha256(payload_bytes) != row.get("payload_sha256"):
+                    raise ValueError("payload checksum does not match stored bytes")
+                validate_repair_notices_json(_row_repair_notices(row))
+            except Exception as exc:
+                raise UncacheablePayload(artifact_name, key_hash) from exc
+
         if expected_key is not None:
             if not isinstance(expected_key, Mapping):
                 raise TypeError("caller key must be a mapping")
@@ -3423,6 +3463,56 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                 row.get("key_bytes"), field="key", key_hash=key_hash
             )
             stored_key = _pt1_row_key(stored_key_bytes, key_hash=key_hash)
+
+        if any(
+            value is not None
+            for value in (
+                input_bucket_key,
+                input_bucket_bytes,
+                input_bucket_hash,
+            )
+        ):
+            derived_bucket_key = canonical_physics_bucket_key_from_replay_key(
+                stored_key
+            )
+            derived_bucket_bytes = canonical_json_bytes(derived_bucket_key)
+            derived_bucket_hash = _sha256(derived_bucket_bytes)
+            if (
+                input_bucket_key is not None
+                and _json_ready(input_bucket_key) != derived_bucket_key
+            ):
+                raise UncacheableKey(
+                    PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                    "write_candidate_physics_bucket_key",
+                )
+            if input_bucket_bytes is not None:
+                try:
+                    supplied_bucket_bytes = _pt1_row_bytes(
+                        input_bucket_bytes,
+                        field="physics bucket key",
+                        key_hash=key_hash,
+                    )
+                except PT1PersistentStoreCorrupt as exc:
+                    raise UncacheableKey(
+                        PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                        "write_candidate_physics_bucket_bytes",
+                    ) from exc
+                if supplied_bucket_bytes != derived_bucket_bytes:
+                    raise UncacheableKey(
+                        PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                        "write_candidate_physics_bucket_bytes",
+                    )
+            if (
+                input_bucket_hash is not None
+                and input_bucket_hash != derived_bucket_hash
+            ):
+                raise UncacheableKey(
+                    PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                    "write_candidate_physics_bucket_hash",
+                )
+            input_bucket_key = derived_bucket_key
+            input_bucket_bytes = derived_bucket_bytes
+            input_bucket_hash = derived_bucket_hash
 
         derive_indexes = False
         if legacy_layout:
@@ -3508,7 +3598,7 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
             require_indexable=derive_indexes or not legacy_layout,
         )
         return row
-    except UncacheableKey:
+    except (UncacheableKey, UncacheablePayload):
         raise
     except Exception as exc:
         raise UncacheableKey(
@@ -3597,13 +3687,6 @@ class PT1PersistentEquilibriumStore:
         except PT1PersistentStoreCorrupt as exc:
             raise UncacheablePayload(artifact, key_hash) from exc
         payload_codec_version = _payload_codec_version(artifact)
-        if self.strict_vapor_gate:
-            assert_strict_vapor_pt1_row(
-                artifact=artifact,
-                key=key,
-                payload=payload,
-                key_hash=key_hash,
-            )
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
 
         insert_columns = (
@@ -3720,7 +3803,10 @@ class PT1PersistentEquilibriumStore:
                     entry["payload_hash"] != payload_hash
                     or canonical_json_bytes(entry["payload"]) != payload_bytes
                 ):
-                    raise UncacheablePayload(artifact, key_hash)
+                    raise PT1PersistentStoreCorrupt(
+                        "PT-1 payload conflict for identical cache key: "
+                        f"{artifact}: {key_hash}"
+                    )
                 existing_notices_json = entry["repair_notices_json"]
                 effective_notices_json = monotonic_repair_notices_json(
                     existing_notices_json,

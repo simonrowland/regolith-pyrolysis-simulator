@@ -216,6 +216,10 @@ def test_rekey_legacy_stamp_rejects_overflowing_key_as_corrupt(
     db_path = tmp_path / "legacy-overflow-key-cache.db"
     _write_rekeyable_rows(db_path, ("one",))
     with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN store_schema_version TEXT"
+        )
         key_hash, key_bytes = conn.execute(
             f"SELECT key_hash, key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
