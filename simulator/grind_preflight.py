@@ -545,7 +545,7 @@ def _strict_vapor_pt1_store_summary(
         ).fetchall()
     }
     checksum_columns = {"key_sha256", "payload_sha256"}
-    has_checksums = checksum_columns <= table_columns
+    has_checksums = bool(checksum_columns & table_columns)
     selected_columns = (
         "*"
         if has_checksums and strict_vapor_gate

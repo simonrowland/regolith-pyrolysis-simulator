@@ -4603,6 +4603,48 @@ def test_stored_row_json_decode_errors_miss_or_raise_typed(
         assert reader.hits == 1
 
 
+def test_ladder_and_interpolation_ignore_unused_ordinary_bucket_hash(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "unused-ordinary-bucket-index.sqlite"
+    key = _c3a_ladder_key(
+        "unused-ordinary-bucket-index",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    _put_c3a_payload(db_path, key, "unused-ordinary-bucket-index")
+    key_hash = _key_hash(key)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET physics_bucket_sha256 = ? WHERE key_hash = ?",
+            ("0" * 64, key_hash),
+        )
+
+    persistent = PT1PersistentEquilibriumStore(db_path)
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    rung_hash = rrd._sha256(canonical_json_bytes(rung_key))
+    assert persistent._get_by_physics_ladder_bucket(
+        artifact="equilibrium_post_record",
+        rung_tag=rung_tag,
+        rung_key=rung_key,
+        rung_hash=rung_hash,
+        query_key=key,
+    ) is not None
+
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    candidates = persistent._list_interpolation_candidates(
+        artifact="equilibrium_post_record",
+        replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
+        query_key=key,
+    )
+    assert [candidate["key_hash"] for candidate in candidates] == [key_hash]
+
+
 @pytest.mark.parametrize(
     "reader",
     ("exact", "interpolation", "bucket", "ladder"),
@@ -4737,6 +4779,42 @@ def _rewrite_pt1_key_and_derived_indexes(
             (*values, original_key_hash),
         )
     return key_bytes, key_hash, bucket_key, bucket_bytes
+
+
+def test_pt1_current_layout_key_dependency_corruption_precedes_stale_codec_miss(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "stale-codec-invalid-key-dependency.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    entry = next(iter(capture._entries.values()))
+    key = copy.deepcopy(entry["key"])
+    key["model"] = []
+    key_bytes, key_hash, _bucket_key, _bucket_bytes = (
+        _rewrite_pt1_key_and_derived_indexes(
+            db_path,
+            str(entry["key_hash"]),
+            key,
+        )
+    )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_codec_version = ? WHERE key_hash = ?",
+            (0, key_hash),
+        )
+
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="invalid stored equilibrium replay key dependency fields",
+    ):
+        PT1PersistentEquilibriumStore(db_path)._get_with_decoded(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+        )
 
 
 @pytest.mark.parametrize(
@@ -10256,54 +10334,6 @@ _PT1_LADDER_ROW_DEFECT_GROUPS = (
             ),
         ),
     ),
-    (
-        "bucket-bytes-decode",
-        _pt1_ladder_defects(
-            "bucket-bytes-decode",
-            "physics_key_bytes",
-            (
-                ("missing", None, "invalid physics bucket key bytes"),
-                ("invalid-storage-type", -1, "invalid physics bucket key bytes"),
-            ),
-        ),
-    ),
-    (
-        "bucket-schema",
-        _pt1_ladder_defects(
-            "bucket-schema",
-            "physics_bucket_schema_version",
-            (
-                ("invalid", "bad", "does not reproduce physics bucket"),
-                ("finite-wrong", -1, "does not reproduce physics bucket"),
-            ),
-        ),
-    ),
-    (
-        "bucket-hash",
-        _pt1_ladder_defects(
-            "bucket-hash",
-            "physics_bucket_sha256",
-            (
-                ("missing", None, "does not reproduce physics bucket"),
-                ("invalid", "bad", "does not reproduce physics bucket"),
-                ("finite-wrong", "0" * 64, "does not reproduce physics bucket"),
-            ),
-        ),
-    ),
-    (
-        "bucket-bytes-reproduction",
-        _pt1_ladder_defects(
-            "bucket-bytes-reproduction",
-            "physics_key_bytes",
-            (
-                (
-                    "finite-wrong",
-                    sqlite3.Binary(b"{}"),
-                    "does not reproduce physics bucket",
-                ),
-            ),
-        ),
-    ),
     *tuple(
         group
         for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
@@ -12378,6 +12408,69 @@ def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
         )
 
     assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
+
+
+def test_strict_pt1_put_gates_the_payload_bytes_it_writes(
+    tmp_path: Path,
+) -> None:
+    key = _strict_vapor_key()
+    payload = {
+        "authority": _alphamelts_record_authority(),
+        "equilibrium_result": {"status": "ok"},
+        "last_vapor_pressures_source": {
+            "Na": "builtin_authoritative:standard_reaction_term"
+        },
+    }
+    written_payload = copy.deepcopy(payload)
+    written_payload["last_vapor_pressures_source"]["Na"] = "builtin_fallback"
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(written_payload)
+    db_path = tmp_path / "strict-pt1-mismatched-payload-bytes.sqlite"
+    store = rrd.PT1PersistentEquilibriumStore(db_path, strict_vapor_gate=True)
+
+    with pytest.raises(GrindSourceGateError, match="builtin_fallback"):
+        store.put(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=hashlib.sha256(key_bytes).hexdigest(),
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+        )
+
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
+
+
+@pytest.mark.parametrize(
+    ("removed_checksum", "corrupted_checksum"),
+    (
+        ("payload_sha256", "key_sha256"),
+        ("key_sha256", "payload_sha256"),
+    ),
+)
+def test_strict_preflight_verifies_each_checksum_column_that_exists(
+    tmp_path: Path,
+    removed_checksum: str,
+    corrupted_checksum: str,
+) -> None:
+    db_path = tmp_path / f"strict-pt1-only-{corrupted_checksum}.sqlite"
+    _put_strict_pt1_equilibrium_row(db_path, source="builtin_authoritative")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} DROP COLUMN {removed_checksum}"
+        )
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {corrupted_checksum} = ?",
+            ("0" * 64,),
+        )
+
+    with pytest.raises(GrindSourceGateError, match="stored row is corrupt"):
+        assert_strict_vapor_result_store(
+            db_path,
+            lambda _path, _payload: (None, None),
+            strict_vapor_gate=True,
+        )
 
 
 def _retain_pt1_table_columns(

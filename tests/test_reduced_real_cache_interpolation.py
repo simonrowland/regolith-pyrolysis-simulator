@@ -300,7 +300,10 @@ def test_pt1_exact_lookup_rejects_legacy_stamp_on_current_layout(
             ("pt1", key_hash),
         )
 
-    with pytest.raises(rrd.PT1PersistentStoreCorrupt, match="current-layout"):
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="store schema version drift",
+    ):
         PT1PersistentEquilibriumStore(db_path).get(
             artifact="equilibrium_post_record",
             key=key,

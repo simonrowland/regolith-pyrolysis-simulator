@@ -144,7 +144,7 @@ def _table_columns(conn: sqlite3.Connection) -> set[str]:
 def _has_current_layout(columns: set[str]) -> bool:
     return (
         set(_PT1_SOURCE_REQUIRED_TEXT_FIELDS)
-        | {"key_bytes", "payload_bytes", "git_dirty"}
+        | {"key_bytes", "payload_bytes", "payload_codec_version", "git_dirty"}
     ) <= columns
 
 
@@ -266,6 +266,15 @@ def rekey_cache(
             ),
         }
         physics_columns_present = physics_index_columns & table_columns
+        preserved_payload_columns = tuple(
+            column
+            for column in (
+                "payload_bytes",
+                "payload_sha256",
+                "repair_notices_json",
+            )
+            if column in table_columns
+        )
         if current_layout:
             selection = "*"
         else:
@@ -279,6 +288,7 @@ def rekey_cache(
                 )
                 if column in table_columns
             )
+            selected_columns.extend(preserved_payload_columns)
             selected_columns.extend(sorted(physics_columns_present))
             selection = ", ".join(
                 f'"{column}"' for column in selected_columns
@@ -298,6 +308,9 @@ def rekey_cache(
             if not replace_rekey_cache_identity(key, target):
                 continue
             old_key_hash = str(row["key_hash"])
+            preserved_payload_values = tuple(
+                row_values[column] for column in preserved_payload_columns
+            )
             row_columns = set(row.keys())
             artifact = row["artifact"] if "artifact" in row_columns else None
             legacy_layout = (
@@ -379,6 +392,24 @@ def rekey_cache(
                 """,
                 tuple(values),
             )
+            if preserved_payload_columns:
+                quoted_columns = ", ".join(
+                    f'"{column}"' for column in preserved_payload_columns
+                )
+                persisted = conn.execute(
+                    f"SELECT {quoted_columns} FROM {PT1_EQUILIBRIUM_TABLE} "
+                    "WHERE key_hash = ?",
+                    (key_hash,),
+                ).fetchone()
+                if persisted is None:
+                    raise PT1PersistentStoreCorrupt(
+                        f"PT-1 rekeyed row disappeared before commit: {key_hash}"
+                    )
+                persisted_values = tuple(persisted)
+                if persisted_values != preserved_payload_values:
+                    raise PT1PersistentStoreCorrupt(
+                        f"PT-1 rekey changed stored payload fields: {key_hash}"
+                    )
             updated += 1
 
         conn.commit()

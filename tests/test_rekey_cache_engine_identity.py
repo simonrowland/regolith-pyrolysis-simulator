@@ -424,9 +424,23 @@ def test_rekey_compact_table_overlapping_preflight_signature(
             "ADD COLUMN payload_bytes BLOB"
         )
         conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN payload_sha256 TEXT"
+        )
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN repair_notices_json TEXT"
+        )
+        conn.execute(
             f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
-            "SET artifact = ?, payload_bytes = ?",
-            ("equilibrium_post_record", sqlite3.Binary(opaque_payload)),
+            "SET artifact = ?, payload_bytes = ?, payload_sha256 = ?, "
+            "repair_notices_json = ?",
+            (
+                "equilibrium_post_record",
+                sqlite3.Binary(opaque_payload),
+                hashlib.sha256(opaque_payload).hexdigest(),
+                '[{"kind":"legacy"}]',
+            ),
         )
 
     result = rekey.rekey_cache(
@@ -436,10 +450,13 @@ def test_rekey_compact_table_overlapping_preflight_signature(
 
     assert result.rows_updated == 1
     with sqlite3.connect(db_path) as conn:
-        (stored_payload,) = conn.execute(
-            f"SELECT payload_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        stored_payload, stored_hash, stored_notices = conn.execute(
+            f"SELECT payload_bytes, payload_sha256, repair_notices_json "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
     assert bytes(stored_payload) == opaque_payload
+    assert stored_hash == hashlib.sha256(opaque_payload).hexdigest()
+    assert stored_notices == '[{"kind":"legacy"}]'
 
 
 def test_rekey_legacy_stamp_rejects_overflowing_key_as_corrupt(

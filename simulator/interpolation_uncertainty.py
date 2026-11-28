@@ -266,7 +266,10 @@ def _cache_distance_component(
     neighbors: Sequence[Mapping[str, Any]],
 ) -> dict[str, Any]:
     distances = [
-        _finite_float(neighbor.get("interpolation_distance"))
+        _finite_float(
+            neighbor.get("interpolation_distance"),
+            preserve_infinity=True,
+        )
         for neighbor in neighbors
     ]
     distances = [value for value in distances if value is not None]
@@ -696,14 +699,18 @@ def _alkali_present(alkali: str, species: Sequence[str]) -> bool:
     return any(name == alkali or name.startswith(prefixes) for name in species)
 
 
-def _finite_float(value: Any) -> float | None:
+def _finite_float(value: Any, *, preserve_infinity: bool = False) -> float | None:
     if not is_declared_real_scalar(value, allow_numeric_str=True):
         return None
     try:
         result = float(value)
+    except OverflowError:
+        if preserve_infinity:
+            return -math.inf if value < 0 else math.inf
+        return None
     except (TypeError, ValueError):
         return None
-    if not math.isfinite(result):
+    if math.isnan(result) or (not preserve_infinity and not math.isfinite(result)):
         return None
     return result
 

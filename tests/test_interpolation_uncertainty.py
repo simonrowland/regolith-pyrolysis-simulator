@@ -134,6 +134,32 @@ def test_cache_distance_keeps_direct_infinite_neighbor_distance() -> None:
     assert component["mean_neighbor_distance"] == math.inf
 
 
+def test_cache_distance_keeps_supplied_infinity_alongside_finite_distance() -> None:
+    query = _key("query", temperature_K=1500.0)
+    neighbors = [
+        _neighbor(
+            "infinite",
+            temperature_K=1500.0,
+            liquid_fraction=0.7,
+            distance=math.inf,
+        ),
+        _neighbor(
+            "finite",
+            temperature_K=1510.0,
+            liquid_fraction=0.8,
+            distance=0.025,
+        ),
+    ]
+
+    component = build_interpolation_uncertainty_vector(
+        query,
+        neighbors,
+    )["components"][CACHE_DISTANCE]
+
+    assert component["max_neighbor_distance"] == math.inf
+    assert component["mean_neighbor_distance"] == math.inf
+
+
 def test_threshold_straddle_is_categorical_non_interpolable_near_liquidus() -> None:
     vector = build_interpolation_uncertainty_vector(
         _key("query", temperature_K=1500.0),
