@@ -1792,6 +1792,8 @@ _FUSION_TABLES = {
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
     "SrO": ("O-013", "O-014"),
+    # O-052/O-053 share the printed ZrO2(II) <--> liquid transition.
+    "ZrO2": ("O-052", "O-053"),
 }
 
 # The source hashes identify the JANAF text; pin the extracted temperature-node
@@ -1817,6 +1819,8 @@ _FUSION_NODE_SET_SHA256 = {
     "Mg-009": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
     "O-038": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
+    "O-052": "012e3beabbec56b9aff592b4f1b770b81c09201354d8876e0994c1fac62764f4",
+    "O-053": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
 }
 
 _ACCEPTED_MELTING_K = {
@@ -1831,6 +1835,8 @@ _ACCEPTED_MELTING_K = {
     "SiO2": Decimal("1986"),
     # O-013/O-014 print the crystal <--> liquid transition at 2938 K.
     "SrO": Decimal("2938"),
+    # O-052/O-053 print the ZrO2(II) <--> liquid transition at 2950 K.
+    "ZrO2": Decimal("2950"),
 }
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))

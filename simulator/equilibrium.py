@@ -24,6 +24,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_range_K,
     ellingham_metal_phase_kind,
+    ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
 from simulator.chemistry.melt_activity import (
@@ -69,16 +70,18 @@ def _oxide_liquid_standard_log10_factor_per_oxide(
 ) -> float:
     """Return log10(K_liquid/K_crystal) for one oxide formula unit.
 
-    Premise: Mg and Ca decomposition/vaporization rows use crystalline JANAF
-    oxide standards, while melt activities are Raoultian on the liquid
-    standard. JANAF Mg-008/Mg-009 and Ca-027/Ca-028 supply
-    ΔG_fus° = G°(oxide,l) - G°(oxide,cr). Replacing n crystalline reactants
-    with liquid-standard activities gives ΔG°_liq = ΔG°_cr +
+    Premise: a crystalline-oxide K combined with liquid-standard melt
+    activities needs ΔG_fus° = G°(oxide,l) - G°(oxide,cr). The JANAF pairs
+    provide this for MgO (Mg-008/Mg-009), CaO (Ca-027/Ca-028), Al2O3
+    (Al-096/Al-100), TiO2 (O-043/O-044), Cr2O3 (Cr-014/Cr-015), and ZrO2
+    (O-052/O-053). Algebra: replacing n crystalline oxide formula units with
+    liquid-standard activities gives ΔG°_liq = ΔG°_cr +
     n(G°_cr - G°_liq), hence log10(K_liq/K_cr) per oxide is
     ΔG_fus°/(R T ln 10). Unit check: kJ/mol is converted to J/mol before
-    division by R T; the result is dimensionless. Sanity: at 2156.15 K the
-    JANAF factors are +0.542275 dex per MgO and +0.624220 dex per CaO; at a
-    crystal/liquid Gibbs crossing ΔG_fus°=0 and the correction vanishes.
+    division by R T; the result is dimensionless. Sanity: below melting the
+    liquid has higher Gibbs energy and the shift is positive; at the
+    crystal/liquid crossing ΔG_fus°=0 and the correction vanishes. At
+    2156.15 K the MgO and CaO factors are +0.542275 and +0.624220 dex.
     """
     from simulator.reference_data.janaf import janaf_fusion_energy
 
@@ -90,6 +93,27 @@ def _oxide_liquid_standard_log10_factor_per_oxide(
         * 1000.0
         / (GAS_CONSTANT * float(temperature_K) * math.log(10.0))
     )
+
+
+def _engine_model_standard_state_caveat(
+    *,
+    K_reference_phase: str,
+    activity_reference_phase: str,
+    temperature_K: float,
+    reason: str,
+) -> dict[str, Any]:
+    from simulator.policy.enums import NoticeKind
+
+    return {
+        'type': 'typed_notice',
+        'kind': NoticeKind.ENGINE_MODEL_CAVEAT.value,
+        'K_reference_phase': K_reference_phase,
+        'activity_reference_phase': activity_reference_phase,
+        'temperature_K': float(temperature_K),
+        'reference_phase_mismatch_magnitude': 'unknown',
+        'conversion_applied': False,
+        'reason': reason,
+    }
 
 
 def _internal_analytical_control_refusal(
@@ -1388,6 +1412,129 @@ class EquilibriumMixin:
                 K_decomp *= 10.0 ** (
                     n_ox * cao_liquid_standard_log10_factor
                 )
+            elif parent_oxide in {
+                'K2O', 'Al2O3', 'TiO2', 'Cr2O3', 'NiO', 'MnO', 'ZrO2'
+            }:
+                active_segment = ellingham_segment_for_temperature(
+                    species, T_K
+                )
+                source_phase_basis = active_segment.phase_basis
+                solid_phase_markers = {
+                    'K2O': 'K2O(cr)',
+                    'Al2O3': 'Al2O3(alpha,s)',
+                    'TiO2': 'TiO2(rutile,s)',
+                    'Cr2O3': 'Cr2O3(s)',
+                    'NiO': 'NiO(s)',
+                    'MnO': 'MnO(s)',
+                    'ZrO2': 'ZrO2(II)',
+                }
+                liquid_phase_markers = {
+                    'Al2O3': 'Al2O3(l)',
+                    'TiO2': 'TiO2(l)',
+                    'MnO': 'MnO(lit. liquid range)',
+                }
+                liquid_marker = liquid_phase_markers.get(parent_oxide)
+                if liquid_marker and liquid_marker in source_phase_basis:
+                    # The active Ellingham segment already carries the
+                    # liquid-oxide reference used by the melt activity.
+                    pass
+                else:
+                    source_phase_marker = solid_phase_markers[parent_oxide]
+                    source_phase_name = (
+                        f"{source_phase_marker}, {active_segment.janaf_anchor}"
+                    )
+                    activity_phase_name = (
+                        f'{parent_oxide}(l), liquid-standard melt activity'
+                    )
+                    pair_markers = {
+                        'Al2O3': 'Al2O3(alpha,s)',
+                        'TiO2': 'TiO2(rutile,s)',
+                        'Cr2O3': 'Cr2O3(s)',
+                        'ZrO2': 'ZrO2(II)',
+                    }
+                    if (
+                        parent_oxide in pair_markers
+                        and pair_markers[parent_oxide] in source_phase_basis
+                    ):
+                        try:
+                            liquid_standard_log10_factor = (
+                                _oxide_liquid_standard_log10_factor_per_oxide(
+                                    parent_oxide, T_K
+                                )
+                            )
+                        except ValueError as exc:
+                            activity_standard_state_flags[species] = (
+                                _engine_model_standard_state_caveat(
+                                    K_reference_phase=source_phase_name,
+                                    activity_reference_phase=activity_phase_name,
+                                    temperature_K=T_K,
+                                    reason=(
+                                        'The crystal/liquid JANAF pair cannot '
+                                        f'ground a conversion at this temperature: {exc}. '
+                                        'The crystalline K is retained with the '
+                                        'liquid-standard activity; mismatch '
+                                        'magnitude is unknown.'
+                                    ),
+                                )
+                            )
+                        else:
+                            # Premise: the listed JANAF crystal/liquid pair
+                            # gives ΔG_fus°=G°(oxide,l)-G°(oxide,cr), while
+                            # this Ellingham K consumes n_ox crystal formula
+                            # units. Algebra: log10(K_liq/K_cr)=n_ox*
+                            # ΔG_fus°/(R*T*ln(10)); the factor's per-formula
+                            # value comes from
+                            # _oxide_liquid_standard_log10_factor_per_oxide.
+                            # Units: the helper converts kJ/mol to J/mol;
+                            # n_ox is dimensionless and K remains dimensionless.
+                            # Sanity: the shift is zero at each melting
+                            # crossing and positive below Tm because the
+                            # liquid has the higher Gibbs energy there.
+                            K_decomp *= 10.0 ** (
+                                n_ox * liquid_standard_log10_factor
+                            )
+                    else:
+                        unresolved_reasons = {
+                            'K2O': (
+                                'The direct K liquid rail is based on the '
+                                'Lamoreaux & Hildenbrand 1984 K2O(l) Gibbs '
+                                'function, but this fallback K is based on '
+                                'JANAF K-012 K2O(cr). No same-source '
+                                'crystal/liquid Gibbs pair grounds their '
+                                'difference; K-012 also ends at 2000 K, below '
+                                'this temperature. The crystalline K is '
+                                'retained with the liquid-standard activity; '
+                                'mismatch magnitude is unknown.'
+                            ),
+                            'NiO': (
+                                'REF-058 supplies the NiO(s) K, but no '
+                                'matching JANAF NiO(l) pair covers this '
+                                'temperature; the compiled Burcat NiO(L) '
+                                'interval starts at 2228 K. The crystalline '
+                                'K is retained with the liquid-standard '
+                                'activity; mismatch magnitude is unknown.'
+                            ),
+                            'MnO': (
+                                'No grounded liquid MnO Gibbs table is '
+                                'available for this crystalline K. The K is '
+                                'retained with the liquid-standard activity; '
+                                'mismatch magnitude is unknown.'
+                            ),
+                        }
+                        activity_standard_state_flags[species] = (
+                            _engine_model_standard_state_caveat(
+                                K_reference_phase=source_phase_name,
+                                activity_reference_phase=activity_phase_name,
+                                temperature_K=T_K,
+                                reason=unresolved_reasons.get(
+                                    parent_oxide,
+                                    'The active crystalline K phase has no '
+                                    'matching grounded liquid reference pair. '
+                                    'The K is retained with the liquid-standard '
+                                    'activity; mismatch magnitude is unknown.',
+                                ),
+                            )
+                        )
 
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
             dissociation_pO2_bar = _surface_pO2_for_channel(species)
@@ -1563,26 +1710,22 @@ class EquilibriumMixin:
                     P_sat = reference_evaluation.pressure_pa
                     coefficient_block = 'compiled_reference_pressure_model'
                     if parent_oxide == 'CoO':
-                        from simulator.policy.enums import NoticeKind
-
-                        activity_standard_state_flags[name] = {
-                            'type': 'typed_notice',
-                            'kind': NoticeKind.ENGINE_MODEL_CAVEAT.value,
-                            'K_reference_phase': 'CoO(cr)',
-                            'activity_reference_phase': (
-                                'CoO(l), Raoultian pure-liquid'
-                            ),
-                            'temperature_K': T_K,
-                            'reference_phase_mismatch_magnitude': 'unknown',
-                            'conversion_applied': False,
-                            'reason': (
-                                'The available CoO(cr) -> CoO(g) '
-                                'standard-reaction K is retained with the '
-                                'liquid-standard activity; no grounded CoO '
-                                'crystal/liquid fusion pair bounds the '
-                                'reference-phase correction.'
-                            ),
-                        }
+                        activity_standard_state_flags[name] = (
+                            _engine_model_standard_state_caveat(
+                                K_reference_phase='CoO(cr)',
+                                activity_reference_phase=(
+                                    'CoO(l), Raoultian pure-liquid'
+                                ),
+                                temperature_K=T_K,
+                                reason=(
+                                    'The available CoO(cr) -> CoO(g) '
+                                    'standard-reaction K is retained with the '
+                                    'liquid-standard activity; no grounded CoO '
+                                    'crystal/liquid fusion pair bounds the '
+                                    'reference-phase correction.'
+                                ),
+                            )
+                        )
                 else:
                     reason = _antoine_skip_reason_for_refusal(exc)
                     _append_antoine_skip_notice(

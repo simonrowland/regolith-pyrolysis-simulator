@@ -77,6 +77,17 @@ def _run_typed_omission_sim(sim, monkeypatch, *, a_feo=1.0):
     return EquilibriumMixin._internal_analytical_equilibrium(sim)
 
 
+def _metal_ellingham_fallback_sim(species, parent_oxide, temperature_K):
+    row = {
+        'parent_oxide': parent_oxide,
+        'pure_component_antoine': {'A': 0.0, 'B': 0.0, 'C': 0.0},
+        'valid_range_K': [1000.0, 3000.0],
+    }
+    sim = _typed_omission_sim(metals={species: row}, species=(species,))
+    sim.melt.temperature_C = temperature_K - CELSIUS_TO_KELVIN_OFFSET
+    return sim
+
+
 def test_internal_analytical_cold_path_still_ok_at_25_c():
     result = EquilibriumMixin._internal_analytical_equilibrium(
         _minimal_sim(temperature_C=25.0, p_total_mbar=1.0)
@@ -205,6 +216,166 @@ def test_internal_analytical_ca_pressure_uses_liquid_standard_conversion(
         10.0**log10_factor,
         rel=1e-12,
     )
+
+
+@pytest.mark.parametrize(
+    (
+        'species',
+        'oxide',
+        'temperature_K',
+        'liquid_standard_factor_dex',
+        'pressure_dex_per_oxide_dex',
+    ),
+    [
+        ('Al', 'Al2O3', 2156.15, 0.1884078657, 0.5),
+        ('Ti', 'TiO2', 2073.15, 0.0443590835, 1.0),
+        ('Cr', 'Cr2O3', 2156.15, 0.5246179442, 0.5),
+        ('Zr', 'ZrO2', 2156.15, 0.5289049456, 1.0),
+    ],
+)
+def test_internal_analytical_crystal_ellingham_k_is_converted_to_liquid(
+    monkeypatch,
+    species,
+    oxide,
+    temperature_K,
+    liquid_standard_factor_dex,
+    pressure_dex_per_oxide_dex,
+):
+    original_factor = (
+        equilibrium_module._oxide_liquid_standard_log10_factor_per_oxide
+    )
+    log10_factor = original_factor(oxide, temperature_K)
+    assert log10_factor == pytest.approx(liquid_standard_factor_dex, abs=1e-6)
+
+    sim = _metal_ellingham_fallback_sim(species, oxide, temperature_K)
+    oxide_activity = SimpleNamespace(
+        activity=1e-8,
+        warning=None,
+        equivalent_parent_activity=lambda exponent: 1e-8 ** (1.0 / exponent),
+        provenance=lambda: {},
+    )
+    monkeypatch.setattr(
+        equilibrium_module,
+        'melt_oxide_activity',
+        lambda *_args, **_kwargs: oxide_activity,
+    )
+    converted_pressure = _run_typed_omission_sim(sim, monkeypatch).vapor_pressures_Pa[
+        species
+    ]
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            equilibrium_module,
+            '_oxide_liquid_standard_log10_factor_per_oxide',
+            lambda current_oxide, _temperature_K: (
+                0.0 if current_oxide == oxide
+                else original_factor(current_oxide, _temperature_K)
+            ),
+        )
+        crystal_standard_pressure = _run_typed_omission_sim(
+            sim, monkeypatch
+        ).vapor_pressures_Pa[species]
+
+    assert converted_pressure / crystal_standard_pressure == pytest.approx(
+        10.0 ** (pressure_dex_per_oxide_dex * log10_factor),
+        rel=1e-12,
+    )
+
+
+@pytest.mark.parametrize(
+    ('species', 'oxide', 'temperature_K'),
+    [
+        ('Al', 'Al2O3', 2400.0),
+        ('Ti', 'TiO2', 2156.15),
+        ('Mn', 'MnO', 2156.15),
+    ],
+)
+def test_internal_analytical_liquid_ellingham_source_is_not_shifted(
+    monkeypatch, species, oxide, temperature_K
+):
+    original_factor = (
+        equilibrium_module._oxide_liquid_standard_log10_factor_per_oxide
+    )
+    oxide_activity = SimpleNamespace(
+        activity=1e-8,
+        warning=None,
+        equivalent_parent_activity=lambda exponent: 1e-8 ** (1.0 / exponent),
+        provenance=lambda: {},
+    )
+    monkeypatch.setattr(
+        equilibrium_module,
+        'melt_oxide_activity',
+        lambda *_args, **_kwargs: oxide_activity,
+    )
+
+    def reject_liquid_source_shift(current_oxide, current_temperature_K):
+        if current_oxide == oxide:
+            pytest.fail(f'{species} source K is already on the liquid oxide standard')
+        return original_factor(current_oxide, current_temperature_K)
+
+    monkeypatch.setattr(
+        equilibrium_module,
+        '_oxide_liquid_standard_log10_factor_per_oxide',
+        reject_liquid_source_shift,
+    )
+    sim = _metal_ellingham_fallback_sim(species, oxide, temperature_K)
+    result = _run_typed_omission_sim(sim, monkeypatch)
+
+    assert species in result.vapor_pressures_Pa
+    assert species not in result.diagnostics['activity_standard_state_flags']
+
+
+@pytest.mark.parametrize(
+    ('species', 'oxide', 'temperature_K'),
+    [
+        ('K', 'K2O', 2156.15),
+        ('Ni', 'NiO', 2156.15),
+        ('Mn', 'MnO', 2000.0),
+    ],
+)
+def test_internal_analytical_unresolved_oxide_standard_keeps_pressure_with_caveat(
+    monkeypatch, species, oxide, temperature_K
+):
+    oxide_activity = SimpleNamespace(
+        activity=1e-8,
+        warning=None,
+        equivalent_parent_activity=lambda exponent: 1e-8 ** (1.0 / exponent),
+        provenance=lambda: {},
+    )
+    monkeypatch.setattr(
+        equilibrium_module,
+        'melt_oxide_activity',
+        lambda *_args, **_kwargs: oxide_activity,
+    )
+    result = _run_typed_omission_sim(
+        _metal_ellingham_fallback_sim(species, oxide, temperature_K),
+        monkeypatch,
+    )
+    caveat = result.diagnostics['activity_standard_state_flags'][species]
+
+    assert species in result.vapor_pressures_Pa
+    assert caveat['type'] == 'typed_notice'
+    assert caveat['kind'] == 'engine_model_caveat'
+    assert caveat['K_reference_phase'].startswith(oxide)
+    assert caveat['activity_reference_phase'].startswith(f'{oxide}(l)')
+    assert caveat['reference_phase_mismatch_magnitude'] == 'unknown'
+    assert caveat['conversion_applied'] is False
+    if oxide == 'K2O':
+        assert 'Lamoreaux & Hildenbrand 1984 K2O(l)' in caveat['reason']
+        assert 'JANAF K-012' in caveat['reason']
+
+
+@pytest.mark.parametrize(
+    ('oxide', 'melting_temperature_K'),
+    [('Al2O3', 2327.0), ('TiO2', 2130.0), ('Cr2O3', 2603.0), ('ZrO2', 2950.0)],
+)
+def test_oxide_liquid_standard_shift_is_zero_at_melting_and_positive_below(
+    oxide, melting_temperature_K
+):
+    factor = equilibrium_module._oxide_liquid_standard_log10_factor_per_oxide
+
+    assert factor(oxide, melting_temperature_K) == pytest.approx(0.0, abs=1e-3)
+    assert factor(oxide, melting_temperature_K - 100.0) > 0.0
 
 
 def test_internal_analytical_cao_vapor_uses_liquid_standard_conversion(
