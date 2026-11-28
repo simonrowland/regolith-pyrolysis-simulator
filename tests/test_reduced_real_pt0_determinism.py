@@ -7120,6 +7120,246 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
         )
         payload_bytes = canonical_json_bytes(payload)
         key_hash = rrd._sha256(key_bytes)
+        return {
+            "artifact": "freeze_gate_curve",
+            "key_hash": key_hash,
+            "key_sha256": key_hash,
+            "key_bytes": key_bytes,
+            "payload_bytes": payload_bytes,
+            "payload_sha256": rrd._sha256(payload_bytes),
+            "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
+        }
+
+    stale_payload = payload_for([0.0, 100.0])
+    valid_payload = payload_for([30.0, 80.0])
+    assert not rrd._pt1_row_admission(row_for(stale_payload))
+    assert rrd._pt1_row_admission(row_for(valid_payload))
+    reversed_band_key = copy.deepcopy(rrd._json_ready(key))
+    reversed_band_key["freeze_gate_cache_key"][7]["certified_band"] = [
+        80.0,
+        30.0,
+    ]
+    reversed_identity = rrd._magemin_identity_from_replay_key(reversed_band_key)
+    assert reversed_identity is not None
+    assert reversed_identity.silica_verdict == "extrapolated"
+    assert reversed_identity.certified_band == (80.0, 30.0)
+    assert not rrd._pt1_row_admission(
+        row_for(
+            payload_for([80.0, 30.0]),
+            replay_key=reversed_band_key,
+        )
+    )
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "d447-query-identity-readers.sqlite",
+    )
+    store._store("freeze_gate_curve", key, valid_payload, law_disclosures=[])
+    wrong_query_key = copy.deepcopy(rrd._json_ready(key))
+    identity_payload = wrong_query_key["freeze_gate_cache_key"][7]
+    identity_payload["certified_band"] = [31.0, 80.0]
+    wrong_identity = rrd._magemin_identity_from_replay_key(wrong_query_key)
+    assert wrong_identity is not None
+    assert wrong_identity.silica_verdict == "extrapolated"
+    assert wrong_identity.certified_band == (31.0, 80.0)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    assert canonical_physics_bucket_key_from_replay_key(
+        wrong_query_key
+    ) == bucket_key
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    bucket_hash = rrd._sha256(bucket_bytes)
+
+    assert store._entry_for_physics_bucket(
+        "freeze_gate_curve",
+        bucket_key,
+        query_key=wrong_query_key,
+    ) is None
+    persistent = store.persistent_store
+    assert persistent is not None
+    assert persistent._get_by_physics_bucket(
+        artifact="freeze_gate_curve",
+        physics_bucket_key=bucket_key,
+        physics_bucket_bytes=bucket_bytes,
+        physics_bucket_hash=bucket_hash,
+        query_key=wrong_query_key,
+    ) is None
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    assert rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        wrong_query_key,
+        rung_tag,
+    ) == rung_key
+    rung_hash = rrd._sha256(canonical_json_bytes(rung_key))
+    assert persistent._get_by_physics_ladder_bucket(
+        artifact="freeze_gate_curve",
+        rung_tag=rung_tag,
+        rung_key=rung_key,
+        rung_hash=rung_hash,
+        query_key=wrong_query_key,
+    ) is None
+    assert persistent._list_interpolation_candidates(
+        artifact="freeze_gate_curve",
+        replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
+        query_key=wrong_query_key,
+    ) == []
+
+    # The inverse mismatch also matters: an extrapolated row can be valid
+    # for its stored identity and still be incompatible with an in-band query.
+    stored_wrong_band_key = copy.deepcopy(rrd._json_ready(key))
+    stored_identity_payload = stored_wrong_band_key[
+        "freeze_gate_cache_key"
+    ][7]
+    stored_identity_payload["certified_band"] = [0.0, 100.0]
+    in_band_query_key = copy.deepcopy(rrd._json_ready(key))
+    in_band_identity_payload = in_band_query_key[
+        "freeze_gate_cache_key"
+    ][7]
+    in_band_identity_payload["silica_verdict"] = "in_band"
+    in_band_identity_payload["certified_band"] = None
+    stored_identity = rrd._magemin_identity_from_replay_key(
+        stored_wrong_band_key
+    )
+    in_band_identity = rrd._magemin_identity_from_replay_key(
+        in_band_query_key
+    )
+    assert stored_identity is not None
+    assert stored_identity.silica_verdict == "extrapolated"
+    assert stored_identity.certified_band == (0.0, 100.0)
+    assert in_band_identity is not None
+    assert in_band_identity.silica_verdict == "in_band"
+    assert in_band_identity.certified_band is None
+
+    wrong_band_store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "d447-stored-identity-readers.sqlite",
+    )
+    wrong_band_store._store(
+        "freeze_gate_curve",
+        stored_wrong_band_key,
+        payload_for([0.0, 100.0]),
+        law_disclosures=[],
+    )
+    stored_bucket_key = canonical_physics_bucket_key_from_replay_key(
+        stored_wrong_band_key
+    )
+    in_band_bucket_key = canonical_physics_bucket_key_from_replay_key(
+        in_band_query_key
+    )
+    assert stored_bucket_key == in_band_bucket_key
+    stored_bucket_bytes = canonical_json_bytes(stored_bucket_key)
+    stored_bucket_hash = rrd._sha256(stored_bucket_bytes)
+    assert wrong_band_store._entry_for_physics_bucket(
+        "freeze_gate_curve",
+        stored_bucket_key,
+        query_key=in_band_query_key,
+    ) is None
+    wrong_band_persistent = wrong_band_store.persistent_store
+    assert wrong_band_persistent is not None
+    assert wrong_band_persistent._get_by_physics_bucket(
+        artifact="freeze_gate_curve",
+        physics_bucket_key=in_band_bucket_key,
+        physics_bucket_bytes=stored_bucket_bytes,
+        physics_bucket_hash=stored_bucket_hash,
+        query_key=in_band_query_key,
+    ) is None
+    stored_rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        stored_wrong_band_key,
+        rung_tag,
+    )
+    in_band_rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        in_band_query_key,
+        rung_tag,
+    )
+    assert stored_rung_key == in_band_rung_key
+    stored_rung_hash = rrd._sha256(canonical_json_bytes(stored_rung_key))
+    assert wrong_band_store._entry_for_physics_ladder_bucket(
+        "freeze_gate_curve",
+        rung_tag,
+        in_band_rung_key,
+        query_key=in_band_query_key,
+    ) is None
+    assert wrong_band_persistent._get_by_physics_ladder_bucket(
+        artifact="freeze_gate_curve",
+        rung_tag=rung_tag,
+        rung_key=in_band_rung_key,
+        rung_hash=stored_rung_hash,
+        query_key=in_band_query_key,
+    ) is None
+    assert wrong_band_persistent._list_interpolation_candidates(
+        artifact="freeze_gate_curve",
+        replay_scope_sha256=rrd._replay_scope_hash(in_band_bucket_key),
+        query_key=in_band_query_key,
+    ) == []
+
+
+def test_extrapolated_gate_admission_uses_query_identity_at_each_reader_with_complete_indexed_row(
+    tmp_path: Path,
+) -> None:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    sim = _build_pt0_sim(None)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim._liquid_fraction_provider = "magemin"
+    register_synthetic_gate_curve_producer(sim)
+    composition_wt_pct = {"SiO2": 80.001, "MgO": 10.0, "FeO": 9.999}
+    composition_mol = {
+        species: amount
+        / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        composition_mol,
+        source="d447 PT-1 row-admission request key",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger = ledger
+    sim._chem_kernel = sim._build_chemistry_kernel()
+    sim.inventory.inert_melt_components_kg.clear()
+    sim._project_cleaned_melt_from_atom_ledger()
+    key = canonical_replay_key(
+        sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=float(sim._current_melt_redox_fO2_log()),
+        fe_redox_policy="intrinsic",
+        provider_role="fallback",
+    )
+
+    def payload_for(silica_bounds: list[float]) -> dict[str, Any]:
+        return {
+            "curve": {
+                "source": "gate_liquid_fraction:fallback:magemin-shadow",
+                "solidus_T_C": 1200.0,
+                "liquidus_T_C": 1300.0,
+                "path": [
+                    {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                    {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+                ],
+                "is_liquidus_floor": False,
+                "authority": "extrapolated",
+                "certified_band": {"sio2_wt_pct": silica_bounds},
+            }
+        }
+
+    def row_for(
+        payload: Mapping[str, Any],
+        *,
+        replay_key: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        key_bytes = canonical_json_bytes(
+            key if replay_key is None else replay_key
+        )
+        payload_bytes = canonical_json_bytes(payload)
+        key_hash = rrd._sha256(key_bytes)
         selected_key = key if replay_key is None else replay_key
         bucket_key = canonical_physics_bucket_key_from_replay_key(selected_key)
         bucket_bytes = canonical_json_bytes(bucket_key)
