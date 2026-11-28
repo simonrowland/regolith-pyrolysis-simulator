@@ -441,6 +441,17 @@ def test_markova_openimcc_scores_printed_cells_and_keeps_card_blocked(
     assert (group["n_required"], group["n_numeric"], group["n_no_band"]) == (55, 55, 55)
 
 
+# Owner-ratified CPU budget (2026-11-27, via the train): on tree
+# 8d953a6cd26d42310b9fba5851c4f87dc0991d13, the controller's cold
+# (no runner engine cache) studio-1 Mac-Studio-256-1 run measured 447.900
+# CPU-s / 476.703 wall s (one fresh sample, serial -n 0, load average ~31
+# at start). Use ceil(1.5 x measured CPU-s) = 672 s for the one-sample margin.
+# Keep this Markova redox diagnostic pin nightly in the serial chain. Planned
+# cost fixes: the pending ~30% bit-identical IA Knudsen ODE speed-up and an
+# analytic oxygen-balance Jacobian.
+@pytest.mark.nightly
+@pytest.mark.cpu_budget(672)
+@pytest.mark.xdist_group("serial")
 def test_markova_partial_residue_score_carries_redox_diagnostic(
     fresh_mass_loss_extracts,
 ) -> None:
@@ -532,6 +543,17 @@ def _markova_vi_silica(context, temperature_K):
     )
 
 
+# Owner-ratified CPU budget (2026-11-27, via the train): on tree
+# 8d953a6cd26d42310b9fba5851c4f87dc0991d13, the controller's cold
+# (no runner engine cache) studio-1 Mac-Studio-256-1 run measured 880.972
+# CPU-s / 928.855 wall s (one fresh sample, serial -n 0, load average ~31
+# at start). Use ceil(1.5 x measured CPU-s) = 1322 s for the one-sample margin.
+# Keep this Markova analytical VI score pin nightly in the serial chain.
+# Planned cost fixes: the pending ~30% bit-identical IA Knudsen ODE speed-up
+# and an analytic oxygen-balance Jacobian.
+@pytest.mark.nightly
+@pytest.mark.cpu_budget(1322)
+@pytest.mark.xdist_group("serial")
 def test_markova_analytical_vi_2207_scores_after_exhaustion(fresh_mass_loss_extracts) -> None:
     from simulator.accounting.formulas import parse_formula
     _richter_result, markova = fresh_mass_loss_extracts

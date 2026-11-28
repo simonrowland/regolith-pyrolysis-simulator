@@ -174,6 +174,14 @@ HEAVY_ROSTER = frozenset({
     # sample, not the 5400 s sibling ceiling (measured 1728 s elsewhere).
     ("tests/chemistry/test_condensation_green_pins.py",
      "test_green_full_lunar_capture_pin"),
+    # Owner-ratified b274 Markova CPU-budget fold (2026-11-27, via the train):
+    # retain the analytical VI score and partial-residue redox diagnostic
+    # pins, whose one-sample cold CPU costs exceed the default ceiling. Both
+    # stay nightly in the existing serial chain with the approved 1.5x caps.
+    ("tests/battery/test_mass_loss_fraction_scoring.py",
+     "test_markova_analytical_vi_2207_scores_after_exhaustion"),
+    ("tests/battery/test_mass_loss_fraction_scoring.py",
+     "test_markova_partial_residue_score_carries_redox_diagnostic"),
 })
 
 # b-586: these campaign-length yield nodes must stay out of the PR tier. They
