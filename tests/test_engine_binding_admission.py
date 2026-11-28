@@ -389,6 +389,74 @@ def test_synthetic_reviewed_pin_admits_matching_projection(tmp_path: Path) -> No
     assert receipt["entries"][0]["comparison"]["status"] == "matched"
 
 
+def test_engine_chemistry_version_bump_refuses_binding_receipt(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+
+    identity = BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "alphamelts-r1", "subprocess"
+    )
+    candidate = BindingAssessmentCandidate(
+        identity=identity,
+        artifact="equilibrium_post_record",
+        simulator=None,
+        result=None,
+        provenance={"binding_provenance_verifiable": True},
+    )
+    pin_path = tmp_path / "reviewed.json"
+    monkeypatch.setattr(
+        admission,
+        "_pin_for",
+        lambda _identity, _artifact, _pin_root: (
+            pin_path,
+            {"projection": {"case": "matched"}},
+        ),
+    )
+    monkeypatch.setattr(
+        admission, "_projection", lambda _candidate: {"case": "matched"}
+    )
+    receipt_path = tmp_path / "receipt.json"
+
+    assess_bindings(
+        [candidate],
+        pin_directory=tmp_path,
+        receipt_path=receipt_path,
+    )
+
+    receipt = json.loads(receipt_path.read_text())
+    assert receipt["entries"][0]["provenance"][
+        "engine_chemistry_versions"
+    ] == {"alphamelts": engine_cache.ENGINE_CHEMISTRY_VERSION["alphamelts"]}
+    monkeypatch.setitem(
+        engine_cache.ENGINE_CHEMISTRY_VERSION,
+        "alphamelts",
+        engine_cache.ENGINE_CHEMISTRY_VERSION["alphamelts"] + 1,
+    )
+
+    with pytest.raises(
+        EngineBindingAdmissionError,
+        match="engine chemistry version mismatch",
+    ):
+        authorize_binding(
+            identity,
+            candidate.provenance,
+            receipt_path=receipt_path,
+        )
+
+
+def test_binding_receipt_refuses_producer_without_owned_chemistry_version():
+    from simulator.engine_cache import EngineCacheChemistryVersionError
+
+    identity = BindingIdentity(
+        "sulfsat", "SulfSatGate", "sulfsat-r1", "python_api"
+    )
+
+    with pytest.raises(EngineCacheChemistryVersionError):
+        admission._with_current_engine_chemistry_versions(identity, {})
+
+
 def test_projection_mismatch_is_recorded_but_not_admitted(tmp_path: Path) -> None:
     candidate = _candidate(curve={**SYNTHETIC_CURVE, "liquidus_T_C": 1301.0})
     receipt_path = _assess(tmp_path, candidate)

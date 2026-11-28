@@ -488,6 +488,41 @@ ENGINE_CHEMISTRY_VERSION = {
     "thermoengine": 4,
 }
 
+
+class EngineCacheChemistryVersionError(ValueError):
+    """The requested producer has no engine-cache chemistry version."""
+
+    def __init__(self, unknown_producers: Iterable[object]) -> None:
+        self.unknown_producers = tuple(
+            sorted(
+                {
+                    producer if isinstance(producer, str) else repr(producer)
+                    for producer in unknown_producers
+                }
+            )
+        )
+        super().__init__(
+            "unknown engine-cache chemistry version producer(s): "
+            + ", ".join(repr(producer) for producer in self.unknown_producers)
+        )
+
+
+def chemistry_versions(producer_ids: Iterable[str]) -> dict[str, int]:
+    """Return current chemistry versions for every named cache producer."""
+    requested = tuple(producer_ids)
+    unknown = tuple(
+        producer
+        for producer in requested
+        if not isinstance(producer, str)
+        or producer not in ENGINE_CHEMISTRY_VERSION
+    )
+    if unknown:
+        raise EngineCacheChemistryVersionError(unknown)
+    return {
+        producer: int(ENGINE_CHEMISTRY_VERSION[producer])
+        for producer in sorted(set(requested))
+    }
+
 # Bump only when an engine change can alter predictions. Runtime identity is
 # diagnostic and does not change cache keys or expire cached outputs.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version

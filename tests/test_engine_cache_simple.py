@@ -51,6 +51,25 @@ def _stored_hot(path: Path):
     return engine_cache._decode_hot(row[0], row[1])
 
 
+def test_chemistry_versions_returns_sorted_versions_for_known_producers() -> None:
+    requested = ("thermoengine", "alphamelts", "alphamelts")
+
+    versions = engine_cache.chemistry_versions(requested)
+
+    assert tuple(versions) == ("alphamelts", "thermoengine")
+    assert versions == {
+        engine: engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+        for engine in sorted(set(requested))
+    }
+
+
+def test_chemistry_versions_rejects_unknown_producers_with_typed_error() -> None:
+    with pytest.raises(engine_cache.EngineCacheChemistryVersionError) as exc_info:
+        engine_cache.chemistry_versions(("alphamelts", "future-engine"))
+
+    assert exc_info.value.unknown_producers == ("future-engine",)
+
+
 def test_engine_cache_path_scope_overrides_without_mutating_environment(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

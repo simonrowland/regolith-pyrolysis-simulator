@@ -173,6 +173,29 @@ _SELECTED_PRODUCER_IDENTITIES = {
         "python_api",
     ),
 }
+_BINDING_CHEMISTRY_VERSION_PRODUCERS = {
+    "alphamelts": ("alphamelts",),
+    "thermoengine": ("thermoengine",),
+    "magemin": ("magemin",),
+    "builtin-vapor-pressure": ("internal-analytical",),
+    "openimcc": ("openimcc",),
+    "sulfsat": ("sulfsat",),
+}
+
+
+def _with_current_engine_chemistry_versions(
+    identity: BindingIdentity,
+    provenance: Mapping[str, Any],
+) -> dict[str, Any]:
+    producer_ids = _BINDING_CHEMISTRY_VERSION_PRODUCERS.get(identity.engine_id)
+    if producer_ids is None:
+        return dict(provenance)
+    from simulator.engine_cache import chemistry_versions
+
+    return {
+        **dict(provenance),
+        "engine_chemistry_versions": chemistry_versions(producer_ids),
+    }
 
 
 def binding_receipt_path(config_path: str | Path | None = None) -> Path:
@@ -287,7 +310,7 @@ def current_backend_provenance(
     provenance = install_provenance(identity, runtime_backend=backend)
     getter = getattr(backend, "get_engine_version", None)
     provenance["runtime_version"] = version_getter_provenance(getter)
-    return provenance
+    return _with_current_engine_chemistry_versions(identity, provenance)
 
 
 def publish_live_backend_admission(backend: Any) -> None:
@@ -329,7 +352,7 @@ def cached_real_provenance(config: Any, live_backend: Any | None) -> dict[str, A
         getter = lambda: version
     provenance = install_provenance(identity, runtime_backend=live_backend)
     provenance["runtime_version"] = version_getter_provenance(getter)
-    return provenance
+    return _with_current_engine_chemistry_versions(identity, provenance)
 
 
 def current_cached_real_provenance(
@@ -395,7 +418,7 @@ def selected_binding_provenance(
                 AttributeError("SulfSat calibration version getter missing")
             )
         )
-    return provenance
+    return _with_current_engine_chemistry_versions(identity, provenance)
 
 
 def pt1_version_provenance(getter: Any) -> str:
@@ -1484,6 +1507,10 @@ def assess_bindings(
     entries: list[dict[str, Any]] = []
     results: list[BindingAssessmentResult] = []
     for candidate in candidates:
+        candidate_provenance = _with_current_engine_chemistry_versions(
+            candidate.identity,
+            candidate.provenance,
+        )
         pin_path, pin = _pin_for(
             candidate.identity,
             candidate.artifact,
@@ -1510,7 +1537,7 @@ def assess_bindings(
                     raise ValueError("reviewed pin projection must be a mapping")
                 if canonical_json_bytes(projected) == canonical_json_bytes(expected):
                     comparison_status = "matched"
-                    if candidate.provenance.get(
+                    if candidate_provenance.get(
                         "binding_provenance_verifiable"
                     ) is True:
                         status = "admitted"
@@ -1535,7 +1562,7 @@ def assess_bindings(
                     else None
                 ),
             },
-            "provenance": dict(candidate.provenance),
+            "provenance": candidate_provenance,
         }
         entries.append(entry)
         results.append(
@@ -1705,6 +1732,20 @@ def authorize_binding(
             identity,
             "install provenance unverifiable",
         )
+    versioned_producers = _BINDING_CHEMISTRY_VERSION_PRODUCERS.get(
+        identity.engine_id
+    )
+    if versioned_producers is not None:
+        current_provenance = _with_current_engine_chemistry_versions(
+            identity,
+            current_provenance,
+        )
+        current_versions = current_provenance["engine_chemistry_versions"]
+        if provenance.get("engine_chemistry_versions") != current_versions:
+            raise EngineBindingAdmissionError(
+                identity,
+                "engine chemistry version mismatch",
+            )
     if canonical_json_bytes(dict(provenance)) != canonical_json_bytes(
         dict(current_provenance)
     ):
