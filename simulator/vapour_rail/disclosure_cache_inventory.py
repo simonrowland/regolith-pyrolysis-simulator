@@ -251,7 +251,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/policy/default_policy.py:_load_policy_table': {
         "path": 'simulator/policy/default_policy.py',
-        "line": 70,
+        "line": 69,
         "kind": 'lru',
         "name": '_load_policy_table',
         "carries_disclosure": False,
