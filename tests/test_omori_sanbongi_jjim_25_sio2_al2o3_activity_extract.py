@@ -18,6 +18,7 @@ from simulator.battery.score import (
     predict_with_engine,
 )
 from simulator.battery.waypoints import GapReason
+from simulator.corpus_paths import regolith_corpus_root
 from tests.literature_extract_test_utils import activity_test_bench, isolated_root
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
@@ -188,7 +189,10 @@ def _assert_omori_derivation(sample: dict, *, mole_role: str) -> None:
         assert "mole_percent" not in roles
 
 
-def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
+def test_rendered_figure_reads_standard_states_and_validator_coverage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(regolith_corpus_root()))
     document = _document()
     _figure_audit_rows(document)
     sio2_rows = document["species"]["SiO2"]["observations"]
@@ -429,7 +433,17 @@ def test_migration_preserves_temperatures_compositions_and_typed_activity_reques
         callable_requests = [request for request in requests if request.payload is not None]
         assert {request.readiness.engine for request in callable_requests} == {
             "alphamelts", "thermoengine", "openimcc", "internal-analytical"
-        }
+        }, [
+            (
+                request.readiness.engine,
+                request.readiness.status.value,
+                tuple(
+                    (gap.waypoint, gap.reason.value, gap.missing)
+                    for gap in request.readiness.gaps
+                ),
+            )
+            for request in requests
+        ]
         for request in callable_requests:
             assert request.payload["reference_state"] in {
                 "raoultian_pure_liquid_endmember",

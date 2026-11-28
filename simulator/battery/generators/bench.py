@@ -137,9 +137,11 @@ class UnsupportedValue(ValueError):
 
 
 # Each element has more than one oxidation state in silicate melts over the
-# Parent-oxide basis tokens already printed on rows. single_cation is a
-# different activity and is not converted into this set.
-_PARENT_OXIDE_COMPONENT_BASES = frozenset({"oxide", "parent", "parent_oxide"})
+# The registry's canonical basis and legacy oxide/parent basis tokens. A
+# single_cation activity is different and is not converted into this set.
+_RAOULTIAN_ACTIVITY_COMPONENT_BASES = frozenset(
+    {"oxide", "parent", "parent_oxide", "raoultian_pure_endmember"}
+)
 _IMCC_SINGLE_CATION_COMPONENTS = frozenset({"NaO0.5", "KO0.5"})
 
 
@@ -166,7 +168,7 @@ _ENGINE_REPORTED_ACTIVITY = {
         "raoultian_pure_liquid_endmember",
         ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
         Phase.L,
-        _PARENT_OXIDE_COMPONENT_BASES,
+        _RAOULTIAN_ACTIVITY_COMPONENT_BASES,
     )
     for engine in ("alphamelts", "thermoengine")
 }
@@ -174,19 +176,19 @@ _ENGINE_REPORTED_ACTIVITY["openimcc"] = EngineReportedActivity(
     "raoultian_pure_liquid_oxide_parent",
     ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
     Phase.L,
-    _PARENT_OXIDE_COMPONENT_BASES,
+    _RAOULTIAN_ACTIVITY_COMPONENT_BASES,
 )
 _ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
     "raoultian_pure_liquid_endmember",
     ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
     Phase.L,
-    _PARENT_OXIDE_COMPONENT_BASES,
+    _RAOULTIAN_ACTIVITY_COMPONENT_BASES,
 )
 _ENGINE_REPORTED_ACTIVITY["magemin"] = EngineReportedActivity(
     "raoultian_native_crystal_activity",
     ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
     Phase.CR,
-    _PARENT_OXIDE_COMPONENT_BASES,
+    _RAOULTIAN_ACTIVITY_COMPONENT_BASES,
 )
 
 
