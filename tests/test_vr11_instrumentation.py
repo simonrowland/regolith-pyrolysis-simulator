@@ -799,7 +799,8 @@ def test_flux_selector_keeps_declared_inapplicability_as_typed_non_debit() -> No
     )
 
     assert pressures == {}
-    assert report["batch_channel_states"]["Fe"] == (
+    assert report["batch_channel_states"]["Fe"] == "refusal"
+    assert report["batch_channel_refusal_codes"]["Fe"] == (
         REFUSAL_INAPPLICABLE_PREDICATE
     )
     assert report.get("notices", []) == []
@@ -943,7 +944,7 @@ def test_post_langmuir_closure_notice_keeps_peer_flux(
     monkeypatch.setattr(
         evaporation,
         "_pre_rg_effective_pressure_source",
-        lambda *_args: EffectivePressureSource(
+        lambda *_args, **_kwargs: EffectivePressureSource(
             "test_effective_pressure_source",
             {"Fe": 1.0, "Na": 2.0},
         ),
