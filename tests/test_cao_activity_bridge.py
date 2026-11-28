@@ -132,11 +132,14 @@ def test_cao_exchange_mu_survives_the_compact_cell_cache() -> None:
     )
     assert payload.g0_pWo_J_per_mol_melts_berman_apparent == -800000.0
 
-    equilibrium = EquilibriumResult(diagnostics={
-        MELTS_CAO_EXCHANGE_MU_FIELD: 12345.0,
-        MELTS_CASIO3_LIQUID_G0_FIELD: -900000.0,
-        MELTS_PWO_G0_FIELD: -800000.0,
-    })
+    equilibrium = EquilibriumResult(
+        liquid_fraction=1.0,
+        diagnostics={
+            MELTS_CAO_EXCHANGE_MU_FIELD: 12345.0,
+            MELTS_CASIO3_LIQUID_G0_FIELD: -900000.0,
+            MELTS_PWO_G0_FIELD: -800000.0,
+        },
+    )
     restored_equilibrium = EquilibriumResult.from_engine_cache_value(
         equilibrium.to_engine_cache_value(engine_id='alphamelts'),
         engine_id='alphamelts',
@@ -147,8 +150,8 @@ def test_cao_exchange_mu_survives_the_compact_cell_cache() -> None:
 def test_thermoengine_exchange_mu_requires_calcium_in_the_composition() -> None:
     from engines.alphamelts.thermoengine import (
         ThermoEngineTransport,
-        activity_from_chem_potential,
     )
+    from simulator.melt_backend.alphamelts import activity_from_chem_potential
 
     class LiquidPhase:
         endmember_names = ('CaSiO3', 'SiO2')
@@ -874,6 +877,10 @@ def test_alphamelts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
         candidate for candidate in predictions.values()
         if candidate.identity.species.formula == 'CaO'
     )
+    cao_refusal = next(
+        residual for residual in _residuals
+        if residual.candidate == cao_candidate.observation_id
+    )
     non_cao_candidate = next(
         candidate for candidate in predictions.values()
         if candidate.identity.species.formula == 'SiO2'
@@ -885,11 +892,15 @@ def test_alphamelts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
     )
     if ca_free:
         assert cao_candidate.value.point is None
-        assert cao_candidate.refusal_reason is RefusalReason.UNSUPPORTED
-        assert cao_candidate.refusal_detail['reason'] == (
+        assert cao_candidate.value.unavailable_reason == (
             'species_unmatched_in_engine_output'
         )
-        assert cao_candidate.refusal_detail['converter'].startswith(
+        assert cao_refusal.refusal is not None
+        assert cao_refusal.refusal.reason is RefusalReason.UNSUPPORTED
+        assert cao_refusal.refusal.detail['reason'] == (
+            'species_unmatched_in_engine_output'
+        )
+        assert cao_refusal.refusal.detail['converter'].startswith(
             'typed-refusal:melts_endmember_not_parent_oxide'
         )
         assert not any(

@@ -19713,11 +19713,29 @@ def _compile_residual_with_lineage(
 
     if prediction.execution.state is not ExecutionState.PRODUCED or prediction.value is None:
         reason = prediction.refusal_reason or RefusalReason.UNSUPPORTED
+        # d-460 keeps a missing Ca exchange visible as an unavailable candidate.
+        missing_melts_cao_exchange = (
+            engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+            and preserve_melts_cao_reference
+            and quantity is Quantity.ACTIVITY
+            and formula == "CaO"
+            and reason is RefusalReason.UNSUPPORTED
+            and prediction.refusal_detail.get("reason")
+            == "species_unmatched_in_engine_output"
+            and str(prediction.refusal_detail.get("converter", "")).startswith(
+                "typed-refusal:melts_endmember_not_parent_oxide"
+            )
+        )
         return _refused(
             reason,
             prediction.refusal_detail or {"reason": prediction.execution.state.value},
             execution=prediction.execution,
             extra_notices=prediction.notices,
+            candidate=(
+                candidate_observation(reference, prediction)
+                if missing_melts_cao_exchange
+                else None
+            ),
             source_relation=source_relation,
         )
 
