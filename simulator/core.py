@@ -7980,7 +7980,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pre_holdup = self._overhead_holdup_mol()
         headspace_temperature_K = self._headspace_temperature_K()
         headspace_volume_m3 = self._headspace_volume_m3()
-        temperature_K = float(self.melt.temperature_C) + 273.15
+        temperature_K = (
+            float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        )
         zero_liquid = _zero_liquid_precedes_interpolation(equilibrium)
         initial_partials = _headspace_partial_pressures_Pa(
             pre_holdup,
@@ -8053,11 +8055,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     temperature_K=temperature_K,
                     overhead_partials_Pa=initial_partials,
                 )
-            )
-            EvaporationMixin._classify_proven_zero_langmuir_channels(
-                self,
-                batch_flux_overlay,
-                vapor_pressure_diagnostic,
             )
             outcome = EvaporationMixin._vapour_batch_resolution_outcome(
                 self,
@@ -8270,25 +8267,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     iteration_overlay,
                     reclosed,
                     final_pressures=reclosed_pressures,
-                )
-                EvaporationMixin._classify_proven_zero_langmuir_channels(
-                    self,
-                    iteration_overlay,
-                    vapor_pressure_diagnostic,
-                    surface=reclosed,
+                    vapor_pressure_diagnostic=vapor_pressure_diagnostic,
                     overhead_partials_Pa=partials_Pa,
                 )
-                trial_states = iteration_overlay.get(
-                    'batch_channel_states', {}
-                )
-                closure_failures = {
-                    species: reason
-                    for species, reason in closure_failures.items()
-                    if not (
-                        isinstance(trial_states, Mapping)
-                        and trial_states.get(species) == 'zero_by_physics'
-                    )
-                }
                 trial_outcome = EvaporationMixin._vapour_batch_resolution_outcome(
                     self,
                     {},
@@ -8320,6 +8301,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             batch_flux_pressures,
                             iteration_overlay,
                             closure_failures,
+                            capacity_solve=True,
                         )
                     )
                     if not fresh_closure_failures:
@@ -8403,6 +8385,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         iteration_flux_pressures or {},
                         iteration_overlay,
                         late_provider_unavailable,
+                        capacity_solve=True,
                     )
                 )
                 capacity_bound_notice = _append_capacity_solve_exclusion_notice(

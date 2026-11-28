@@ -398,6 +398,10 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             "Fe": "not_requested",
             "Si": "resolved",
         }),
+        ("rung5_unavailable_sole_carrier", {
+            "Fe": "unavailable_transport",
+            "Si": "not_requested",
+        }),
         ("provider_refusal+resolved", {
             "Fe": "provider_refusal",
             "Si": "resolved",
@@ -406,6 +410,22 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             "Fe": "resolved",
             "Si": "provider_refusal",
         }),
+    ) + tuple(
+        (
+            f"{left}+{right}",
+            dict(zip(species_ids, (left, right))),
+        )
+        for peer_state in (
+            "catalog_proven_zero",
+            "closure_proven_zero",
+            "unavailable_catalog",
+            "unavailable_parent",
+            "unavailable_transport",
+        )
+        for left, right in (
+            ("provider_refusal", peer_state),
+            (peer_state, "provider_refusal"),
+        )
     )
     production_booking_cases = frozenset(
         f"{left}+{right}"
@@ -416,6 +436,19 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             "provider_refusal",
         )
         for left, right in ((state, "resolved"), ("resolved", state))
+    ) | frozenset(
+        f"{left}+{right}"
+        for peer_state in (
+            "catalog_proven_zero",
+            "closure_proven_zero",
+            "unavailable_catalog",
+            "unavailable_parent",
+            "unavailable_transport",
+        )
+        for left, right in (
+            ("provider_refusal", peer_state),
+            (peer_state, "provider_refusal"),
+        )
     )
 
     basis = _real_capacity_sim()
@@ -457,104 +490,86 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
         sim._last_vapor_pressure_diagnostic = copy.deepcopy(
             vapor_pressure_diagnostic
         )
+        capacity_sim = _real_capacity_sim()
+        capacity_sim.start_campaign(CampaignPhase.C0)
+        capacity_sim.melt.temperature_C = 1600.0
+        capacity_sim.vapor_pressures["metals"]["Fe"].update({
+            "critical_temperature_K": 6000.0,
+            "critical_pressure_atm": 500.0,
+        })
+        capacity_sim._last_vapor_pressure_diagnostic = copy.deepcopy(
+            vapor_pressure_diagnostic
+        )
         case_equilibrium = copy.deepcopy(equilibrium)
         sim._freeze_gate_enabled = lambda: False
         sim._cold_train_capacity_policy = lambda: (capacity, cold_train)
         sim._headspace_bleed_conductance_kg_s = lambda **_kwargs: 0.0
+        capacity_sim._freeze_gate_enabled = lambda: False
+        capacity_sim._cold_train_capacity_policy = lambda: (capacity, cold_train)
+        capacity_sim._headspace_bleed_conductance_kg_s = lambda **_kwargs: 0.0
         provider_statuses = []
         provider_request_maps = []
         closure_publications = []
         booked_by_production_step = set()
+        case_should_refuse = not any(
+            state in {"resolved", "catalog_proven_zero", "closure_proven_zero"}
+            for state in state_by_species.values()
+        )
 
-        closure_partial_mbar = {}
-        if "closure_proven_zero" in state_by_species.values():
-            for zero_species, state in state_by_species.items():
-                if state == "closure_proven_zero":
-                    moles = 1.0e-3
-                    sim.atom_ledger.load_external(
-                        "process.overhead_gas",
-                        {
-                            zero_species: (
-                                moles
-                                * float(MOLAR_MASS[zero_species])
-                                / 1000.0
-                            ),
-                        },
-                        source="b1318 production closure-zero input",
-                        material_origin="feedstock",
+        for target in (sim, capacity_sim):
+            closure_partial_mbar = {}
+            if "closure_proven_zero" in state_by_species.values():
+                for zero_species, state in state_by_species.items():
+                    if state == "closure_proven_zero":
+                        moles = 1.0e-3
+                        target.atom_ledger.load_external(
+                            "process.overhead_gas",
+                            {
+                                zero_species: (
+                                    moles
+                                    * float(MOLAR_MASS[zero_species])
+                                    / 1000.0
+                                ),
+                            },
+                            source="b1318 production closure-zero input",
+                            material_origin="feedstock",
+                        )
+                        partial_pa = capacity_coupling._headspace_partial_pressures_Pa(
+                            {zero_species: moles},
+                            species=(zero_species,),
+                            temperature_K=target._headspace_temperature_K(),
+                            volume_m3=target._headspace_volume_m3(),
+                        )[zero_species]
+                        closure_partial_mbar[zero_species] = partial_pa / 100.0
+                provenance = dict(
+                    target._last_vapor_pressure_diagnostic.get(
+                        "vapor_pressure_numerator_provenance", {}
                     )
-                    partial_pa = capacity_coupling._headspace_partial_pressures_Pa(
-                        {zero_species: moles},
-                        species=(zero_species,),
-                        temperature_K=sim._headspace_temperature_K(),
-                        volume_m3=sim._headspace_volume_m3(),
-                    )[zero_species]
-                    closure_partial_mbar[zero_species] = partial_pa / 100.0
-            provenance = dict(
-                sim._last_vapor_pressure_diagnostic.get(
-                    "vapor_pressure_numerator_provenance", {}
                 )
-            )
-            for zero_species in closure_partial_mbar:
-                provenance[zero_species] = {
-                    "pressure_rail": "condensed_raoult_psat",
-                    "activity_factor": 1.0,
-                    "raw_metal_activity_root": 2.0,
-                    "P_reference_Antoine_Pa": 1.0,
-                }
-            sim._last_vapor_pressure_diagnostic[
-                "vapor_pressure_numerator_provenance"
-            ] = provenance
-            # A high real headspace partial plus a no-buffer redox input makes
-            # the surface solver refuse this carrier; its typed cap then proves
-            # zero. No closure function or classifier is stubbed.
-            sim._melt_redox_source_capacity_mol_per_ln_fO2 = (
-                lambda **_kwargs: 0.0
-            )
-            sim._melt_headspace_composition_mbar = closure_partial_mbar
+                for zero_species in closure_partial_mbar:
+                    provenance[zero_species] = {
+                        "pressure_rail": "condensed_raoult_psat",
+                        "activity_factor": 1.0,
+                        "raw_metal_activity_root": 2.0,
+                        "P_reference_Antoine_Pa": 1.0,
+                    }
+                target._last_vapor_pressure_diagnostic[
+                    "vapor_pressure_numerator_provenance"
+                ] = provenance
+                # A high real headspace partial plus a no-buffer redox input
+                # makes the surface solver refuse this carrier; its typed cap
+                # then proves zero. No closure function or classifier is stubbed.
+                target._melt_redox_source_capacity_mol_per_ln_fO2 = (
+                    lambda **_kwargs: 0.0
+                )
+                target._melt_headspace_composition_mbar = closure_partial_mbar
 
         with pytest.MonkeyPatch.context() as local:
             for species, state in state_by_species.items():
-                if state == "unavailable_catalog":
-                    catalog = sim.vapour_rail_catalog
-                    compiled = dict(catalog.species)
-                    compiled.pop(species)
-                    legacy_projection = catalog.legacy_view()
-                    for rows in legacy_projection.values():
-                        if isinstance(rows, dict):
-                            rows.pop(species, None)
-                    sim.vapour_rail_catalog = VapourRailCatalog(
-                        species=compiled,
-                        legacy_projection=legacy_projection,
-                        request_rules=catalog.request_rules,
-                        catalog_payload=sim.vapor_pressure_catalog_data,
-                    )
-                elif state == "not_requested":
+                if state == "not_requested":
                     # Peer-not-requested removes it from both the actual
                     # request and the real equilibrium source map.
                     case_equilibrium.vapor_pressures_Pa.pop(species, None)
-                    for key in (
-                        "vapor_pressures_Pa",
-                        "backend_vapor_pressures_Pa",
-                    ):
-                        source = sim._last_vapor_pressure_diagnostic.get(key)
-                        if isinstance(source, dict):
-                            source.pop(species, None)
-                    catalog = sim.vapour_rail_catalog
-                    sim.vapour_rail_catalog = VapourRailCatalog(
-                        species=catalog.species,
-                        legacy_projection=catalog.legacy_view(),
-                        request_rules=tuple(
-                            rule for rule in catalog.request_rules
-                            if rule.species_id != species
-                        ),
-                        catalog_payload=sim.vapor_pressure_catalog_data,
-                    )
-                elif state == "unavailable_parent":
-                    for group in ("metals", "oxide_vapors"):
-                        row = sim.vapor_pressures.get(group, {}).get(species)
-                        if isinstance(row, dict):
-                            row.pop("parent_oxide", None)
                 elif state == "unavailable_transport":
                     from simulator.condensation import _LENNARD_JONES_PARAMS
 
@@ -563,46 +578,84 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                         species,
                         raising=False,
                     )
-                    if species == "Fe":
-                        sim.vapor_pressures["metals"]["Fe"].pop(
+                for target in (sim, capacity_sim):
+                    if state == "unavailable_catalog":
+                        catalog = target.vapour_rail_catalog
+                        compiled = dict(catalog.species)
+                        compiled.pop(species)
+                        legacy_projection = catalog.legacy_view()
+                        for rows in legacy_projection.values():
+                            if isinstance(rows, dict):
+                                rows.pop(species, None)
+                        target.vapour_rail_catalog = VapourRailCatalog(
+                            species=compiled,
+                            legacy_projection=legacy_projection,
+                            request_rules=catalog.request_rules,
+                            catalog_payload=target.vapor_pressure_catalog_data,
+                        )
+                    elif state == "not_requested":
+                        for key in (
+                            "vapor_pressures_Pa",
+                            "backend_vapor_pressures_Pa",
+                        ):
+                            source = target._last_vapor_pressure_diagnostic.get(key)
+                            if isinstance(source, dict):
+                                source.pop(species, None)
+                        catalog = target.vapour_rail_catalog
+                        target.vapour_rail_catalog = VapourRailCatalog(
+                            species=catalog.species,
+                            legacy_projection=catalog.legacy_view(),
+                            request_rules=tuple(
+                                rule for rule in catalog.request_rules
+                                if rule.species_id != species
+                            ),
+                            catalog_payload=target.vapor_pressure_catalog_data,
+                        )
+                    elif state == "unavailable_parent":
+                        for group in ("metals", "oxide_vapors"):
+                            row = target.vapor_pressures.get(group, {}).get(species)
+                            if isinstance(row, dict):
+                                row.pop("parent_oxide", None)
+                    elif state == "unavailable_transport" and species == "Fe":
+                        target.vapor_pressures["metals"]["Fe"].pop(
                             "critical_temperature_K", None
                         )
-                        sim.vapor_pressures["metals"]["Fe"].pop(
+                        target.vapor_pressures["metals"]["Fe"].pop(
                             "critical_pressure_atm", None
                         )
-                elif state == "catalog_proven_zero":
-                    # Production has no input/configuration that constructs
-                    # ZeroByPhysics today. Keep the real catalog request, then
-                    # use this narrow typed-answer seam; the production
-                    # selector, closure, provider, and Picard loop still run.
-                    real_builder = sim.build_vapour_batch
+                    elif state == "catalog_proven_zero":
+                        # Production has no input/configuration that constructs
+                        # ZeroByPhysics today. Keep the real catalog request,
+                        # then use this narrow typed-answer seam; the production
+                        # selector, closure, provider, and Picard loop still run.
+                        real_builder = target.build_vapour_batch
 
-                    def build_with_proven_zero(
-                        *,
-                        _species=species,
-                        _real_builder=real_builder,
-                        **kwargs,
-                    ):
-                        batch = _real_builder(**kwargs)
-                        channels = dict(batch.channels_by_species)
-                        answer = channels[_species]
-                        zero = ZeroByPhysics(
-                            "b1318_narrow_catalog_zero_test_seam"
-                        )
-                        channels[_species] = replace(
-                            answer,
-                            pressure=zero,
-                            selected_runtime_pressure=zero,
-                        )
-                        return replace(
-                            batch,
-                            channels_by_species=channels,
-                            flux_active_species_ids=(
-                                batch.flux_active_species_ids - {_species}
-                            ),
-                        )
+                        def build_with_proven_zero(
+                            *,
+                            _species=species,
+                            _real_builder=real_builder,
+                            **kwargs,
+                        ):
+                            batch = _real_builder(**kwargs)
+                            channels = dict(batch.channels_by_species)
+                            answer = channels[_species]
+                            zero = ZeroByPhysics(
+                                "b1318_narrow_catalog_zero_test_seam"
+                            )
+                            channels[_species] = replace(
+                                answer,
+                                pressure=zero,
+                                selected_runtime_pressure=zero,
+                            )
+                            return replace(
+                                batch,
+                                channels_by_species=channels,
+                                flux_active_species_ids=(
+                                    batch.flux_active_species_ids - {_species}
+                                ),
+                            )
 
-                    sim.build_vapour_batch = build_with_proven_zero
+                        target.build_vapour_batch = build_with_proven_zero
 
             if case_name.startswith("provider_refusal+") or case_name.endswith(
                 "+provider_refusal"
@@ -663,7 +716,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                 real_close = EvaporationMixin._closed_langmuir_pressures_for_partials
 
                 def capture_closure_publication(host, publication_Pa, **kwargs):
-                    if host is sim:
+                    if host is sim or host is capacity_sim:
                         closure_publications.append(set(publication_Pa))
                     return real_close(host, publication_Pa, **kwargs)
 
@@ -672,24 +725,24 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                     "_closed_langmuir_pressures_for_partials",
                     capture_closure_publication,
                 )
-            ledger_before_capacity = sim.atom_ledger.mol_by_account()
-            transitions_before_capacity = len(sim.atom_ledger.transitions)
+            ledger_before_capacity = capacity_sim.atom_ledger.mol_by_account()
+            transitions_before_capacity = len(capacity_sim.atom_ledger.transitions)
             capacity_result = None
             capacity_refusal = None
             try:
-                capacity_result = sim._compute_capacity_coupling_shadow_impl(
+                capacity_result = capacity_sim._compute_capacity_coupling_shadow_impl(
                     case_equilibrium
                 )
             except EvaporationFluxRefusal as exc:
                 capacity_refusal = exc
             capacity_overlay = copy.deepcopy(
-                getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {}
+                getattr(capacity_sim, "_last_vapour_batch_flux_overlay", {}) or {}
             )
             capacity_surface = copy.deepcopy(
-                getattr(sim, "_last_langmuir_surface_oxygen", {}) or {}
+                getattr(capacity_sim, "_last_langmuir_surface_oxygen", {}) or {}
             )
-            assert sim.atom_ledger.mol_by_account() == ledger_before_capacity
-            assert len(sim.atom_ledger.transitions) == transitions_before_capacity
+            assert capacity_sim.atom_ledger.mol_by_account() == ledger_before_capacity
+            assert len(capacity_sim.atom_ledger.transitions) == transitions_before_capacity
 
             live_flux = None
             live_refusal = None
@@ -706,7 +759,10 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             if case_name in production_booking_cases:
                 sim._get_equilibrium = lambda: case_equilibrium
                 transition_start = len(sim.atom_ledger.transitions)
-                sim.step()
+                try:
+                    sim.step()
+                except EvaporationFluxRefusal:
+                    assert case_should_refuse, case_name
                 booked_by_production_step = {
                     species
                     for transition in sim.atom_ledger.transitions[transition_start:]
@@ -729,10 +785,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             for species, state in state_by_species.items()
             if state in {"catalog_proven_zero", "closure_proven_zero"}
         }
-        should_refuse = not any(
-            state in {"resolved", "catalog_proven_zero", "closure_proven_zero"}
-            for state in state_by_species.values()
-        )
+        should_refuse = case_should_refuse
         assert (live_refusal is not None) is should_refuse, case_name
         assert (capacity_refusal is not None) is should_refuse, case_name
         if case_name.startswith("provider_refusal+") or case_name.endswith(
@@ -809,7 +862,22 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             assert capacity_surface.get("applied") is True, case_name
             assert live_surface.get("applied") is True, case_name
         if case_name == "unavailable_transport+resolved":
-            assert "Fe" in live_surface.get("refused_species", {}), case_name
+            assert "Fe" not in live_surface.get("refused_species", {}), case_name
+            assert sim._vapour_batch_hour_availability[
+                "unavailable_by_species"
+            ].get("Fe") == "missing_transport_parameters_possible_continuum"
+            assert any(
+                notice.get("kind") == "vapour_batch_unresolved"
+                and notice.get("species") == "Fe"
+                and notice.get("reason")
+                == "missing_transport_parameters_possible_continuum"
+                for notice in live_overlay.get("notices", ())
+                if isinstance(notice, dict)
+            ), case_name
+            assert all(
+                "Fe" not in publication
+                for publication in closure_publications
+            ), (case_name, closure_publications)
         live_rates_by_case[case_name] = dict(live_flux.species_kg_hr)
         capacity_rates_by_case[case_name] = dict(
             capacity_result.evaporation_flux_kg_hr
@@ -915,6 +983,12 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                 excluded_booking_species.add("FeO")
             if "Si" in unavailable:
                 excluded_booking_species.update({"SiO", "SiO2"})
+            for zero_species in zero_by_physics:
+                excluded_booking_species.add(zero_species)
+                if zero_species == "Fe":
+                    excluded_booking_species.add("FeO")
+                elif zero_species == "Si":
+                    excluded_booking_species.update({"SiO", "SiO2"})
             assert excluded_booking_species.isdisjoint(
                 booked_by_production_step
             ), (
@@ -2245,11 +2319,27 @@ def test_lennard_jones_owner_uses_boiling_density_and_supported_le_bas():
     assert le_bas["inputs"]["le_bas_molar_volume_cm3_mol"] == pytest.approx(14.8)
 
 
-def test_lennard_jones_owner_uses_only_sourced_tabulated_pairs():
-    from simulator.condensation import _resolve_lennard_jones_parameters
+def test_lennard_jones_owner_uses_sourced_and_legacy_proxy_rows():
+    from simulator.condensation import (
+        _LENNARD_JONES_PARAMS,
+        _resolve_lennard_jones_parameters,
+    )
 
     assert _resolve_lennard_jones_parameters("Na", {})["status"] == "tabulated"
-    assert _resolve_lennard_jones_parameters("Fe", {})["status"] == "missing"
+    assert _resolve_lennard_jones_parameters("CrO2", {})["status"] == "missing"
+    for species in ("Fe", "Mg", "Mn", "Cr", "Al", "Ti", "Ca", "SiO"):
+        estimate = _resolve_lennard_jones_parameters(species, {})
+        row = f"simulator.condensation._LENNARD_JONES_PARAMS[{species!r}]"
+        assert estimate["status"] == "estimated", species
+        assert estimate["method"] == "legacy_code_proxy", species
+        assert estimate["flag"] == "lj_estimated:legacy_code_proxy", species
+        assert estimate["provenance"]["row"] == row, species
+        assert estimate["inputs"]["legacy_row"] == row, species
+        assert (
+            estimate["sigma_angstrom"],
+            estimate["epsilon_over_k_K"],
+            estimate["molar_mass_g_mol"],
+        ) == _LENNARD_JONES_PARAMS[species]
 
 
 def test_capacity_resolution_decision_is_owned_by_evaporation() -> None:
@@ -2703,18 +2793,43 @@ def test_capacity_picard_reclose_keeps_peer_when_surface_refuses_fe(monkeypatch)
             },
         },
     }
-    monkeypatch.setattr(
-        sim,
-        "_resolve_evaporation_batch_flux_state",
-        lambda *_args, **_kwargs: (
-            {"Fe": 1.0, "Na": 2.0},
-            overlay,
+    sim._vapour_batch_hour_availability = {
+        "hour": int(sim.melt.hour),
+        "member_species": ("Fe", "Na"),
+        "unavailable_by_species": {},
+        "restarted_unavailable_species": (),
+    }
+
+    def resolve_capacity_flux_state(*_args, **_kwargs):
+        current_overlay = copy.deepcopy(overlay)
+        unavailable = sim._vapour_batch_hour_availability[
+            "unavailable_by_species"
+        ]
+        pressures = {"Fe": 1.0, "Na": 2.0}
+        if "Fe" in unavailable:
+            pressures.pop("Fe")
+            current_overlay["batch_channel_states"]["Fe"] = "unavailable"
+            current_overlay["selected_runtime_pa_by_species"].pop("Fe")
+            current_overlay["notices"].append({
+                "kind": "vapour_batch_unresolved",
+                "species": "Fe",
+                "hour": int(sim.melt.hour),
+                "reason": unavailable["Fe"],
+            })
+        return (
+            pressures,
+            current_overlay,
             None,
             {},
             pressure_diagnostic,
             None,
-            overlay,
-        ),
+            copy.deepcopy(current_overlay),
+        )
+
+    monkeypatch.setattr(
+        sim,
+        "_resolve_evaporation_batch_flux_state",
+        resolve_capacity_flux_state,
     )
 
     def reclose(_partials):
@@ -2760,20 +2875,20 @@ def test_capacity_picard_reclose_keeps_peer_when_surface_refuses_fe(monkeypatch)
     assert result.capacity is capacity
     assert result.evaporation_flux_kg_hr["Na"] > 0.0
     assert captured
-    assert captured[0]["vapour_batch_flux_pressures_Pa"] == {
-        "Fe": 0.0,
-        "Na": 2.0,
-    }
+    assert captured[0]["vapour_batch_flux_pressures_Pa"] == {"Na": 2.0}
     control_notices = captured[0]["vapour_batch_flux_overlay"]["notices"]
-    assert not any(
+    assert any(
         notice.get("kind") == "vapour_batch_unresolved"
+        and notice.get("species") == "Fe"
         for notice in control_notices
     )
-    assert not any(
+    assert any(
         notice.get("kind") == "capacity_solve_excludes_unavailable_species"
         for notice in control_notices
     )
-    assert overlay["notices"] == []
+    assert "Fe" in sim._vapour_batch_hour_availability[
+        "unavailable_by_species"
+    ]
 
 
 def test_capacity_picard_accounts_for_fe_recovered_after_initial_refusal(
@@ -3017,22 +3132,17 @@ def test_capacity_picard_closure_failure_restarts_once_without_zero_booking(
     )
     provider_pressure_maps = []
 
-    def positive_fe_flux(_provider, request):
+    real_dispatch = BuiltinEvaporationFluxProvider.dispatch
+
+    def capture_real_provider(provider, request):
         pressure_map = dict(
             request.control_inputs["vapour_batch_flux_pressures_Pa"]
         )
         provider_pressure_maps.append(pressure_map)
-        return SimpleNamespace(
-            status="ok",
-            diagnostic={
-                "evaporation_flux_kg_hr": {
-                    species: 1.0e-3 for species in pressure_map
-                }
-            },
-        )
+        return real_dispatch(provider, request)
 
     monkeypatch.setattr(
-        BuiltinEvaporationFluxProvider, "dispatch", positive_fe_flux
+        BuiltinEvaporationFluxProvider, "dispatch", capture_real_provider
     )
     real_solver = capacity_coupling.solve_capacity_shadow
     solver_calls = 0
@@ -3051,7 +3161,7 @@ def test_capacity_picard_closure_failure_restarts_once_without_zero_booking(
     if fail_on_restart:
         with pytest.raises(EvaporationFluxRefusal) as refusal:
             sim.step()
-        assert refusal.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+        assert refusal.value.reason == "capacity_member_closure_failure"
         assert solver_calls == 2
         assert reclose_calls == 2
         booked_species = {

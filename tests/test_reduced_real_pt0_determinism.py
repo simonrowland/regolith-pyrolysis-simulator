@@ -8045,6 +8045,16 @@ def _run_interpolation_class_guard_hour(
             "path": ((1000.0, 0.0), (1600.0, 1.0)),
         },
     )
+    gate_curve = {
+        "source": "unit-test:interpolation-class-guard",
+        "status": "ok",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1600.0,
+        "path": ((1000.0, 0.0), (1600.0, 1.0)),
+    }
+    sim._freeze_gate_curve_from_gate_dispatch = lambda *_args, **_kwargs: (
+        _classified_gate_curve_for_test(sim, gate_curve)
+    )
     assert store._cached_real_binding_eligible(sim)
     if interpolation_source is not None:
         def candidates(**kwargs: Any) -> list[dict[str, Any]]:

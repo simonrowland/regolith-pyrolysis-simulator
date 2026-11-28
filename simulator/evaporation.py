@@ -1998,17 +1998,72 @@ class EvaporationMixin:
             campaign = None
         else:
             campaign = campaign.strip()
-        transport_property_rows = {
-            str(species): dict(row)
-            for species in partials_Pa
-            if (row := _evaporation_vapor_row(
-                getattr(self, 'vapor_pressures', {}), str(species)
-            )) is not None
-        }
+        transport_cache = getattr(
+            self, '_vapour_batch_hour_availability', None
+        )
+        cached_property_rows = (
+            transport_cache.get('lennard_jones_property_rows_by_species', {})
+            if isinstance(transport_cache, Mapping)
+            else {}
+        )
+        transport_property_rows = (
+            {
+                str(species): dict(row)
+                for species, row in cached_property_rows.items()
+                if isinstance(row, Mapping)
+            }
+            if isinstance(cached_property_rows, Mapping)
+            else {}
+        )
+        if not transport_property_rows:
+            transport_property_rows = {
+                str(species): dict(row)
+                for species in partials_Pa
+                if (row := _evaporation_vapor_row(
+                    getattr(self, 'vapor_pressures', {}), str(species)
+                )) is not None
+            }
+        cached_parameters = (
+            transport_cache.get('lennard_jones_parameters_by_species', {})
+            if isinstance(transport_cache, Mapping)
+            else {}
+        )
+        transport_parameters = (
+            {
+                str(species): dict(parameters)
+                for species, parameters in cached_parameters.items()
+                if isinstance(parameters, Mapping)
+            }
+            if isinstance(cached_parameters, Mapping)
+            else {}
+        )
+        cached_eligibility = (
+            transport_cache.get('transport_eligibility_by_species', {})
+            if isinstance(transport_cache, Mapping)
+            else {}
+        )
+        transport_eligibility = (
+            {
+                str(species): str(decision)
+                for species, decision in cached_eligibility.items()
+            }
+            if isinstance(cached_eligibility, Mapping)
+            else {}
+        )
         catalog = getattr(self, "vapor_pressures", None)
+        cached_hkl = (
+            transport_cache.get('hkl_upper_bound_transport_species', ())
+            if isinstance(transport_cache, Mapping)
+            else None
+        )
         hkl = frozenset(
-            _load_hkl_upper_bound_transport_species(
-                catalog if isinstance(catalog, dict) else {}
+            str(species)
+            for species in (
+                cached_hkl
+                if cached_hkl is not None
+                else _load_hkl_upper_bound_transport_species(
+                    catalog if isinstance(catalog, dict) else {}
+                )
             )
         )
         extrapolate = False
@@ -2055,6 +2110,8 @@ class EvaporationMixin:
             extrapolate_continuum=extrapolate,
             campaign_name=campaign,
             lennard_jones_property_rows_by_species=transport_property_rows,
+            lennard_jones_parameters_by_species=transport_parameters,
+            transport_eligibility_by_species=transport_eligibility,
         )
 
     def _closed_langmuir_pressures_for_partials(
@@ -2429,8 +2486,10 @@ class EvaporationMixin:
         surface: Any,
         *,
         final_pressures: Mapping[str, float],
+        vapor_pressure_diagnostic: Mapping[str, Any] | None = None,
+        overhead_partials_Pa: Mapping[str, float] | None = None,
     ) -> dict[str, str]:
-        """Disclose selector-eligible species removed by final surface closure."""
+        """Classify closure refusals and disclose those still unavailable."""
         states = flux_overlay.get('batch_channel_states', {})
         refused_species = getattr(surface, 'refused_species', {}) or {}
         refusal_codes = getattr(surface, 'refusal_codes_by_species', {}) or {}
@@ -2476,7 +2535,59 @@ class EvaporationMixin:
                 species=species_id,
                 reason=str(reason),
             )
+        if isinstance(vapor_pressure_diagnostic, Mapping):
+            proven_zero = EvaporationMixin._classify_proven_zero_langmuir_channels(
+                self,
+                flux_overlay,
+                vapor_pressure_diagnostic,
+                surface=surface,
+                overhead_partials_Pa=overhead_partials_Pa,
+            )
+            closure_unavailable = {
+                species: reason
+                for species, reason in closure_unavailable.items()
+                if species not in proven_zero
+            }
         return closure_unavailable
+
+    def _carry_classified_vapour_batch_results(
+        self,
+        batch_report: dict[str, Any] | None,
+        flux_overlay: Mapping[str, Any],
+        flux: Any,
+    ) -> None:
+        """Project already-classified typed-zero evidence onto report rows."""
+        states = flux_overlay.get('batch_channel_states', {})
+        driving_forces = flux_overlay.get('net_driving_force_by_species', {})
+        if not isinstance(states, Mapping):
+            return
+        channels = (
+            batch_report.get('channels_by_species')
+            if isinstance(batch_report, dict)
+            else None
+        )
+        authorities = getattr(flux, 'carrier_authority_by_species', None)
+        for species, state in states.items():
+            if state != 'zero_by_physics':
+                continue
+            evidence = {
+                'kind': 'zero_by_physics',
+                'evidence_ref': 'non_positive_capped_net_driving_force',
+            }
+            extra = (
+                {'net_driving_force': dict(driving_forces[species])}
+                if isinstance(driving_forces, Mapping)
+                and isinstance(driving_forces.get(species), Mapping)
+                else {}
+            )
+            for rows in (channels, authorities):
+                if not isinstance(rows, dict):
+                    continue
+                record = rows.get(str(species))
+                if not isinstance(record, dict):
+                    continue
+                record['pressure'] = dict(evidence)
+                record['extra'] = {**dict(record.get('extra') or {}), **extra}
 
     def _classify_proven_zero_langmuir_channels(
         self,
@@ -2939,25 +3050,9 @@ class EvaporationMixin:
                 flux_overlay_report,
                 langmuir_surface,
                 final_pressures=closed_pressures,
-            )
-            EvaporationMixin._classify_proven_zero_langmuir_channels(
-                self,
-                flux_overlay_report,
-                vapor_pressure_diagnostic,
-                surface=langmuir_surface,
+                vapor_pressure_diagnostic=vapor_pressure_diagnostic,
                 overhead_partials_Pa=partials,
             )
-            channel_states = flux_overlay_report.get(
-                'batch_channel_states', {}
-            )
-            closure_failures = {
-                species: reason
-                for species, reason in closure_failures.items()
-                if not (
-                    isinstance(channel_states, Mapping)
-                    and channel_states.get(species) == 'zero_by_physics'
-                )
-            }
             if not closure_failures:
                 break
             EvaporationMixin._classify_hour_vapour_availability(
@@ -3044,8 +3139,18 @@ class EvaporationMixin:
                 cached.get('estimated_lennard_jones_params_by_species', {})
                 or {}
             )
+            member_species = set(
+                str(species)
+                for species in cached.get('member_species', flux_pressures)
+            )
             transport_property_rows = dict(
                 cached.get('lennard_jones_property_rows_by_species', {}) or {}
+            )
+            transport_parameters = dict(
+                cached.get('lennard_jones_parameters_by_species', {}) or {}
+            )
+            transport_eligibility = dict(
+                cached.get('transport_eligibility_by_species', {}) or {}
             )
             hkl_upper_bound_species = set(
                 cached.get('hkl_upper_bound_transport_species', ()) or ()
@@ -3060,12 +3165,16 @@ class EvaporationMixin:
                 if species is not None
             }
             estimated_transport = {}
+            member_species = {str(species) for species in flux_pressures}
             transport_property_rows = {}
-            hkl_upper_bound_species = set(
+            transport_parameters = {}
+            transport_eligibility = {}
+            catalog_hkl_upper_bound_species = set(
                 _load_hkl_upper_bound_transport_species(
                     getattr(self, 'vapor_pressures', {}) or {}
                 )
             )
+            hkl_upper_bound_species = set()
             restarted_unavailable_species = set()
             self._langmuir_flux_closure_context = None
             from simulator.condensation import (
@@ -3077,7 +3186,7 @@ class EvaporationMixin:
             )
 
             vapor_data = getattr(self, 'vapor_pressures', {}) or {}
-            for species in tuple(flux_pressures):
+            for species in sorted(member_species):
                 row = _evaporation_vapor_row(vapor_data, species)
                 if row is not None:
                     transport_property_rows[str(species)] = dict(row)
@@ -3085,11 +3194,17 @@ class EvaporationMixin:
                     vapor_data, species
                 )
                 parameters = _resolve_lennard_jones_parameters(species, row)
-                if parameters.get('status') == 'tabulated':
-                    continue
-                if parameters.get('status') == 'estimated':
+                if molar_mass is not None:
                     parameters['molar_mass_g_mol'] = molar_mass
+                transport_parameters[str(species)] = dict(parameters)
+                if parameters.get('status') == 'estimated':
                     estimated_transport[str(species)] = parameters
+                if str(species) in catalog_hkl_upper_bound_species:
+                    transport_eligibility[str(species)] = 'hkl_upper_bound'
+                    hkl_upper_bound_species.add(str(species))
+                    continue
+                if parameters.get('status') in {'tabulated', 'estimated'}:
+                    transport_eligibility[str(species)] = 'chapman_enskog'
                     continue
 
                 free_molecular_to_rating = False
@@ -3126,11 +3241,13 @@ class EvaporationMixin:
                     unavailable[str(species)] = (
                         'missing_transport_parameters_possible_continuum'
                     )
+                    transport_eligibility[str(species)] = 'unavailable'
                 else:
                     # The existing provider path models this case as its
                     # explicit HKL kinetic upper bound, avoiding a CE call
                     # for which the species has no Lennard-Jones pair.
                     hkl_upper_bound_species.add(str(species))
+                    transport_eligibility[str(species)] = 'hkl_upper_bound'
 
             # A missing parent matters to the Langmuir residual only when
             # that same balance is active and this carrier is coupled to a
@@ -3205,6 +3322,7 @@ class EvaporationMixin:
                             unavailable[species] = (
                                 'missing_evaporation_stoichiometry'
                             )
+                            transport_eligibility[species] = 'unavailable'
             for notice in flux_overlay.get('notices', ()) or ():
                 if (
                     isinstance(notice, Mapping)
@@ -3216,16 +3334,27 @@ class EvaporationMixin:
                         str(notice.get('reason') or 'unavailable'),
                     )
 
+        for species in unavailable:
+            if species in member_species:
+                transport_eligibility[species] = 'unavailable'
         for species, reason in (observed_unavailable_by_species or {}).items():
             unavailable.setdefault(str(species), str(reason))
+            transport_eligibility[str(species)] = 'unavailable'
         self._vapour_batch_hour_availability = {
             'hour': hour,
+            'member_species': tuple(sorted(member_species)),
             'unavailable_by_species': dict(unavailable),
             'estimated_lennard_jones_params_by_species': dict(
                 estimated_transport
             ),
             'lennard_jones_property_rows_by_species': dict(
                 transport_property_rows
+            ),
+            'lennard_jones_parameters_by_species': dict(
+                transport_parameters
+            ),
+            'transport_eligibility_by_species': dict(
+                transport_eligibility
             ),
             'hkl_upper_bound_transport_species': tuple(
                 sorted(hkl_upper_bound_species)
@@ -3259,12 +3388,14 @@ class EvaporationMixin:
         flux_pressures: Mapping[str, Any],
         flux_overlay: dict[str, Any],
         unavailable_by_species: Mapping[str, str],
+        *,
+        capacity_solve: bool = False,
     ) -> dict[str, str]:
-        """Exclude newly refused members before one deterministic re-close.
+        """Exclude newly refused frozen members before deterministic re-close.
 
-        Membership only shrinks. Each newly refused member is recorded once,
-        so live and Picard callers can restart without allowing a stale peer
-        pressure to survive a provider-stage refusal.
+        Capacity Picard permits one restart of the whole solve. Live dispatch
+        retains its per-member restart because a provider can discover a later
+        species-local refusal after the first re-dispatch.
         """
         cache = getattr(self, '_vapour_batch_hour_availability', None)
         restarted = set(
@@ -3272,10 +3403,21 @@ class EvaporationMixin:
             if isinstance(cache, Mapping)
             else ()
         )
+        members = set(
+            str(species)
+            for species in (
+                cache.get('member_species', flux_pressures)
+                if isinstance(cache, Mapping)
+                else flux_pressures
+            )
+        )
+        if capacity_solve and isinstance(cache, Mapping):
+            if cache.get('capacity_restart_used') is True:
+                return {}
         fresh = {
             str(species): str(reason)
             for species, reason in unavailable_by_species.items()
-            if str(species) in flux_pressures and str(species) not in restarted
+            if str(species) in members and str(species) not in restarted
         }
         if not fresh:
             return {}
@@ -3291,6 +3433,8 @@ class EvaporationMixin:
         if isinstance(cache, dict):
             restarted.update(fresh)
             cache['restarted_unavailable_species'] = tuple(sorted(restarted))
+            if capacity_solve:
+                cache['capacity_restart_used'] = True
         return fresh
 
     def _evaporation_publisher_film(
@@ -3492,6 +3636,9 @@ class EvaporationMixin:
                     for species, record in channels.items()
                     if isinstance(record, Mapping)
                 }
+        EvaporationMixin._carry_classified_vapour_batch_results(
+            self, batch_report, flux_overlay_report, flux
+        )
         if capacity_bound is not None:
             for authority in flux.carrier_authority_by_species.values():
                 authority['capacity_solve_excludes_unavailable_species'] = (
@@ -3518,12 +3665,6 @@ class EvaporationMixin:
                 count=len(extrapolated_flux_species),
             )
 
-        EvaporationMixin._classify_proven_zero_langmuir_channels(
-            self,
-            flux_overlay_report,
-            vapor_pressure_diagnostic,
-            flux=flux,
-        )
         # Keep the base live dispatch when an unresolved channel accompanies
         # typed non-debits. The pressure map sent to the provider remains the
         # resolver's eligible map; unavailable peers stay only in the overlay.
@@ -7025,6 +7166,19 @@ class EvaporationMixin:
         )
         if overhead_pressure_pa is None:
             overhead_pressure_pa = filmed_overhead_pressure
+        transport_cache = getattr(
+            self, '_vapour_batch_hour_availability', None
+        )
+        cached_members = (
+            transport_cache.get('member_species')
+            if isinstance(transport_cache, Mapping)
+            else None
+        )
+        auxiliary_flux_members = (
+            dict.fromkeys((str(species) for species in cached_members), 0.0)
+            if isinstance(cached_members, (tuple, list, set, frozenset))
+            else vapor_pressures
+        )
         # Reporting projection of the post-decision flux map (not a flux input).
         with compatibility_pressure_read_context('reporting_projection'):
             live_reporting = dict(
@@ -7032,11 +7186,13 @@ class EvaporationMixin:
             )
         if isinstance(vapour_batch_flux_overlay, dict):
             aux_maps = self._build_evaporation_aux_maps(
-                vapor_pressures,
+                dict(auxiliary_flux_members),
                 vapour_batch_flux_overlay=vapour_batch_flux_overlay,
             )
         else:
-            aux_maps = self._build_evaporation_aux_maps(vapor_pressures)
+            aux_maps = self._build_evaporation_aux_maps(
+                dict(auxiliary_flux_members)
+            )
         (
             molar_masses_kg_mol,
             stoich_by_species,
@@ -7115,9 +7271,6 @@ class EvaporationMixin:
             'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
                 self.vapor_pressures
             ),
-            'hkl_upper_bound_transport_species': (
-                _load_hkl_upper_bound_transport_species(self.vapor_pressures)
-            ),
             'campaign_name': str(
                 getattr(
                     getattr(getattr(self, 'melt', None), 'campaign', None),
@@ -7128,9 +7281,6 @@ class EvaporationMixin:
             ),
             'surface_oxygen_bound': surface_oxygen_bound,
         }
-        transport_cache = getattr(
-            self, '_vapour_batch_hour_availability', None
-        )
         property_rows = (
             transport_cache.get('lennard_jones_property_rows_by_species', {})
             if isinstance(transport_cache, Mapping)
@@ -7142,21 +7292,42 @@ class EvaporationMixin:
                 for species, row in property_rows.items()
                 if isinstance(row, Mapping)
             }
+        parameters_by_species = (
+            transport_cache.get('lennard_jones_parameters_by_species', {})
+            if isinstance(transport_cache, Mapping)
+            else {}
+        )
+        if isinstance(parameters_by_species, Mapping) and parameters_by_species:
+            controls['lennard_jones_parameters_by_species'] = {
+                str(species): dict(parameters)
+                for species, parameters in parameters_by_species.items()
+                if isinstance(parameters, Mapping)
+            }
+        eligibility_by_species = (
+            transport_cache.get('transport_eligibility_by_species', {})
+            if isinstance(transport_cache, Mapping)
+            else {}
+        )
+        if isinstance(eligibility_by_species, Mapping) and eligibility_by_species:
+            controls['transport_eligibility_by_species'] = {
+                str(species): str(decision)
+                for species, decision in eligibility_by_species.items()
+            }
         free_molecular_upper_bound = (
             transport_cache.get('hkl_upper_bound_transport_species', ())
             if isinstance(transport_cache, Mapping)
             else ()
         )
-        if free_molecular_upper_bound:
-            controls['hkl_upper_bound_transport_species'] = tuple(sorted(
-                {
-                    str(species)
-                    for species in controls.get(
-                        'hkl_upper_bound_transport_species', ()
-                    ) or ()
-                }
-                | {str(species) for species in free_molecular_upper_bound}
-            ))
+        controls['hkl_upper_bound_transport_species'] = tuple(sorted(
+            str(species)
+            for species in (
+                free_molecular_upper_bound
+                if isinstance(transport_cache, Mapping)
+                else _load_hkl_upper_bound_transport_species(
+                    self.vapor_pressures
+                )
+            )
+        ))
         if vapour_batch_report is not None:
             controls[CONTROL_BATCH_REPORT_KEY] = dict(vapour_batch_report)
         if vapour_batch_flux_overlay is not None:

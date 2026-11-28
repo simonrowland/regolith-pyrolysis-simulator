@@ -328,18 +328,19 @@ def _resolve_lennard_jones_parameters(
     species: str,
     row: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
-    """Choose one binding d-480 transport pair: tabulated, estimated, missing.
+    """Choose the binding d-480 transport pair by preference rung.
 
     Premise -> correlation -> units: when a sourced pair is absent, d-480
     selects Tc/Pc first (sigma=2.44*(Tc/Pc_atm)^(1/3), epsilon/k=0.77 Tc),
     then BSL's normal-boiling form (sigma=1.18 Vb^(1/3), epsilon/k=1.15 Tb),
     with Vb=M/rho_liquid(Tb), then Le Bas increments for formulas made only
-    of supported elements plus the same BSL form. Tc is K, Pc atm, M g/mol,
-    density g/cm^3, Vb cm^3/mol, sigma Å, and epsilon/k K. The Le Bas
-    increments are in cm^3/mol from Le Bas, *The Molecular Volumes of Liquid
-    Chemical Compounds* (1915). Sanity: N2's Tc=126.2 K and Pc=33.5 atm give
-    sigma≈3.80 Å and epsilon/k=97.2 K, close in size to the sourced repo pair
-    (3.798 Å, 71.4 K); the tabulated rung remains authoritative.
+    of supported elements plus the same BSL form, and finally the legacy code
+    proxy row. Tc is K, Pc atm, M g/mol, density g/cm^3, Vb cm^3/mol,
+    sigma Å, and epsilon/k K. The Le Bas increments are in cm^3/mol from
+    Le Bas, *The Molecular Volumes of Liquid Chemical Compounds* (1915).
+    Sanity: N2's Tc=126.2 K and Pc=33.5 atm give sigma≈3.80 Å and
+    epsilon/k=97.2 K, close in size to the sourced repo pair (3.798 Å,
+    71.4 K); the tabulated rung remains authoritative.
     """
     row = row if isinstance(row, Mapping) else {}
 
@@ -378,7 +379,10 @@ def _resolve_lennard_jones_parameters(
         critical_pressure = positive("critical_pressure_bar")
         critical_pressure_raw = critical_pressure
         if critical_pressure is not None:
-            critical_pressure = (critical_pressure[0], critical_pressure[1] / 1.01325)
+            critical_pressure = (
+                critical_pressure[0],
+                critical_pressure[1] * PA_PER_BAR / STANDARD_ATMOSPHERE_PA,
+            )
     if critical_temperature is not None and critical_pressure is not None:
         sigma = 2.44 * (
             critical_temperature[1] / critical_pressure[1]
@@ -446,6 +450,26 @@ def _resolve_lennard_jones_parameters(
                     inputs["boiling_point_C"] = boiling_c[1]
                 method, flag = "le_bas+bsl_boiling", "lj_estimated:le_bas+bsl_boiling"
         if method is None or volume is None:
+            legacy = _LENNARD_JONES_PARAMS.get(str(species))
+            if legacy is not None and provenance.get("status") == "proxy":
+                legacy_row = (
+                    "simulator.condensation._LENNARD_JONES_PARAMS"
+                    f"[{str(species)!r}]"
+                )
+                return {
+                    "species": str(species),
+                    "status": "estimated",
+                    "method": "legacy_code_proxy",
+                    "flag": "lj_estimated:legacy_code_proxy",
+                    "provenance": {
+                        "row": legacy_row,
+                        "source": provenance.get("source"),
+                    },
+                    "sigma_angstrom": legacy[0],
+                    "epsilon_over_k_K": legacy[1],
+                    "molar_mass_g_mol": legacy[2],
+                    "inputs": {"legacy_row": legacy_row},
+                }
             return {
                 "species": str(species), "status": "missing", "method": "missing",
                 "flag": "missing_transport_parameters_possible_continuum",

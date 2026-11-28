@@ -236,6 +236,12 @@ class LangmuirTransport:
     lennard_jones_property_rows_by_species: Mapping[str, Mapping[str, Any]] = field(
         default_factory=dict
     )
+    lennard_jones_parameters_by_species: Mapping[str, Mapping[str, Any]] = field(
+        default_factory=dict
+    )
+    transport_eligibility_by_species: Mapping[str, str] = field(
+        default_factory=dict
+    )
 
 
 @dataclass(frozen=True)
@@ -1171,7 +1177,16 @@ def _publisher_net_law_with_transport(
     ideal = _ideal_molar_conductance(
         alpha, molar_mass_kg_per_mol, transport.temperature_K
     )
-    hkl_bound = species in transport.hkl_upper_bound_species
+    eligibility = transport.transport_eligibility_by_species.get(species)
+    if eligibility == "unavailable":
+        raise EvaporationFluxConfigurationError(
+            f"transport unavailable for Langmuir closure probe: {species}"
+        )
+    hkl_bound = (
+        eligibility == "hkl_upper_bound"
+        if eligibility is not None
+        else species in transport.hkl_upper_bound_species
+    )
     # d-376 amendment 1. Disabled film and an HKL upper bound are ideal
     # Hertz-Knudsen, ``R_gas = 0``. Overhead O2 stays the backpressure,
     # so the O2 drive is zero at and below that partial and the root
@@ -1189,13 +1204,15 @@ def _publisher_net_law_with_transport(
     if not transport.gas_resistance_enabled or hkl_bound:
         return ideal, drive_bulk
 
-    property_row = transport.lennard_jones_property_rows_by_species.get(
-        species, {}
-    )
-    parameters = _resolve_lennard_jones_parameters(
-        species,
-        property_row if isinstance(property_row, Mapping) else {},
-    )
+    parameters = transport.lennard_jones_parameters_by_species.get(species)
+    if not isinstance(parameters, Mapping):
+        property_row = transport.lennard_jones_property_rows_by_species.get(
+            species, {}
+        )
+        parameters = _resolve_lennard_jones_parameters(
+            species,
+            property_row if isinstance(property_row, Mapping) else {},
+        )
     if parameters.get("status") not in {"tabulated", "estimated"}:
         raise EvaporationFluxConfigurationError(
             "missing transport parameters for Langmuir closure probe: "

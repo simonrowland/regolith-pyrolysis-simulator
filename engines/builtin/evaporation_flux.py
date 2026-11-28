@@ -1616,6 +1616,24 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
         if not isinstance(transport_property_rows_by_species, Mapping):
             transport_property_rows_by_species = {}
+        transport_parameters_by_species = controls.get(
+            "lennard_jones_parameters_by_species", {}
+        )
+        if not isinstance(transport_parameters_by_species, Mapping):
+            transport_parameters_by_species = {}
+        transport_eligibility_by_species = controls.get(
+            "transport_eligibility_by_species", {}
+        )
+        if not isinstance(transport_eligibility_by_species, Mapping):
+            transport_eligibility_by_species = {}
+        hkl_upper_bound_transport_species = frozenset(
+            set(hkl_upper_bound_transport_species)
+            | {
+                str(species)
+                for species, decision in transport_eligibility_by_species.items()
+                if decision == "hkl_upper_bound"
+            }
+        )
         from simulator.condensation import _resolve_lennard_jones_parameters
         from simulator.chemistry.langmuir_knudsen import (
             hertz_knudsen_k_kg_s_m2_pa,
@@ -1923,23 +1941,31 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             try:
                 species_transport_params = None
                 if uses_gas_resistance and species not in hkl_upper_bound_transport_species:
-                    property_row = transport_property_rows_by_species.get(
-                        species, {}
-                    )
-                    parameters = _resolve_lennard_jones_parameters(
-                        species,
-                        property_row if isinstance(property_row, Mapping) else {},
-                    )
+                    parameters = transport_parameters_by_species.get(species)
+                    if not isinstance(parameters, Mapping):
+                        property_row = transport_property_rows_by_species.get(
+                            species, {}
+                        )
+                        parameters = _resolve_lennard_jones_parameters(
+                            species,
+                            property_row if isinstance(property_row, Mapping) else {},
+                        )
                     if parameters.get("status") not in {"tabulated", "estimated"}:
                         missing_transport_parameters[species] = {
                             "policy": "fail_loud_missing_transport_parameters",
                             "carrier_gas": carrier_gas,
                             "parent_oxide": str(stoich.get("parent_oxide") or ""),
-                            "reason": "missing_transport_parameters_possible_continuum",
+                            "reason": (
+                                "missing Chapman-Enskog transport parameters "
+                                f"for sampled species: {species}"
+                            ),
                             "refusal_type": "missing_transport_parameters_possible_continuum",
                             "status": "unavailable",
                             "authority_level": "unavailable",
-                            "flag": parameters.get("flag"),
+                            "flag": (
+                                parameters.get("flag")
+                                or "missing_transport_parameters_possible_continuum"
+                            ),
                         }
                         continue
                     species_transport_params = (
