@@ -2113,7 +2113,7 @@ def test_zero_liquid_capacity_checks_retained_holdup_vessel_rating(monkeypatch):
         accumulator_enabled=False,
         relief={
             "k_relief_kg_hr_Pa": 1.0e-30,
-            "p_open_Pa": 1.0e12,
+            "p_open_Pa": 0.5,
             "vessel_rating_Pa": 1.0,
         },
     )
