@@ -8031,6 +8031,13 @@ def _run_interpolation_class_guard_hour(
 
     backend = DeterministicMAGEMinBackend()
     sim.backend = backend
+    from simulator.chemistry.kernel import ChemistryIntent
+
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    provider._backend = backend
+    provider._backend_initialised = True
     from simulator.engine_binding_admission import publish_live_backend_admission
 
     publish_live_backend_admission(backend)
