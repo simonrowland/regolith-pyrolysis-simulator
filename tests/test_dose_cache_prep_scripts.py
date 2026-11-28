@@ -20,6 +20,7 @@ from scripts.seed_reduced_real_cache import (
     validate_source_schema,
 )
 from simulator.corpus_version import current_corpus_version
+from simulator.engine_cache import chemistry_versions as current_chemistry_versions
 from simulator.optimize.evaluate import _cache_trace_payload
 from simulator.reduced_real_determinism import (
     PT1_EQUILIBRIUM_TABLE,
@@ -32,7 +33,12 @@ from simulator.reduced_real_determinism import (
 )
 
 
-def _put_cache_row(db_path: Path, *, tag: str) -> None:
+def _put_cache_row(
+    db_path: Path,
+    *,
+    tag: str,
+    engine_chemistry_versions: dict[str, int] | None = None,
+) -> None:
     key = {
         "artifact": "freeze_gate_curve",
         "code_version": "test",
@@ -40,6 +46,8 @@ def _put_cache_row(db_path: Path, *, tag: str) -> None:
         "schema_version": "test",
         "tag": tag,
     }
+    if engine_chemistry_versions is not None:
+        key["engine_chemistry_versions"] = engine_chemistry_versions
     payload = {"curve": {"status": "in_range", "tag": tag}}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
@@ -185,6 +193,37 @@ def test_seed_cache_merges_sources_idempotently(tmp_path: Path) -> None:
     assert first["rows_after"] == 1
     assert second["inserted_rows"] == 0
     assert payload_count(target) == 1
+
+
+@pytest.mark.parametrize("transport", ["seed", "merge"])
+def test_seed_and_merge_preserve_engine_chemistry_versions_in_key_bytes(
+    tmp_path: Path,
+    transport: str,
+) -> None:
+    source = tmp_path / f"{transport}-version-source.db"
+    target = tmp_path / f"{transport}-version-target.db"
+    versions = current_chemistry_versions(("alphamelts",))
+    _put_cache_row(
+        source,
+        tag=f"version-{transport}",
+        engine_chemistry_versions=versions,
+    )
+    with sqlite3.connect(source) as connection:
+        (source_key_bytes,) = connection.execute(
+            f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+
+    if transport == "seed":
+        seed_cache(target, [source])
+    else:
+        assert merge_grind_cache.main([str(target), str(source)]) == 0
+
+    with sqlite3.connect(target) as connection:
+        (target_key_bytes,) = connection.execute(
+            f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert target_key_bytes == source_key_bytes
+    assert json.loads(target_key_bytes)["engine_chemistry_versions"] == versions
 
 
 def test_seed_cache_accepts_new_schema_equilibrium_authority(tmp_path: Path) -> None:

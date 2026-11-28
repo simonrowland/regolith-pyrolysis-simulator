@@ -25,6 +25,7 @@ import yaml
 from simulator.accounting.formulas import load_species_formulas
 from simulator.config import ENGINE_MODEL_UNAVAILABLE, resolve_grid_engine_model
 from simulator.battery.enums import refuse_proprietary_engine_use
+from simulator.engine_cache import chemistry_versions
 from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -932,6 +933,12 @@ def _engine_result_namespace(
     raise ValueError(f"engine result namespace is not resolved: {selected!r}")
 
 
+def _producer_chemistry_versions_json(backend_name: str) -> str:
+    namespace = _engine_result_namespace({}, backend_name)
+    producer_id = namespace.removesuffix("-equilibrium-grid")
+    return canonical_json(chemistry_versions((producer_id,)))
+
+
 def _cache_v2_quantized_values(
     inputs: Mapping[str, Any],
     backend_name: str | None = None,
@@ -1301,6 +1308,7 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     timing_s REAL NOT NULL,
     timing_s_repr TEXT NOT NULL,
     engine_version TEXT NOT NULL,
+    producer_chemistry_versions_json TEXT,
     engine_mode TEXT NOT NULL,
     engine_model TEXT NOT NULL,
     run_mode TEXT,
@@ -1577,7 +1585,7 @@ class GridCacheWriter:
                 "variant-local bookkeeping only; recompute reviewed canonical_state_bytes "
                 "from typed full-precision inputs; never transplant this hash",
             )
-            self._set_metadata("schema_output_field_count", "84")
+            self._set_metadata("schema_output_field_count", "85")
             self._set_metadata("schema_input_field_count", "27")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
@@ -1609,6 +1617,23 @@ class GridCacheWriter:
             return CacheV2GridBackend(backend_name).value
         except ValueError as exc:
             raise ValueError(f"unsupported grid backend: {backend_name!r}") from exc
+
+    @staticmethod
+    def _current_output_chemistry_versions_json() -> tuple[str, ...]:
+        return tuple(
+            _producer_chemistry_versions_json(backend.value)
+            for backend in CacheV2GridBackend
+        )
+
+    def _current_output_eligibility_clause(
+        self, alias: str = "o"
+    ) -> tuple[str, tuple[str, ...]]:
+        stamps = self._current_output_chemistry_versions_json()
+        placeholders = ",".join("?" for _ in stamps)
+        return (
+            f"{alias}.producer_chemistry_versions_json IN ({placeholders})",
+            stamps,
+        )
 
     def _assert_backend_not_blended(self, backend_name: str | None) -> None:
         if backend_name is None:
@@ -1842,6 +1867,7 @@ class GridCacheWriter:
                 "subprocess_run_mode": "TEXT",
             },
             "alphamelts_outputs": {
+                "producer_chemistry_versions_json": "TEXT",
                 "failure_reason_code": "TEXT",
                 "failure_message": "TEXT",
                 "generic_requested_temperature_C": "REAL",
@@ -2171,7 +2197,11 @@ class GridCacheWriter:
                 "c.grid_key_id IS NULL",
                 "g.shuffle_rank > ?",
             ]
+            chemistry_clause, chemistry_parameters = (
+                self._current_output_eligibility_clause("o")
+            )
             parameters: list[Any] = [
+                *chemistry_parameters,
                 self.engine_epoch,
                 int(batch_id),
                 int(after_shuffle_rank),
@@ -2191,7 +2221,10 @@ class GridCacheWriter:
                 "g.kress91_partition_provenance_json, "
                 "g.kress91_fixed_ferric_fraction, g.intended_fO2_log, "
                 "g.shuffle_rank, g.shard, g.timeout_s FROM grid_keys g "
-                "LEFT JOIN alphamelts_outputs o ON o.expedited_key = g.expedited_key "
+                "LEFT JOIN alphamelts_outputs o ON "
+                "o.expedited_key = g.expedited_key AND "
+                + chemistry_clause
+                + " "
                 "LEFT JOIN grid_key_claims c ON c.grid_key_id = g.id "
                 "AND c.engine_epoch = ? WHERE "
                 + " AND ".join(clauses)
@@ -2264,8 +2297,11 @@ class GridCacheWriter:
         shard: int | None,
         rank_limit: int | None,
     ) -> None:
+        chemistry_clause, chemistry_parameters = (
+            self._current_output_eligibility_clause("o")
+        )
         clauses = ["o.id IS NULL"]
-        parameters: list[Any] = []
+        parameters: list[Any] = list(chemistry_parameters)
         if shard is not None:
             clauses.append("g.shard = ?")
             parameters.append(int(shard))
@@ -2275,7 +2311,9 @@ class GridCacheWriter:
         rows = self.connection.execute(
             "SELECT g.id, g.input_payload_json FROM grid_keys g "
             "LEFT JOIN alphamelts_outputs o "
-            "ON o.expedited_key = g.expedited_key WHERE "
+            "ON o.expedited_key = g.expedited_key AND "
+            + chemistry_clause
+            + " WHERE "
             + " AND ".join(clauses),
             tuple(parameters),
         )
@@ -2329,8 +2367,11 @@ class GridCacheWriter:
         rank_limit: int | None = None,
         grid_key_ids: Sequence[int] | None = None,
     ) -> dict[str, int]:
+        chemistry_clause, chemistry_parameters = (
+            self._current_output_eligibility_clause("o")
+        )
         extra = "" if shard is None else " AND g.shard = ?"
-        parameters: list[Any] = [int(batch_id)]
+        parameters: list[Any] = [*chemistry_parameters, int(batch_id)]
         if shard is not None:
             parameters.append(int(shard))
         if rank_limit is not None:
@@ -2345,7 +2386,9 @@ class GridCacheWriter:
         row = self.connection.execute(
             "SELECT COUNT(*) AS total, COUNT(o.id) AS done "
             "FROM grid_keys g LEFT JOIN alphamelts_outputs o "
-            "ON o.expedited_key = g.expedited_key "
+            "ON o.expedited_key = g.expedited_key AND "
+            + chemistry_clause
+            + " "
             "WHERE g.batch_id = ?" + extra,
             tuple(parameters),
         ).fetchone()
@@ -2393,6 +2436,9 @@ class GridCacheWriter:
             if selector_clauses:
                 clauses.append("(" + " OR ".join(selector_clauses) + ")")
         if refusal_reason is not None:
+            chemistry_clause, chemistry_parameters = (
+                self._current_output_eligibility_clause("source_output")
+            )
             joins = (
                 " JOIN alphamelts_outputs source_output "
                 "ON source_output.expedited_key = g.expedited_key"
@@ -2401,9 +2447,12 @@ class GridCacheWriter:
                 [
                     "source_output.engine_epoch = ?",
                     "source_output.refusal_reason = ?",
+                    chemistry_clause,
                 ]
             )
-            parameters.extend([int(source_epoch), str(refusal_reason)])
+            parameters.extend(
+                [int(source_epoch), str(refusal_reason), *chemistry_parameters]
+            )
         if not clauses:
             raise ValueError("at least one key selector or refusal reason is required")
         query = (
@@ -2427,11 +2476,19 @@ class GridCacheWriter:
                 "refusal_reason": {},
                 "failure_reason_code": {},
             }
+        chemistry_clause, chemistry_parameters = (
+            self._current_output_eligibility_clause("alphamelts_outputs")
+        )
         placeholders = ",".join("?" for _ in grid_key_ids)
-        parameters = (self.engine_epoch, *(int(value) for value in grid_key_ids))
+        parameters = (
+            self.engine_epoch,
+            *(int(value) for value in grid_key_ids),
+            *chemistry_parameters,
+        )
         status_rows = self.connection.execute(
             "SELECT status, COUNT(*) FROM alphamelts_outputs "
             f"WHERE engine_epoch = ? AND grid_key_id IN ({placeholders}) "
+            f"AND {chemistry_clause} "
             "GROUP BY status ORDER BY status",
             parameters,
         )
@@ -2439,6 +2496,7 @@ class GridCacheWriter:
             "SELECT COALESCE(refusal_reason, '<none>'), COUNT(*) "
             "FROM alphamelts_outputs "
             f"WHERE engine_epoch = ? AND grid_key_id IN ({placeholders}) "
+            f"AND {chemistry_clause} "
             "GROUP BY refusal_reason ORDER BY COUNT(*) DESC",
             parameters,
         )
@@ -2446,6 +2504,7 @@ class GridCacheWriter:
             "SELECT COALESCE(failure_reason_code, '<none>'), COUNT(*) "
             "FROM alphamelts_outputs "
             f"WHERE engine_epoch = ? AND grid_key_id IN ({placeholders}) "
+            f"AND {chemistry_clause} "
             "GROUP BY failure_reason_code ORDER BY COUNT(*) DESC",
             parameters,
         )
@@ -2625,11 +2684,14 @@ class GridCacheWriter:
         return result
 
     def _existing_key_batch(self, keys: Sequence[str]) -> set[str]:
+        chemistry_clause, chemistry_parameters = (
+            self._current_output_eligibility_clause("alphamelts_outputs")
+        )
         placeholders = ",".join("?" for _ in keys)
         rows = self.connection.execute(
             f"SELECT expedited_key FROM alphamelts_outputs "
-            f"WHERE expedited_key IN ({placeholders})",
-            tuple(keys),
+            f"WHERE expedited_key IN ({placeholders}) AND {chemistry_clause}",
+            (*keys, *chemistry_parameters),
         )
         return {str(row[0]) for row in rows}
 
@@ -2821,6 +2883,9 @@ class GridCacheWriter:
                 "grid_key_id": int(row["id"]),
                 "expedited_key": str(row["expedited_key"]),
                 "engine_epoch": self.engine_epoch,
+                "producer_chemistry_versions_json": (
+                    _producer_chemistry_versions_json(output_backend_name)
+                ),
             }
         )
         write_section = self._begin_write_section("grid_key_claim_result")
@@ -2829,11 +2894,16 @@ class GridCacheWriter:
             # otherwise opposite-engine writers can both observe an empty DB.
             self._assert_backend_not_blended(output_backend_name)
             existing = self.connection.execute(
-                "SELECT 1 FROM alphamelts_outputs "
+                "SELECT id, producer_chemistry_versions_json "
+                "FROM alphamelts_outputs "
                 "WHERE expedited_key = ?",
                 (str(row["expedited_key"]),),
             ).fetchone()
-            if existing is not None:
+            if (
+                existing is not None
+                and existing["producer_chemistry_versions_json"]
+                == output_values["producer_chemistry_versions_json"]
+            ):
                 self.connection.execute(
                     "DELETE FROM grid_key_claims "
                     "WHERE grid_key_id = ? AND engine_epoch = ? "
@@ -2854,6 +2924,27 @@ class GridCacheWriter:
                 raise RuntimeError(
                     f"grid key {grid_key_id} is not claimed by this writer"
                 )
+            if existing is not None:
+                update_values = {
+                    name: value
+                    for name, value in output_values.items()
+                    if name != "id"
+                }
+                assignments = ", ".join(
+                    f'"{name}" = ?' for name in update_values
+                )
+                cursor = self.connection.execute(
+                    f"UPDATE alphamelts_outputs SET {assignments} WHERE id = ?",
+                    (*update_values.values(), int(existing["id"])),
+                )
+                self.connection.execute(
+                    "DELETE FROM grid_key_claims "
+                    "WHERE grid_key_id = ? AND engine_epoch = ? "
+                    "AND claim_owner = ?",
+                    (int(grid_key_id), self.engine_epoch, self.claim_owner),
+                )
+                self._finish_write_section(write_section)
+                return cursor.rowcount == 1
             cursor = self._insert_or_ignore("alphamelts_outputs", output_values)
             self.connection.execute(
                 "DELETE FROM grid_key_claims "
@@ -3280,10 +3371,14 @@ class GridCacheWriter:
         )
 
     def counts(self) -> dict[str, int]:
+        chemistry_clause, chemistry_parameters = (
+            self._current_output_eligibility_clause("alphamelts_outputs")
+        )
         rows = self.connection.execute(
             "SELECT status_kind, COUNT(*) FROM alphamelts_outputs "
-            "WHERE engine_epoch = ? GROUP BY status_kind",
-            (self.engine_epoch,),
+            f"WHERE engine_epoch = ? AND {chemistry_clause} "
+            "GROUP BY status_kind",
+            (self.engine_epoch, *chemistry_parameters),
         )
         counts = {"success": 0, "refusal": 0, "failure": 0}
         for kind, count in rows:
@@ -3292,6 +3387,9 @@ class GridCacheWriter:
         return counts
 
     def sample_row(self) -> dict[str, Any] | None:
+        chemistry_clause, chemistry_parameters = (
+            self._current_output_eligibility_clause("o")
+        )
         row = self.connection.execute(
             "SELECT o.id, o.expedited_key, h.temperature_C, h.pressure_bar, "
             "h.intended_fO2_log, h.kress91_fixed_ferric_fraction, "
@@ -3301,8 +3399,9 @@ class GridCacheWriter:
             "o.status, o.status_kind, o.engine_version, "
             "o.timing_s, o.generic_phases_present_json "
             "FROM alphamelts_outputs o JOIN grid_keys h ON h.id = o.grid_key_id "
-            "WHERE o.engine_epoch = ? ORDER BY o.id DESC LIMIT 1",
-            (self.engine_epoch,),
+            f"WHERE o.engine_epoch = ? AND {chemistry_clause} "
+            "ORDER BY o.id DESC LIMIT 1",
+            (self.engine_epoch, *chemistry_parameters),
         ).fetchone()
         if row is None:
             return None

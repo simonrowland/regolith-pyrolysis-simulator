@@ -49,6 +49,7 @@ from simulator.chemistry.phase_context import (
     LIQUIDUS_MATCH_TOLERANCE_C,
     _uncached_grind_cache_lookup,
 )
+from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, chemistry_versions
 
 _LEGACY_SELECT = """
         SELECT o.id
@@ -62,6 +63,7 @@ _LEGACY_SELECT = """
            AND ABS({temperature_column} - ?) <= ?
            AND ABS(g.pressure_bar - ?) <= ?
            AND ABS(g.fO2_log - ?) <= ?
+           AND o.producer_chemistry_versions_json IN ({producer_version_placeholders})
          ORDER BY ABS({temperature_column} - ?), o.id
 """
 
@@ -80,6 +82,7 @@ _NEW_SELECT = """
            AND ABS(g.pressure_bar - ?) <= ?
            AND g.fO2_log BETWEEN ? AND ?
            AND ABS(g.fO2_log - ?) <= ?
+           AND o.producer_chemistry_versions_json IN ({producer_version_placeholders})
          ORDER BY ABS({temperature_column} - ?), o.id
 """
 
@@ -95,7 +98,10 @@ def _candidate_ids(
     params: tuple,
     *,
     include_isothermal: bool,
+    producer_version_placeholders: str,
 ) -> list[int]:
+    if not producer_version_placeholders:
+        return []
     rows: list[int] = []
     if include_isothermal:
         rows.extend(
@@ -104,6 +110,7 @@ def _candidate_ids(
                 sql.format(
                     temperature_column="o.generic_temperature_C",
                     epoch_predicate=">= 2",
+                    producer_version_placeholders=producer_version_placeholders,
                 ),
                 params,
             )
@@ -116,6 +123,7 @@ def _candidate_ids(
                     "COALESCE(o.alpha_liquidus_T_C, o.generic_liquidus_T_C)"
                 ),
                 epoch_predicate="= 1",
+                producer_version_placeholders=producer_version_placeholders,
             ),
             params,
         )
@@ -124,7 +132,10 @@ def _candidate_ids(
 
 
 def _query_params(
-    temperature_C: float, pressure_bar: float, fO2_log: float
+    temperature_C: float,
+    pressure_bar: float,
+    fO2_log: float,
+    producer_chemistry_version_stamps: tuple[str, ...],
 ) -> tuple[tuple, tuple]:
     t_lo, t_hi = pc._sargable_bounds(temperature_C, LIQUIDUS_MATCH_TOLERANCE_C)
     p_lo, p_hi = pc._sargable_bounds(pressure_bar, CONTROL_MATCH_TOLERANCE)
@@ -136,6 +147,7 @@ def _query_params(
         CONTROL_MATCH_TOLERANCE,
         fO2_log,
         CONTROL_MATCH_TOLERANCE,
+        *producer_chemistry_version_stamps,
         temperature_C,
     )
     rewritten = (
@@ -151,6 +163,7 @@ def _query_params(
         f_hi,
         fO2_log,
         CONTROL_MATCH_TOLERANCE,
+        *producer_chemistry_version_stamps,
         temperature_C,
     )
     return legacy, rewritten
@@ -185,6 +198,11 @@ def _identity(path: Path) -> int:
             or 0
         )
         include_isothermal = max_epoch >= 2
+        producer_chemistry_version_stamps = (
+            pc._current_producer_chemistry_version_stamps(
+                connection, chemistry_versions(ENGINE_CHEMISTRY_VERSION)
+            )
+        )
         row_count = int(
             connection.execute(
                 "SELECT COUNT(*) FROM alphamelts_outputs"
@@ -248,19 +266,28 @@ def _identity(path: Path) -> int:
             seen.add(query)
             temperature_C, pressure_bar, fO2_log = query
             legacy_params, new_params = _query_params(
-                temperature_C, pressure_bar, fO2_log
+                temperature_C,
+                pressure_bar,
+                fO2_log,
+                producer_chemistry_version_stamps,
             )
             legacy_ids = _candidate_ids(
                 connection,
                 _LEGACY_SELECT,
                 legacy_params,
                 include_isothermal=include_isothermal,
+                producer_version_placeholders=",".join(
+                    "?" for _ in producer_chemistry_version_stamps
+                ),
             )
             new_ids = _candidate_ids(
                 connection,
                 _NEW_SELECT,
                 new_params,
                 include_isothermal=include_isothermal,
+                producer_version_placeholders=",".join(
+                    "?" for _ in producer_chemistry_version_stamps
+                ),
             )
             compared += 1
             if legacy_ids != new_ids:
@@ -287,6 +314,9 @@ def _bench(path: Path, temperature_C: float, repeats: int) -> None:
         composition_mol=composition,
         fO2_log=-9.0,
         liquidus_temperature_C=None,
+        producer_chemistry_versions=chemistry_versions(
+            ENGINE_CHEMISTRY_VERSION
+        ),
     )
     pc._cached_grind_cache_lookup.cache_clear()
     pc._max_engine_epoch.cache_clear()

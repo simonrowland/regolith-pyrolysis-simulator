@@ -1418,14 +1418,23 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(
     existing_only,
 ):
     database = tmp_path / "legacy-grid.db"
-    with GridCacheWriter(database):
-        pass
+    inputs = _inputs(1200.0)
+    with GridCacheWriter(database, backend_name="subprocess") as writer:
+        batch_id = writer.ensure_batch(
+            label="legacy-grid", kind="fixed", seed=1, params={}
+        )
+        writer.materialize_key(
+            inputs, batch_id=batch_id, shuffle_rank=0, shard=0
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        writer.write_result(grid_key_id, _output())
     connection = sqlite3.connect(database)
     connection.execute("DROP INDEX idx_alphamelts_outputs_failure_reason")
     for table, column in (
         ("grid_keys", "kress91_fixed_ferric_fraction"),
         ("grid_keys", "kress91_fixed_ferric_fraction_repr"),
         ("grid_keys", "subprocess_run_mode"),
+        ("alphamelts_outputs", "producer_chemistry_versions_json"),
         ("alphamelts_outputs", "failure_reason_code"),
         ("alphamelts_outputs", "failure_message"),
         ("alphamelts_outputs", "generic_requested_temperature_C"),
@@ -1477,6 +1486,9 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(
         output_field_count = writer.connection.execute(
             "SELECT value FROM metadata WHERE key = 'schema_output_field_count'"
         ).fetchone()[0]
+        legacy_stamp = writer.connection.execute(
+            "SELECT producer_chemistry_versions_json FROM alphamelts_outputs"
+        ).fetchone()[0]
 
     assert "subprocess_run_mode" in grid_columns
     assert {
@@ -1484,6 +1496,7 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(
         "kress91_fixed_ferric_fraction_repr",
     } <= grid_columns
     assert {
+        "producer_chemistry_versions_json",
         "failure_reason_code",
         "failure_message",
         "generic_requested_temperature_C",
@@ -1513,7 +1526,8 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(
         "applied_timeout_s",
         "applied_timeout_s_repr",
     } <= output_columns
-    assert output_field_count == "84"
+    assert output_field_count == "85"
+    assert legacy_stamp is None
 
 
 def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path):
@@ -3143,6 +3157,96 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "failure": 0,
             "total": 1,
         }
+
+
+def test_grid_output_version_bump_requeues_and_replaces_stale_row(
+    tmp_path, monkeypatch
+):
+    from simulator import engine_cache
+
+    database = tmp_path / "chemistry-version.db"
+    inputs = _inputs(1200.0)
+    with GridCacheWriter(database, backend_name="subprocess") as writer:
+        batch_id = writer.ensure_batch(
+            label="chemistry-version", kind="fixed", seed=1, params={}
+        )
+        writer.materialize_key(
+            inputs, batch_id=batch_id, shuffle_rank=0, shard=0
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        assert writer.write_result(grid_key_id, _output())
+        existing = writer.connection.execute(
+            "SELECT id, producer_chemistry_versions_json "
+            "FROM alphamelts_outputs"
+        ).fetchone()
+        assert json.loads(existing["producer_chemistry_versions_json"]) == (
+            engine_cache.chemistry_versions(("alphamelts",))
+        )
+
+        old_version = engine_cache.ENGINE_CHEMISTRY_VERSION["alphamelts"]
+        monkeypatch.setitem(
+            engine_cache.ENGINE_CHEMISTRY_VERSION,
+            "alphamelts",
+            old_version + 1,
+        )
+        assert writer.queue_counts(batch_id=batch_id) == {
+            "total": 1,
+            "done": 0,
+            "remaining": 1,
+        }
+        pending = writer.pending_rows(batch_id=batch_id)
+        assert [row["grid_key_id"] for row in pending] == [grid_key_id]
+        assert writer.write_result(grid_key_id, _output())
+        updated = writer.connection.execute(
+            "SELECT id, producer_chemistry_versions_json "
+            "FROM alphamelts_outputs"
+        ).fetchone()
+        assert int(updated["id"]) == int(existing["id"])
+        assert json.loads(updated["producer_chemistry_versions_json"]) == (
+            engine_cache.chemistry_versions(("alphamelts",))
+        )
+
+
+def test_harvest_copy_and_fingerprint_include_producer_chemistry_versions(
+    monkeypatch,
+):
+    from scripts.grind_harvest import (
+        _copyable_output_columns,
+        _row_fingerprint,
+        _scientific_payload_columns,
+    )
+    from scripts.grid_pregrind_writer import _producer_chemistry_versions_json
+    from simulator import engine_cache
+
+    columns = (
+        "id",
+        "source_host",
+        "source_row_id",
+        "expedited_key",
+        "engine_epoch",
+        "producer_chemistry_versions_json",
+    )
+    copyable = _copyable_output_columns(columns)
+    payload = _scientific_payload_columns(columns)
+    assert "producer_chemistry_versions_json" in copyable
+    assert "producer_chemistry_versions_json" in payload
+
+    old_stamp = _producer_chemistry_versions_json("subprocess")
+    old_version = engine_cache.ENGINE_CHEMISTRY_VERSION["alphamelts"]
+    monkeypatch.setitem(
+        engine_cache.ENGINE_CHEMISTRY_VERSION, "alphamelts", old_version + 1
+    )
+    current_stamp = _producer_chemistry_versions_json("subprocess")
+    old = {
+        "expedited_key": "same-request",
+        "engine_epoch": 1,
+        "producer_chemistry_versions_json": old_stamp,
+    }
+    current = {
+        **old,
+        "producer_chemistry_versions_json": current_stamp,
+    }
+    assert _row_fingerprint(old, payload) != _row_fingerprint(current, payload)
 
 
 def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path):

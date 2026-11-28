@@ -62,6 +62,47 @@ def PhaseContext(
     grind_cache_path: str | Path | None = None,
     liquidus_temperature_C: float | None = None,
 ) -> dict[str, dict[str, Any]]:
+    """Return diagnostic phase context using the legacy public call shape."""
+    return _phase_context(
+        T,
+        P,
+        composition,
+        fO2,
+        molar_masses=molar_masses,
+        scalar_liquid_fraction=scalar_liquid_fraction,
+        verified_scalar_source=verified_scalar_source,
+        grind_cache_path=grind_cache_path,
+        liquidus_temperature_C=liquidus_temperature_C,
+        producer_chemistry_versions=None,
+    )
+
+
+def _phase_context_with_producer_versions(
+    *args: Any,
+    producer_chemistry_versions: Mapping[str, int],
+    **kwargs: Any,
+) -> dict[str, dict[str, Any]]:
+    """Internal entry for the production caller to pass owner versions."""
+    return _phase_context(
+        *args,
+        producer_chemistry_versions=producer_chemistry_versions,
+        **kwargs,
+    )
+
+
+def _phase_context(
+    T: float,
+    P: float,
+    composition: Mapping[str, float],
+    fO2: float,
+    *,
+    molar_masses: Mapping[str, float],
+    scalar_liquid_fraction: float | None = None,
+    verified_scalar_source: str | None = None,
+    grind_cache_path: str | Path | None = None,
+    liquidus_temperature_C: float | None = None,
+    producer_chemistry_versions: Mapping[str, int] | None,
+) -> dict[str, dict[str, Any]]:
     """Return phase/activity context for each positive-composition species.
 
     Tier 1 reads the grind accumulator. Epoch-1 rows are eligible only when
@@ -89,6 +130,7 @@ def PhaseContext(
         composition_mol=composition_mol,
         fO2_log=fO2_log,
         liquidus_temperature_C=liquidus_temperature_C,
+        producer_chemistry_versions=producer_chemistry_versions,
     )
     if cache_result is not None:
         selected_provenance = {
@@ -154,11 +196,17 @@ def _grind_cache_lookup(
     composition_mol: Mapping[str, float],
     fO2_log: float,
     liquidus_temperature_C: float | None,
+    producer_chemistry_versions: Mapping[str, int] | None,
 ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
     if path.is_file():
+        connection = _grind_cache_readonly_connection(path)
+        producer_version_stamps = _current_producer_chemistry_version_stamps(
+            connection, producer_chemistry_versions or {}
+        )
         return _cached_grind_cache_lookup(
             str(path.resolve()),
             _grind_cache_data_version(path),
+            producer_version_stamps,
             temperature_C,
             pressure_bar,
             tuple(sorted(composition_mol.items())),
@@ -172,7 +220,43 @@ def _grind_cache_lookup(
         composition_mol=composition_mol,
         fO2_log=fO2_log,
         liquidus_temperature_C=liquidus_temperature_C,
+        producer_chemistry_version_stamps=(),
     )
+
+
+def _current_producer_chemistry_version_stamps(
+    connection: sqlite3.Connection,
+    current_versions: Mapping[str, int],
+) -> tuple[str, ...]:
+    try:
+        rows = connection.execute(
+            "SELECT DISTINCT producer_chemistry_versions_json "
+            "FROM alphamelts_outputs "
+            "WHERE producer_chemistry_versions_json IS NOT NULL"
+        ).fetchall()
+    except sqlite3.OperationalError as exc:
+        if "producer_chemistry_versions_json" in str(exc):
+            return ()
+        raise
+    stamps: set[str] = set()
+    for row in rows:
+        try:
+            recorded = json.loads(str(row[0]))
+        except (TypeError, ValueError):
+            continue
+        if not isinstance(recorded, dict) or not recorded:
+            continue
+        producers = tuple(sorted(recorded))
+        if any(producer not in current_versions for producer in producers):
+            continue
+        stamps.add(
+            json.dumps(
+                {producer: int(current_versions[producer]) for producer in producers},
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+        )
+    return tuple(sorted(stamps))
 
 
 def _grind_cache_data_version(path: Path) -> tuple[int, int, int]:
@@ -210,6 +294,7 @@ def _grind_cache_data_version(path: Path) -> tuple[int, int, int]:
 def _cached_grind_cache_lookup(
     path: str,
     _data_version: tuple[int, int, int],
+    producer_chemistry_version_stamps: tuple[str, ...],
     temperature_C: float,
     pressure_bar: float,
     composition_items: tuple[tuple[str, float], ...],
@@ -223,6 +308,7 @@ def _cached_grind_cache_lookup(
         composition_mol=dict(composition_items),
         fO2_log=fO2_log,
         liquidus_temperature_C=liquidus_temperature_C,
+        producer_chemistry_version_stamps=producer_chemistry_version_stamps,
     )
 
 
@@ -234,6 +320,8 @@ def _uncached_grind_cache_lookup(
     composition_mol: Mapping[str, float],
     fO2_log: float,
     liquidus_temperature_C: float | None,
+    producer_chemistry_versions: Mapping[str, int] | None = None,
+    producer_chemistry_version_stamps: tuple[str, ...] | None = None,
 ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
     provenance: dict[str, Any] = {
         "source": "grind-accumulator.db",
@@ -261,6 +349,12 @@ def _uncached_grind_cache_lookup(
             > LIQUIDUS_MATCH_TOLERANCE_C
         )
         connection = _grind_cache_readonly_connection(path)
+        if producer_chemistry_version_stamps is None:
+            producer_chemistry_version_stamps = (
+                _current_producer_chemistry_version_stamps(
+                    connection, producer_chemistry_versions or {}
+                )
+            )
         database_id = _metadata_value(connection, "database_id")
         if database_id:
             provenance["database_id"] = database_id
@@ -272,6 +366,7 @@ def _uncached_grind_cache_lookup(
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             include_isothermal=max_epoch >= 2,
+            producer_chemistry_version_stamps=producer_chemistry_version_stamps,
         )
         if off_liquidus_request:
             refused_epoch_1 = sum(
@@ -462,7 +557,10 @@ def _candidate_rows(
     pressure_bar: float,
     fO2_log: float,
     include_isothermal: bool,
+    producer_chemistry_version_stamps: tuple[str, ...] = (),
 ) -> list[sqlite3.Row]:
+    if not producer_chemistry_version_stamps:
+        return []
     # |x - t| <= tol  <=>  t - tol <= x <= t + tol
     #                 <=>  x BETWEEN t - tol AND t + tol
     # on the reals (closed interval; SQLite BETWEEN is inclusive). ABS(col - ?)
@@ -509,8 +607,12 @@ def _candidate_rows(
            AND ABS(g.pressure_bar - ?) <= ?
            AND g.fO2_log BETWEEN ? AND ?
            AND ABS(g.fO2_log - ?) <= ?
+           AND o.producer_chemistry_versions_json IN ({producer_version_placeholders})
          ORDER BY ABS({temperature_column} - ?), o.id
     """
+    producer_version_placeholders = ",".join(
+        "?" for _ in producer_chemistry_version_stamps
+    )
     params = (
         temperature_lo,
         temperature_hi,
@@ -524,6 +626,7 @@ def _candidate_rows(
         fo2_hi,
         fO2_log,
         CONTROL_MATCH_TOLERANCE,
+        *producer_chemistry_version_stamps,
         temperature_C,
     )
     rows: list[sqlite3.Row] = []
@@ -534,6 +637,7 @@ def _candidate_rows(
                     temperature_column="o.generic_temperature_C",
                     scope_literal="'isothermal_epoch_2'",
                     epoch_predicate=">= 2",
+                    producer_version_placeholders=producer_version_placeholders,
                 ),
                 params,
             ).fetchall()
@@ -547,6 +651,7 @@ def _candidate_rows(
                 ),
                 scope_literal="'liquidus_surface_epoch_1'",
                 epoch_predicate="= 1",
+                producer_version_placeholders=producer_version_placeholders,
             ),
             params,
         ).fetchall()

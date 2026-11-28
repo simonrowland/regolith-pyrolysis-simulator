@@ -2972,13 +2972,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 verified_scalar_source = 'hour_pinned_melt_redox_gate'
 
-            from simulator.chemistry.phase_context import PhaseContext
+            from simulator.chemistry.phase_context import (
+                _phase_context_with_producer_versions,
+            )
+            from simulator.engine_cache import (
+                ENGINE_CHEMISTRY_VERSION,
+                chemistry_versions,
+            )
 
             liquidus_temperature_C = None
             if isinstance(gate_authority, Mapping):
                 liquidus_temperature_C = gate_authority.get('liquidus_T_C')
 
-            per_species = PhaseContext(
+            per_species = _phase_context_with_producer_versions(
                 float(self.melt.temperature_C),
                 float(self.melt.p_total_mbar) / 1000.0,
                 self._backend_composition_mol(),
@@ -2987,6 +2993,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 scalar_liquid_fraction=scalar_liquid_fraction,
                 verified_scalar_source=verified_scalar_source,
                 liquidus_temperature_C=liquidus_temperature_C,
+                producer_chemistry_versions=(
+                    chemistry_versions(ENGINE_CHEMISTRY_VERSION)
+                ),
             )
             record = {
                 'schema': 'phase_context_diagnostic_v1',

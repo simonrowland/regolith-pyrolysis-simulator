@@ -10,14 +10,28 @@ import pytest
 
 from simulator.chemistry.phase_context import (
     InvalidLiquidFractionError,
-    PhaseContext,
     _optional_fraction,
+    _phase_context_with_producer_versions,
 )
+from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, chemistry_versions
 from simulator.state import MOLAR_MASS
 
 
 def _phase_context(*args, **kwargs):
-    return PhaseContext(*args, molar_masses=MOLAR_MASS, **kwargs)
+    return _phase_context_with_producer_versions(
+        *args,
+        molar_masses=MOLAR_MASS,
+        producer_chemistry_versions=chemistry_versions(ENGINE_CHEMISTRY_VERSION),
+        **kwargs,
+    )
+
+
+def _producer_chemistry_stamp() -> str:
+    return json.dumps(
+        chemistry_versions(("alphamelts",)),
+        sort_keys=True,
+        separators=(",", ":"),
+    )
 
 
 def _write_epoch_1_cache(
@@ -57,7 +71,8 @@ def _write_epoch_1_cache(
                 generic_activity_coefficients_json TEXT,
                 generic_temperature_C REAL,
                 generic_liquidus_T_C REAL,
-                alpha_liquidus_T_C REAL
+                alpha_liquidus_T_C REAL,
+                producer_chemistry_versions_json TEXT
             );
             """
         )
@@ -67,7 +82,7 @@ def _write_epoch_1_cache(
         )
         connection.execute(
             "INSERT INTO alphamelts_outputs VALUES "
-            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 7,
                 1,
@@ -82,6 +97,7 @@ def _write_epoch_1_cache(
                 900.0,
                 1299.0,
                 1300.0,
+                _producer_chemistry_stamp(),
             ),
         )
     return composition
@@ -112,6 +128,42 @@ def test_phase_context_selects_epoch_1_only_on_liquidus_surface(tmp_path):
         "liquidus_surface_epoch_1"
     )
     assert provenance["grind_cache"]["executed_temperature_C"] == 1300.0
+
+
+def test_phase_context_rejects_row_with_older_producer_chemistry_version(
+    tmp_path, monkeypatch
+):
+    cache = tmp_path / "grind-accumulator.db"
+    composition = _write_epoch_1_cache(cache)
+    initial = _phase_context(
+        1300.0,
+        1.0,
+        composition,
+        -9.0,
+        scalar_liquid_fraction=0.25,
+        grind_cache_path=cache,
+    )
+    assert initial["SiO2"]["provenance"]["selected_tier"] == (
+        "grind_cache_assemblage"
+    )
+    old_version = ENGINE_CHEMISTRY_VERSION["alphamelts"]
+    monkeypatch.setitem(
+        ENGINE_CHEMISTRY_VERSION, "alphamelts", old_version + 1
+    )
+
+    context = _phase_context(
+        1300.0,
+        1.0,
+        composition,
+        -9.0,
+        scalar_liquid_fraction=0.25,
+        grind_cache_path=cache,
+    )
+
+    assert context["SiO2"]["liquid_fraction"] == pytest.approx(0.25)
+    assert context["SiO2"]["provenance"]["selected_tier"] == (
+        "kress_scalar_liquid_fraction"
+    )
 
 
 def test_epoch_1_refuses_isothermal_claim_and_selects_scalar(tmp_path):
@@ -164,7 +216,7 @@ def test_epoch_2_presence_does_not_unlock_epoch_1_liquidus_surface(tmp_path):
         )
         connection.execute(
             "INSERT INTO alphamelts_outputs VALUES "
-            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 8,
                 2,
@@ -179,6 +231,7 @@ def test_epoch_2_presence_does_not_unlock_epoch_1_liquidus_surface(tmp_path):
                 1200.0,
                 1300.0,
                 1300.0,
+                _producer_chemistry_stamp(),
             ),
         )
 

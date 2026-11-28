@@ -23,6 +23,7 @@ import pytest
 
 from scripts.grid_pregrind_writer import (
     GridCacheWriter,
+    _producer_chemistry_versions_json,
     install_phase_context_lookup_indexes,
 )
 from scripts.replay_phase_context_lookup_identity import _copy_and_index
@@ -33,6 +34,7 @@ from simulator.chemistry.phase_context import (
     MAX_COMPOSITION_DISTANCE,
     _uncached_grind_cache_lookup,
 )
+from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, chemistry_versions
 
 
 # Frozen snapshot of _candidate_rows as of 19a7ab13, before the sargable rewrite.
@@ -53,6 +55,7 @@ _LEGACY_SELECT = """
            AND ABS({temperature_column} - ?) <= ?
            AND ABS(g.pressure_bar - ?) <= ?
            AND ABS(g.fO2_log - ?) <= ?
+           AND o.producer_chemistry_versions_json IN ({producer_version_placeholders})
          ORDER BY ABS({temperature_column} - ?), o.id
 """
 def _legacy_candidate_rows(
@@ -63,6 +66,16 @@ def _legacy_candidate_rows(
     fO2_log: float,
     include_isothermal: bool,
 ) -> list[sqlite3.Row]:
+    producer_chemistry_version_stamps = (
+        pc._current_producer_chemistry_version_stamps(
+            connection, chemistry_versions(ENGINE_CHEMISTRY_VERSION)
+        )
+    )
+    if not producer_chemistry_version_stamps:
+        return []
+    producer_version_placeholders = ",".join(
+        "?" for _ in producer_chemistry_version_stamps
+    )
     params = (
         temperature_C,
         LIQUIDUS_MATCH_TOLERANCE_C,
@@ -70,6 +83,7 @@ def _legacy_candidate_rows(
         CONTROL_MATCH_TOLERANCE,
         fO2_log,
         CONTROL_MATCH_TOLERANCE,
+        *producer_chemistry_version_stamps,
         temperature_C,
     )
     rows: list[sqlite3.Row] = []
@@ -80,6 +94,7 @@ def _legacy_candidate_rows(
                     temperature_column="o.generic_temperature_C",
                     scope_literal="'isothermal_epoch_2'",
                     epoch_predicate=">= 2",
+                    producer_version_placeholders=producer_version_placeholders,
                 ),
                 params,
             ).fetchall()
@@ -93,6 +108,7 @@ def _legacy_candidate_rows(
                 ),
                 scope_literal="'liquidus_surface_epoch_1'",
                 epoch_predicate="= 1",
+                producer_version_placeholders=producer_version_placeholders,
             ),
             params,
         ).fetchall()
@@ -174,10 +190,21 @@ def _new_selected_id(
         composition_mol=composition_mol,
         fO2_log=fO2_log,
         liquidus_temperature_C=liquidus_temperature_C,
+        producer_chemistry_versions=chemistry_versions(ENGINE_CHEMISTRY_VERSION),
     )
     if result is None:
         return None
     return int(result["id"])
+
+
+def _uncached_current(path: Path, **kwargs):
+    return _uncached_grind_cache_lookup(
+        path,
+        producer_chemistry_versions=chemistry_versions(
+            ENGINE_CHEMISTRY_VERSION
+        ),
+        **kwargs,
+    )
 
 
 def _create_schema(connection: sqlite3.Connection) -> None:
@@ -203,7 +230,8 @@ def _create_schema(connection: sqlite3.Connection) -> None:
             generic_activity_coefficients_json TEXT,
             generic_temperature_C REAL,
             generic_liquidus_T_C REAL,
-            alpha_liquidus_T_C REAL
+            alpha_liquidus_T_C REAL,
+            producer_chemistry_versions_json TEXT
         );
         """
     )
@@ -237,7 +265,7 @@ def _insert_row(
     )
     connection.execute(
         "INSERT INTO alphamelts_outputs VALUES "
-        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             row_id,
             row_id,
@@ -252,6 +280,7 @@ def _insert_row(
             generic_temperature_C,
             generic_liquidus_T_C,
             alpha_liquidus_T_C,
+            _producer_chemistry_versions_json("subprocess"),
         ),
     )
 
@@ -734,7 +763,7 @@ def test_boundary_matrix_epoch_1_only_isothermal_unavailable(tmp_path):
     _compare_selected_ids(cache, [on_liquidus, off_liquidus_empty])
 
     _reset_lookup_caches()
-    result, provenance = _uncached_grind_cache_lookup(cache, **off_liquidus_empty)
+    result, provenance = _uncached_current(cache, **off_liquidus_empty)
     pc._close_grind_cache_connections()
     assert result is None
     assert provenance["isothermal_status"] == "empty_pending_epoch_2_regrind"
@@ -777,7 +806,7 @@ def test_boundary_matrix_cross_thread_distinct_query_keys(tmp_path):
             if name != "a":
                 if not first_lookup_done.wait(timeout=10):
                     raise TimeoutError("first lookup did not complete")
-            result, prov = _uncached_grind_cache_lookup(cache, **keys[name])
+            result, prov = _uncached_current(cache, **keys[name])
             selected[name] = None if result is None else int(result["id"])
             provenance[name] = prov
         except Exception as exc:
@@ -890,9 +919,9 @@ def test_uncached_lookup_reuses_sqlite_connection(tmp_path, monkeypatch):
         fO2_log=-9.0,
         liquidus_temperature_C=None,
     )
-    _uncached_grind_cache_lookup(cache, **kwargs)
+    _uncached_current(cache, **kwargs)
     kwargs["temperature_C"] = 1300.01
-    _uncached_grind_cache_lookup(cache, **kwargs)
+    _uncached_current(cache, **kwargs)
     pc._close_grind_cache_connections()
     assert len(calls) == 1
 
@@ -994,6 +1023,9 @@ def test_cached_miss_is_invalidated_by_a_commit_into_a_still_live_wal(tmp_path):
             composition_mol=composition,
             fO2_log=-8.0,
             liquidus_temperature_C=1600.0,
+            producer_chemistry_versions=chemistry_versions(
+                ENGINE_CHEMISTRY_VERSION
+            ),
         )
 
         _reset_lookup_caches()
