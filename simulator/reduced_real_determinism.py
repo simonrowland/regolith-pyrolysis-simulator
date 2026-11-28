@@ -2972,10 +2972,43 @@ class _PT1RowLayout(str, Enum):
     V2 = "v2"
     PARTIAL_BUCKET = "partial_bucket"
     LEGACY = "legacy"
+    PREFLIGHT = "preflight"
+    MINIMAL_ADMISSION = "minimal_admission"
     UNSUPPORTED = "unsupported"
 
 
 def _pt1_row_layout(columns: Iterable[str]) -> _PT1RowLayout:
+    """Classify PT-1 table and admission-row shapes handled by green.
+
+    Green creates or consumes these reduced-real shapes (extra source columns
+    are ignored where noted below):
+
+    | Layout | Column signature | Green handling |
+    | --- | --- | --- |
+    | CURRENT | `{key_hash, artifact, store_schema_version, request_schema_version, key_sha256, payload_sha256, payload_codec_version, key_bytes, payload_bytes, code_version, corpus_version, engine_version, data_digests_json, repair_notices_json, created_at, git_dirty}` plus all bucket/ladder fields | current stamped read/write |
+    | V2 | CURRENT without `repair_notices_json` | attached read and seed/merge with the v2 stamp |
+    | PARTIAL_BUCKET | legacy cache or rekey signature plus one or more bucket/ladder fields | legacy read/rekey or incremental index migration |
+    | LEGACY cache | `{key_hash, artifact, store_schema_version, request_schema_version, key_sha256, payload_sha256, key_bytes, payload_bytes, code_version, engine_version, data_digests_json, created_at, git_dirty}` | legacy read/copy |
+    | LEGACY rekey | `{key_hash, key_sha256, key_bytes, engine_version}` plus optional `corpus_version` | legacy rekey |
+    | PREFLIGHT | exactly `{key_hash, artifact, key_bytes, payload_bytes}` | strict-vapour preflight decodes and walks the two JSON values |
+    | MINIMAL_ADMISSION | exactly `{artifact, key_hash, key_sha256, key_bytes, payload_sha256, payload_bytes, payload_codec_version}` | `_pt1_row_admission` validates the mapping without engine or index columns |
+
+    Bucket/ladder fields are `physics_bucket_schema_version`,
+    `physics_bucket_sha256`, `replay_scope_sha256`, `physics_key_bytes`, and
+    each `physics_bucket_{h40,h30,h40c,h30c}_{sha256,distance}` column. The
+    signatures come from production `_initialize` and `_ensure_physics_bucket_columns`,
+    v2 and b265 column-drop fixtures, and PT-1 fixtures in
+    `test_engine_local_config`, `test_backfill_physics_bucket`,
+    `test_rekey_cache_engine_identity`, `test_corpus_anchored_parity`, and
+    `test_grind_preflight`. The minimal mapping is built in
+    `test_extrapolated_gate_admission_uses_query_identity_at_each_reader`;
+    stored rows passed directly to `_entry_from_row` are full current rows.
+    Seed's `source_only_metadata` column is ignored by green for the cache
+    schema signatures. PREFLIGHT and MINIMAL_ADMISSION are exact sets.
+    Converter-only one-column `reduced_real_equilibrium_payloads(value)`
+    tables are not replay layouts.
+    """
+
     column_names = frozenset(columns)
     bucket_columns = frozenset(
         {
@@ -2997,27 +3030,79 @@ def _pt1_row_layout(columns: Iterable[str]) -> _PT1RowLayout:
         "key_hash",
         "artifact",
         "store_schema_version",
+        "request_schema_version",
         "key_sha256",
         "payload_sha256",
         "payload_codec_version",
         "key_bytes",
         "payload_bytes",
+        "code_version",
+        "corpus_version",
+        "engine_version",
+        "data_digests_json",
         "repair_notices_json",
+        "created_at",
+        "git_dirty",
     }) | bucket_columns
     if current_columns.issubset(column_names):
         return _PT1RowLayout.CURRENT
     if (current_columns - {"repair_notices_json"}).issubset(column_names):
         return _PT1RowLayout.V2
 
-    if bucket_columns.intersection(column_names):
+    legacy_cache_columns = frozenset(
+        {
+            "key_hash",
+            "artifact",
+            "store_schema_version",
+            "request_schema_version",
+            "key_sha256",
+            "payload_sha256",
+            "key_bytes",
+            "payload_bytes",
+            "code_version",
+            "engine_version",
+            "data_digests_json",
+            "created_at",
+            "git_dirty",
+        }
+    )
+    rekey_columns = frozenset(
+        {
+            "key_hash",
+            "key_sha256",
+            "key_bytes",
+            "engine_version",
+        }
+    )
+    has_legacy_identity = (
+        legacy_cache_columns.issubset(column_names)
+        or rekey_columns.issubset(column_names)
+    )
+    if bucket_columns.intersection(column_names) and has_legacy_identity:
         return _PT1RowLayout.PARTIAL_BUCKET
-    if {
-        "key_hash",
-        "key_sha256",
-        "key_bytes",
-        "engine_version",
-    }.issubset(column_names):
+    if has_legacy_identity:
         return _PT1RowLayout.LEGACY
+    if column_names == frozenset(
+        {
+            "key_hash",
+            "artifact",
+            "key_bytes",
+            "payload_bytes",
+        }
+    ):
+        return _PT1RowLayout.PREFLIGHT
+    if column_names == frozenset(
+        {
+            "artifact",
+            "key_hash",
+            "key_sha256",
+            "key_bytes",
+            "payload_sha256",
+            "payload_bytes",
+            "payload_codec_version",
+        }
+    ):
+        return _PT1RowLayout.MINIMAL_ADMISSION
     return _PT1RowLayout.UNSUPPORTED
 
 
@@ -3572,7 +3657,11 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
     artifact_name = artifact if isinstance(artifact, str) else "unknown"
     row_columns = set(row)
     layout = _pt1_row_layout(row_columns)
-    if layout is _PT1RowLayout.UNSUPPORTED:
+    if layout in (
+        _PT1RowLayout.UNSUPPORTED,
+        _PT1RowLayout.PREFLIGHT,
+        _PT1RowLayout.MINIMAL_ADMISSION,
+    ):
         raise UncacheableKey(
             PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
             "write_candidate_layout",

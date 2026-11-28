@@ -12313,3 +12313,119 @@ def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
         )
 
     assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
+
+
+def test_pt1_row_layout_classifies_each_green_supported_shape(
+    tmp_path: Path,
+) -> None:
+    store = PT1PersistentEquilibriumStore(tmp_path / "pt1-layouts.sqlite")
+    with store._connect() as conn:
+        store._initialize(conn)
+        current_columns = frozenset(
+            str(row["name"])
+            for row in conn.execute(
+                f"PRAGMA table_info({rrd.PT1_EQUILIBRIUM_TABLE})"
+            )
+        )
+    assert {
+        "request_schema_version",
+        "payload_codec_version",
+        "repair_notices_json",
+        "law_disclosures_json",
+        "created_at",
+        "git_dirty",
+    } <= current_columns
+
+    legacy_cache_columns = frozenset(
+        {
+            "key_hash",
+            "artifact",
+            "store_schema_version",
+            "request_schema_version",
+            "key_sha256",
+            "payload_sha256",
+            "key_bytes",
+            "payload_bytes",
+            "code_version",
+            "engine_version",
+            "data_digests_json",
+            "created_at",
+            "git_dirty",
+        }
+    )
+    rekey_core = frozenset(
+        {"key_hash", "key_sha256", "key_bytes", "engine_version"}
+    )
+    layout_cases = {
+        "current store schema": (
+            current_columns,
+            rrd._PT1RowLayout.CURRENT,
+        ),
+        "current schema with ignored source metadata": (
+            current_columns | {"source_only_metadata"},
+            rrd._PT1RowLayout.CURRENT,
+        ),
+        "current schema without optional disclosures": (
+            current_columns - {"law_disclosures_json"},
+            rrd._PT1RowLayout.CURRENT,
+        ),
+        "v2 without repair notices": (
+            current_columns - {"repair_notices_json"},
+            rrd._PT1RowLayout.V2,
+        ),
+        "b265 schema without codec and disclosures": (
+            current_columns - {"payload_codec_version", "law_disclosures_json"},
+            rrd._PT1RowLayout.PARTIAL_BUCKET,
+        ),
+        "legacy cache table": (
+            legacy_cache_columns,
+            rrd._PT1RowLayout.LEGACY,
+        ),
+        "legacy cache table with corpus version": (
+            legacy_cache_columns | {"corpus_version"},
+            rrd._PT1RowLayout.LEGACY,
+        ),
+        "legacy cache with an index column added": (
+            legacy_cache_columns | {"physics_bucket_schema_version"},
+            rrd._PT1RowLayout.PARTIAL_BUCKET,
+        ),
+        "four-column rekey table": (
+            rekey_core,
+            rrd._PT1RowLayout.LEGACY,
+        ),
+        "rekey table with corpus version": (
+            rekey_core | {"corpus_version"},
+            rrd._PT1RowLayout.LEGACY,
+        ),
+        "rekey table with replay scope": (
+            rekey_core | {"corpus_version", "replay_scope_sha256"},
+            rrd._PT1RowLayout.PARTIAL_BUCKET,
+        ),
+        "rekey table with an index column added": (
+            rekey_core | {"physics_bucket_schema_version"},
+            rrd._PT1RowLayout.PARTIAL_BUCKET,
+        ),
+        "strict-vapour preflight table": (
+            {"key_hash", "artifact", "key_bytes", "payload_bytes"},
+            rrd._PT1RowLayout.PREFLIGHT,
+        ),
+        "minimal row-admission mapping": (
+            {
+                "artifact",
+                "key_hash",
+                "key_sha256",
+                "key_bytes",
+                "payload_sha256",
+                "payload_bytes",
+                "payload_codec_version",
+            },
+            rrd._PT1RowLayout.MINIMAL_ADMISSION,
+        ),
+        "converter-only value table": (
+            {"value"},
+            rrd._PT1RowLayout.UNSUPPORTED,
+        ),
+    }
+
+    for name, (columns, expected) in layout_cases.items():
+        assert rrd._pt1_row_layout(columns) is expected, name
