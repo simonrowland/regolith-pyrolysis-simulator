@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Callable, Mapping, Sequence
+from functools import lru_cache
 
 from scipy.optimize import brentq
 
@@ -43,6 +44,22 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 _MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
 _CHROMIUM_OXYGEN_PER_CR_CANDIDATES = (1.0, 1.5, 3.0)
+
+
+@lru_cache(maxsize=256)
+def _cached_molar_flux_denominators(
+    temperature_hex: str,
+    channel_keys: tuple[tuple[str, str], ...],
+) -> tuple[float, ...]:
+    """Cache the T and channel-only denominator in each molar flux."""
+
+    temperature = float.fromhex(temperature_hex)
+    return tuple(
+        math.sqrt(
+            2.0 * math.pi * GAS_CONSTANT * temperature * float.fromhex(mass_hex)
+        )
+        for _species, mass_hex in channel_keys
+    )
 
 
 def _cell_material_class(
@@ -159,6 +176,9 @@ def _solve_vacuum_oxygen_balance(
     background_pressure_Pa: float = 0.0,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
     on_accepted_evaluation: Callable[[float], None] | None = None,
+    defer_pressure_law_diagnostics: Callable[
+        [Callable[[], tuple[PressureLawChannelDiagnostic, ...]], tuple[str, ...]], None
+    ] | None = None,
 ) -> _VacuumOxygenBalance:
     """Solve an alpha-weighted, engine-supplied vacuum pressure model.
 
@@ -247,14 +267,34 @@ def _solve_vacuum_oxygen_balance(
     if not active_channels or not strictly_monotone:
         raise ValueError("oxygen-balance flux is not strictly monotone for active channels")
 
+    flux_channel_keys = tuple(
+        (channel.species, float(channel.molar_mass_kg_per_mol).hex())
+        for channel in active_channels
+    )
+    flux_denominators = dict(zip(
+        (channel.species for channel in active_channels),
+        _cached_molar_flux_denominators(temperature.hex(), flux_channel_keys),
+        strict=True,
+    ))
+    fixed_parent_oxygen_demands = tuple(
+        None
+        if (
+            (channel.species == "CrO2" and channel.redox_metal_atoms > 0.0)
+            or (
+                channel.oxygen_per_metal_atom is not None
+                and channel.redox_metal_atoms > 0.0
+            )
+        )
+        else channel.parent_oxygen_demand
+        for channel in active_channels
+    )
+
     def molar_flux(channel: _VacuumOxygenChannel, pressure: float) -> float:
         # Only the flux uses the bulk-partial ceiling. Keep equilibrium Peq
         # untouched for the power-law validation and thermodynamic root axis.
         drive = (_net_evaporation_pressure_Pa(pressure, background_pressure_Pa)
                  if background_pressure_Pa else pressure)
-        return channel.alpha * drive / math.sqrt(
-            2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
-        )
+        return channel.alpha * drive / flux_denominators[channel.species]
 
     def evaluate(
         logp: float, model_pressures: Mapping[str, float] | None = None,
@@ -275,7 +315,9 @@ def _solve_vacuum_oxygen_balance(
         demands: dict[str, float] = {}
         oxygen_flux = 0.0
         parent_flux = 0.0
-        for channel in active_channels:
+        for channel, fixed_demand in zip(
+            active_channels, fixed_parent_oxygen_demands, strict=True
+        ):
             try:
                 pressure = float(model_pressures[channel.species])
             except (KeyError, TypeError, ValueError, OverflowError) as exc:
@@ -287,7 +329,11 @@ def _solve_vacuum_oxygen_balance(
                     f"pressure model returned invalid {channel.species!r} pressure"
                 )
             pressures[channel.species] = pressure
-            demand = _channel_parent_oxygen_demand(channel, model_pressures)
+            demand = (
+                fixed_demand
+                if fixed_demand is not None
+                else _channel_parent_oxygen_demand(channel, model_pressures)
+            )
             if not math.isfinite(demand) or demand < 0.0:
                 raise ValueError(
                     f"parent oxygen demand is invalid for {channel.species!r}"
@@ -360,78 +406,101 @@ def _solve_vacuum_oxygen_balance(
         root_demands,
         root_q,
     ) = evaluate(root)
-    pressure_law_diagnostics: list[PressureLawChannelDiagnostic] = []
+    pressure_law_diagnostics: tuple[PressureLawChannelDiagnostic, ...] = ()
     fixed_activities = bool(getattr(pressure_model, "declares_fixed_activities", False))
     redox_active = bool(getattr(pressure_model, "declares_redox_active", False))
     if bracket_boundary != "lower":
-        probe_low = max(low, root - 0.1)
-        probe_high = root + 0.1
-        lower_model_pressures = pressure_model(probe_low)
-        upper_model_pressures = pressure_model(probe_high)
-        _low_residual, lower_pressures, _low_oxygen, _low_parent, _activity_low, _low_demands, _q_low = evaluate(
-            probe_low, lower_model_pressures
-        )
-        _high_residual, upper_pressures, _high_oxygen, _high_parent, _activity_high, _high_demands, _q_high = evaluate(
-            probe_high, upper_model_pressures
-        )
-        for channel in active_channels:
-            pressure = pressures[channel.species]
-            if pressure <= 1.0e-300:
-                continue
-            lower_pressure = lower_pressures[channel.species]
-            upper_pressure = upper_pressures[channel.species]
-            if lower_pressure <= 0.0 or upper_pressure <= 0.0:
-                lower_omissions = getattr(
-                    lower_model_pressures, "below_threshold_omissions", {}
-                )
-                upper_omissions = getattr(
-                    upper_model_pressures, "below_threshold_omissions", {}
-                )
-                lower_omission_proven = (
-                    isinstance(lower_omissions, Mapping)
-                    and channel.species in lower_omissions
-                )
-                upper_omission_proven = (
-                    isinstance(upper_omissions, Mapping)
-                    and channel.species in upper_omissions
-                )
-                if (
-                    (lower_pressure > 0.0 or lower_omission_proven)
-                    and (upper_pressure > 0.0 or upper_omission_proven)
-                ):
+        def calculate_pressure_law_diagnostics():
+            diagnostics: list[PressureLawChannelDiagnostic] = []
+            probe_low = max(low, root - 0.1)
+            probe_high = root + 0.1
+            lower_model_pressures = pressure_model(probe_low)
+            upper_model_pressures = pressure_model(probe_high)
+            (
+                _low_residual, lower_pressures, _low_oxygen, _low_parent,
+                _activity_low, _low_demands, _q_low,
+            ) = evaluate(probe_low, lower_model_pressures)
+            (
+                _high_residual, upper_pressures, _high_oxygen, _high_parent,
+                _activity_high, _high_demands, _q_high,
+            ) = evaluate(probe_high, upper_model_pressures)
+            for channel in active_channels:
+                pressure = pressures[channel.species]
+                if pressure <= 1.0e-300:
                     continue
-                raise ValueError(
-                    f"pressure law for {channel.species!r} is not positive around the root"
-                )
-            observed_exponent = (
-                math.log10(upper_pressure) - math.log10(lower_pressure)
-            ) / (probe_high - probe_low)
-            if fixed_activities or not redox_active:
-                # Fixed-activity laws and undeclared callables retain the
-                # supplied stoichiometric exponent as a hard contract.
-                if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
-                    raise PressureLawExponentMismatch(
-                        f"pressure law exponent mismatch for {channel.species!r}: "
-                        f"declared {channel.pO2_exponent}, observed {observed_exponent}"
+                lower_pressure = lower_pressures[channel.species]
+                upper_pressure = upper_pressures[channel.species]
+                if lower_pressure <= 0.0 or upper_pressure <= 0.0:
+                    lower_omissions = getattr(
+                        lower_model_pressures, "below_threshold_omissions", {}
                     )
-                continue
-            expected_exponent = channel.pO2_exponent
-            if channel.oxygen_per_metal_atom is not None and root_q is not None:
-                from simulator.fe_redox import KRESS91_LN_FO2_COEFFICIENT
+                    upper_omissions = getattr(
+                        upper_model_pressures, "below_threshold_omissions", {}
+                    )
+                    lower_omission_proven = (
+                        isinstance(lower_omissions, Mapping)
+                        and channel.species in lower_omissions
+                    )
+                    upper_omission_proven = (
+                        isinstance(upper_omissions, Mapping)
+                        and channel.species in upper_omissions
+                    )
+                    if (
+                        (lower_pressure > 0.0 or lower_omission_proven)
+                        and (upper_pressure > 0.0 or upper_omission_proven)
+                    ):
+                        continue
+                    raise ValueError(
+                        f"pressure law for {channel.species!r} is not positive around the root"
+                    )
+                observed_exponent = (
+                    math.log10(upper_pressure) - math.log10(lower_pressure)
+                ) / (probe_high - probe_low)
+                if fixed_activities or not redox_active:
+                    # Fixed-activity laws and undeclared callables retain the
+                    # supplied stoichiometric exponent as a hard contract.
+                    if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
+                        raise PressureLawExponentMismatch(
+                            f"pressure law exponent mismatch for {channel.species!r}: "
+                            f"declared {channel.pO2_exponent}, observed {observed_exponent}"
+                        )
+                    continue
+                expected_exponent = channel.pO2_exponent
+                if channel.oxygen_per_metal_atom is not None and root_q is not None:
+                    from simulator.fe_redox import KRESS91_LN_FO2_COEFFICIENT
 
-                expected_exponent -= KRESS91_LN_FO2_COEFFICIENT * root_q
-            pressure_law_diagnostics.append(
-                PressureLawChannelDiagnostic(
-                    species=channel.species,
-                    declared=channel.pO2_exponent,
-                    observed=observed_exponent,
-                    expected=expected_exponent,
-                    reason=RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+                    expected_exponent -= KRESS91_LN_FO2_COEFFICIENT * root_q
+                diagnostics.append(
+                    PressureLawChannelDiagnostic(
+                        species=channel.species,
+                        declared=channel.pO2_exponent,
+                        observed=observed_exponent,
+                        expected=expected_exponent,
+                        reason=RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+                    )
                 )
+                flags = getattr(pressure_model, "engine_flags", None)
+                if isinstance(flags, set):
+                    flags.add(RESIDUE_PRESSURE_LAW_REDOX_ACTIVE)
+            return tuple(diagnostics)
+
+        if defer_pressure_law_diagnostics is None:
+            pressure_law_diagnostics = calculate_pressure_law_diagnostics()
+        elif redox_active and not fixed_activities and any(
+            pressures[channel.species] > 1.0e-300 for channel in active_channels
+        ):
+            # These two pressure evaluations only calculate a notice payload;
+            # the root, fluxes, and integrated state are already fixed above.
+            defer_pressure_law_diagnostics(
+                calculate_pressure_law_diagnostics,
+                tuple(
+                    channel.species
+                    for channel in active_channels
+                    if pressures[channel.species] > 1.0e-300
+                ),
             )
-            flags = getattr(pressure_model, "engine_flags", None)
-            if isinstance(flags, set):
-                flags.add(RESIDUE_PRESSURE_LAW_REDOX_ACTIVE)
+        else:
+            pressure_law_diagnostics = calculate_pressure_law_diagnostics()
     if on_accepted_evaluation is not None:
         on_accepted_evaluation(root)
 

@@ -132,6 +132,23 @@ def test_vacuum_oxygen_root_pin_before_flux_refactor():
     assert result.pO2_bar == pytest.approx(0.0000020188591846109878, rel=1e-10)
 
 
+def test_molar_flux_coefficient_cache_uses_exact_temperature_and_channels():
+    from simulator.battery.oxygen_balance import _cached_molar_flux_denominators
+
+    channels = (("Mg", float(0.024305).hex()),)
+    t_key = float(2073.15).hex()
+    exact = _cached_molar_flux_denominators(t_key, channels)
+    adjacent = _cached_molar_flux_denominators(
+        math.nextafter(2073.15, 2074.0).hex(), channels
+    )
+    other_channels = _cached_molar_flux_denominators(
+        t_key, (("MgO", float(0.040304).hex()),)
+    )
+
+    assert exact != adjacent
+    assert exact != other_channels
+
+
 @pytest.mark.parametrize("with_sio,expected_po2,expected_mg,expected_sio", [
     (False, 8.131046268682460e-7, 2.762438138455805e-7, 0.0),
     (True, 1.462909125212295e-6, 2.059477816151990e-7, 2.910603362049900e-7),

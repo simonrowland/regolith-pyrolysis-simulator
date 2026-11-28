@@ -132,6 +132,20 @@ class ResidueEngineNonconvergence(RuntimeError):
         }
 
 
+def _residue_pressure_state_key(
+    inventory: Mapping[str, float], logp: float, temperature: float
+) -> tuple[tuple[tuple[str, str], ...], str, str]:
+    """Identify the exact dynamic inputs to one residue pressure evaluation."""
+
+    composition = tuple(
+        sorted(
+            (str(species), float(amount).hex())
+            for species, amount in inventory.items()
+        )
+    )
+    return composition, float(logp).hex(), float(temperature).hex()
+
+
 class IsolatedOpenImccWorkerError(RuntimeError):
     """OpenIMCC exception reported across the residue worker pipe.
 
@@ -1000,6 +1014,7 @@ def _residue_oxygen_balance(
     temperature,
     background_pressure_Pa=0.0,
     on_accepted_evaluation=None,
+    defer_pressure_law_diagnostics=None,
 ):
     """The shared channel stoichiometry and pressure-root call for both paths."""
     try:
@@ -1008,6 +1023,10 @@ def _residue_oxygen_balance(
             root_kwargs["background_pressure_Pa"] = background_pressure_Pa
         if on_accepted_evaluation is not None:
             root_kwargs["on_accepted_evaluation"] = on_accepted_evaluation
+        if defer_pressure_law_diagnostics is not None:
+            root_kwargs["defer_pressure_law_diagnostics"] = (
+                defer_pressure_law_diagnostics
+            )
         return _solve_vacuum_oxygen_balance(
             pressure_at,
             _residue_oxygen_channels(terms, inventory),
@@ -1097,6 +1116,9 @@ def integrate_residue_inventory(
     bracket_boundary_steps: list[OxygenBalanceBracketBoundary | None] = []
     buffer_oxygen_exchange_mol = 0.0
     pressure_law_diagnostics: dict[str, PressureLawChannelDiagnostic] = {}
+    pressure_state_cache: dict[
+        tuple[tuple[tuple[str, str], ...], str, str], Mapping[str, float]
+    ] = {}
 
     # Supplied channels define the supported pressure bundle. Root metadata
     # uses formula atom counts, matching R1a's (nO_gas - nO_parent) balance.
@@ -1119,7 +1141,16 @@ def integrate_residue_inventory(
                 for species, amount in inventory.items()
                 if amount > 0.0
             }
-            pressures = pressure_model(engine_inventory, float(log10_pO2_bar))
+            key = _residue_pressure_state_key(
+                engine_inventory, float(log10_pO2_bar), temperature
+            )
+            try:
+                pressures = pressure_state_cache[key]
+            except KeyError:
+                pressures = pressure_model(
+                    engine_inventory, float(log10_pO2_bar)
+                )
+                pressure_state_cache[key] = pressures
             _inherit_residue_pressure_contract(pressure_at, pressure_model)
             return pressures
 
@@ -1412,14 +1443,29 @@ def integrate_knudsen_residue_inventory(
         _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS if linear_temperature else _KNUDSEN_MAX_RHS_EVALUATIONS
     )
     evaluations = 0
+    # The pressure closure and channels are fixed during this integration;
+    # these exact dynamic inputs fully identify each pressure evaluation.
+    pressure_state_cache: dict[
+        tuple[tuple[tuple[str, str], ...], str, str], Mapping[str, float]
+    ] = {}
     for (endpoint, temperature), logp in zip(path, source_fO2_log_by_interval):
         if logp is not None and (not math.isfinite(logp) or logp > 0.0):
             raise ResidueInventoryRefusal("oxygen_condition_invalid")
         stop = min(target, endpoint)
-        # The supplementary linear path shares one budget across its ramp.
-        # A slow sensitivity solve must not withhold a step-hold prediction.
+        # Each printed step-hold interval gets the established physics guard.
+        # The supplementary linear-temperature sensitivity shares one budget
+        # across its ramp, so a slow diagnostic cannot withhold the primary
+        # step-hold prediction.
         if not linear_temperature:
             evaluations = 0
+        deferred_pressure_law_diagnostics: list[
+            tuple[Callable[[], tuple], tuple[str, ...]]
+        ] = []
+
+        def defer_pressure_law_diagnostics(calculate, possible_species):
+            deferred_pressure_law_diagnostics.append(
+                (calculate, possible_species)
+            )
 
         def derivative(extent, amounts):
             nonlocal evaluations
@@ -1443,13 +1489,28 @@ def integrate_knudsen_residue_inventory(
                 current_temperature = previous_temperature + fraction * (temperature - previous_temperature)
 
             def pressure_at(p):
-                pressures = pressure_model(current, p, current_temperature)
+                key = _residue_pressure_state_key(current, p, current_temperature)
+                try:
+                    pressures = pressure_state_cache[key]
+                except KeyError:
+                    pressures = pressure_model(current, p, current_temperature)
+                    pressure_state_cache[key] = pressures
                 _inherit_residue_pressure_contract(pressure_at, pressure_model)
                 return pressures
 
             if logp is None:
                 try:
-                    balance = _residue_oxygen_balance(terms, current, pressure_at, current_temperature)
+                    # Keep the established full root bracket: a warm-started
+                    # local bracket changes last-bit roots and scored residuals.
+                    balance = _residue_oxygen_balance(
+                        terms,
+                        current,
+                        pressure_at,
+                        current_temperature,
+                        defer_pressure_law_diagnostics=(
+                            defer_pressure_law_diagnostics
+                        ),
+                    )
                 except ResidueInventoryRefusal:
                     raise
                 except ValueError as exc:
@@ -1532,6 +1593,34 @@ def integrate_knudsen_residue_inventory(
                         else:
                             state[index] = 0.0
             state = [max(0.0, v) for v in state]
+        # The pressure-law slopes only feed residue notices. Reproduce the
+        # latest diagnostic per species after solve_ivp accepts the interval,
+        # instead of probing every trial RHS state.
+        first_seen_species_order = tuple(dict.fromkeys(
+            species
+            for _calculate, possible_species in deferred_pressure_law_diagnostics
+            for species in possible_species
+        ))
+        unresolved_species = set(first_seen_species_order)
+        latest_diagnostics: dict[str, PressureLawChannelDiagnostic] = {}
+        for calculate, _possible_species in reversed(
+            deferred_pressure_law_diagnostics
+        ):
+            try:
+                diagnostics = calculate()
+            except ValueError as exc:
+                raise _residue_oxygen_balance_failure(exc) from exc
+            if diagnostics:
+                for diagnostic in diagnostics:
+                    if diagnostic.species in unresolved_species:
+                        latest_diagnostics[diagnostic.species] = diagnostic
+                        unresolved_species.remove(diagnostic.species)
+            if not unresolved_species:
+                break
+        for species in first_seen_species_order:
+            diagnostic = latest_diagnostics.get(species)
+            if diagnostic is not None:
+                pressure_law_diagnostics[species] = diagnostic
         previous_endpoint, previous_temperature = endpoint, temperature
         if xi >= target:
             break

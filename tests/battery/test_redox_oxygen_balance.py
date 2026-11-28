@@ -380,6 +380,60 @@ def test_fixed_activity_matching_exponent_keeps_the_root() -> None:
     assert balance.pO2_bar > 0.0
 
 
+def test_knudsen_defers_redox_diagnostic_probes_without_changing_result(
+    monkeypatch,
+) -> None:
+    from simulator.battery import residue
+
+    original_balance = residue._residue_oxygen_balance
+
+    def run(*, defer_diagnostics: bool):
+        pressure_calls = 0
+
+        def pressure(_inventory, logp, _temperature):
+            nonlocal pressure_calls
+            pressure_calls += 1
+            p_o2_bar = 10.0**logp
+            return PressureEvaluation(
+                {"Fe": p_o2_bar**-0.5, "O2": 1.0e5 * p_o2_bar},
+                fe3_over_sum_fe=0.5,
+                speciation_source="test",
+            )
+
+        pressure.declares_redox_active = True
+
+        if not defer_diagnostics:
+            def immediate_diagnostics(*args, **kwargs):
+                kwargs.pop("defer_pressure_law_diagnostics", None)
+                return original_balance(*args, **kwargs)
+
+            monkeypatch.setattr(
+                residue, "_residue_oxygen_balance", immediate_diagnostics
+            )
+        result = integrate_knudsen_residue_inventory(
+            {"FeO": 1.0},
+            _channels(),
+            pressure,
+            temperature_path=((0.01, 1800.0),),
+            measured_mass_loss_fraction=0.01,
+            near_saturated=True,
+            source_fO2_log_by_interval=(None,),
+        )
+        monkeypatch.setattr(residue, "_residue_oxygen_balance", original_balance)
+        return result, pressure_calls
+
+    immediate, immediate_calls = run(defer_diagnostics=False)
+    deferred, deferred_calls = run(defer_diagnostics=True)
+
+    assert deferred.residue_mol == immediate.residue_mol
+    assert deferred.evaporated_mol == immediate.evaporated_mol
+    assert deferred.retained_oxygen_atoms_mol == immediate.retained_oxygen_atoms_mol
+    assert deferred.atom_closure_mol == immediate.atom_closure_mol
+    assert deferred.pO2_bar_by_step == immediate.pO2_bar_by_step
+    assert deferred.pressure_law_diagnostics == immediate.pressure_law_diagnostics
+    assert deferred_calls < immediate_calls
+
+
 def test_undeclared_pressure_law_keeps_the_hard_exponent_check() -> None:
     def pressure(logp: float):
         return _law(
