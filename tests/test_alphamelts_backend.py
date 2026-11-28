@@ -6870,6 +6870,92 @@ def test_unscoped_legacy_calcium_potentials_do_not_publish_raw_activities():
     })
 
 
+@pytest.mark.parametrize(
+    'calcium_label',
+    ('CaO_Liq', 'a(CaO_Liq)', 'activity(CaO_Liq)'),
+)
+def test_unscoped_legacy_cao_aliases_are_not_seen_by_vapor_fallback(
+    calcium_label,
+    monkeypatch,
+):
+    from engines.alphamelts.domain import canonical_melt_oxide_activity_name
+
+    assert canonical_melt_oxide_activity_name(calcium_label) == 'CaO'
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 70.0, 'CaO': 30.0},
+        'liquid1_prop': {'mass': 100.0},
+        'chemical_potentials': {
+            'Na': -900.0,
+            calcium_label: -700000.0,
+        },
+        'standard_chemical_potentials': {
+            'Na': -1000.0,
+            calcium_label: -800000.0,
+        },
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 70.0, 'CaO': 30.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
+    })
+    fallback_inputs = []
+    fallback_resolver = backend._activity_for_vapor_species_with_composition
+
+    def observe_fallback(species, activities, account_mol, *, temperature_K=None):
+        resolved = fallback_resolver(
+            species,
+            activities,
+            account_mol,
+            temperature_K=temperature_K,
+        )
+        fallback_inputs.append((dict(activities), resolved))
+        return resolved
+
+    monkeypatch.setattr(backend, '_load_vapor_pressure_table', lambda: {
+        'Ca': {},
+    })
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine',
+        lambda *_args, **_kwargs: {'Ca': 1.0},
+    )
+    monkeypatch.setattr(
+        backend,
+        '_activity_for_vapor_species_with_composition',
+        observe_fallback,
+    )
+
+    pressures = backend._activities_times_antoine_or_fail(
+        1526.85,
+        result.activity_coefficients,
+        {'SiO2': 70.0, 'CaO': 30.0},
+        context='legacy calcium alias regression',
+        use_melt_activity_ladder=True,
+    )
+
+    assert pressures == {'Ca': 1.0}
+    assert len(fallback_inputs) == 1
+    fallback_activities, (activity, notice) = fallback_inputs[0]
+    assert all(
+        canonical_melt_oxide_activity_name(name) != 'CaO'
+        for name in fallback_activities
+    )
+    assert activity is not None
+    assert notice is not None
+    assert notice['reason'] == (
+        'alphaMELTS supplied no oxide-component activity'
+    )
+
+
 def test_petthermotools_does_not_mix_mu_and_mu0_from_different_sources():
     from engines.alphamelts.domain import MELTS_LIQUID_ACTIVITY_UNAVAILABLE
 

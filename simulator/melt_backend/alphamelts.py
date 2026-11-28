@@ -6362,7 +6362,7 @@ class _MELTSBackendSupport(MeltBackend):
         has_calcium = melts_liquid_contains_parent_oxide(
             liquid_composition, 'CaO'
         )
-        calcium_bearing_endmembers = {'CaO'} | {
+        calcium_bearing_species = {'CaO'} | {
             endmember
             for endmember, parents
             in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.items()
@@ -6380,13 +6380,18 @@ class _MELTSBackendSupport(MeltBackend):
             if set(mu_source) != set(mu0_source):
                 unpaired_source = True
             for species in mu_source.keys() & mu0_source.keys():
+                species_name = str(species)
+                calcium_identity = (
+                    canonical_melt_oxide_activity_name(species_name)
+                    or species_name
+                )
                 if (
                     not is_selected_liquid
-                    and str(species) in calcium_bearing_endmembers
+                    and calcium_identity in calcium_bearing_species
                 ):
                     continue
                 compound_parents = MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.get(
-                    str(species), ()
+                    species_name, ()
                 )
                 if not has_calcium and 'CaO' in compound_parents:
                     continue
