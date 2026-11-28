@@ -452,6 +452,14 @@ BASELINE_STAGE4_SIO2_KG = {
 # Production Stage-3 product after the d-402 flagged pO2-free solid-state wall
 # bound. Both feedstocks record zero Stage-3 SiO2 in this 24-hour recipe; the
 # old 4.89580870473e-9 kg Mars capture came from the reactive Psat=0 backstop.
+# Oxidative SiO2 wall deposit (kg) over the 24 h C2A CLI run, from the b274
+# regenerated studio fixtures (field wall_deposit_kg.SiO2). Lunar has no SiO2
+# wall entry (0.0); Mars carries the oxidative leg.
+BASELINE_WALL_SIO2_KG = {
+    "lunar_mare_low_ti": 0.0,
+    "mars_basalt": 2.69424544509e-06,
+}
+
 BASELINE_STAGE3_SIO2_KG = {
     "lunar_mare_low_ti": 0.0,
     "mars_basalt": 0.0,
@@ -589,17 +597,24 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
         BASELINE_STAGE4_SIO2_KG[feedstock], rel=1e-8
     )
     # 2026-07-29 t-475: bounded flowing-gas partial pressures keep Na/K/SiO
-    # off the hot train. Lunar Cr now has a tiny admissible deposit instead of
-    # being erased by an out-of-range melt-P_sat refusal.
-    non_cr_wall_total = sum(
-        float(value)
-        for species, value in actual["wall_deposit_kg"].items()
-        if species != "Cr"
+    # off the hot train as dew-point condensate. Lunar Cr has a tiny admissible
+    # deposit instead of being erased by an out-of-range melt-P_sat refusal.
+    # b274: the oxidative SiO2 wall leg is a reactive sink, not dew-point
+    # condensation: SiO(g) + 1/2 O2 -> SiO2(s) on the wall. It deposits SiO2
+    # even when p_SiO is below SiO's own saturation pressure. The oxygen is
+    # the O the oxide-Fe debit leaves (b274 fold, declared Mars wall leaf).
+    # So SiO2 is the one non-Cr species allowed on the wall, pinned per
+    # feedstock from the regenerated studio fixture. Every other non-Cr
+    # species stays zero.
+    wall = {k: float(v) for k, v in actual["wall_deposit_kg"].items()}
+    other_wall_total = sum(
+        value for species, value in wall.items() if species not in ("Cr", "SiO2")
     )
-    assert non_cr_wall_total == pytest.approx(0.0)
-    assert wall_total == pytest.approx(
-        float(actual["wall_deposit_kg"].get("Cr", 0.0))
+    assert other_wall_total == pytest.approx(0.0)
+    assert wall.get("SiO2", 0.0) == pytest.approx(
+        BASELINE_WALL_SIO2_KG[feedstock], rel=1e-8, abs=1e-15
     )
+    assert wall_total == pytest.approx(wall.get("Cr", 0.0) + wall.get("SiO2", 0.0))
     assert routed_total > 0.0
     assert 0.0 <= actual["sio_yield_pct_of_feedstock"] <= 30.0
     assert actual["alpha_SiO"] == pytest.approx(0.0320984652281)
