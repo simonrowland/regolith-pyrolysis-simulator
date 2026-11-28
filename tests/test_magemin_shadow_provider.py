@@ -41,7 +41,8 @@ from engines.magemin import (
 import engines.magemin.provider as provider_module
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
-from simulator.chemistry.kernel.planner import Planner
+from simulator.accounting.ledger import AtomLedger
+from simulator.chemistry.kernel.planner import ChemistryKernel
 from simulator.chemistry.kernel.registry import ProviderRegistry
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
@@ -417,29 +418,34 @@ def test_slot_acquisition_error_is_terminal_through_provider_and_planner(
         primary._engine_version()
 
     registry = ProviderRegistry()
-    registry.gate_provider_order = (primary, fallback)
-    planner = Planner(registry)
+    registry.register_gate_provider_order((primary, fallback))
+    kernel = ChemistryKernel(
+        AtomLedger(),
+        registry,
+        species_formula_registry={},
+        allow_fallback_intents=frozenset({
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+        }),
+    )
     attempted = []
 
-    def dispatch_through_provider(_intent, provider, **_kwargs):
+    def dispatch_through_provider(_self, _intent, provider, **_kwargs):
         attempted.append(provider)
         if provider is primary:
             raise slot_error
         pytest.fail('slot acquisition failure stepped down to another engine')
 
     monkeypatch.setattr(
-        Planner, '_dispatch_through_provider', dispatch_through_provider
+        ChemistryKernel,
+        '_dispatch_through_provider',
+        dispatch_through_provider,
     )
     with pytest.raises(magemin_module._MAGEMinSubprocessSlotUnavailable):
-        planner._dispatch_gate_provider_order(
+        kernel.dispatch(
+            ChemistryIntent.GATE_LIQUID_FRACTION,
             temperature_C=1200.0,
             pressure_bar=1.0,
             fO2_log=-8.0,
-            redox_state=None,
-            fe_redox_policy='intrinsic',
-            control_inputs=None,
-            declared_accounts=None,
-            account_mol_overrides=None,
         )
 
     assert attempted == [primary]

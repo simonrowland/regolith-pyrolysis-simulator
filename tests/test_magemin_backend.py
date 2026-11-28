@@ -1029,7 +1029,8 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(
     submitted = {}
 
     class FakeFuture:
-        def result(self):
+        def result(self, timeout=None):
+            submitted['result_timeout_s'] = timeout
             submitted['result_called'] = True
             return {'phases': {'liq': {'mass_kg': 1.0}}}
 
