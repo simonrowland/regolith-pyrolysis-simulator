@@ -1314,43 +1314,35 @@ def _parse_observation_species_formula(
     if not isinstance(identity, Identity) or identity.species is None:
         return None, None
     if observation.source_id == "nasa-glenn":
-        source_path = (
-            observation.locator.source_path
-            if observation.locator is not None
-            else None
-        )
-        source_name = Path(source_path).name if source_path else ""
-        match = re.fullmatch(r"(NG-\d{4})\.json", source_name)
-        if match is None:
-            match = re.match(r"nasa-glenn:(NG-\d{4})(?::|$)", observation.observation_id)
-        if match is None:
-            # Non-migrated callers can carry the broad source id without a
-            # NASA record locator. Apply the record witness only when the
-            # observation identifies a specific compiled card.
-            return (
-                parse_species_formula(
-                    identity.species.formula,
-                    species=identity.species,
-                ),
-                None,
+        locator_values = []
+        if observation.locator is not None:
+            locator_values.extend(
+                (observation.locator.source_path, observation.locator.record)
             )
+        locator_values.append(observation.read_from)
         from simulator.reference_data.nasa_glenn import (
-            accepted_formula,
-            load_record_document_by_id,
+            accepted_observation_formula,
         )
 
-        record = load_record_document_by_id(match.group(1))
-        if record is None:
-            return None, {
-                "kind": "formula_source_record_missing",
-                "identity_refusal": True,
-                "source_id": observation.source_id,
-                "observation_id": observation.observation_id,
-                "record_id": match.group(1),
-            }
-        _source_formula, diagnostic = accepted_formula(record)
+        _record, source_formula, diagnostic = accepted_observation_formula(
+            observation.observation_id,
+            locator_values,
+            identity.species.formula,
+        )
         if diagnostic is not None and diagnostic.get("identity_refusal") is True:
             return None, diagnostic
+        if source_formula is not None:
+            # The NASA Glenn card's accepted slot composition owns the parsed
+            # result after the observation formula has been checked against it.
+            return (
+                tuple(
+                    sorted(
+                        (element, float(count))
+                        for element, count in source_formula.elements.items()
+                    )
+                ),
+                diagnostic,
+            )
     return (
         parse_species_formula(
             identity.species.formula,

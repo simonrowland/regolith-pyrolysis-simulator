@@ -135,6 +135,16 @@ def test_formula_parser_accepts_printed_unambiguous_spellings(
     _assert_formula_counts(formula, expected)
 
 
+@pytest.mark.parametrize(
+    ("formula", "expected"),
+    (("IO", (("I", 1.0), ("O", 1.0))), ("IO2", (("I", 1.0), ("O", 2.0)))),
+)
+def test_generic_formula_parser_keeps_iodine_oxygen_formulas_source_agnostic(
+    formula: str, expected: tuple[tuple[str, float], ...]
+) -> None:
+    assert parse_species_formula(formula) == expected
+
+
 @pytest.mark.parametrize(("record_id", "published", "expected"), WEIGHTED_SOURCE_FORMULAS)
 def test_case_repaired_spelling_matches_its_printed_formula_weight(
     record_id: str, published: str, expected: dict[str, float]

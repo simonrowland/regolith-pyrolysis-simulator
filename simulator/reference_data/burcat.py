@@ -28,6 +28,7 @@ from simulator.reference_data.nasa_glenn import (
     CompositionSlot,
     NasaGlennParseError,
     PublishedNumber,
+    _is_nasa_glenn_record_id,
     coverage_by_element,
     feedstock_element_symbols,
     is_nasa7_four_line_record,
@@ -705,7 +706,7 @@ def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
         if not re.fullmatch(r"BU-\d{4}", burcat_id):
             raise BurcatParseError(f"{label}: invalid Burcat record id {burcat_id!r}")
         if peer_compilation == "nasa-glenn":
-            if not re.fullmatch(r"NG-\d{4}", peer_id):
+            if not _is_nasa_glenn_record_id(peer_id):
                 raise BurcatParseError(f"{label}: invalid NASA Glenn record id {peer_id!r}")
             peer_path = (
                 ROOT / "data" / "literature" / "compilations" / "nasa-glenn"

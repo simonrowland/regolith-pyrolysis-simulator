@@ -60,7 +60,11 @@ from typing import Any, Mapping, Sequence
 
 from simulator.reference_data import janaf
 from simulator.reference_data.janaf import TABLES_DIR
-from simulator.reference_data.nasa_glenn import COMPILATION_ROOT, load_record_document
+from simulator.reference_data.nasa_glenn import (
+    COMPILATION_ROOT,
+    accepted_formula,
+    load_record_document,
+)
 from simulator.vapour_rail.nasa_cea import (
     R_J_PER_MOL_K,
     Nasa9Segment,
@@ -559,6 +563,14 @@ def _nasa_record_data(
     """Prepared coefficients keyed by the source path and its file version."""
 
     document = load_record_document(path)
+    _source_formula, diagnostic = accepted_formula(document)
+    if _source_formula is None or (
+        diagnostic is not None and diagnostic.get("identity_refusal") is True
+    ):
+        raise WallSaturationLawRefusal(
+            "wall_nasa_source_identity_mismatch",
+            f"{path.stem} has no usable NASA Glenn chemical identity: {diagnostic}",
+        )
     phase = str(document.get("phase") or "")
     intervals = document.get("intervals")
     if not isinstance(intervals, Sequence) or isinstance(intervals, (str, bytes)):

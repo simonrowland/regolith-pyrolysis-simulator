@@ -706,6 +706,27 @@ def test_collapsed_interval_does_not_change_si_gibbs() -> None:
     assert math.isfinite(nasa_record_g_over_rt("NG-1366", 400.0))
 
 
+def test_nasa_record_identity_gate_refuses_inert_slot_cards(monkeypatch) -> None:
+    from simulator.accounting.formulas import parse_formula
+    from simulator.vapour_rail import wall_saturation
+
+    def assert_inert_record_refused() -> None:
+        with pytest.raises(WallSaturationLawRefusal) as exc_info:
+            nasa_record_g_over_rt("NG-2032", 500.0)
+        assert exc_info.value.reason == "wall_nasa_source_identity_mismatch"
+        assert math.isfinite(nasa_record_g_over_rt("NG-1858", _T_K))
+
+    assert_inert_record_refused()
+
+    def bypass_card_decision(record):
+        return parse_formula(record["formula"]), None
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(wall_saturation, "accepted_formula", bypass_card_decision)
+        with pytest.raises(AssertionError):
+            assert_inert_record_refused()
+
+
 @pytest.mark.parametrize(
     ("thermo", "record_id", "source_path", "root_name"),
     (

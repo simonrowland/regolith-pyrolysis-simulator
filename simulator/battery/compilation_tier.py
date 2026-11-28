@@ -173,7 +173,10 @@ _STATED_PRESSURE_EFFECT_BOUND_J_MOL = Decimal("4")
 
 
 def _compilation_engines_for_pair(
-    engines: Sequence[Engine], identity: Identity
+    engines: Sequence[Engine],
+    identity: Identity,
+    *,
+    observation: Observation | None = None,
 ) -> tuple[Engine, ...]:
     """Keep engines whose owners declare a capability for this identity."""
 
@@ -214,7 +217,9 @@ def _compilation_engines_for_pair(
                 routed.append(engine)
             continue
         if engine is Engine.NASA_CEA_9:
-            record, reason = _nasa_cea_9_record_for_species(species)
+            record, reason = _nasa_cea_9_record_for_species(
+                species, observation=observation
+            )
             if record is not None or reason not in {
                 "nasa-cea-formula-not-covered",
                 "nasa-cea-phase-not-covered",
@@ -267,7 +272,9 @@ def _compilation_engines_for_scoring(
         return ()
     if not isinstance(observation.identity, Identity):
         return tuple(engines)
-    return _compilation_engines_for_pair(engines, observation.identity)
+    return _compilation_engines_for_pair(
+        engines, observation.identity, observation=observation
+    )
 
 
 class _SelectedResiduals(tuple):
@@ -1161,12 +1168,35 @@ def _nasa_cea_9_record_index():
 
 def _nasa_cea_9_record_for_species(
     species,
+    *,
+    observation: Observation | None = None,
 ) -> tuple[Mapping[str, object] | None, str]:
-    by_formula, _by_id = _nasa_cea_9_record_index()
-    formula = species.formula
-    records = by_formula.get(formula, ())
-    if not records:
-        return None, "nasa-cea-formula-not-covered"
+    record = None
+    source_parsed = None
+    if (
+        observation is not None
+        and observation.source_id == "nasa-glenn"
+        and isinstance(observation.identity, Identity)
+        and observation.identity.species == species
+    ):
+        locator_values = []
+        if observation.locator is not None:
+            locator_values.extend(
+                (observation.locator.source_path, observation.locator.record)
+            )
+        locator_values.append(observation.read_from)
+        from simulator.reference_data.nasa_glenn import (
+            accepted_observation_formula,
+        )
+
+        record, source_parsed, diagnostic = accepted_observation_formula(
+            observation.observation_id,
+            locator_values,
+            species.formula,
+        )
+        if diagnostic is not None and diagnostic.get("identity_refusal") is True:
+            return None, "nasa-cea-source-formula-identity-mismatch"
+
     phase = phase_token(species)
     polymorph = polymorph_token(species)
     if phase is Phase.G:
@@ -1182,20 +1212,30 @@ def _nasa_cea_9_record_for_species(
         phase_labels = {phase_label}
     else:
         return None, "nasa-cea-phase-not-covered"
-    matches = [
-        record
-        for record in records
-        if str(record.get("phase", "")).strip().casefold() in phase_labels
-    ]
-    if not matches:
-        return None, "nasa-cea-phase-not-covered"
-    if len(matches) != 1:
-        return None, "nasa-cea-phase-ambiguous"
-    record = matches[0]
-    from simulator.reference_data.nasa_glenn import accepted_formula
 
-    _parsed_formula, diagnostic = accepted_formula(record)
-    if diagnostic is not None and diagnostic.get("identity_refusal") is True:
+    if record is None:
+        by_formula, _by_id = _nasa_cea_9_record_index()
+        records = by_formula.get(species.formula, ())
+        if not records:
+            return None, "nasa-cea-formula-not-covered"
+        matches = [
+            candidate
+            for candidate in records
+            if str(candidate.get("phase", "")).strip().casefold() in phase_labels
+        ]
+        if not matches:
+            return None, "nasa-cea-phase-not-covered"
+        if len(matches) != 1:
+            return None, "nasa-cea-phase-ambiguous"
+        record = matches[0]
+        from simulator.reference_data.nasa_glenn import accepted_formula
+
+        source_parsed, diagnostic = accepted_formula(record)
+        if diagnostic is not None and diagnostic.get("identity_refusal") is True:
+            return None, "nasa-cea-source-formula-identity-mismatch"
+    elif str(record.get("phase", "")).strip().casefold() not in phase_labels:
+        return None, "nasa-cea-phase-not-covered"
+    if source_parsed is None:
         return None, "nasa-cea-source-formula-identity-mismatch"
     if record.get("phase_ordinal") is not None:
         return None, "nasa-cea-phase-ordinal-unresolved"
@@ -1318,6 +1358,7 @@ def _nasa_cea_9_attempt(
     temperature_K: Decimal,
     *,
     origin: str,
+    observation: Observation,
 ) -> ThermoAttempt:
     from simulator.vapour_rail.nasa_cea import (
         R_J_PER_MOL_K,
@@ -1348,7 +1389,9 @@ def _nasa_cea_9_attempt(
                 quantity=quantity,
                 origin=origin,
             )
-        gas_record, gas_reason = _nasa_cea_9_record_for_species(identity.species)
+        gas_record, gas_reason = _nasa_cea_9_record_for_species(
+            identity.species, observation=observation
+        )
         condensed_record, condensed_reason = _nasa_cea_9_record_for_species(
             reservoir.value
         )
@@ -1426,7 +1469,9 @@ def _nasa_cea_9_attempt(
             if isinstance(accepted, ThermoAttempt):
                 return accepted
             reference_temperature, declared_anchor = accepted
-        record, reason = _nasa_cea_9_record_for_species(identity.species)
+        record, reason = _nasa_cea_9_record_for_species(
+            identity.species, observation=observation
+        )
         if record is None:
             return _refuse(
                 RefusalReason.UNSUPPORTED,
@@ -3572,7 +3617,9 @@ def predict_thermo_attempt(
             origin=origin,
         )
     if engine is Engine.NASA_CEA_9 and identity.species is not None:
-        _record, record_reason = _nasa_cea_9_record_for_species(identity.species)
+        _record, record_reason = _nasa_cea_9_record_for_species(
+            identity.species, observation=observation
+        )
         if record_reason == "nasa-cea-source-formula-identity-mismatch":
             return _refuse(
                 RefusalReason.IDENTITY_MISMATCH,
@@ -3819,7 +3866,11 @@ def predict_thermo_attempt(
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
     if engine is Engine.NASA_CEA_9:
         return _nasa_cea_9_attempt(
-            identity, quantity, temperature_K, origin=origin
+            identity,
+            quantity,
+            temperature_K,
+            origin=origin,
+            observation=observation,
         )
     if engine is Engine.VAPOROCK:
         return _vaporock_gas_attempt(

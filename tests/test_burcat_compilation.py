@@ -410,6 +410,12 @@ def test_peer_alias_loader_rejects_malformed_entries_and_missing_ids(tmp_path) -
     with pytest.raises(BurcatParseError, match="does not exist"):
         load_peer_aliases(alias_path)
 
+    alias = _alias_entry_from_source_records("BU-3006", "NG-0948")
+    alias["peer_record_id"] = "NG-94x8"
+    _write_alias_fixture(alias_path, [alias])
+    with pytest.raises(BurcatParseError, match="invalid NASA Glenn record id"):
+        load_peer_aliases(alias_path)
+
 
 def test_same_formula_distinct_phase_census(record_docs) -> None:
     from collections import defaultdict

@@ -441,6 +441,70 @@ def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
     )
 
 
+def test_all_stored_nasa_glenn_inert_rows_are_typed_scoring_refusals(
+    monkeypatch,
+) -> None:
+    from simulator.reference_data import nasa_glenn
+
+    context = load_score_context(sources=("nasa-glenn",))
+    inert_observation_ids = set()
+    for record in nasa_glenn.load_all_record_documents():
+        _parsed, diagnostic = nasa_glenn.accepted_formula(record)
+        if diagnostic is not None and diagnostic.get("identity_refusal") is True:
+            inert_observation_ids.add(f"nasa-glenn:{record['record_id']}")
+    assert len(inert_observation_ids) == 18
+    assert inert_observation_ids <= context.observations.keys()
+    air_id = "nasa-glenn:NG-2031"
+    assert air_id in context.observations
+    selected_ids = inert_observation_ids | {air_id}
+    selected_observations = {
+        observation_id: context.observations[observation_id]
+        for observation_id in selected_ids
+    }
+    selected_context = replace(context, observations=selected_observations)
+
+    def assert_scoring_decision() -> None:
+        residuals, _candidates = score_store(
+            selected_context,
+            engines=(Engine.INTERNAL_ANALYTICAL,),
+            include_diagnostics=True,
+        )
+        by_reference = {residual.reference: residual for residual in residuals}
+        assert inert_observation_ids <= by_reference.keys()
+        for observation_id in inert_observation_ids:
+            refusal = by_reference[observation_id].refusal
+            assert refusal is not None
+            assert refusal.reason is RefusalReason.IDENTITY_MISMATCH
+        air_residual = by_reference[air_id]
+        assert (
+            air_residual.refusal is None
+            or air_residual.refusal.reason is not RefusalReason.IDENTITY_MISMATCH
+        )
+        air_formula, air_diagnostic = score_mod._parse_observation_species_formula(
+            selected_observations[air_id]
+        )
+        assert air_formula is not None
+        assert air_diagnostic is None or air_diagnostic.get("identity_refusal") is not True
+
+    assert_scoring_decision()
+
+    from simulator.accounting.formulas import parse_formula
+
+    def bypass_source_binding(_observation_id, _locator_values, formula):
+        return (
+            {"record_id": "NG-2032", "formula": formula},
+            parse_formula(formula),
+            None,
+        )
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            nasa_glenn, "accepted_observation_formula", bypass_source_binding
+        )
+        with pytest.raises(AssertionError):
+            assert_scoring_decision()
+
+
 def test_prediction_refusal_reports_unknown_composition_component() -> None:
     reason = "printed oxide wt% map has unsupported numeric component(s): XxO"
     identity = replace(

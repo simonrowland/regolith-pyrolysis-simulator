@@ -1163,7 +1163,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_polynomial': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 1201,
+        "line": 1246,
         "kind": 'lru',
         "name": '_nasa_cea_9_polynomial',
         "carries_disclosure": False,
@@ -1171,11 +1171,27 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_record_index': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 1145,
+        "line": 1152,
         "kind": 'lru',
         "name": '_nasa_cea_9_record_index',
         "carries_disclosure": False,
         "how": 'Indexes NASA-9 source records by formula and id. It stores source mappings, not evaluated vapour-law results.',
+    },
+    'lru:simulator/reference_data/nasa_glenn.py:_nasa_glenn_atomic_weights': {
+        "path": 'simulator/reference_data/nasa_glenn.py',
+        "line": 379,
+        "kind": 'lru',
+        "name": '_nasa_glenn_atomic_weights',
+        "carries_disclosure": False,
+        "how": 'Caches source-era atomic weights read from NASA elemental cards; these are source data used for formula mass checks, not evaluated vapour laws.',
+    },
+    'lru:simulator/reference_data/nasa_glenn.py:load_record_document_by_id': {
+        "path": 'simulator/reference_data/nasa_glenn.py',
+        "line": 1536,
+        "kind": 'lru',
+        "name": 'load_record_document_by_id',
+        "carries_disclosure": False,
+        "how": 'Caches parsed NASA source records by id; it stores source coefficients and identity fields, not evaluated vapour-law results.',
     },
     'lru:simulator/battery/generators/janaf.py:_janaf_liquid_element_table_ids': {
         "path": 'simulator/battery/generators/janaf.py',
@@ -1307,7 +1323,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/vapour_rail/wall_saturation.py:_nasa_record_data': {
         "path": 'simulator/vapour_rail/wall_saturation.py',
-        "line": 555,
+        "line": 559,
         "kind": 'lru',
         "name": '_nasa_record_data',
         "carries_disclosure": False,
@@ -1315,7 +1331,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/vapour_rail/wall_saturation.py:_janaf_record_data': {
         "path": 'simulator/vapour_rail/wall_saturation.py',
-        "line": 619,
+        "line": 631,
         "kind": 'lru',
         "name": '_janaf_record_data',
         "carries_disclosure": False,
@@ -1323,7 +1339,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/vapour_rail/wall_saturation.py:_nasa_state_for_source': {
         "path": 'simulator/vapour_rail/wall_saturation.py',
-        "line": 656,
+        "line": 668,
         "kind": 'lru',
         "name": '_nasa_state_for_source',
         "carries_disclosure": False,
@@ -1331,7 +1347,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/vapour_rail/wall_saturation.py:_janaf_state_for_source': {
         "path": 'simulator/vapour_rail/wall_saturation.py',
-        "line": 728,
+        "line": 740,
         "kind": 'lru',
         "name": '_janaf_state_for_source',
         "carries_disclosure": False,

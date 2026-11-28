@@ -63,6 +63,11 @@ _FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d*)")
 _FLOAT_TOKEN_RE = re.compile(
     r"[+-]?(?:\d+\.\d*|\.\d+|\d+)(?:[DdEe][+-]?\d+)?"
 )
+_NASA_RECORD_ID_PATTERN = r"NG-\d{4}"
+_NASA_RECORD_ID_RE = re.compile(_NASA_RECORD_ID_PATTERN)
+_RECORD_ID_IN_SOURCE_TEXT_RE = re.compile(
+    rf"(?<![A-Z0-9]){_NASA_RECORD_ID_PATTERN}(?![A-Z0-9])"
+)
 _PHASE_SUFFIX_RE = re.compile(r"\(([^)]+)\)(?:,.*)?$")
 _PHASE_TAGS = frozenset(
     {
@@ -325,10 +330,12 @@ def _record_formula_mass_tolerance(
     atomic_weights: Mapping[str, float],
     source_atomic_weights: Mapping[str, float],
 ) -> tuple[float, float]:
-    # The tolerance is the sum of half-unit rounding from the printed header
-    # and counts, plus sum(count * |NASA source-era weight - simulator
-    # weight|). NASA's elemental cards preserve the source table's 1960s–90s
-    # atomic weights; the simulator uses the current CIAAW/NIST table.
+    # For true count x, printed count c, source weight s, and repository
+    # weight r, the mass difference is (x - c)s + c(s - r). Use s for the
+    # count-rounding half-width; using r can underbound it when s > r. The
+    # second term below allows the full source/repository weight difference.
+    # NASA's elemental cards preserve its source-era weights; the simulator
+    # uses the current CIAAW/NIST table.
     bounds = [_half_printed_unit(molecular_weight.as_published)]
     for slot in slots:
         if (
@@ -339,7 +346,10 @@ def _record_formula_mass_tolerance(
         ):
             continue
         if slot.element in atomic_weights:
-            mass_per_count = atomic_weights[slot.element]
+            mass_per_count = max(
+                atomic_weights[slot.element],
+                source_atomic_weights.get(slot.element, atomic_weights[slot.element]),
+            )
         else:
             try:
                 slot_formula = parse_formula(
@@ -347,8 +357,11 @@ def _record_formula_mass_tolerance(
                 )
             except ValueError:
                 continue
-            mass_per_count = sum(
-                atomic_weights[element]
+            mass_per_count = math.fsum(
+                max(
+                    atomic_weights[element],
+                    source_atomic_weights.get(element, atomic_weights[element]),
+                )
                 for element, count in slot_formula.elements.items()
                 if math.isclose(count, slot.count, rel_tol=0.0, abs_tol=1e-12)
             )
@@ -545,6 +558,94 @@ def accepted_formula(
         "formula_as_published": formula,
         **weight_evidence,
     }
+
+
+def accepted_observation_formula(
+    observation_id: str,
+    locator_values: Iterable[str | None],
+    observation_formula: str,
+) -> tuple[Mapping[str, Any] | None, Any | None, dict[str, Any] | None]:
+    """Resolve and bind a NASA Glenn observation to its source card.
+
+    ``observation_id`` and every record-bearing locator are competing claims.
+    The selected card must pass :func:`accepted_formula`, and the observation
+    formula must have the same element counts. A row with no card claim is
+    left to the source-agnostic species parser used by its consumer.
+    """
+    from simulator.accounting.exceptions import AccountingError
+    from simulator.accounting.formulas import parse_formula
+
+    claims: list[tuple[str, str]] = []
+    for source, value in (("observation_id", observation_id), *(
+        ("locator", item) for item in locator_values
+    )):
+        if not isinstance(value, str):
+            continue
+        claims.extend(
+            (source, match.group(0).upper())
+            for match in _RECORD_ID_IN_SOURCE_TEXT_RE.finditer(value)
+        )
+    record_ids = {record_id for _source, record_id in claims}
+    if not record_ids:
+        return None, None, None
+    if len(record_ids) != 1:
+        return None, None, {
+            "kind": "formula_source_record_identity_disagreement",
+            "disposition": "refusal",
+            "identity_refusal": True,
+            "observation_id": observation_id,
+            "located_record_ids": claims,
+        }
+
+    record_id = next(iter(record_ids))
+    record = load_record_document_by_id(record_id)
+    if record is None:
+        return None, None, {
+            "kind": "formula_source_record_missing",
+            "disposition": "refusal",
+            "identity_refusal": True,
+            "observation_id": observation_id,
+            "record_id": record_id,
+        }
+
+    parsed, diagnostic = accepted_formula(record)
+    if diagnostic is not None and diagnostic.get("identity_refusal") is True:
+        return record, None, {**diagnostic, "observation_id": observation_id}
+    if parsed is None:
+        return record, None, {
+            "kind": "formula_source_record_unusable",
+            "disposition": "refusal",
+            "identity_refusal": True,
+            "observation_id": observation_id,
+            "record_id": record_id,
+        }
+    try:
+        observed = parse_formula(observation_formula)
+    except AccountingError:
+        observed = None
+    if observed is None or set(observed.elements) != set(parsed.elements) or any(
+        not math.isclose(
+            float(observed.elements[element]),
+            float(parsed.elements[element]),
+            rel_tol=0.0,
+            abs_tol=1e-8,
+        )
+        for element in parsed.elements
+    ):
+        return record, None, {
+            "kind": "formula_observation_composition_disagreement",
+            "disposition": "refusal",
+            "identity_refusal": True,
+            "observation_id": observation_id,
+            "record_id": record_id,
+            "formula_as_published": record.get("formula"),
+            "observation_formula": observation_formula,
+            "record_elements": dict(parsed.elements),
+            "observation_elements": (
+                None if observed is None else dict(observed.elements)
+            ),
+        }
+    return record, parsed, diagnostic
 
 
 def _interval_source_lines(intervals: Iterable[IntervalRecord]) -> list[str]:
@@ -1424,9 +1525,16 @@ def load_record_document(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _is_nasa_glenn_record_id(record_id: object) -> bool:
+    return (
+        isinstance(record_id, str)
+        and _NASA_RECORD_ID_RE.fullmatch(record_id) is not None
+    )
+
+
 @lru_cache(maxsize=128)
 def load_record_document_by_id(record_id: str) -> dict[str, Any] | None:
-    if re.fullmatch(r"NG-\d{4}", record_id) is None:
+    if not _is_nasa_glenn_record_id(record_id):
         return None
     path = COMPILATION_ROOT / "records" / f"{record_id}.json"
     if not path.is_file():

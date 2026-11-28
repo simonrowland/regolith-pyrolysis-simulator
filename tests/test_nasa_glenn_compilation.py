@@ -199,9 +199,67 @@ def test_record_formula_weight_witness_census(source_records, capsys) -> None:
     assert adn_notice["printed_molecular_weight_g_mol"] == 630.0
     assert adn_notice["parsed_molecular_weight_g_mol"] == pytest.approx(124.056)
     assert adn_notice["difference_g_mol"] > adn_notice["precision_tolerance_g_mol"]
+    adn_document, bound_adn, bound_adn_notice = (
+        nasa_glenn.accepted_observation_formula(
+            "nasa-glenn:NG-2106",
+            (
+                "data/literature/compilations/nasa-glenn/records/NG-2106.json",
+                "compilation_record:data/literature/compilations/nasa-glenn/records/NG-2106.json",
+            ),
+            adn.formula,
+        )
+    )
+    assert adn_document is not None
+    assert bound_adn is not None
+    assert bound_adn_notice is not None
+    assert bound_adn_notice["kind"] == "formula_molecular_weight_conflict"
+    assert bound_adn_notice["identity_refusal"] is False
+    air_document, air_formula, air_notice = nasa_glenn.accepted_observation_formula(
+        "nasa-glenn:NG-2031",
+        ("data/literature/compilations/nasa-glenn/records/NG-2031.json",),
+        nasa_glenn.load_record_document_by_id("NG-2031")["formula"],
+    )
+    assert air_document is not None
+    assert air_formula is not None
+    assert air_notice is None
     with capsys.disabled():
         print("NASA_GLENN_FORMULA_WEIGHT_CENSUS " + json.dumps(refusals, sort_keys=True))
         print("NASA_GLENN_FORMULA_WEIGHT_NOTICES " + json.dumps([adn_notice], sort_keys=True))
+
+
+@pytest.mark.parametrize(
+    ("record_id", "valid"),
+    (("NG-2032", True), ("ng-2032", False), ("NG-203", False), ("NG-20320", False)),
+)
+def test_nasa_glenn_record_id_grammar(record_id: str, valid: bool) -> None:
+    assert nasa_glenn._is_nasa_glenn_record_id(record_id) is valid
+
+
+def test_formula_rounding_bound_uses_heavier_source_atomic_weight() -> None:
+    from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, parse_formula
+
+    printed_count = 2.0
+    actual_count = 2.00499999
+    source_weight = nasa_glenn._nasa_glenn_atomic_weights()["O"]
+    repository_weight = ATOMIC_WEIGHTS_G_PER_MOL["O"]
+    printed_header = 32.0787968
+    slot = nasa_glenn.CompositionSlot("O", "2.00", "O", printed_count, False)
+    tolerance, _source_weight_tolerance = nasa_glenn._record_formula_mass_tolerance(
+        [slot],
+        nasa_glenn.PublishedNumber("32.0787968", printed_header),
+        parse_formula("O2.00"),
+        parse_formula,
+        ATOMIC_WEIGHTS_G_PER_MOL,
+        {"O": source_weight},
+    )
+
+    # The header is the source-era mass for the unrounded count. Comparing it
+    # to the printed count at the repository weight gives this lower bound.
+    observed_difference = abs(printed_header - printed_count * repository_weight)
+    assert source_weight > repository_weight
+    assert actual_count * source_weight == pytest.approx(printed_header)
+    assert observed_difference == pytest.approx(0.0807968)
+    assert tolerance >= observed_difference
 
 
 def test_inertair_witness_refuses_both_battery_consumers_and_mutation_is_caught(
@@ -259,6 +317,99 @@ def test_inertair_witness_refuses_both_battery_consumers_and_mutation_is_caught(
 
     with monkeypatch.context() as mutation:
         mutation.setattr(nasa_glenn, "accepted_formula", bypass_witness)
+        with pytest.raises(AssertionError):
+            assert_score_refuses()
+        with pytest.raises(AssertionError):
+            assert_nasa9_refuses()
+
+
+def test_nasa9_observation_binding_uses_card_id_and_all_locator_claims(
+    monkeypatch,
+) -> None:
+    from simulator.battery.compilation_tier import (
+        _nasa_cea_9_record_for_species,
+        predict_thermo_attempt,
+    )
+    from simulator.battery.enums import Engine, Phase, Quantity, RefusalReason
+    from simulator.battery.score import _parse_observation_species_formula
+    from simulator.battery.records import Species, State
+    from tests.battery import factories as F
+    from simulator.accounting.formulas import parse_formula
+
+    air = nasa_glenn.load_record_document_by_id("NG-2031")
+    assert air is not None
+    identity = replace(
+        F.o2_identity(),
+        quantity=Quantity.CP,
+        species=Species(air["formula"], Phase.G),
+        reaction=State.not_applicable("pure standard-state thermo"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    observation = replace(
+        F.observation(
+            "nasa-glenn:NG-2032",
+            "exp-1",
+            identity,
+            0,
+            source_id="nasa-glenn",
+        ),
+        locator=F.loc(
+            source_path="data/literature/compilations/nasa-glenn/records/NG-2032.json"
+        ),
+        read_from=(
+            "compilation_record:"
+            "data/literature/compilations/nasa-glenn/records/NG-2032.json"
+        ),
+    )
+    species = observation.identity.species
+
+    def assert_score_refuses() -> None:
+        parsed, diagnostic = _parse_observation_species_formula(observation)
+        assert parsed is None
+        assert diagnostic is not None
+        assert diagnostic["identity_refusal"] is True
+
+    def assert_nasa9_refuses() -> None:
+        record, reason = _nasa_cea_9_record_for_species(
+            species, observation=observation
+        )
+        assert record is None
+        assert reason == "nasa-cea-source-formula-identity-mismatch"
+        attempt = predict_thermo_attempt(Engine.NASA_CEA_9, observation)
+        assert attempt.value is None
+        assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+
+    assert_score_refuses()
+    assert_nasa9_refuses()
+
+    wrong_locator = replace(
+        observation,
+        locator=F.loc(
+            source_path="data/literature/compilations/nasa-glenn/records/NG-2031.json"
+        ),
+    )
+    _parsed, competing_diagnostic = _parse_observation_species_formula(wrong_locator)
+    assert competing_diagnostic is not None
+    assert competing_diagnostic["kind"] == "formula_source_record_identity_disagreement"
+    assert competing_diagnostic["identity_refusal"] is True
+    wrong_locator_record, wrong_locator_reason = _nasa_cea_9_record_for_species(
+        species, observation=wrong_locator
+    )
+    assert wrong_locator_record is None
+    assert wrong_locator_reason == "nasa-cea-source-formula-identity-mismatch"
+    wrong_locator_attempt = predict_thermo_attempt(
+        Engine.NASA_CEA_9, wrong_locator
+    )
+    assert wrong_locator_attempt.value is None
+    assert wrong_locator_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+
+    def bypass_source_binding(_observation_id, _locator_values, _formula):
+        return air, parse_formula(air["formula"]), None
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            nasa_glenn, "accepted_observation_formula", bypass_source_binding
+        )
         with pytest.raises(AssertionError):
             assert_score_refuses()
         with pytest.raises(AssertionError):
