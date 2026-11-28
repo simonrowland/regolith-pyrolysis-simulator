@@ -199,6 +199,7 @@
       .map((notice) => {
         const species = notice.species || "unknown species";
         const method = notice.method || "method not reported";
+        const flag = notice.flag || "flag not reported";
         const sigma = Number.isFinite(notice.sigma_angstrom)
           ? `${notice.sigma_angstrom} Å`
           : "not reported";
@@ -210,7 +211,7 @@
               .map(([key, value]) => `${key}=${String(value)}`)
               .join(", ")
           : "inputs not reported";
-        return `${species}: ${method}; sigma ${sigma}; epsilon/k ${epsilon}; inputs ${inputs}`;
+        return `${species}: ${method} (${flag}); sigma ${sigma}; epsilon/k ${epsilon}; inputs ${inputs}`;
       });
     return estimates.length ? estimates.join("; ") : "none";
   }

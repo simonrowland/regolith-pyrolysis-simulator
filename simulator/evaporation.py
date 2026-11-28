@@ -1361,7 +1361,7 @@ def _pre_rg_effective_pressure_source(
     """
 
     shadow_kwargs = {'read_context': EFFECTIVE_PRESSURE_SOURCE_CONTEXT}
-    if unresolved_species:
+    if unresolved_species is not None:
         shadow_kwargs['unresolved_species'] = unresolved_species
     effective_pressures = _legacy_evaporation_shadow_pressure_map(
         vapor_pressure_data,
@@ -1388,6 +1388,18 @@ def _evaporation_parent_oxide(
     species: str,
 ) -> str | None:
     """Return the parent oxide required by the evaporation debit owner."""
+    row = _evaporation_vapor_row(vapor_pressure_data, species)
+    if row is None:
+        return None
+    parent_oxide = row.get('parent_oxide')
+    return str(parent_oxide) if parent_oxide else None
+
+
+def _evaporation_vapor_row(
+    vapor_pressure_data: Mapping[str, Any] | None,
+    species: str,
+) -> Mapping[str, Any] | None:
+    """Read the one legacy-projected vapor row used by evaporation owners."""
     if not isinstance(vapor_pressure_data, Mapping):
         return None
     row = (vapor_pressure_data.get('metals', {}) or {}).get(species, {})
@@ -1397,8 +1409,30 @@ def _evaporation_parent_oxide(
         )
     if not isinstance(row, Mapping):
         return None
-    parent_oxide = row.get('parent_oxide')
-    return str(parent_oxide) if parent_oxide else None
+    return row
+
+
+def _append_transport_parameters_estimated_notice(
+    overlay: dict[str, Any],
+    *,
+    species: str,
+    hour: int | None,
+    parameters: Mapping[str, Any],
+) -> None:
+    """Publish the owner-selected estimate with its rung flag and inputs."""
+    notice = {
+        'kind': 'transport_parameters_estimated',
+        'species': str(species),
+        'hour': hour,
+        'method': parameters.get('method'),
+        'flag': parameters.get('flag'),
+        'inputs': dict(parameters.get('inputs', {}) or {}),
+        'sigma_angstrom': parameters.get('sigma_angstrom'),
+        'epsilon_over_k_K': parameters.get('epsilon_over_k_K'),
+    }
+    notices = overlay.setdefault('notices', [])
+    if notice not in notices:
+        notices.append(notice)
 
 
 def _zero_liquid_precedes_interpolation(equilibrium: Any) -> bool:
@@ -1957,6 +1991,13 @@ class EvaporationMixin:
             campaign = None
         else:
             campaign = campaign.strip()
+        transport_property_rows = {
+            str(species): dict(row)
+            for species in partials_Pa
+            if (row := _evaporation_vapor_row(
+                getattr(self, 'vapor_pressures', {}), str(species)
+            )) is not None
+        }
         catalog = getattr(self, "vapor_pressures", None)
         hkl = frozenset(
             _load_hkl_upper_bound_transport_species(
@@ -2006,6 +2047,7 @@ class EvaporationMixin:
             hkl_upper_bound_species=hkl,
             extrapolate_continuum=extrapolate,
             campaign_name=campaign,
+            lennard_jones_property_rows_by_species=transport_property_rows,
         )
 
     def _closed_langmuir_pressures_for_partials(
@@ -2751,6 +2793,10 @@ class EvaporationMixin:
         solver_species.difference_update(unavailable_by_species)
         solver_species.intersection_update(vapor_pressures)
         flux_overlay_report['n_flux_pressures'] = len(vapor_pressures)
+        # Preserve input-side membership and notices before the first
+        # surface closure. Each capacity trial re-evaluates cap proofs
+        # against its own pressure vector from this uncapped baseline.
+        selector_flux_overlay = copy.deepcopy(flux_overlay_report)
         # Shadow equality is the unadjusted provider seam. The surface
         # balance below is the flux boundary both consumers must share.
         if hasattr(self, "_last_langmuir_surface_oxygen"):
@@ -2899,6 +2945,14 @@ class EvaporationMixin:
                 unresolved_notice_reasons,
                 observed_unavailable_by_species=closure_failures,
             )
+            EvaporationMixin._classify_hour_vapour_availability(
+                self,
+                equilibrium,
+                vapor_pressures,
+                selector_flux_overlay,
+                unresolved_notice_reasons,
+                observed_unavailable_by_species=closure_failures,
+            )
             active_species.difference_update(closure_failures)
             closure_publication = {
                 species: pressure
@@ -2915,10 +2969,6 @@ class EvaporationMixin:
             diagnostic["overhead_partials_Pa"] = dict(partials)
             diagnostic["overhead_pressure_Pa"] = film_pressure
             self._last_langmuir_surface_oxygen = diagnostic
-        # This is the complete batch-level baseline for capacity trials:
-        # comparison disclosure and persistent selector notices are fixed
-        # across the Picard loop; only closure notices are trial-specific.
-        selector_flux_overlay = copy.deepcopy(flux_overlay_report)
         EvaporationMixin._record_langmuir_refusal_notices(
             self,
             flux_overlay_report,
@@ -2971,10 +3021,15 @@ class EvaporationMixin:
                 cached.get('estimated_lennard_jones_params_by_species', {})
                 or {}
             )
+            transport_property_rows = dict(
+                cached.get('lennard_jones_property_rows_by_species', {}) or {}
+            )
             hkl_upper_bound_species = set(
                 cached.get('hkl_upper_bound_transport_species', ()) or ()
             )
-            closure_restart_used = bool(cached.get('closure_restart_used'))
+            restarted_unavailable_species = set(
+                cached.get('restarted_unavailable_species', ()) or ()
+            )
         else:
             unavailable = {
                 str(species): str(reason)
@@ -2982,16 +3037,16 @@ class EvaporationMixin:
                 if species is not None
             }
             estimated_transport = {}
+            transport_property_rows = {}
             hkl_upper_bound_species = set(
                 _load_hkl_upper_bound_transport_species(
                     getattr(self, 'vapor_pressures', {}) or {}
                 )
             )
-            closure_restart_used = False
+            restarted_unavailable_species = set()
             self._langmuir_flux_closure_context = None
             from simulator.condensation import (
-                _LENNARD_JONES_PARAMS,
-                _estimate_lennard_jones_parameters,
+                _resolve_lennard_jones_parameters,
                 _knudsen_number,
             )
             from simulator.transport_constants import (
@@ -2999,38 +3054,19 @@ class EvaporationMixin:
             )
 
             vapor_data = getattr(self, 'vapor_pressures', {}) or {}
-            metals = vapor_data.get('metals', {}) or {}
-            oxide_vapors = vapor_data.get('oxide_vapors', {}) or {}
             for species in tuple(flux_pressures):
-                if species in _LENNARD_JONES_PARAMS:
-                    continue
-                row = metals.get(species) or oxide_vapors.get(species) or {}
+                row = _evaporation_vapor_row(vapor_data, species)
+                if row is not None:
+                    transport_property_rows[str(species)] = dict(row)
                 molar_mass = production_vapor_molar_mass_g_per_mol(
                     vapor_data, species
                 )
-                estimate = (
-                    _estimate_lennard_jones_parameters(
-                        species,
-                        row,
-                    )
-                    if isinstance(row, Mapping)
-                    else None
-                )
-                if estimate is not None:
-                    estimate['molar_mass_g_mol'] = molar_mass
-                    estimated_transport[species] = estimate
-                    estimate_notice = {
-                        'kind': 'transport_parameters_estimated',
-                        'species': str(species),
-                        'hour': hour,
-                        'method': estimate['method'],
-                        'inputs': dict(estimate['inputs']),
-                        'sigma_angstrom': estimate['sigma_angstrom'],
-                        'epsilon_over_k_K': estimate['epsilon_over_k_K'],
-                    }
-                    notices = flux_overlay.setdefault('notices', [])
-                    if estimate_notice not in notices:
-                        notices.append(estimate_notice)
+                parameters = _resolve_lennard_jones_parameters(species, row)
+                if parameters.get('status') == 'tabulated':
+                    continue
+                if parameters.get('status') == 'estimated':
+                    parameters['molar_mass_g_mol'] = molar_mass
+                    estimated_transport[str(species)] = parameters
                     continue
 
                 free_molecular_to_rating = False
@@ -3072,6 +3108,80 @@ class EvaporationMixin:
                     # explicit HKL kinetic upper bound, avoiding a CE call
                     # for which the species has no Lennard-Jones pair.
                     hkl_upper_bound_species.add(str(species))
+
+            # A missing parent matters to the Langmuir residual only when
+            # that same balance is active and this carrier is coupled to a
+            # peer. The debit helper remains the deciding source for whether
+            # this is a missing parent that would have raised before flux.
+            pressure_diagnostic = getattr(
+                self, '_last_vapor_pressure_diagnostic', {}
+            )
+            pressure_diagnostic = (
+                pressure_diagnostic
+                if isinstance(pressure_diagnostic, Mapping)
+                else {}
+            )
+            candidate_pressures = {
+                str(species): pressure
+                for species, pressure in flux_pressures.items()
+                if str(species) not in unavailable
+            }
+            from simulator.langmuir_surface_oxygen import (
+                langmuir_closure_participant_species,
+            )
+            capacity_reader = getattr(
+                self, '_langmuir_melt_redox_capacity_mol_per_ln_fO2', None
+            )
+            capacity = None
+            if callable(capacity_reader):
+                temperature_c = getattr(equilibrium, 'temperature_C', None)
+                if temperature_c is None:
+                    temperature_c = getattr(
+                        getattr(self, 'melt', None), 'temperature_C', None
+                    )
+                try:
+                    temperature_k = (
+                        float(temperature_c) + CELSIUS_TO_KELVIN_OFFSET
+                    )
+                except (TypeError, ValueError, OverflowError):
+                    temperature_k = None
+                if temperature_k is not None:
+                    try:
+                        capacity = capacity_reader(
+                            temperature_K=temperature_k,
+                            eval_pO2_bar=pressure_diagnostic.get(
+                                'source_reaction_fO2_bar'
+                            ),
+                        )
+                    except (AttributeError, TypeError, ValueError, OverflowError):
+                        capacity = None
+            closure_members = langmuir_closure_participant_species(
+                candidate_pressures,
+                provenance_by_species=pressure_diagnostic.get(
+                    'vapor_pressure_numerator_provenance', {}
+                ),
+                source_reaction_fO2_bar=pressure_diagnostic.get(
+                    'source_reaction_fO2_bar'
+                ),
+                transport_pO2_bar=pressure_diagnostic.get('pO2_bar'),
+                legacy_catalog=vapor_data,
+                compiled_catalog=getattr(self, 'vapour_rail_catalog', None),
+                melt_redox_capacity_mol_per_ln_fO2=capacity,
+            )
+            if len(closure_members) > 1:
+                from simulator.accounting.exceptions import AccountingError
+
+                for species in sorted(closure_members):
+                    if _evaporation_parent_oxide(vapor_data, species):
+                        continue
+                    row = _evaporation_vapor_row(vapor_data, species) or {}
+                    try:
+                        self._evaporation_stoich(species, dict(row))
+                    except AccountingError as exc:
+                        if 'requires parent_oxide metadata' in str(exc):
+                            unavailable[species] = (
+                                'missing_evaporation_stoichiometry'
+                            )
             for notice in flux_overlay.get('notices', ()) or ():
                 if (
                     isinstance(notice, Mapping)
@@ -3091,25 +3201,24 @@ class EvaporationMixin:
             'estimated_lennard_jones_params_by_species': dict(
                 estimated_transport
             ),
+            'lennard_jones_property_rows_by_species': dict(
+                transport_property_rows
+            ),
             'hkl_upper_bound_transport_species': tuple(
                 sorted(hkl_upper_bound_species)
             ),
-            'closure_restart_used': closure_restart_used,
+            'restarted_unavailable_species': tuple(
+                sorted(restarted_unavailable_species)
+            ),
         }
 
         for species, estimate in estimated_transport.items():
-            estimate_notice = {
-                'kind': 'transport_parameters_estimated',
-                'species': str(species),
-                'hour': hour,
-                'method': estimate['method'],
-                'inputs': dict(estimate['inputs']),
-                'sigma_angstrom': estimate['sigma_angstrom'],
-                'epsilon_over_k_K': estimate['epsilon_over_k_K'],
-            }
-            notices = flux_overlay.setdefault('notices', [])
-            if estimate_notice not in notices:
-                notices.append(estimate_notice)
+            _append_transport_parameters_estimated_notice(
+                flux_overlay,
+                species=str(species),
+                hour=hour,
+                parameters=estimate,
+            )
 
         for species, reason in unavailable.items():
             flux_pressures.pop(species, None)
@@ -3120,6 +3229,46 @@ class EvaporationMixin:
                 reason=reason,
             )
         return unavailable
+
+    def _restart_for_late_unavailability(
+        self,
+        equilibrium: Any,
+        flux_pressures: Mapping[str, Any],
+        flux_overlay: dict[str, Any],
+        unavailable_by_species: Mapping[str, str],
+    ) -> dict[str, str]:
+        """Exclude newly refused members before one deterministic re-close.
+
+        Membership only shrinks. Each newly refused member is recorded once,
+        so live and Picard callers can restart without allowing a stale peer
+        pressure to survive a provider-stage refusal.
+        """
+        cache = getattr(self, '_vapour_batch_hour_availability', None)
+        restarted = set(
+            cache.get('restarted_unavailable_species', ())
+            if isinstance(cache, Mapping)
+            else ()
+        )
+        fresh = {
+            str(species): str(reason)
+            for species, reason in unavailable_by_species.items()
+            if str(species) in flux_pressures and str(species) not in restarted
+        }
+        if not fresh:
+            return {}
+        EvaporationMixin._classify_hour_vapour_availability(
+            self,
+            equilibrium,
+            dict(flux_pressures),
+            flux_overlay,
+            {},
+            observed_unavailable_by_species=fresh,
+        )
+        cache = getattr(self, '_vapour_batch_hour_availability', None)
+        if isinstance(cache, dict):
+            restarted.update(fresh)
+            cache['restarted_unavailable_species'] = tuple(sorted(restarted))
+        return fresh
 
     def _evaporation_publisher_film(
         self,
@@ -3657,6 +3806,31 @@ class EvaporationMixin:
             flux=flux,
         )
         diagnostic['vapour_batch_flux_overlay'] = flux_overlay_report
+        late_provider_unavailable = {
+            str(species): str(reason)
+            for species, reason in provider_unavailable.items()
+            if str(species) in vapor_pressures
+        }
+        if late_provider_unavailable:
+            fresh_provider_unavailable = (
+                EvaporationMixin._restart_for_late_unavailability(
+                    self,
+                    equilibrium,
+                    vapor_pressures,
+                    flux_overlay_report,
+                    late_provider_unavailable,
+                )
+            )
+            if fresh_provider_unavailable:
+                return EvaporationMixin._calculate_evaporation(
+                    self,
+                    equilibrium,
+                    gate_authority=gate_authority,
+                    overhead_partials_override_Pa=(
+                        overhead_partials_override_Pa
+                    ),
+                    capacity_bound_notice=capacity_bound_notice,
+                )
         continuum_notice = diagnostic.get('continuum_extrapolation_notice')
         condensation_model = getattr(self, 'condensation_model', None)
         if continuum_notice and condensation_model is not None:
@@ -6414,9 +6588,6 @@ class EvaporationMixin:
         stoich_by_species: dict[str, dict] = {}
         available_oxide_kg: dict[str, float] = {}
 
-        metals_data = self.vapor_pressures.get('metals', {}) or {}
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
-
         cleaned_melt_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt')
         spent_reductant_residue_kg = self.atom_ledger.kg_by_account(
@@ -6424,9 +6595,9 @@ class EvaporationMixin:
         projection_parity_tolerance_pct = 5.0e-12
 
         for species in tuple(vapor_pressures):
-            sp_data = metals_data.get(species, {})
-            if not sp_data:
-                sp_data = oxide_vapors_data.get(species, {})
+            sp_data = dict(
+                _evaporation_vapor_row(self.vapor_pressures, species) or {}
+            )
 
             M_g_mol = production_vapor_molar_mass_g_per_mol(
                 self.vapor_pressures, species
@@ -6915,18 +7086,16 @@ class EvaporationMixin:
         transport_cache = getattr(
             self, '_vapour_batch_hour_availability', None
         )
-        estimated_transport = (
-            transport_cache.get(
-                'estimated_lennard_jones_params_by_species', {}
-            )
+        property_rows = (
+            transport_cache.get('lennard_jones_property_rows_by_species', {})
             if isinstance(transport_cache, Mapping)
             else {}
         )
-        if isinstance(estimated_transport, Mapping) and estimated_transport:
-            controls['estimated_lennard_jones_params_by_species'] = {
-                str(species): dict(parameters)
-                for species, parameters in estimated_transport.items()
-                if isinstance(parameters, Mapping)
+        if isinstance(property_rows, Mapping) and property_rows:
+            controls['lennard_jones_property_rows_by_species'] = {
+                str(species): dict(row)
+                for species, row in property_rows.items()
+                if isinstance(row, Mapping)
             }
         free_molecular_upper_bound = (
             transport_cache.get('hkl_upper_bound_transport_species', ())
@@ -7108,8 +7277,6 @@ class EvaporationMixin:
                 _note(species, rate)
             return kept
 
-        metals_data = self.vapor_pressures.get('metals', {}) or {}
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
         parent_groups: dict[str, list[dict]] = defaultdict(list)
 
         for species in sorted(raw_rates_kg_hr):
@@ -7121,9 +7288,9 @@ class EvaporationMixin:
                 # Debit floor. The computed rate is still the supply.
                 _note(species, raw_rate_kg_hr if raw_rate_kg_hr > 0.0 else 0.0)
                 continue
-            sp_data = metals_data.get(species, {})
-            if not sp_data:
-                sp_data = oxide_vapors_data.get(species, {})
+            sp_data = dict(
+                _evaporation_vapor_row(self.vapor_pressures, species) or {}
+            )
             stoich = self._evaporation_stoich(species, sp_data)
             parent_oxide = stoich['parent_oxide']
             oxide_per_product_kg = float(stoich['oxide_per_product_kg'])

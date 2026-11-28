@@ -89,6 +89,10 @@ class CapacityCouplingRefusalError(RuntimeError):
         super().__init__(refusal.reason)
 
 
+class CapacitySolveRestart(Exception):
+    """Control signal for the caller to restart with a smaller member set."""
+
+
 def partition_melt_oxygen(
     *,
     bled_o2_mol: float,
@@ -313,6 +317,8 @@ def solve_capacity_shadow(
                 str(species): max(0.0, float(rate))
                 for species, rate in flux_kg_hr_at_partials(partials).items()
             }
+        except CapacitySolveRestart:
+            raise
         except EvaporationFluxRefusal:
             raise
         except Exception as exc:
@@ -334,6 +340,8 @@ def solve_capacity_shadow(
                         partials
                     ).items()
                 }
+            except CapacitySolveRestart:
+                raise
             except EvaporationFluxRefusal:
                 raise
             except Exception as exc:

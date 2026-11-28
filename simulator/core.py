@@ -7940,6 +7940,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.capacity_coupling import (
+            CapacitySolveRestart as _RestartCapacitySolve,
             _headspace_partial_pressures_Pa,
             solve_capacity_shadow,
         )
@@ -8164,16 +8165,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             capacity_flux_overlay
         )
         solver_molar_masses = dict(provider_molar_masses)
-        flux_species = set(batch_flux_pressures or ())
         selector_channel_states = selection_flux_overlay.get(
             'batch_channel_states', {}
         )
+        flux_species = {
+            str(species)
+            for species, state in selector_channel_states.items()
+            if state == 'eligible'
+        } if isinstance(selector_channel_states, Mapping) else set()
+        selector_unavailable = {
+            str(notice.get('species'))
+            for notice in selection_flux_overlay.get('notices', ()) or ()
+            if isinstance(notice, Mapping)
+            and notice.get('kind') == 'vapour_batch_unresolved'
+            and notice.get('species') is not None
+        }
+        flux_species.difference_update(selector_unavailable)
         if isinstance(selector_channel_states, Mapping):
             for species, state in selector_channel_states.items():
                 if (
                     state != 'eligible'
                     or species in solver_molar_masses
-                    or species not in flux_species
                 ):
                     continue
                 solver_molar_masses[str(species)] = resolve_species_formula(
@@ -8218,9 +8230,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         rates_cache = {}
-
-        class _RestartCapacitySolve(RuntimeError):
-            pass
 
         def flux_at_partials(partials_Pa):
             nonlocal capacity_bound_notice, capacity_flux_overlay
@@ -8299,44 +8308,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 trial_resolved_species = trial_outcome.resolved_species
                 if closure_failures:
-                    _append_capacity_solve_exclusion_notice(
+                    restart_bound_notice = _append_capacity_solve_exclusion_notice(
                         self,
                         iteration_overlay,
                         resolved_species=trial_resolved_species,
                     )
-                    hour_cache = getattr(
-                        self, '_vapour_batch_hour_availability', None
+                    fresh_closure_failures = (
+                        EvaporationMixin._restart_for_late_unavailability(
+                            self,
+                            equilibrium,
+                            batch_flux_pressures,
+                            iteration_overlay,
+                            closure_failures,
+                        )
                     )
-                    restart_used = bool(
-                        isinstance(hour_cache, Mapping)
-                        and hour_cache.get('closure_restart_used')
-                    )
-                    if restart_used:
+                    if not fresh_closure_failures:
                         raise EvaporationFluxRefusal(
                             'capacity_member_closure_failure',
                             {
                                 'reason': 'capacity_member_closure_failure',
                                 'closure_failures': dict(closure_failures),
                                 'vapour_batch_flux_overlay': iteration_overlay,
-                                'bound_direction': {
-                                    'resolved_fluxes': 'upper',
-                                    'headspace_pressure': 'lower',
-                                },
+                                'bound_direction': dict(
+                                    (restart_bound_notice or {}).get(
+                                        'bound_direction', {}
+                                    )
+                                ),
                             },
                         )
-                    EvaporationMixin._classify_hour_vapour_availability(
-                        self,
-                        equilibrium,
-                        batch_flux_pressures,
-                        iteration_overlay,
-                        {},
-                        observed_unavailable_by_species=closure_failures,
-                    )
-                    hour_cache = getattr(
-                        self, '_vapour_batch_hour_availability', None
-                    )
-                    if isinstance(hour_cache, dict):
-                        hour_cache['closure_restart_used'] = True
                     raise _RestartCapacitySolve(
                         'Picard closure member became unavailable'
                     )
@@ -8391,6 +8390,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'stoich_by_species', {}
                 ),
             )
+            late_provider_unavailable = {
+                str(species): str(reason)
+                for species, reason in provider_unavailable.items()
+                if str(species) in (iteration_flux_pressures or {})
+            }
+            if late_provider_unavailable:
+                fresh_provider_unavailable = (
+                    EvaporationMixin._restart_for_late_unavailability(
+                        self,
+                        equilibrium,
+                        iteration_flux_pressures or {},
+                        iteration_overlay,
+                        late_provider_unavailable,
+                    )
+                )
+                capacity_bound_notice = _append_capacity_solve_exclusion_notice(
+                    self,
+                    iteration_overlay,
+                    resolved_species=_provider_resolved_flux_species(
+                        diagnostic,
+                        iteration_overlay,
+                        flux_pressures=iteration_flux_pressures,
+                    ),
+                )
+                capacity_flux_overlay = copy.deepcopy(iteration_overlay)
+                self._last_vapour_batch_flux_overlay = copy.deepcopy(
+                    capacity_flux_overlay
+                )
+                if fresh_provider_unavailable:
+                    raise _RestartCapacitySolve(
+                        'Picard provider member became unavailable'
+                    )
+                raise EvaporationFluxRefusal(
+                    'capacity_member_closure_failure',
+                    {
+                        'reason': 'capacity_member_closure_failure',
+                        'provider_unavailable': dict(late_provider_unavailable),
+                        'vapour_batch_flux_overlay': iteration_overlay,
+                        'bound_direction': dict(
+                            (capacity_bound_notice or {}).get(
+                                'bound_direction', {}
+                            )
+                        ),
+                    },
+                )
             capacity_bound_notice = _append_capacity_solve_exclusion_notice(
                 self,
                 iteration_overlay,

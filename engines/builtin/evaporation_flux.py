@@ -1611,11 +1611,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("hkl_upper_bound_transport_species", ()) or ()
             )
         )
-        estimated_transport_by_species = controls.get(
-            "estimated_lennard_jones_params_by_species", {}
+        transport_property_rows_by_species = controls.get(
+            "lennard_jones_property_rows_by_species", {}
         )
-        if not isinstance(estimated_transport_by_species, Mapping):
-            estimated_transport_by_species = {}
+        if not isinstance(transport_property_rows_by_species, Mapping):
+            transport_property_rows_by_species = {}
+        from simulator.condensation import _resolve_lennard_jones_parameters
         from simulator.chemistry.langmuir_knudsen import (
             hertz_knudsen_k_kg_s_m2_pa,
         )
@@ -1920,12 +1921,30 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 flux_uncertainty_pct[species] = uncertainty_pct
 
             try:
-                estimated_transport = estimated_transport_by_species.get(species)
                 species_transport_params = None
-                if isinstance(estimated_transport, Mapping):
+                if uses_gas_resistance and species not in hkl_upper_bound_transport_species:
+                    property_row = transport_property_rows_by_species.get(
+                        species, {}
+                    )
+                    parameters = _resolve_lennard_jones_parameters(
+                        species,
+                        property_row if isinstance(property_row, Mapping) else {},
+                    )
+                    if parameters.get("status") not in {"tabulated", "estimated"}:
+                        missing_transport_parameters[species] = {
+                            "policy": "fail_loud_missing_transport_parameters",
+                            "carrier_gas": carrier_gas,
+                            "parent_oxide": str(stoich.get("parent_oxide") or ""),
+                            "reason": "missing_transport_parameters_possible_continuum",
+                            "refusal_type": "missing_transport_parameters_possible_continuum",
+                            "status": "unavailable",
+                            "authority_level": "unavailable",
+                            "flag": parameters.get("flag"),
+                        }
+                        continue
                     species_transport_params = (
-                        float(estimated_transport["sigma_angstrom"]),
-                        float(estimated_transport["epsilon_over_k_K"]),
+                        float(parameters["sigma_angstrom"]),
+                        float(parameters["epsilon_over_k_K"]),
                         M_kg_mol * 1000.0,
                     )
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(

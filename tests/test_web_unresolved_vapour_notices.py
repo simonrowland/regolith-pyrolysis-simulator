@@ -27,13 +27,13 @@ CAPACITY_BOUND = {
 TRANSPORT_ESTIMATE = {
     "kind": "transport_parameters_estimated",
     "species": "Fe",
-    "method": "bsl_boiling_point",
+    "method": "tc_pc",
+    "flag": "lj_estimated:tc_pc",
     "sigma_angstrom": 3.5,
     "epsilon_over_k_K": 120.0,
     "inputs": {
-        "boiling_molar_volume_cm3_mol": 25.0,
-        "boiling_point_C": 100.0,
-        "normal_boiling_point_K": 373.15,
+        "critical_temperature_K": 6000.0,
+        "critical_pressure_atm": 500.0,
     },
 }
 
@@ -149,9 +149,8 @@ def test_unresolved_vapour_notice_summary_is_pinned_across_surfaces() -> None:
         "headspace pressure lower"
     )
     expected_estimate = (
-        "Fe: bsl_boiling_point; sigma 3.5 Å; epsilon/k 120 K; inputs "
-        "boiling_molar_volume_cm3_mol=25, boiling_point_C=100, "
-        "normal_boiling_point_K=373.15"
+        "Fe: tc_pc (lj_estimated:tc_pc); sigma 3.5 Å; epsilon/k 120 K; inputs "
+        "critical_temperature_K=6000, critical_pressure_atm=500"
     )
 
     assert _render_notice_summaries() == (
@@ -171,9 +170,8 @@ def test_live_and_frozen_consumers_use_the_shared_notice_formatter() -> None:
         "headspace pressure lower"
     )
     expected_estimate = (
-        "Fe: bsl_boiling_point; sigma 3.5 Å; epsilon/k 120 K; inputs "
-        "boiling_molar_volume_cm3_mol=25, boiling_point_C=100, "
-        "normal_boiling_point_K=373.15"
+        "Fe: tc_pc (lj_estimated:tc_pc); sigma 3.5 Å; epsilon/k 120 K; inputs "
+        "critical_temperature_K=6000, critical_pressure_atm=500"
     )
 
     assert _render_notice_summaries(marker) == (

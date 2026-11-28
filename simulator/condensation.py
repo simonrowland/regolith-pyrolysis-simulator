@@ -318,25 +318,30 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
 }
 
 
-def _estimate_lennard_jones_parameters(
+_LE_BAS_MOLAR_VOLUME_CM3_MOL = {
+    "C": 14.8, "H": 3.7, "O": 7.4, "N": 15.6, "S": 25.6,
+    "F": 8.7, "Cl": 24.6, "Br": 27.0, "I": 37.0,
+}
+
+
+def _resolve_lennard_jones_parameters(
     species: str,
-    row: Mapping[str, Any],
-) -> dict[str, Any] | None:
-    """Estimate sigma/epsilon from declared boiling or critical inputs.
+    row: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Choose one binding d-480 transport pair: tabulated, estimated, missing.
 
-    Premise and source: when a species lacks a tabulated Lennard-Jones row,
-    Bird, Stewart & Lightfoot, *Transport Phenomena*, 2nd ed., gives the
-    corresponding-states estimates sigma = 1.18 V_b^(1/3) and epsilon/k =
-    1.15 T_b from normal-boiling liquid molar volume V_b and boiling
-    temperature T_b. If those inputs are absent, use sigma = 0.841 V_c^(1/3)
-    and epsilon/k = 0.77 T_c from critical molar volume V_c and temperature
-    T_c. Volumes are cm^3/mol, temperatures K, sigma Å and epsilon/k K.
-
-    Sanity against the repo's tabulated BSL N2 row: T_c=126.2 K and
-    V_c=90.1 cm^3/mol estimate sigma=3.77 Å and epsilon/k=97.2 K, versus
-    3.798 Å and 71.4 K in ``_LENNARD_JONES_PARAMS``. This is a coarse
-    transport estimate, not a replacement for the tabulated pair.
+    Premise -> correlation -> units: when a sourced pair is absent, d-480
+    selects Tc/Pc first (sigma=2.44*(Tc/Pc_atm)^(1/3), epsilon/k=0.77 Tc),
+    then BSL's normal-boiling form (sigma=1.18 Vb^(1/3), epsilon/k=1.15 Tb),
+    with Vb=M/rho_liquid(Tb), then Le Bas increments for formulas made only
+    of supported elements plus the same BSL form. Tc is K, Pc atm, M g/mol,
+    density g/cm^3, Vb cm^3/mol, sigma Å, and epsilon/k K. The Le Bas
+    increments are in cm^3/mol from Le Bas, *The Molecular Volumes of Liquid
+    Chemical Compounds* (1915). Sanity: N2's Tc=126.2 K and Pc=33.5 atm give
+    sigma≈3.80 Å and epsilon/k=97.2 K, close in size to the sourced repo pair
+    (3.798 Å, 71.4 K); the tabulated rung remains authoritative.
     """
+    row = row if isinstance(row, Mapping) else {}
 
     def positive(*keys: str) -> tuple[str, float] | None:
         for key in keys:
@@ -348,46 +353,123 @@ def _estimate_lennard_jones_parameters(
                 return key, value
         return None
 
-    boiling_temperature = positive("normal_boiling_point_K")
-    if boiling_temperature is None:
-        boiling_point_c = positive("boiling_point_C")
-        if boiling_point_c is not None:
-            boiling_temperature = (
-                "boiling_point_C",
-                boiling_point_c[1] + CELSIUS_TO_KELVIN_OFFSET,
-            )
-    boiling_volume = positive("boiling_molar_volume_cm3_mol")
-    if boiling_temperature is not None and boiling_volume is not None:
-        method = "bsl_boiling_point"
-        temperature_key, temperature_k = boiling_temperature
-        volume_key, volume_cm3_mol = boiling_volume
-        sigma = 1.18 * volume_cm3_mol ** (1.0 / 3.0)
-        epsilon_over_k = 1.15 * temperature_k
-        inputs = {volume_key: volume_cm3_mol}
-        if temperature_key == "boiling_point_C":
-            inputs[temperature_key] = boiling_point_c[1]
-            inputs["normal_boiling_point_K"] = temperature_k
-        else:
-            inputs[temperature_key] = temperature_k
-    else:
-        critical_temperature = positive("critical_temperature_K")
-        critical_volume = positive("critical_molar_volume_cm3_mol")
-        if critical_temperature is None or critical_volume is None:
-            return None
-        method = "bsl_critical_point_fallback"
-        sigma = 0.841 * critical_volume[1] ** (1.0 / 3.0)
-        epsilon_over_k = 0.77 * critical_temperature[1]
-        inputs = {
-            critical_temperature[0]: critical_temperature[1],
-            critical_volume[0]: critical_volume[1],
+    provenance = _LENNARD_JONES_PROVENANCE.get(str(species), {})
+    tabulated = _LENNARD_JONES_PARAMS.get(str(species))
+    if tabulated is not None and provenance.get("status") == "sourced":
+        return {
+            "species": str(species), "status": "tabulated", "method": "tabulated",
+            "source": provenance.get("source"), "sigma_angstrom": tabulated[0],
+            "epsilon_over_k_K": tabulated[1], "molar_mass_g_mol": tabulated[2],
+            "inputs": {"source": provenance.get("source")},
         }
+
+    critical_temperature = positive("critical_temperature_K")
+    critical_pressure = positive("critical_pressure_atm")
+    critical_pressure_raw = critical_pressure
+    if critical_pressure is None:
+        critical_pressure = positive("critical_pressure_Pa")
+        critical_pressure_raw = critical_pressure
+        if critical_pressure is not None:
+            critical_pressure = (
+                critical_pressure[0],
+                critical_pressure[1] / STANDARD_ATMOSPHERE_PA,
+            )
+    if critical_pressure is None:
+        critical_pressure = positive("critical_pressure_bar")
+        critical_pressure_raw = critical_pressure
+        if critical_pressure is not None:
+            critical_pressure = (critical_pressure[0], critical_pressure[1] / 1.01325)
+    if critical_temperature is not None and critical_pressure is not None:
+        sigma = 2.44 * (
+            critical_temperature[1] / critical_pressure[1]
+        ) ** (1.0 / 3.0)
+        epsilon_over_k = 0.77 * critical_temperature[1]
+        inputs = {critical_temperature[0]: critical_temperature[1]}
+        if critical_pressure_raw is not None:
+            inputs[critical_pressure_raw[0]] = critical_pressure_raw[1]
+        inputs["critical_pressure_atm"] = critical_pressure[1]
+        method, flag = "tc_pc", "lj_estimated:tc_pc"
+    else:
+        boiling_temperature = positive("normal_boiling_point_K")
+        boiling_c = None
+        if boiling_temperature is None:
+            boiling_c = positive("boiling_point_C")
+            if boiling_c is not None:
+                boiling_temperature = (
+                    "normal_boiling_point_K",
+                    boiling_c[1] + CELSIUS_TO_KELVIN_OFFSET,
+                )
+        molar_mass = positive("molar_mass_g_mol")
+        density = positive("liquid_density_g_cm3")
+        density_raw = density
+        if density is None:
+            density_kg_m3 = positive("liquid_density_kg_m3")
+            density_raw = density_kg_m3
+            if density_kg_m3 is not None:
+                density = (density_kg_m3[0], density_kg_m3[1] / 1000.0)
+        method = flag = None
+        inputs = {}
+        volume = None
+        if boiling_temperature is not None and molar_mass is not None and density is not None:
+            volume = molar_mass[1] / density[1]
+            inputs = {
+                "normal_boiling_point_K": boiling_temperature[1],
+                molar_mass[0]: molar_mass[1],
+                density_raw[0]: density_raw[1],
+                "liquid_density_g_cm3": density[1],
+                "boiling_molar_volume_cm3_mol": volume,
+            }
+            if boiling_c is not None:
+                inputs["boiling_point_C"] = boiling_c[1]
+            method, flag = "bsl_boiling_density", "lj_estimated:bsl_boiling_density"
+        elif boiling_temperature is not None and row.get("formula"):
+            from simulator.accounting.formulas import parse_formula
+
+            try:
+                formula = parse_formula(str(row["formula"]), species=str(species))
+            except (TypeError, ValueError):
+                formula = None
+            if formula is not None and all(
+                element in _LE_BAS_MOLAR_VOLUME_CM3_MOL
+                for element in formula.elements
+            ):
+                volume = sum(
+                    _LE_BAS_MOLAR_VOLUME_CM3_MOL[element] * count
+                    for element, count in formula.elements.items()
+                )
+                inputs = {
+                    "formula": str(row["formula"]),
+                    "normal_boiling_point_K": boiling_temperature[1],
+                    "le_bas_molar_volume_cm3_mol": volume,
+                }
+                if boiling_c is not None:
+                    inputs["boiling_point_C"] = boiling_c[1]
+                method, flag = "le_bas+bsl_boiling", "lj_estimated:le_bas+bsl_boiling"
+        if method is None or volume is None:
+            return {
+                "species": str(species), "status": "missing", "method": "missing",
+                "flag": "missing_transport_parameters_possible_continuum",
+                "reason": "missing_transport_parameters_possible_continuum",
+                "inputs": {},
+            }
+        sigma = 1.18 * volume ** (1.0 / 3.0)
+        epsilon_over_k = 1.15 * boiling_temperature[1]
     if not all(math.isfinite(value) and value > 0.0 for value in (sigma, epsilon_over_k)):
-        return None
+        return {
+            "species": str(species), "status": "missing", "method": "missing",
+            "flag": "missing_transport_parameters_possible_continuum",
+            "reason": "missing_transport_parameters_possible_continuum",
+            "inputs": inputs,
+        }
     return {
-        "species": str(species),
-        "sigma_angstrom": sigma,
+        "species": str(species), "status": "estimated", "method": method,
+        "flag": flag, "sigma_angstrom": sigma,
         "epsilon_over_k_K": epsilon_over_k,
-        "method": method,
+        "molar_mass_g_mol": (
+            float(row["molar_mass_g_mol"])
+            if row.get("molar_mass_g_mol") is not None
+            else None
+        ),
         "inputs": inputs,
     }
 

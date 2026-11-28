@@ -421,6 +421,10 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
     basis = _real_capacity_sim()
     basis.start_campaign(CampaignPhase.C0)
     basis.melt.temperature_C = 1600.0
+    basis.vapor_pressures["metals"]["Fe"].update({
+        "critical_temperature_K": 6000.0,
+        "critical_pressure_atm": 500.0,
+    })
     equilibrium = basis._get_equilibrium()
     vapor_pressure_diagnostic = copy.deepcopy(
         basis._last_vapor_pressure_diagnostic
@@ -446,6 +450,10 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
         sim = _real_capacity_sim()
         sim.start_campaign(CampaignPhase.C0)
         sim.melt.temperature_C = 1600.0
+        sim.vapor_pressures["metals"]["Fe"].update({
+            "critical_temperature_K": 6000.0,
+            "critical_pressure_atm": 500.0,
+        })
         sim._last_vapor_pressure_diagnostic = copy.deepcopy(
             vapor_pressure_diagnostic
         )
@@ -454,6 +462,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
         sim._cold_train_capacity_policy = lambda: (capacity, cold_train)
         sim._headspace_bleed_conductance_kg_s = lambda **_kwargs: 0.0
         provider_statuses = []
+        provider_request_maps = []
         closure_publications = []
         booked_by_production_step = set()
 
@@ -554,6 +563,13 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                         species,
                         raising=False,
                     )
+                    if species == "Fe":
+                        sim.vapor_pressures["metals"]["Fe"].pop(
+                            "critical_temperature_K", None
+                        )
+                        sim.vapor_pressures["metals"]["Fe"].pop(
+                            "critical_pressure_atm", None
+                        )
                 elif state == "catalog_proven_zero":
                     # Production has no input/configuration that constructs
                     # ZeroByPhysics today. Keep the real catalog request, then
@@ -594,6 +610,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                 from engines.builtin.evaporation_flux import (
                     BuiltinEvaporationFluxProvider,
                 )
+                import simulator.state as state_module
 
                 real_dispatch = BuiltinEvaporationFluxProvider.dispatch
                 refused_species = next(
@@ -601,30 +618,37 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                     for species, state in state_by_species.items()
                     if state == "provider_refusal"
                 )
+                local.delitem(
+                    state_module.MOLAR_MASS,
+                    refused_species,
+                    raising=False,
+                )
 
                 def refuse_provider_channel(provider, request):
-                    result = real_dispatch(provider, request)
-                    diagnostic = copy.deepcopy(result.diagnostic or {})
-                    for key in (
-                        "evaporation_flux_kg_hr",
-                        "zero_net_evaporation_flux",
-                        "evaporation_series_resistance",
-                    ):
-                        channel_map = diagnostic.get(key)
-                        if isinstance(channel_map, dict):
-                            channel_map.pop(refused_species, None)
-                    below = diagnostic.get("below_threshold_evaporation_flux")
-                    if isinstance(below, dict):
-                        rates = below.get("fluxes_kg_hr")
-                        if isinstance(rates, dict):
-                            rates.pop(refused_species, None)
-                    diagnostic["reason"] = "provider_stage_refused_test_channel"
-                    provider_statuses.append("unavailable")
-                    return replace(
-                        result,
-                        status="unavailable",
-                        diagnostic=diagnostic,
+                    controls = dict(request.control_inputs)
+                    requested = dict(
+                        controls.get("vapour_batch_flux_pressures_Pa", {}) or {}
                     )
+                    provider_request_maps.append(set(requested))
+                    if refused_species not in requested:
+                        return real_dispatch(provider, request)
+                    molar_masses = dict(
+                        controls.get("molar_mass_kg_mol", {}) or {}
+                    )
+                    molar_masses.pop(refused_species, None)
+                    controls["molar_mass_kg_mol"] = molar_masses
+                    result = real_dispatch(
+                        provider,
+                        replace(request, control_inputs=controls),
+                    )
+                    diagnostic = dict(result.diagnostic or {})
+                    provider_statuses.append({
+                        "status": result.status,
+                        "missing_molar_mass": dict(
+                            diagnostic.get("missing_molar_mass", {}) or {}
+                        ),
+                    })
+                    return result
 
                 local.setattr(
                     BuiltinEvaporationFluxProvider,
@@ -632,7 +656,10 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                     refuse_provider_channel,
                 )
 
-            if "unavailable_parent" in state_by_species.values():
+            if any(
+                state in {"unavailable_parent", "provider_refusal"}
+                for state in state_by_species.values()
+            ):
                 real_close = EvaporationMixin._closed_langmuir_pressures_for_partials
 
                 def capture_closure_publication(host, publication_Pa, **kwargs):
@@ -711,10 +738,34 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
         if case_name.startswith("provider_refusal+") or case_name.endswith(
             "+provider_refusal"
         ):
-            assert "unavailable" in provider_statuses, (
-                case_name,
-                provider_statuses,
+            refused_species = next(
+                species
+                for species, state in state_by_species.items()
+                if state == "provider_refusal"
             )
+            assert any(
+                refused.get("missing_molar_mass", {}).get(
+                    refused_species
+                )
+                for refused in provider_statuses
+            ), (case_name, provider_statuses)
+            assert any(
+                refused_species in publication
+                for publication in closure_publications
+            ), (case_name, closure_publications)
+            first_refusal_request = next(
+                index
+                for index, request_species in enumerate(provider_request_maps)
+                if refused_species in request_species
+            )
+            assert any(
+                refused_species not in request_species
+                for request_species in provider_request_maps[
+                    first_refusal_request + 1:
+                ]
+            ), (case_name, provider_request_maps)
+            assert capacity_surface.get("applied") is True, case_name
+            assert live_surface.get("applied") is True, case_name
         if "unavailable_parent" in state_by_species.values():
             excluded_species = next(
                 species
@@ -2078,16 +2129,17 @@ def test_estimated_lennard_jones_inputs_drive_continuum_hour_with_flag(
     from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
     from simulator.condensation import (
         _LENNARD_JONES_PARAMS,
-        _estimate_lennard_jones_parameters,
+        _resolve_lennard_jones_parameters,
     )
     from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
 
     sim = _real_capacity_sim()
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
-    sim.vapor_pressures["metals"]["Fe"][
-        "boiling_molar_volume_cm3_mol"
-    ] = 50.0
+    sim.vapor_pressures["metals"]["Fe"].update({
+        "critical_temperature_K": 6000.0,
+        "critical_pressure_atm": 500.0,
+    })
     monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Fe")
     equilibrium = sim._get_equilibrium()
     provider_controls = []
@@ -2109,29 +2161,26 @@ def test_estimated_lennard_jones_inputs_drive_continuum_hour_with_flag(
     )
 
     assert isinstance(flux, EvaporationFlux)
+    assert flux.species_kg_hr.get("Fe", 0.0) > 0.0
     assert provider_controls
-    estimate = provider_controls[0][
-        "estimated_lennard_jones_params_by_species"
+    property_row = provider_controls[0][
+        "lennard_jones_property_rows_by_species"
     ]["Fe"]
-    expected = _estimate_lennard_jones_parameters(
-        "Fe", sim.vapor_pressures["metals"]["Fe"]
+    expected = _resolve_lennard_jones_parameters(
+        "Fe", property_row
     )
-    assert expected is not None
-    assert estimate["method"] == "bsl_boiling_point"
-    assert estimate["sigma_angstrom"] == pytest.approx(
-        expected["sigma_angstrom"]
-    )
-    assert estimate["epsilon_over_k_K"] == pytest.approx(
-        expected["epsilon_over_k_K"]
-    )
+    assert expected["status"] == "estimated"
+    assert expected["flag"] == "lj_estimated:tc_pc"
+    assert property_row["critical_temperature_K"] == 6000.0
+    assert property_row["critical_pressure_atm"] == 500.0
     overlay = provider_controls[0]["vapour_batch_flux_overlay"]
     assert any(
         notice.get("kind") == "transport_parameters_estimated"
         and notice.get("species") == "Fe"
-        and notice.get("method") == "bsl_boiling_point"
-        and notice.get("inputs", {}).get("boiling_molar_volume_cm3_mol")
-        == 50.0
-        and notice.get("inputs", {}).get("boiling_point_C") == 2862.0
+        and notice.get("method") == "tc_pc"
+        and notice.get("flag") == "lj_estimated:tc_pc"
+        and notice.get("inputs", {}).get("critical_temperature_K") == 6000.0
+        and notice.get("inputs", {}).get("critical_pressure_atm") == 500.0
         for notice in overlay.get("notices", ())
         if isinstance(notice, dict)
     )
@@ -2144,26 +2193,63 @@ def test_estimated_lennard_jones_inputs_drive_continuum_hour_with_flag(
     assert series["d_ab_m2_s"] > 0.0
 
 
-def test_lennard_jones_estimator_uses_critical_point_fallback():
-    from simulator.condensation import _estimate_lennard_jones_parameters
+def test_lennard_jones_owner_uses_critical_point_preference():
+    from simulator.condensation import _resolve_lennard_jones_parameters
 
-    estimate = _estimate_lennard_jones_parameters(
+    estimate = _resolve_lennard_jones_parameters(
         "Xe",
         {
             "critical_temperature_K": 100.0,
-            "critical_molar_volume_cm3_mol": 64.0,
+            "critical_pressure_atm": 10.0,
         },
     )
 
-    assert estimate is not None
+    assert estimate["status"] == "estimated"
     assert estimate["species"] == "Xe"
-    assert estimate["sigma_angstrom"] == pytest.approx(3.364)
+    assert estimate["sigma_angstrom"] == pytest.approx(
+        2.44 * (100.0 / 10.0) ** (1.0 / 3.0)
+    )
     assert estimate["epsilon_over_k_K"] == pytest.approx(77.0)
-    assert estimate["method"] == "bsl_critical_point_fallback"
+    assert estimate["method"] == "tc_pc"
+    assert estimate["flag"] == "lj_estimated:tc_pc"
     assert estimate["inputs"] == {
         "critical_temperature_K": 100.0,
-        "critical_molar_volume_cm3_mol": 64.0,
+        "critical_pressure_atm": 10.0,
     }
+
+
+def test_lennard_jones_owner_uses_boiling_density_and_supported_le_bas():
+    from simulator.condensation import _resolve_lennard_jones_parameters
+
+    bsl = _resolve_lennard_jones_parameters(
+        "Fe",
+        {
+            "formula": "Fe",
+            "molar_mass_g_mol": 55.845,
+            "boiling_point_C": 2862.0,
+            "liquid_density_g_cm3": 7.0,
+        },
+    )
+    assert bsl["method"] == "bsl_boiling_density"
+    assert bsl["flag"] == "lj_estimated:bsl_boiling_density"
+    vb = 55.845 / 7.0
+    assert bsl["sigma_angstrom"] == pytest.approx(1.18 * vb ** (1.0 / 3.0))
+    assert bsl["epsilon_over_k_K"] == pytest.approx(1.15 * (2862.0 + 273.15))
+
+    le_bas = _resolve_lennard_jones_parameters(
+        "H2O",
+        {"formula": "H2O", "boiling_point_C": 100.0},
+    )
+    assert le_bas["method"] == "le_bas+bsl_boiling"
+    assert le_bas["flag"] == "lj_estimated:le_bas+bsl_boiling"
+    assert le_bas["inputs"]["le_bas_molar_volume_cm3_mol"] == pytest.approx(14.8)
+
+
+def test_lennard_jones_owner_uses_only_sourced_tabulated_pairs():
+    from simulator.condensation import _resolve_lennard_jones_parameters
+
+    assert _resolve_lennard_jones_parameters("Na", {})["status"] == "tabulated"
+    assert _resolve_lennard_jones_parameters("Fe", {})["status"] == "missing"
 
 
 def test_capacity_resolution_decision_is_owned_by_evaporation() -> None:
@@ -2823,8 +2909,17 @@ def test_capacity_picard_closure_failure_restarts_once_without_zero_booking(
     )
 
     sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
-    sim._last_langmuir_surface_oxygen = {}
+    sim.vapor_pressures["metals"]["Fe"].update({
+        "critical_temperature_K": 6000.0,
+        "critical_pressure_atm": 500.0,
+    })
+    equilibrium = sim._get_equilibrium()
+    pressure_diagnostic = copy.deepcopy(sim._last_vapor_pressure_diagnostic)
+    assert {"Fe", "Si"} <= set(equilibrium.vapor_pressures_Pa)
+    sim._last_vapor_pressure_diagnostic = pressure_diagnostic
+
     capacity = FiniteCapacity(0.05)
     cold_train = SimpleNamespace(
         accumulator_enabled=False,
@@ -2844,151 +2939,75 @@ def test_capacity_picard_closure_failure_restarts_once_without_zero_booking(
         "_headspace_bleed_conductance_kg_s",
         lambda **_kwargs: 0.0,
     )
-    selection_overlay = {
-        "batch_channel_states": {"Fe": "eligible", "Si": "eligible"},
-        "selected_runtime_pa_by_species": {"Fe": 1.0, "Si": 2.0},
-        "notices": [],
-    }
-    pressure_diagnostic = {
-        "vapor_pressure_numerator_provenance": {
-            "Fe": {
-                "pressure_rail": "condensed_raoult_psat",
-                "activity_factor": 1.0,
-                "raw_metal_activity_root": 2.0,
-                "P_reference_Antoine_Pa": 1.0,
-            },
-            "Si": {
-                "pressure_rail": "condensed_raoult_psat",
-                "activity_factor": 1.0,
-                "raw_metal_activity_root": 2.0,
-                "P_reference_Antoine_Pa": 2.0,
-            },
-        },
-    }
 
-    def resolve_available_channels(equilibrium, **_kwargs):
-        pressures = {"Fe": 1.0, "Si": 2.0}
-        EvaporationMixin._classify_hour_vapour_availability(
-            sim,
-            equilibrium,
-            pressures,
-            selection_overlay,
-            {},
-        )
-        return (
-            pressures,
-            selection_overlay,
-            None,
-            {},
-            pressure_diagnostic,
-            None,
-            selection_overlay,
-        )
-
-    monkeypatch.setattr(
-        sim,
-        "_resolve_evaporation_batch_flux_state",
-        resolve_available_channels,
-    )
-
+    real_reclose = sim._reclose_langmuir_pressures
     reclose_calls = 0
 
-    def reclose(partials):
+    def fail_member_inside_picard(partials):
         nonlocal reclose_calls
         reclose_calls += 1
-        fail_species = "Si" if reclose_calls == 1 else "Fe" if fail_on_restart else None
-        pressures = (
-            {"Fe": 1.0}
-            if fail_species != "Fe"
-            else {}
+        result = real_reclose(partials)
+        fail_species = "Si" if reclose_calls == 1 else (
+            "Fe" if fail_on_restart and reclose_calls == 2 else None
         )
-        refused = (
-            {fail_species: "surface oxygen closure did not converge"}
-            if fail_species is not None
-            else {}
-        )
-        refusal_codes = (
-            {fail_species: LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED}
-            if fail_species is not None
-            else {}
-        )
-        return SimpleNamespace(
-            applied=True,
-            surface_pO2_bar=1.0e-6,
+        if fail_species is None:
+            return result
+        assert fail_species in result.pressures_Pa
+        pressures = dict(result.pressures_Pa)
+        pressures.pop(fail_species)
+        refused = dict(result.refused_species)
+        refused[fail_species] = "surface oxygen closure did not converge"
+        refusal_codes = dict(result.refusal_codes_by_species)
+        refusal_codes[fail_species] = LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED
+        return replace(
+            result,
             pressures_Pa=pressures,
             refused_species=refused,
             refusal_codes_by_species=refusal_codes,
-            as_diagnostic=lambda: {
-                "applied": True,
-                "surface_pO2_bar": 1.0e-6,
-                "refused_species": dict(refused),
-                "refusal_codes_by_species": dict(refusal_codes),
-                "overhead_partials_Pa": dict(partials),
-                "warning": (
-                    "surface oxygen closure did not converge"
-                    if refused
-                    else None
-                ),
+        )
+
+    monkeypatch.setattr(
+        sim, "_reclose_langmuir_pressures", fail_member_inside_picard
+    )
+    provider_pressure_maps = []
+
+    def positive_fe_flux(_provider, request):
+        pressure_map = dict(
+            request.control_inputs["vapour_batch_flux_pressures_Pa"]
+        )
+        provider_pressure_maps.append(pressure_map)
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={
+                "evaporation_flux_kg_hr": {
+                    species: 1.0e-3 for species in pressure_map
+                }
             },
         )
 
-    monkeypatch.setattr(sim, "_reclose_langmuir_pressures", reclose)
-    provider_controls = []
     monkeypatch.setattr(
-        BuiltinEvaporationFluxProvider,
-        "dispatch",
-        lambda _self, request: provider_controls.append(
-            dict(request.control_inputs)
-        ) or SimpleNamespace(
-            status="ok", diagnostic={"evaporation_flux_kg_hr": {"Fe": 0.0}}
-        ),
+        BuiltinEvaporationFluxProvider, "dispatch", positive_fe_flux
     )
-
     real_solver = capacity_coupling.solve_capacity_shadow
     solver_calls = 0
 
-    def force_first_picard_closure(**kwargs):
+    def count_real_solver_calls(**kwargs):
         nonlocal solver_calls
         solver_calls += 1
-        if solver_calls == 1:
-            kwargs["flux_kg_hr_at_partials"]({"Fe": 0.0, "Si": 0.0})
         return real_solver(**kwargs)
 
     monkeypatch.setattr(
-        capacity_coupling,
-        "solve_capacity_shadow",
-        force_first_picard_closure,
+        capacity_coupling, "solve_capacity_shadow", count_real_solver_calls
     )
-    equilibrium = SimpleNamespace(
-        liquid_fraction=1.0,
-        vapor_pressures_Pa={"Fe": 1.0, "Si": 2.0},
-        vapor_pressures_source={},
-        activity_coefficients={},
-        diagnostics={},
-    )
-    sim._last_vapor_pressure_diagnostic = pressure_diagnostic
-    sim.start_campaign(CampaignPhase.C0)
     monkeypatch.setattr(sim, "_get_equilibrium", lambda: equilibrium)
     transitions_before = len(sim.atom_ledger.transitions)
 
     if fail_on_restart:
         with pytest.raises(EvaporationFluxRefusal) as refusal:
             sim.step()
-        assert refusal.value.reason == "capacity_member_closure_failure"
+        assert refusal.value.reason == "vapour_batch_no_debiting_pressure_outcome"
         assert solver_calls == 2
-        refusal_overlay = refusal.value.diagnostic[
-            "vapour_batch_flux_overlay"
-        ]
-        assert refusal.value.diagnostic["bound_direction"] == {
-            "resolved_fluxes": "upper",
-            "headspace_pressure": "lower",
-        }
-        assert {
-            notice.get("species")
-            for notice in refusal_overlay.get("notices", ())
-            if isinstance(notice, dict)
-            and notice.get("kind") == "vapour_batch_unresolved"
-        } == {"Si", "Fe"}
+        assert reclose_calls == 2
         booked_species = {
             species
             for transition in sim.atom_ledger.transitions[transitions_before:]
@@ -3013,10 +3032,12 @@ def test_capacity_picard_closure_failure_restarts_once_without_zero_booking(
         result = shadow_results[0]
         assert isinstance(result, CapacityShadowResult)
         assert result.iterations <= 50
+        assert result.evaporation_flux_kg_hr["Fe"] > 0.0
         assert "Si" not in result.evaporation_flux_kg_hr
-        assert all(rate >= 0.0 for rate in result.evaporation_flux_kg_hr.values())
         assert solver_calls == 2
         assert reclose_calls >= 2
+        assert len(provider_pressure_maps) > 0
+        assert all("Si" not in pressure_map for pressure_map in provider_pressure_maps)
         overlay = sim._last_vapour_batch_flux_overlay
         unresolved = {
             notice.get("species")
