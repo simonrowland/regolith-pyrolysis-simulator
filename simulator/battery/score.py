@@ -1307,6 +1307,59 @@ def parse_species_formula(
     return atoms_parse_formula_else_janaf(text)
 
 
+def _parse_observation_species_formula(
+    observation: Observation,
+) -> tuple[tuple[tuple[str, float], ...] | None, dict[str, Any] | None]:
+    identity = observation.identity
+    if not isinstance(identity, Identity) or identity.species is None:
+        return None, None
+    if observation.source_id == "nasa-glenn":
+        source_path = (
+            observation.locator.source_path
+            if observation.locator is not None
+            else None
+        )
+        source_name = Path(source_path).name if source_path else ""
+        match = re.fullmatch(r"(NG-\d{4})\.json", source_name)
+        if match is None:
+            match = re.match(r"nasa-glenn:(NG-\d{4})(?::|$)", observation.observation_id)
+        if match is None:
+            # Non-migrated callers can carry the broad source id without a
+            # NASA record locator. Apply the record witness only when the
+            # observation identifies a specific compiled card.
+            return (
+                parse_species_formula(
+                    identity.species.formula,
+                    species=identity.species,
+                ),
+                None,
+            )
+        from simulator.reference_data.nasa_glenn import (
+            accepted_formula,
+            load_record_document_by_id,
+        )
+
+        record = load_record_document_by_id(match.group(1))
+        if record is None:
+            return None, {
+                "kind": "formula_source_record_missing",
+                "identity_refusal": True,
+                "source_id": observation.source_id,
+                "observation_id": observation.observation_id,
+                "record_id": match.group(1),
+            }
+        _source_formula, diagnostic = accepted_formula(record)
+        if diagnostic is not None and diagnostic.get("identity_refusal") is True:
+            return None, diagnostic
+    return (
+        parse_species_formula(
+            identity.species.formula,
+            species=identity.species,
+        ),
+        None,
+    )
+
+
 def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bool:
     """Na, K, Fe. Not an oxide, and not a label the formula parser rejects."""
 
@@ -15010,9 +15063,32 @@ def _predict_with_engine(
                 identity=identity,
             )
     formula = identity.species.formula
+    parsed_formula = None
+    formula_source_diagnostic = None
+    if quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
+        parsed_formula, formula_source_diagnostic = (
+            _parse_observation_species_formula(observation)
+        )
+    if (
+        formula_source_diagnostic is not None
+        and formula_source_diagnostic.get("identity_refusal") is True
+    ):
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+            refusal_detail={
+                "reason": "formula_source_identity_mismatch",
+                **formula_source_diagnostic,
+            },
+            identity=identity,
+        )
     if (
         quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
-        and parse_species_formula(formula, species=identity.species) is None
+        and parsed_formula is None
     ):
         return EnginePrediction(
             engine=engine,
@@ -18970,9 +19046,28 @@ def _compile_residual_with_lineage(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
         )
+    parsed_formula = None
+    formula_source_diagnostic = None
+    if quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
+        parsed_formula, formula_source_diagnostic = (
+            _parse_observation_species_formula(reference)
+        )
+    if (
+        formula_source_diagnostic is not None
+        and formula_source_diagnostic.get("identity_refusal") is True
+    ):
+        return _refused(
+            RefusalReason.IDENTITY_MISMATCH,
+            {
+                "reason": "formula_source_identity_mismatch",
+                **formula_source_diagnostic,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("identity_equal",),
+        )
     if (
         quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
-        and parse_species_formula(formula, species=identity.species) is None
+        and parsed_formula is None
     ):
         return _refused(
             RefusalReason.IDENTITY_UNKNOWN,

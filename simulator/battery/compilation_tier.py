@@ -1192,6 +1192,11 @@ def _nasa_cea_9_record_for_species(
     if len(matches) != 1:
         return None, "nasa-cea-phase-ambiguous"
     record = matches[0]
+    from simulator.reference_data.nasa_glenn import accepted_formula
+
+    _parsed_formula, diagnostic = accepted_formula(record)
+    if diagnostic is not None and diagnostic.get("identity_refusal") is True:
+        return None, "nasa-cea-source-formula-identity-mismatch"
     if record.get("phase_ordinal") is not None:
         return None, "nasa-cea-phase-ordinal-unresolved"
     return record, ""
@@ -3566,6 +3571,16 @@ def predict_thermo_attempt(
             quantity=quantity,
             origin=origin,
         )
+    if engine is Engine.NASA_CEA_9 and identity.species is not None:
+        _record, record_reason = _nasa_cea_9_record_for_species(identity.species)
+        if record_reason == "nasa-cea-source-formula-identity-mismatch":
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                record_reason,
+                quantity=quantity,
+                origin=origin,
+                extra={"formula": identity.species.formula},
+            )
     if quantity in {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}:
         if engine is not Engine.INTERNAL_ANALYTICAL:
             return _refuse(

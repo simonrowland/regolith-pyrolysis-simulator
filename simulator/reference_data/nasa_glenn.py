@@ -16,6 +16,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
@@ -319,12 +320,15 @@ def _half_printed_unit(token: str) -> float:
 def _record_formula_mass_tolerance(
     slots: list[CompositionSlot],
     molecular_weight: PublishedNumber,
+    parsed_formula: Any,
     parse_formula: Any,
     atomic_weights: Mapping[str, float],
-) -> float:
-    # Each printed count and the header mass can differ from its exact value by
-    # at most half a unit in its last printed place. Propagate each count's
-    # half-unit through the atom masses, then add the header mass's half-unit.
+    source_atomic_weights: Mapping[str, float],
+) -> tuple[float, float]:
+    # The tolerance is the sum of half-unit rounding from the printed header
+    # and counts, plus sum(count * |NASA source-era weight - simulator
+    # weight|). NASA's elemental cards preserve the source table's 1960s–90s
+    # atomic weights; the simulator uses the current CIAAW/NIST table.
     bounds = [_half_printed_unit(molecular_weight.as_published)]
     for slot in slots:
         if (
@@ -349,44 +353,197 @@ def _record_formula_mass_tolerance(
                 if math.isclose(count, slot.count, rel_tol=0.0, abs_tol=1e-12)
             )
         bounds.append(_half_printed_unit(slot.count_as_published) * mass_per_count)
-    return math.fsum(bounds)
+    source_atomic_weight_tolerance = math.fsum(
+        count * abs(source_atomic_weights[element] - atomic_weights[element])
+        for element, count in parsed_formula.elements.items()
+        if element in source_atomic_weights and element in atomic_weights
+    )
+    bounds.append(source_atomic_weight_tolerance)
+    return math.fsum(bounds), source_atomic_weight_tolerance
 
 
-def _parse_record_formula_with_printed_weight(
-    formula: str,
-    slots: list[CompositionSlot],
-    molecular_weight: PublishedNumber,
+@lru_cache(maxsize=1)
+def _nasa_glenn_atomic_weights() -> dict[str, float]:
+    """Elemental masses printed by NASA's own single-element gas cards."""
+
+    from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+
+    weights: dict[str, float] = {}
+    for record in load_all_record_documents():
+        formula = record.get("formula")
+        slots = record.get("composition")
+        molecular_weight = record.get("molecular_weight")
+        if (
+            not isinstance(formula, str)
+            or formula not in ATOMIC_WEIGHTS_G_PER_MOL
+            or str(record.get("phase", "")).casefold() != "gas"
+            or not isinstance(slots, list)
+            or not isinstance(molecular_weight, Mapping)
+        ):
+            continue
+        non_filler = [
+            slot
+            for slot in slots
+            if isinstance(slot, Mapping) and not slot.get("filler", False)
+        ]
+        if (
+            len(non_filler) == 1
+            and non_filler[0].get("element") == formula
+            and non_filler[0].get("count") == 1.0
+            and isinstance(molecular_weight.get("value"), (float, int))
+        ):
+            weights[formula] = float(molecular_weight["value"])
+    return weights
+
+
+def _record_formula_parts(
+    record: SpeciesRecord | Mapping[str, Any],
+) -> tuple[str, list[CompositionSlot], PublishedNumber, str, str]:
+    if isinstance(record, SpeciesRecord):
+        return (
+            record.formula,
+            record.composition_slots,
+            record.molecular_weight,
+            record.record_id,
+            record.name_as_published,
+        )
+    formula = record.get("formula")
+    raw_slots = record.get("composition")
+    raw_weight = record.get("molecular_weight")
+    if not isinstance(formula, str) or not isinstance(raw_slots, list):
+        raise TypeError("NASA Glenn formula record needs formula and composition")
+    if not isinstance(raw_weight, Mapping):
+        raise TypeError("NASA Glenn formula record needs molecular_weight")
+    slots = [
+        CompositionSlot(
+            element_as_published=str(slot.get("element_as_published") or ""),
+            count_as_published=str(slot.get("count_as_published") or ""),
+            element=(
+                str(slot["element"])
+                if isinstance(slot.get("element"), str)
+                else None
+            ),
+            count=(
+                float(slot["count"])
+                if isinstance(slot.get("count"), (float, int))
+                else None
+            ),
+            filler=bool(slot.get("filler", False)),
+        )
+        for slot in raw_slots
+        if isinstance(slot, Mapping)
+    ]
+    return (
+        formula,
+        slots,
+        PublishedNumber(
+            str(raw_weight.get("as_published") or ""),
+            (
+                float(raw_weight["value"])
+                if isinstance(raw_weight.get("value"), (float, int))
+                else None
+            ),
+        ),
+        str(record.get("record_id") or ""),
+        str(record.get("name_as_published") or ""),
+    )
+
+
+def accepted_formula(
+    record: SpeciesRecord | Mapping[str, Any],
 ) -> tuple[Any | None, dict[str, Any] | None]:
+    """Return parsed formula plus a typed notice/refusal for this source record.
+
+    Parsed element counts must agree with the record's explicit composition
+    slots. An unrecognized CEA token such as inert ``IO`` is not the elements
+    I and O, even when the generic formula parser can split it that way. When
+    the slots do agree, they own identity and an inconsistent printed mass is
+    retained as a typed card conflict rather than changing the composition.
+    """
     from simulator.accounting.exceptions import AccountingError
     from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, parse_formula
 
+    formula, slots, molecular_weight, record_id, name = _record_formula_parts(record)
     try:
         parsed = parse_formula(formula)
     except AccountingError:
         return None, None
-    if molecular_weight.value is None or not math.isfinite(molecular_weight.value):
-        return parsed, None
 
-    parsed_mass = parsed.molar_mass_g_mol
-    if parsed_mass is None:
+    weight_evidence: dict[str, Any] = {}
+    if molecular_weight.value is not None and math.isfinite(molecular_weight.value):
+        parsed_mass = parsed.molar_mass_g_mol
+        if parsed_mass is not None:
+            source_atomic_weights = _nasa_glenn_atomic_weights()
+            tolerance, source_atomic_weight_tolerance = _record_formula_mass_tolerance(
+                slots,
+                molecular_weight,
+                parsed,
+                parse_formula,
+                ATOMIC_WEIGHTS_G_PER_MOL,
+                source_atomic_weights,
+            )
+            difference = abs(molecular_weight.value - parsed_mass)
+            weight_evidence = {
+                "printed_molecular_weight_as_published": molecular_weight.as_published,
+                "printed_molecular_weight_g_mol": molecular_weight.value,
+                "parsed_molecular_weight_g_mol": parsed_mass,
+                "difference_g_mol": difference,
+                "precision_tolerance_g_mol": tolerance,
+                "source_atomic_weight_tolerance_g_mol": source_atomic_weight_tolerance,
+            }
+
+    source_composition: dict[str, float] = defaultdict(float)
+    for slot in slots:
+        if slot.filler or slot.count is None or slot.count <= 0:
+            continue
+        if slot.element not in ATOMIC_WEIGHTS_G_PER_MOL:
+            detail = {
+                "kind": "formula_source_composition_disagreement",
+                "disposition": "refusal",
+                "identity_refusal": True,
+                "record_id": record_id,
+                "name_as_published": name,
+                "formula_as_published": formula,
+                "source_element_token": slot.element_as_published,
+                "source_count": slot.count,
+                "parsed_elements": dict(parsed.elements),
+                **weight_evidence,
+            }
+            return None, detail
+        source_composition[slot.element] += slot.count
+    if set(source_composition) != set(parsed.elements) or any(
+        not math.isclose(
+            source_composition[element], parsed.elements[element],
+            rel_tol=0.0,
+            abs_tol=1e-8,
+        )
+        for element in source_composition
+    ):
+        return None, {
+            "kind": "formula_source_composition_disagreement",
+            "disposition": "refusal",
+            "identity_refusal": True,
+            "record_id": record_id,
+            "name_as_published": name,
+            "formula_as_published": formula,
+            "source_elements": dict(source_composition),
+            "parsed_elements": dict(parsed.elements),
+            **weight_evidence,
+        }
+    if (
+        not weight_evidence
+        or weight_evidence["difference_g_mol"]
+        <= weight_evidence["precision_tolerance_g_mol"]
+    ):
         return parsed, None
-    tolerance = _record_formula_mass_tolerance(
-        slots,
-        molecular_weight,
-        parse_formula,
-        ATOMIC_WEIGHTS_G_PER_MOL,
-    )
-    difference = abs(molecular_weight.value - parsed_mass)
-    if difference <= tolerance:
-        return parsed, None
-    return None, {
-        "kind": "formula_molecular_weight_disagreement",
+    return parsed, {
+        "kind": "formula_molecular_weight_conflict",
+        "disposition": "notice",
+        "identity_refusal": False,
+        "record_id": record_id,
+        "name_as_published": name,
         "formula_as_published": formula,
-        "printed_molecular_weight_as_published": molecular_weight.as_published,
-        "printed_molecular_weight_g_mol": molecular_weight.value,
-        "parsed_molecular_weight_g_mol": parsed_mass,
-        "difference_g_mol": difference,
-        "precision_tolerance_g_mol": tolerance,
+        **weight_evidence,
     }
 
 
@@ -1215,15 +1372,13 @@ def parse_thermo_inp(
     by_name: dict[str, list[int]] = defaultdict(list)
     for index, rec in enumerate(records):
         rec.record_id = f"NG-{index + 1:04d}"
-        _, formula_refusal = _parse_record_formula_with_printed_weight(
-            rec.formula, rec.composition_slots, rec.molecular_weight
-        )
-        if formula_refusal is not None:
+        _, formula_diagnostic = accepted_formula(rec)
+        if formula_diagnostic is not None:
             rec.ambiguities.append(
                 {
                     "record_id": rec.record_id,
                     "name_as_published": rec.name_as_published,
-                    **formula_refusal,
+                    **formula_diagnostic,
                 }
             )
         by_name[rec.name_as_published].append(index)
@@ -1267,6 +1422,16 @@ def record_document(record: SpeciesRecord) -> dict[str, Any]:
 
 def load_record_document(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=128)
+def load_record_document_by_id(record_id: str) -> dict[str, Any] | None:
+    if re.fullmatch(r"NG-\d{4}", record_id) is None:
+        return None
+    path = COMPILATION_ROOT / "records" / f"{record_id}.json"
+    if not path.is_file():
+        return None
+    return load_record_document(path)
 
 
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
