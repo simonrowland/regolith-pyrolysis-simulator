@@ -1710,7 +1710,9 @@ class EquilibriumMixin:
                     P_sat = reference_evaluation.pressure_pa
                     coefficient_block = 'compiled_reference_pressure_model'
                     if reference_evaluation.out_of_range:
-                        valid_reference_range = evaluator.valid_temperature_K
+                        valid_reference_range = (
+                            compiled_evaluator.valid_temperature_K
+                        )
                         oxide_vapor_extrapolations[name] = (
                             _vapor_pressure_temperature_extrapolation_notice(
                                 temperature_K=T_K,

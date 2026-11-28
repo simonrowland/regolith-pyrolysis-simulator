@@ -121,6 +121,7 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     MELT_OXIDE_ACTIVITY_TIER,
     melt_oxide_activity,
     normalize_high_t_melt_activity,
+    single_cation_component_formula,
     single_cation_mole_fractions,
 )
 from simulator.metal_saturation_floor import (  # noqa: E402
@@ -605,6 +606,242 @@ def _standard_reaction_pressure_Pa(
         P_eq_Pa *= channel_linear_mass_action_factor(o2_term, o2_potential)
         pO2_scaled = True
     return P_eq_Pa, activity_factor, pO2_scaled
+
+
+def _compiled_source_reaction_basis(
+    catalog: Any,
+    compiled_species: Any,
+) -> dict[str, Any] | None:
+    """Read one selected catalog reaction and derive its provider powers.
+
+    For ``q A + ... -> nu V + nu_O2 O2 + ...``, equilibrium gives
+    ``P_V ∝ a_A**(q/nu) * pO2**(-nu_O2/nu)``.  The coefficients are ratios
+    of reaction extents and are dimensionless.  Reading the selected source
+    reaction keeps the provider's activity and oxygen powers tied to the same
+    formula units and reaction as the catalog K.
+    """
+
+    reaction_id = getattr(compiled_species, "source_reaction_id", None)
+    if not reaction_id:
+        return None
+    payload = getattr(catalog, "_catalog_payload", None)
+    if not isinstance(payload, Mapping):
+        raise VaporPressureComputationError(
+            f"{compiled_species.species_id}: source reaction catalog payload is missing"
+        )
+    families = payload.get("families")
+    family = families.get(compiled_species.family_id) if isinstance(families, Mapping) else None
+    physical = family.get("physical_properties") if isinstance(family, Mapping) else None
+    species_rows = physical.get("species") if isinstance(physical, Mapping) else None
+    row = species_rows.get(compiled_species.species_id) if isinstance(species_rows, Mapping) else None
+    reactions = row.get("source_reactions") if isinstance(row, Mapping) else None
+    matches = (
+        [
+            reaction
+            for reaction in reactions
+            if isinstance(reaction, Mapping)
+            and reaction.get("id") == reaction_id
+        ]
+        if isinstance(reactions, list)
+        else []
+    )
+    if len(matches) != 1:
+        raise VaporPressureComputationError(
+            f"{compiled_species.species_id}: selected source reaction "
+            f"{reaction_id!r} must resolve once"
+        )
+    reaction = matches[0]
+    reactants = reaction.get("reactants")
+    products = reaction.get("products")
+    if not isinstance(reactants, list) or not isinstance(products, list):
+        raise VaporPressureComputationError(
+            f"{compiled_species.species_id}: source reaction sides are malformed"
+        )
+
+    from simulator.vapour_rail.catalog import _strip_phase_suffix
+
+    def coefficient(side: list[Any], formula: str) -> float:
+        wanted = _strip_phase_suffix(formula)
+        total = 0.0
+        for participant in side:
+            if not isinstance(participant, Mapping):
+                raise VaporPressureComputationError(
+                    f"{compiled_species.species_id}: source reaction participant is malformed"
+                )
+            if _strip_phase_suffix(str(participant.get("formula") or "")) != wanted:
+                continue
+            try:
+                amount = float(participant.get("stoichiometry"))
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise VaporPressureComputationError(
+                    f"{compiled_species.species_id}: source reaction coefficient is malformed"
+                ) from exc
+            if not math.isfinite(amount) or amount <= 0.0:
+                raise VaporPressureComputationError(
+                    f"{compiled_species.species_id}: source reaction coefficient must be finite and positive"
+                )
+            total += amount
+        return total
+
+    target_formula = str(compiled_species.formula)
+    target_nu = coefficient(products, target_formula)
+    if target_nu <= 0.0:
+        raise VaporPressureComputationError(
+            f"{compiled_species.species_id}: source reaction has no target-vapor product"
+        )
+    nu_o2 = coefficient(products, "O2") - coefficient(reactants, "O2")
+    declaration = getattr(compiled_species, "source_reaction_activity", None)
+    activity_input = reaction.get("activity_input")
+    activity_component_id = None
+    activity_standard_state = None
+    if isinstance(activity_input, Mapping):
+        raw_component_id = activity_input.get("component_id")
+        if not isinstance(raw_component_id, str) or not raw_component_id.strip():
+            raise VaporPressureComputationError(
+                f"{compiled_species.species_id}: source activity component is malformed"
+            )
+        activity_component_id = raw_component_id.strip()
+        raw_standard_state = activity_input.get("standard_state")
+        if isinstance(raw_standard_state, Mapping):
+            activity_standard_state = raw_standard_state
+    elif declaration is not None:
+        activity_component_id = str(declaration.component_id)
+    activity_nu = (
+        coefficient(reactants, activity_component_id)
+        if activity_component_id is not None
+        else 0.0
+    )
+    if activity_component_id is not None and activity_nu <= 0.0:
+        raise VaporPressureComputationError(
+            f"{compiled_species.species_id}: declared activity component is not consumed by its source reaction"
+        )
+    activity_exponent = activity_nu / target_nu
+    pO2_exponent = -nu_o2 / target_nu
+
+    activity_reference = None
+    if activity_standard_state is not None:
+        activity_reference = {
+            "component_id": activity_component_id,
+            "phase": str(activity_standard_state.get("phase") or ""),
+            "convention": str(
+                activity_standard_state.get("convention") or ""
+            ),
+            "component_basis": str(
+                activity_standard_state.get("component_basis") or ""
+            ),
+        }
+    elif declaration is not None:
+        standard_state = declaration.standard_state
+        activity_reference = {
+            "component_id": activity_component_id,
+            "phase": str(standard_state.phase),
+            "convention": str(standard_state.convention),
+            "component_basis": str(standard_state.component_basis),
+        }
+
+    # The source K may declare its phase on the selected reaction, or the
+    # corresponding provider reaction formula may identify the reactant phase.
+    # Do not infer a grounded liquid K from an activity's phase label alone.
+    activity_reactant_formula = next(
+        (
+            str(participant.get("formula"))
+            for participant in reactants
+            if isinstance(participant, Mapping)
+            and activity_component_id is not None
+            and _strip_phase_suffix(
+                str(participant.get("formula") or "")
+            )
+            == _strip_phase_suffix(activity_component_id)
+        ),
+        None,
+    )
+    K_phase = None
+    K_standard_state = reaction.get("thermodynamic_standard_state")
+    if isinstance(K_standard_state, Mapping) and K_standard_state.get("phase"):
+        K_phase = str(K_standard_state["phase"])
+    display_reaction = row.get("reaction") if isinstance(row, Mapping) else None
+    display_formula = (
+        display_reaction.get("formula")
+        if isinstance(display_reaction, Mapping)
+        else None
+    )
+    K_phase_formula = None
+    phase_tokens = {
+        "l": "liquid",
+        "liq": "liquid",
+        "liquid": "liquid",
+        "s": "crystalline",
+        "cr": "crystalline",
+        "solid": "crystalline",
+    }
+    if activity_reactant_formula is not None:
+        import re
+
+        match = re.fullmatch(
+            r"([A-Za-z][A-Za-z0-9.]*)\(([^()]*)\)",
+            activity_reactant_formula,
+        )
+        if match is not None:
+            K_phase_formula = (
+                f"{_strip_phase_suffix(match.group(1))}"
+                f"({match.group(2).strip()})"
+            )
+            if K_phase is None:
+                K_phase = phase_tokens.get(match.group(2).strip().lower())
+    if isinstance(display_formula, str):
+        import re
+
+        activity_formula = (
+            _strip_phase_suffix(activity_component_id)
+            if activity_component_id is not None
+            else target_formula
+        )
+        for match in re.finditer(r"([A-Za-z][A-Za-z0-9.]*)\(([^()]*)\)", display_formula):
+            if _strip_phase_suffix(match.group(1)) == activity_formula:
+                K_phase_formula = f"{activity_formula}({match.group(2).strip()})"
+                if K_phase is None:
+                    K_phase = phase_tokens.get(match.group(2).strip().lower())
+                break
+
+    return {
+        "reaction": reaction,
+        "target_formula": target_formula,
+        "target_stoichiometry": target_nu,
+        "activity_component_id": activity_component_id,
+        "activity_stoichiometry": activity_nu,
+        "activity_exponent": activity_exponent,
+        "pO2_exponent": pO2_exponent,
+        "activity_reference": activity_reference,
+        "K_reference_phase": K_phase,
+        "K_reference_formula_unit": (
+            K_phase_formula
+            or activity_reactant_formula
+            or activity_component_id
+        ),
+        "display_reaction_formula": display_formula,
+    }
+
+
+def _liquid_melt_activity_for_component(
+    oxide_activity: Any,
+    component_id: str,
+) -> float:
+    """Return the melt activity on the source reaction's declared formula unit."""
+
+    from simulator.vapour_rail.catalog import _strip_phase_suffix
+
+    component = _strip_phase_suffix(component_id)
+    if component == oxide_activity.parent_oxide:
+        return float(oxide_activity.thermodynamic_parent_activity())
+    if component == single_cation_component_formula(
+        oxide_activity.parent_oxide
+    ):
+        return float(oxide_activity.activity)
+    raise VaporPressureComputationError(
+        f"declared source activity component {component_id!r} does not match "
+        f"melt oxide {oxide_activity.parent_oxide!r} or single-cation "
+        f"component {oxide_activity.single_cation_component!r}"
+    )
 
 
 _HIGH_T_FLUX_OXIDES: tuple[str, ...] = (
@@ -3166,29 +3403,46 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             oxide: str,
             K_reference_phase: str,
             activity_exponent: float,
+            activity_reference_phase: str | None = None,
         ) -> float | None:
             """Return the K shift per liquid oxide formula unit or flag it."""
 
             from simulator.equilibrium import (
                 _oxide_liquid_standard_log10_factor_per_oxide,
             )
+            from simulator.reference_data.janaf import JanafOutOfRangeError
 
             try:
                 return _oxide_liquid_standard_log10_factor_per_oxide(
                     oxide, T_K
                 )
-            except ValueError as exc:
+            except (FileNotFoundError, ValueError) as exc:
+                # JANAF uses ValueError for both temperature-range misses and
+                # data-integrity failures. Only the explicit range condition
+                # (now a typed exception) and an absent fusion-pair record are
+                # non-fatal; missing rows, malformed metadata, and digest
+                # mismatches must surface.
+                message = str(exc)
+                missing_fusion_pair = message.startswith(
+                    "no JANAF fusion table pair for "
+                )
+                if isinstance(exc, ValueError) and not (
+                    isinstance(exc, JanafOutOfRangeError)
+                    or missing_fusion_pair
+                ):
+                    raise
                 _standard_state_caveat(
                     channel=channel,
                     K_reference_phase=K_reference_phase,
-                    activity_reference_phase=(
+                    activity_reference_phase=(activity_reference_phase or (
                         f"{oxide}(l), raoultian pure-liquid melt activity"
-                    ),
+                    )),
                     reason=(
-                        "JANAF crystal/liquid Gibbs data do not cover this "
-                        f"temperature; the {K_reference_phase} K is retained "
-                        "with the liquid-standard activity and the prediction "
-                        f"is unchanged: {exc}"
+                        "JANAF crystal/liquid Gibbs data are unavailable or "
+                        "outside their tabulated range; the "
+                        f"{K_reference_phase} K is "
+                        "retained with the liquid-standard activity and the "
+                        f"prediction is unchanged: {exc}"
                     ),
                     activity_exponent=activity_exponent,
                 )
@@ -3211,6 +3465,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 return 1.0
             total_log10 = float(activity_exponent) * per_formula_log10
             return 10.0 ** total_log10
+
+        surface_floor_standard_state_caveat = None
+        if isinstance(metal_saturation_floor_notice, Mapping):
+            floor_caveat = metal_saturation_floor_notice.get(
+                "engine_model_caveat"
+            )
+            if isinstance(floor_caveat, Mapping):
+                surface_floor_standard_state_caveat = dict(floor_caveat)
 
         transport_o2 = o2_potential_from_pO2_bar(
             pO2_bar=transport_pO2_bar,
@@ -3252,6 +3514,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
                 continue
+            metal_source_basis = None
+            if self._vapour_rail_catalog is not None:
+                compiled_metal_species = self._vapour_rail_catalog.species.get(
+                    species
+                )
+                if compiled_metal_species is not None:
+                    metal_source_basis = _compiled_source_reaction_basis(
+                        self._vapour_rail_catalog,
+                        compiled_metal_species,
+                    )
             # A fit range has no diagnostic meaning when its parent oxide is
             # absent; gate presence before selecting or warning about the fit.
             if float(comp_wt.get(parent_oxide, 0.0) or 0.0) <= 0.0:
@@ -3421,6 +3693,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 assert P_reference_Pa is not None
                 retain_analytical_channel = bool(
                     sp_data.get("retain_analytical_pressure_channel", False)
+                    or metal_source_basis is not None
                 )
                 oxide_activity = _high_t_activity_for_parent(
                     parent_oxide,
@@ -3435,16 +3708,36 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
-                activities[species] = oxide_activity.activity
+                declared_component = (
+                    metal_source_basis.get("activity_component_id")
+                    if metal_source_basis is not None
+                    else None
+                )
+                reported_activity = (
+                    _liquid_melt_activity_for_component(
+                        oxide_activity, declared_component
+                    )
+                    if declared_component is not None
+                    else oxide_activity.activity
+                )
+                activities[species] = reported_activity
 
                 # provenance: liquid_oxide_standard_reaction
                 # K: Lamoreaux & Hildenbrand 1984 Tables 2/4 liquid KO0.5.
                 # Al/Ti/Cr/Mn: TE liquid oxide mu0 + JANAF metal(g) (2026-07-20
                 # pairing fix). Solid-oxide Ellingham is not used here.
-                activity_exponent = float(
-                    sp_data.get("oxide_activity_exponent", 1.0) or 1.0
+                activity_exponent = (
+                    float(metal_source_basis["activity_exponent"])
+                    if metal_source_basis is not None
+                    else float(
+                        sp_data.get("oxide_activity_exponent", 1.0) or 1.0
+                    )
                 )
-                pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
+                pO2_exponent = (
+                    float(metal_source_basis["pO2_exponent"])
+                    if metal_source_basis is not None
+                    else float(sp_data.get("pO2_exponent", 0.0) or 0.0)
+                )
                 pO2_reference_bar = max(
                     1e-30,
                     float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
@@ -3461,7 +3754,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 P_eq_raw, activity_factor, pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
-                        oxide_activity_value=oxide_activity.activity,
+                        oxide_activity_value=reported_activity,
                         activity_exponent=activity_exponent,
                         o2_term=o2_term,
                         o2_potential=o2_potential,
@@ -3472,6 +3765,124 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_standard_reaction",
                 )
+                compiled_metal_standard_state_audit = None
+                if metal_source_basis is not None:
+                    K_phase = metal_source_basis.get("K_reference_phase")
+                    K_formula_unit = metal_source_basis.get(
+                        "K_reference_formula_unit"
+                    )
+                    # The legacy Al/Ti/Cr/Mn blocks carry an explicit liquid
+                    # standard reaction even when the selected catalog
+                    # reaction omits phase tags on its participant formulas.
+                    if K_phase is None and isinstance(liquid_rxn_early, Mapping):
+                        liquid_formula = str(
+                            liquid_rxn_early.get("formula") or ""
+                        )
+                        component = str(
+                            metal_source_basis.get("activity_component_id")
+                            or ""
+                        )
+                        if component and f"{component}(l)" in liquid_formula:
+                            K_phase = "liquid"
+                            K_formula_unit = f"{component}(l)"
+
+                    activity_reference = (
+                        metal_source_basis.get("activity_reference") or {}
+                    )
+                    declared_phase = str(
+                        activity_reference.get("phase") or ""
+                    )
+                    conversion_applied = False
+                    conversion_grounded = False
+                    if K_phase == "crystalline":
+                        # JANAF gives ΔG_fus° for one oxide formula unit.
+                        # The reaction consumes q units, so multiply K by
+                        # 10**(q ΔG_fus°/(R T ln 10)); the shift is positive
+                        # below Tm and zero at the JANAF crystal/liquid
+                        # crossing. This reuses the fallback's checked pair.
+                        caveat_before = activity_standard_state_flags.get(
+                            species
+                        )
+                        multiplier = _liquid_standard_multiplier(
+                            channel=species,
+                            oxide=parent_oxide,
+                            K_reference_phase=(
+                                f"{K_formula_unit}; crystalline source K"
+                            ),
+                            activity_exponent=activity_exponent,
+                        )
+                        conversion_applied = (
+                            activity_standard_state_flags.get(species)
+                            is caveat_before
+                        )
+                        conversion_grounded = conversion_applied
+                        P_reference_Pa = _require_finite_vapor_value(
+                            P_reference_Pa * multiplier,
+                            species=species,
+                            field="P_reference_liquid_standard_state",
+                        )
+                        P_eq_Pa = _require_finite_vapor_value(
+                            P_eq_Pa * multiplier,
+                            species=species,
+                            field="P_eq_liquid_standard_state",
+                        )
+                    elif K_phase == "liquid" and declared_phase == "liquid":
+                        conversion_grounded = True
+                    elif K_phase is None:
+                        _standard_state_caveat(
+                            channel=species,
+                            K_reference_phase=(
+                                f"unresolved source reaction for "
+                                f"{K_formula_unit or parent_oxide}"
+                            ),
+                            activity_reference_phase=(
+                                f"{declared_phase or 'undeclared'} activity "
+                                f"for {metal_source_basis['activity_component_id']}"
+                            ),
+                            reason=(
+                                "The selected source reaction does not ground "
+                                "the condensed K phase; its estimate is kept "
+                                "with an engine-model caveat."
+                            ),
+                            activity_exponent=activity_exponent,
+                        )
+                    else:
+                        _standard_state_caveat(
+                            channel=species,
+                            K_reference_phase=(
+                                f"{K_phase} source K on "
+                                f"{K_formula_unit or parent_oxide}"
+                            ),
+                            activity_reference_phase=(
+                                f"{declared_phase or 'undeclared'} activity "
+                                f"for {metal_source_basis['activity_component_id']}"
+                            ),
+                            reason=(
+                                "The source K reference does not match the "
+                                "provider liquid activity; the estimate is "
+                                "kept with an engine-model caveat."
+                            ),
+                            activity_exponent=activity_exponent,
+                        )
+                    compiled_metal_standard_state_audit = {
+                        "source_reaction_id": metal_source_basis[
+                            "reaction"
+                        ].get("id"),
+                        "K_reference_phase": K_phase,
+                        "K_formula_unit": K_formula_unit,
+                        "K_formula_unit_stoichiometry": metal_source_basis[
+                            "activity_stoichiometry"
+                        ],
+                        "activity_reference": dict(activity_reference),
+                        "provider_activity_reference": (
+                            "liquid Raoultian melt activity on "
+                            f"{metal_source_basis['activity_component_id']}"
+                        ),
+                        "activity_exponent": activity_exponent,
+                        "pO2_exponent": pO2_exponent,
+                        "consistent_after_conversion": conversion_grounded,
+                        "conversion_applied": conversion_applied,
+                    }
                 gamma_auth = _gamma_domain_authority(
                     parent_oxide, T_K, oxide_activity
                 )
@@ -3531,6 +3942,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "pO2_exponent": pO2_exponent,
                         "source_label": source_label,
                     }
+                    if compiled_metal_standard_state_audit is not None:
+                        vapor_pressure_provenance[species][
+                            "compiled_standard_state_audit"
+                        ] = dict(compiled_metal_standard_state_audit)
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
                     )
@@ -3611,12 +4026,30 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
-                activities[species] = oxide_activity.activity
-                activity_exponent = float(
-                    liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                declared_component = (
+                    metal_source_basis.get("activity_component_id")
+                    if metal_source_basis is not None
+                    else None
                 )
-                pO2_exponent = float(
-                    liquid_rxn.get("pO2_exponent", 0.0) or 0.0
+                reported_activity = (
+                    _liquid_melt_activity_for_component(
+                        oxide_activity, declared_component
+                    )
+                    if declared_component is not None
+                    else oxide_activity.activity
+                )
+                activities[species] = reported_activity
+                activity_exponent = (
+                    float(metal_source_basis["activity_exponent"])
+                    if metal_source_basis is not None
+                    else float(
+                        liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                    )
+                )
+                pO2_exponent = (
+                    float(metal_source_basis["pO2_exponent"])
+                    if metal_source_basis is not None
+                    else float(liquid_rxn.get("pO2_exponent", 0.0) or 0.0)
                 )
                 pO2_reference_bar = max(
                     1e-30,
@@ -3634,7 +4067,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 P_eq_raw, activity_factor, pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
-                        oxide_activity_value=oxide_activity.activity,
+                        oxide_activity_value=reported_activity,
                         activity_exponent=activity_exponent,
                         o2_term=o2_term,
                         o2_potential=o2_potential,
@@ -3775,12 +4208,30 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
-                activities[species] = oxide_activity.activity
-                activity_exponent = float(
-                    gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                declared_component = (
+                    metal_source_basis.get("activity_component_id")
+                    if metal_source_basis is not None
+                    else None
                 )
-                pO2_exponent = float(
-                    gas_rail_rxn.get("pO2_exponent", 0.0) or 0.0
+                reported_activity = (
+                    _liquid_melt_activity_for_component(
+                        oxide_activity, declared_component
+                    )
+                    if declared_component is not None
+                    else oxide_activity.activity
+                )
+                activities[species] = reported_activity
+                activity_exponent = (
+                    float(metal_source_basis["activity_exponent"])
+                    if metal_source_basis is not None
+                    else float(
+                        gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                    )
+                )
+                pO2_exponent = (
+                    float(metal_source_basis["pO2_exponent"])
+                    if metal_source_basis is not None
+                    else float(gas_rail_rxn.get("pO2_exponent", 0.0) or 0.0)
                 )
                 pO2_reference_bar = max(
                     1e-30,
@@ -3802,7 +4253,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 P_eq_raw, activity_factor, pO2_scaled = (
                     _standard_reaction_pressure_Pa(
                         P_reference_Pa=P_reference_Pa,
-                        oxide_activity_value=oxide_activity.activity,
+                        oxide_activity_value=reported_activity,
                         activity_exponent=activity_exponent,
                         o2_term=o2_term,
                         o2_potential=o2_potential,
@@ -4251,13 +4702,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             valid = data.get('valid_range_K', [0, 9999])
             compiled_evaluator = None
             compiled_species = None
+            if self._vapour_rail_catalog is not None:
+                try:
+                    compiled_species = self._vapour_rail_catalog.species[name]
+                except KeyError:
+                    pass
             if (
                 (coefficient_refusal is not None
                  or (coefficients is not None and coefficients[0] <= 0.0))
                 and self._vapour_rail_catalog is not None
+                and compiled_species is not None
             ):
                 try:
-                    compiled_species = self._vapour_rail_catalog.species[name]
                     # b-189-exempt: applicability gated at loop top
                     compiled_evaluator = self._vapour_rail_catalog.evaluator_for(
                         name
@@ -4284,16 +4740,39 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if compiled_evaluator is not None
                 else COEFF_BLOCK_ANTOINE
             )
+            compiled_source_basis = (
+                _compiled_source_reaction_basis(
+                    self._vapour_rail_catalog, compiled_species
+                )
+                if self._vapour_rail_catalog is not None
+                and compiled_species is not None
+                else None
+            )
 
             parent_oxide = data.get('parent_oxide', '')
             activity_factor = 1.0
+            activity_exponent = 0.0
             oxide_activity = None
+            if (
+                compiled_source_basis is not None
+                and compiled_source_basis["activity_exponent"] > 0.0
+                and not parent_oxide
+            ):
+                raise VaporPressureComputationError(
+                    f"{name}: source reaction declares a melt activity without a parent oxide"
+                )
             if parent_oxide:
-                retain_analytical_channel = compiled_evaluator is not None or bool(
-                    data.get("retain_analytical_pressure_channel", False)
+                retain_analytical_channel = (
+                    compiled_evaluator is not None
+                    or compiled_source_basis is not None
+                    or bool(data.get("retain_analytical_pressure_channel", False))
                 )
                 activity_exponent_value = data.get('oxide_activity_exponent')
-                if activity_exponent_value is None:
+                if compiled_source_basis is not None:
+                    activity_exponent = float(
+                        compiled_source_basis["activity_exponent"]
+                    )
+                elif activity_exponent_value is None:
                     activity_exponent = (
                         0.0 if name == "FeO_association_gas" else 1.0
                     )
@@ -4307,7 +4786,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 if oxide_activity is None:
                     continue
-                if data.get("source_activity_basis") == "parent_oxide":
+                declared_activity_component = (
+                    compiled_source_basis.get("activity_component_id")
+                    if compiled_source_basis is not None
+                    else None
+                )
+                if declared_activity_component is not None:
+                    try:
+                        reported_activity = _liquid_melt_activity_for_component(
+                            oxide_activity,
+                            declared_activity_component,
+                        )
+                    except VaporPressureComputationError as exc:
+                        raise VaporPressureComputationError(
+                            f"{name}: {exc}"
+                        ) from exc
+                    a_ox = reported_activity
+                elif data.get("source_activity_basis") == "parent_oxide":
                     a_ox = oxide_activity.thermodynamic_parent_activity()
                     reported_activity = a_ox
                 else:
@@ -4326,22 +4821,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
                 activities[name] = reported_activity
-                if compiled_evaluator is not None:
-                    # The compiled source reaction owns its declared activity
-                    # power.  Premise: for q A_cond -> nu V + ..., mass action
-                    # gives p_V proportional to a_A^(q/nu).  The melt provider
-                    # reports the declared source basis, so pass that activity
-                    # itself and let the evaluator apply q/nu once.
-                    # Unit check: activity and its power are dimensionless.
-                    # Sanity: q/nu=1 matches legacy rows; Al2O's q/nu=2 must
-                    # quarter pressure when activity halves.  Calling
-                    # equivalent_parent_activity(2) here would take sqrt(a)
-                    # and silently flatten that physical square to a.
-                    activity_factor = max(reported_activity, 0.0) ** float(
-                        compiled_evaluator.activity_exponent
-                    )
-                else:
-                    activity_factor = max(a_ox, 0.0) ** activity_exponent
+                activity_factor = max(reported_activity, 0.0) ** activity_exponent
 
             valid_range = _range_tuple(valid)
             if compiled_evaluator is None and valid_range is not None:
@@ -4398,23 +4878,67 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     pO2_bar=compiled_evaluator.pO2_reference_bar,
                 )
                 evaluator_pO2_bar = _surface_pO2_for_channel(name)
+                activity_for_pressure = (
+                    max(reported_activity, COMPILED_SOURCE_ACTIVITY_FLOOR)
+                    if parent_oxide
+                    else 1.0
+                )
+                P_reference_Pa = reference_evaluation.pressure_pa
+                pO2_exponent = (
+                    float(compiled_source_basis["pO2_exponent"])
+                    if compiled_source_basis is not None
+                    else float(compiled_evaluator.pO2_exponent)
+                )
+                pO2_reference_bar = max(
+                    1e-30, float(compiled_evaluator.pO2_reference_bar)
+                )
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
-                    source_activity=(
-                        max(
-                            reported_activity,
-                            COMPILED_SOURCE_ACTIVITY_FLOOR,
-                        )
-                        if parent_oxide
-                        else 1.0
-                    ),
+                    source_activity=activity_for_pressure,
                     pO2_bar=evaluator_pO2_bar,
                 )
                 surface_oxygen_notice = evaluation.extrapolation_notice
-                P_reference_Pa = reference_evaluation.pressure_pa
+                # Retain the evaluator's reference-pressure arithmetic. If a
+                # compatibility exponent differs from source stoichiometry,
+                # multiply only by the ratio between the reaction-derived and
+                # compiled powers at this same surface state.
+                activity_delta_exponent = (
+                    activity_exponent - compiled_evaluator.activity_exponent
+                )
+                pO2_delta_exponent = (
+                    pO2_exponent - compiled_evaluator.pO2_exponent
+                )
                 P_eq_Pa = evaluation.pressure_pa
-                pO2_exponent = compiled_evaluator.pO2_exponent
+                if activity_delta_exponent:
+                    P_eq_Pa *= activity_for_pressure ** activity_delta_exponent
+                if pO2_delta_exponent:
+                    correction_term, correction_potential = (
+                        _o2_channel_term_and_potential(
+                            pO2_exponent=pO2_delta_exponent,
+                            pO2_bar=evaluator_pO2_bar,
+                            pO2_reference_bar=pO2_reference_bar,
+                            temperature_K=T_K,
+                            reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                        )
+                    )
+                    if correction_potential is not None and surface_oxygen_notice is None:
+                        notice = correction_potential.observation_or_setpoint_receipt.get(
+                            "extrapolation_notice"
+                        )
+                        if isinstance(notice, Mapping):
+                            surface_oxygen_notice = dict(notice)
+                    P_eq_Pa *= channel_linear_mass_action_factor(
+                        correction_term, correction_potential
+                    )
+                activity_factor = (
+                    activity_for_pressure ** activity_exponent
+                )
                 pO2_scaled = bool(pO2_exponent)
+                P_eq_Pa = _require_finite_vapor_value(
+                    P_eq_Pa,
+                    species=name,
+                    field="P_eq_compiled_source_reaction",
+                )
                 if evaluation.out_of_range:
                     existing_notice = oxide_vapor_extrapolations.get(name)
                     existing_reason = (
@@ -4445,8 +4969,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # window and create a discontinuity at every grid floor.
                     # Algebra: P_eq = 10**log10(P_cont),
                     # with activity and fO2 powers already applied exactly once
-                    # by evaluate(). Units: P_eq remains Pa. Sanity: only the two
-                    # status and acquisition metadata change at the boundary;
+                    # by this source K plus reaction-derived powers. Units:
+                    # P_eq remains Pa. Sanity: only the two status and
+                    # acquisition metadata change at the boundary;
                     # the pressure remains continuous for every status-bearing
                     # compiled carrier.
             else:
@@ -4472,7 +4997,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
 
                 pO2_exponent_value = data.get('pO2_exponent')
-                if pO2_exponent_value is None:
+                if compiled_source_basis is not None:
+                    pO2_exponent = float(
+                        compiled_source_basis["pO2_exponent"]
+                    )
+                elif pO2_exponent_value is None:
                     pO2_exponent = (
                         0.5 if name == "FeO_association_gas" else 0.0
                     )
@@ -4557,7 +5086,131 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if isinstance(reaction, Mapping)
                 else ''
             )
-            if parent_oxide and (
+            compiled_standard_state_audit = None
+            if compiled_source_basis is not None and activity_exponent > 0.0:
+                from simulator.vapour_rail.catalog import _strip_phase_suffix
+
+                K_phase = compiled_source_basis.get("K_reference_phase")
+                activity_reference = (
+                    compiled_source_basis.get("activity_reference") or {}
+                )
+                declared_phase = str(activity_reference.get("phase") or "")
+                K_reference_formula_unit = (
+                    compiled_source_basis.get("K_reference_formula_unit")
+                    or compiled_source_basis.get("activity_component_id")
+                )
+                actual_activity_basis = (
+                    "liquid Raoultian parent-formula melt activity"
+                    if oxide_activity is not None
+                    and _strip_phase_suffix(
+                        str(
+                            compiled_source_basis.get(
+                                "activity_component_id"
+                            )
+                            or ""
+                        )
+                    )
+                    == oxide_activity.parent_oxide
+                    else "liquid Raoultian single-cation melt activity"
+                )
+                conversion_applied = False
+                conversion_grounded = False
+                if K_phase == "crystalline":
+                    # For q condensed units, JANAF contributes
+                    # Δlog10(K)=q ΔG_fus°/(R T ln 10). The shared fallback
+                    # helper supplies the per-unit term; it is positive below
+                    # Tm and zero at the crystal/liquid table crossing.
+                    fusion_oxide = parent_oxide
+                    if str(K_reference_formula_unit or "").endswith("(II)"):
+                        fusion_oxide = f"{parent_oxide}(II)"
+                    multiplier = _liquid_standard_multiplier(
+                        channel=name,
+                        oxide=fusion_oxide,
+                        K_reference_phase=(
+                            f"{K_reference_formula_unit}; crystalline source K"
+                        ),
+                        activity_exponent=activity_exponent,
+                    )
+                    conversion_applied = (
+                        f"{name}" not in activity_standard_state_flags
+                    )
+                    conversion_grounded = conversion_applied
+                    P_reference_Pa = _require_finite_vapor_value(
+                        P_reference_Pa * multiplier,
+                        species=name,
+                        field="P_reference_liquid_standard_state",
+                    )
+                    P_eq_Pa = _require_finite_vapor_value(
+                        P_eq_Pa * multiplier,
+                        species=name,
+                        field="P_eq_liquid_standard_state",
+                    )
+                elif K_phase == "liquid" and declared_phase == "liquid":
+                    conversion_grounded = True
+                elif K_phase == "liquid":
+                    _standard_state_caveat(
+                        channel=name,
+                        K_reference_phase=(
+                            f"liquid source K on {K_reference_formula_unit}"
+                        ),
+                        activity_reference_phase=(
+                            f"{declared_phase or 'undeclared'} activity reference "
+                            f"for {compiled_source_basis['activity_component_id']}"
+                        ),
+                        reason=(
+                            "The selected source reaction declares an activity "
+                            "reference that differs from the liquid melt activity "
+                            "used by its K; the estimate is retained with an "
+                            "engine-model caveat."
+                        ),
+                        activity_exponent=activity_exponent,
+                    )
+                elif K_phase is None:
+                    _standard_state_caveat(
+                        channel=name,
+                        K_reference_phase=(
+                            f"unresolved source reaction for "
+                            f"{K_reference_formula_unit}"
+                        ),
+                        activity_reference_phase=actual_activity_basis,
+                        reason=(
+                            "The selected source reaction does not ground the "
+                            "condensed K phase; its estimate is retained without "
+                            "a standard-state conversion."
+                        ),
+                        activity_exponent=activity_exponent,
+                    )
+                else:
+                    _standard_state_caveat(
+                        channel=name,
+                        K_reference_phase=(
+                            f"{K_phase} source K on "
+                            f"{K_reference_formula_unit}"
+                        ),
+                        activity_reference_phase=actual_activity_basis,
+                        reason=(
+                            "The selected K phase does not match the liquid "
+                            "melt activity supplied by the provider, and no "
+                            "grounded JANAF conversion applies; the estimate "
+                            "is retained."
+                        ),
+                        activity_exponent=activity_exponent,
+                    )
+                compiled_standard_state_audit = {
+                    "source_reaction_id": compiled_species.source_reaction_id,
+                    "K_reference_phase": K_phase,
+                    "K_formula_unit": K_reference_formula_unit,
+                    "K_formula_unit_stoichiometry": (
+                        compiled_source_basis["activity_stoichiometry"]
+                    ),
+                    "activity_reference": dict(activity_reference),
+                    "provider_activity_reference": actual_activity_basis,
+                    "activity_exponent": activity_exponent,
+                    "pO2_exponent": pO2_exponent,
+                    "consistent_after_conversion": conversion_grounded,
+                    "conversion_applied": conversion_applied,
+                }
+            elif parent_oxide and (
                 f"{parent_oxide}(cr)" in reaction_formula
                 or f"{parent_oxide}(s)" in reaction_formula
             ):
@@ -4567,9 +5220,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # Units: q and the log shift are dimensionless. Sanity: the
                 # shift is positive below Tm and zero at the JANAF crossing.
                 activity_exponent_for_standard_state = (
-                    float(compiled_evaluator.activity_exponent)
-                    if compiled_evaluator is not None
-                    else float(activity_exponent)
+                    float(activity_exponent)
                 )
                 if activity_exponent_for_standard_state > 0.0:
                     multiplier = _liquid_standard_multiplier(
@@ -4591,8 +5242,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         field="P_eq_liquid_standard_state",
                     )
 
-            retain_analytical_channel = compiled_evaluator is not None or bool(
-                data.get("retain_analytical_pressure_channel", False)
+            retain_analytical_channel = (
+                compiled_evaluator is not None
+                or compiled_source_basis is not None
+                or bool(data.get("retain_analytical_pressure_channel", False))
             )
             if _publishes_vapor_pressure(
                 P_eq_Pa,
@@ -4647,6 +5300,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         else pO2_exponent
                     ),
                     "activity_factor": activity_factor,
+                    "oxide_activity_exponent": activity_exponent,
                     "source_label": source_label,
                 }
                 oxygen_notice = surface_oxygen_notice
@@ -4666,6 +5320,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[name][
                         "P_reference_model_Pa"
                     ] = P_reference_Pa
+                if compiled_standard_state_audit is not None:
+                    vapor_pressure_provenance[name][
+                        "compiled_standard_state_audit"
+                    ] = dict(compiled_standard_state_audit)
                 if compiled_evaluator is not None and parent_oxide == "P2O5":
                     vapor_pressure_provenance[name][
                         "oxygen_fugacity_channel"
@@ -4739,6 +5397,24 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             vapor_pressure_sources=vapor_pressure_sources,
             vapor_pressure_provenance=vapor_pressure_provenance,
         )
+
+        if surface_floor_standard_state_caveat is not None:
+            for species, provenance in vapor_pressure_provenance.items():
+                channel_caveat = dict(surface_floor_standard_state_caveat)
+                channel_caveat["species"] = species
+                existing_caveat = activity_standard_state_flags.get(species)
+                if existing_caveat is not None:
+                    combined_caveat = dict(existing_caveat)
+                    combined_caveat[
+                        "surface_metal_saturation_floor_caveat"
+                    ] = channel_caveat
+                else:
+                    combined_caveat = channel_caveat
+                activity_standard_state_flags[species] = combined_caveat
+                provenance["engine_model_caveat"] = combined_caveat
+                provenance[
+                    "surface_metal_saturation_floor_caveat"
+                ] = channel_caveat
 
         floor_inversion_notices = _attach_pO2_floor_inversion_notices(
             vapor_pressures=vapor_pressures,

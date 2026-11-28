@@ -1148,6 +1148,252 @@ def test_builtin_provider_uses_one_surface_pO2_for_every_channel():
     )
 
 
+def test_provider_reaction_powers_match_every_compiled_channel():
+    import re
+
+    from engines.builtin.vapor_pressure import (
+        BuiltinVaporPressureProvider,
+        _compiled_source_reaction_basis,
+        _o2_channel_term_and_potential,
+        _standard_reaction_pressure_Pa,
+    )
+
+    payload = yaml.safe_load(
+        (DATA / "vapor_pressures.yaml").read_text(encoding="utf-8")
+    )
+    provider = BuiltinVaporPressureProvider(payload)
+    catalog = provider._vapour_rail_catalog
+    assert catalog is not None
+
+    def bare_formula(value: object) -> str:
+        return re.sub(r"\([^)]*\)$", "", str(value)).strip()
+
+    compiled_channels = []
+    for group in ("metals", "oxide_vapors"):
+        for name in provider._vapor_pressure_data.get(group, {}):
+            species = catalog.species.get(name)
+            if species is None or species.source_reaction_id is None:
+                continue
+            basis = _compiled_source_reaction_basis(catalog, species)
+            assert basis is not None
+            reaction = basis["reaction"]
+            reactants = reaction["reactants"]
+            products = reaction["products"]
+            target_formula = bare_formula(species.formula)
+            target_nu = sum(
+                float(row["stoichiometry"])
+                for row in products
+                if bare_formula(row["formula"]) == target_formula
+            )
+            activity_input = reaction.get("activity_input") or {}
+            component_id = activity_input.get("component_id")
+            activity_nu = sum(
+                float(row["stoichiometry"])
+                for row in reactants
+                if component_id
+                and bare_formula(row["formula"]) == bare_formula(component_id)
+            )
+            nu_o2 = sum(
+                float(row["stoichiometry"])
+                for row in products
+                if bare_formula(row["formula"]) == "O2"
+            ) - sum(
+                float(row["stoichiometry"])
+                for row in reactants
+                if bare_formula(row["formula"]) == "O2"
+            )
+            expected_activity_exponent = activity_nu / target_nu
+            expected_pO2_exponent = -nu_o2 / target_nu
+            assert basis["activity_exponent"] == pytest.approx(
+                expected_activity_exponent
+            )
+            assert basis["pO2_exponent"] == pytest.approx(
+                expected_pO2_exponent
+            )
+
+            # The same mass-action composer used by the provider must show the
+            # reaction-derived logarithmic slopes, including multi-cation and
+            # multi-vapor-coefficient reactions.
+            pO2_reference_bar = (
+                species.evaluator.pO2_reference_bar
+                if species.evaluator is not None
+                else 1.0
+            )
+
+            def pressure(activity: float, pO2: float) -> float:
+                term, potential = _o2_channel_term_and_potential(
+                    pO2_exponent=expected_pO2_exponent,
+                    pO2_bar=pO2,
+                    pO2_reference_bar=pO2_reference_bar,
+                    temperature_K=1600.0,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                )
+                return _standard_reaction_pressure_Pa(
+                    P_reference_Pa=10.0,
+                    oxide_activity_value=activity,
+                    activity_exponent=expected_activity_exponent,
+                    o2_term=term,
+                    o2_potential=potential,
+                )[0]
+
+            activity = 0.23
+            pO2 = 1e-8
+            baseline = pressure(activity, pO2)
+            activity_shifted = pressure(activity * 10.0, pO2)
+            oxygen_shifted = pressure(activity, pO2 * 10.0)
+            assert math.log10(activity_shifted / baseline) == pytest.approx(
+                expected_activity_exponent, abs=1e-12
+            ), name
+            assert math.log10(oxygen_shifted / baseline) == pytest.approx(
+                expected_pO2_exponent, abs=1e-12
+            ), name
+            compiled_channels.append(name)
+
+    assert len(compiled_channels) >= 35
+    assert {"Al2O", "Al2", "CrO", "Ca2", "Mg2"} <= set(
+        compiled_channels
+    )
+
+
+def test_provider_published_log_slopes_follow_compiled_reactions(monkeypatch):
+    from engines.builtin import vapor_pressure as provider_module
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    provider, request, melt_mol, _ = _provider_and_request(
+        1600.0,
+        transport_pO2_bar=1.0e-3,
+    )
+    melt_mol = {**melt_mol, "NiO": 0.2, "CoO": 0.1, "P2O5": 0.1}
+    account_view = dataclasses.replace(
+        request.account_view,
+        accounts={"process.cleaned_melt": melt_mol},
+    )
+    request = dataclasses.replace(
+        request,
+        account_view=account_view,
+        control_inputs={"pO2_bar": 1.0e-3},
+    )
+    catalog = provider._vapour_rail_catalog
+    assert catalog is not None
+
+    original_activity = provider_module._high_t_activity_for_parent
+    activity_scale = {"value": 1.0}
+
+    def scaled_activity(parent_oxide, composition_mol, *, temperature_K, authority):
+        result = original_activity(
+            parent_oxide,
+            composition_mol,
+            temperature_K=temperature_K,
+            authority=authority,
+        )
+        if result is None:
+            return None
+        return dataclasses.replace(
+            result,
+            activity=float(result.activity) * activity_scale["value"],
+        )
+
+    monkeypatch.setattr(
+        provider_module, "_high_t_activity_for_parent", scaled_activity
+    )
+
+    def dispatch(*, scale: float, pO2_bar: float):
+        activity_scale["value"] = scale
+        scaled_request = dataclasses.replace(
+            request,
+            control_inputs={"pO2_bar": pO2_bar},
+        )
+        return provider.dispatch(scaled_request).diagnostic
+
+    baseline = dispatch(scale=1.0, pO2_bar=1.0e-3)
+    activity_changed = dispatch(scale=2.0, pO2_bar=1.0e-3)
+    oxygen_changed = dispatch(scale=1.0, pO2_bar=1.0e-2)
+    baseline_pressures = baseline["vapor_pressures_Pa"]
+    activity_pressures = activity_changed["vapor_pressures_Pa"]
+    oxygen_pressures = oxygen_changed["vapor_pressures_Pa"]
+    assert baseline["surface_oxygen_potential_bar"] == 1.0e-3
+    assert oxygen_changed["surface_oxygen_potential_bar"] == 1.0e-2
+
+    compiled_channels = []
+    for group in ("metals", "oxide_vapors"):
+        for name in provider._vapor_pressure_data.get(group, {}):
+            species = catalog.species.get(name)
+            if species is None or species.source_reaction_id is None:
+                continue
+            basis = _compiled_source_reaction_basis(catalog, species)
+            assert basis is not None
+            assert name in baseline_pressures
+            assert name in activity_pressures
+            assert name in oxygen_pressures
+
+            activity_exponent = float(basis["activity_exponent"])
+            if activity_exponent:
+                activity_before = float(baseline["activities"][name])
+                activity_after = float(activity_changed["activities"][name])
+                observed_activity_slope = math.log10(
+                    activity_pressures[name] / baseline_pressures[name]
+                ) / math.log10(activity_after / activity_before)
+                assert observed_activity_slope == pytest.approx(
+                    activity_exponent, abs=1e-8
+                ), name
+            else:
+                assert activity_pressures[name] == pytest.approx(
+                    baseline_pressures[name], rel=1e-12, abs=0.0
+                ), name
+
+            observed_pO2_slope = math.log10(
+                oxygen_pressures[name] / baseline_pressures[name]
+            ) / math.log10(
+                oxygen_changed["surface_oxygen_potential_bar"]
+                / baseline["surface_oxygen_potential_bar"]
+            )
+            assert observed_pO2_slope == pytest.approx(
+                float(basis["pO2_exponent"]), abs=1e-8
+            ), name
+            compiled_channels.append(name)
+
+    assert len(compiled_channels) >= 35
+
+
+def test_ungrounded_binding_floor_caveat_reaches_every_published_channel():
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+    from simulator.chemistry.kernel.dto import ProviderAccountView
+
+    _, _, _, payload = _provider_and_request(
+        1600.0,
+        intrinsic_fO2_log=-45.0,
+        transport_pO2_bar=1e-3,
+    )
+    provider = BuiltinVaporPressureProvider(payload)
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {"NiO": 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "pO2_bar": 1e-3,
+                "intrinsic_fO2_log": -45.0,
+            },
+        )
+    )
+
+    floor_notice = result.diagnostic["melt_metal_saturation_floor_notice"]
+    assert floor_notice["metal"] == "Ni"
+    assert floor_notice["engine_model_caveat"]["kind"] == "engine_model_caveat"
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
+    assert provenance
+    assert set(result.diagnostic["vapor_pressures_Pa"]) == set(provenance)
+    for row in provenance.values():
+        caveat = row["engine_model_caveat"]
+        assert caveat["kind"] == "engine_model_caveat"
+        assert caveat["surface_floor_binding_metal"] == "Ni"
+
+
 def test_legacy_oxide_pressure_keeps_full_parent_activity_power():
     from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
     from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
