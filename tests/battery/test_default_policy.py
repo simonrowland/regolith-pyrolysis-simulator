@@ -81,6 +81,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         "DP-106",
         "DP-107",
         "DP-112",
+        "DP-119",
     }
 
     required = {
@@ -131,6 +132,11 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         elif policy_id == "DP-112":
             assert entry["status"] == "proposed"
             assert entry["proposed_by"] == "w1123canon"
+            assert entry["canonized_by"] is None
+            assert entry["canonized_at"] is None
+        elif policy_id == "DP-119":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "Simon Rowland"
             assert entry["canonized_by"] is None
             assert entry["canonized_at"] is None
         else:
