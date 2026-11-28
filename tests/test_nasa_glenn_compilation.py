@@ -148,24 +148,48 @@ def test_record_formula_weight_witness_census(source_records, capsys) -> None:
                 "precision_tolerance_g_mol": row["precision_tolerance_g_mol"],
             }
         )
-    assert [
-        (
-            row["record_id"],
-            row["name"],
-            row["formula"],
-            row["printed_weight_g_mol"],
-            row["parsed_weight_g_mol"],
-        )
-        for row in refusals
-    ] == [
+    expected = [
+        ("NG-0297", "InertCH4", "ICIH4", 16.04246, 269.85194),
+        ("NG-0363", "InertC2H4", "IC2IH4", 28.05316, 281.86294),
+        ("NG-0459", "InertC10H8,naph", "IC10IH8", 128.17052, 381.98294),
+        ("NG-0635", "InertH", "IH", 1.00794, 127.91247),
+        ("NG-0670", "InertH2", "IH2", 2.01588, 128.92047),
+        ("NG-0929", "InertO", "IO", 15.9994, 142.90347),
+        ("NG-0938", "InertO2", "IO2", 31.9988, 158.90247),
         (
             "NG-2032",
             "InertAir",
             "N1.5617IO.41959Ar.00937C.00032",
             28.9651159,
-            pytest.approx(155.87037859),
-        )
+            155.87037859,
+        ),
+        ("NG-2070", "InertH2(L)", "IH2", 2.01588, 128.92047),
+        ("NG-2074", "InertJP-4", "ICIH1.94", 13.9661036, 267.77546),
+        ("NG-2076", "InertJP-5", "ICIH1.92", 13.9459448, 267.7553),
+        ("NG-2078", "InertJP-7", "ICIH2.0044", 14.03102, 267.8403752),
+        ("NG-2080", "InertJP-10(L)", "IC10IH16", 136.23404, 390.04694),
+        ("NG-2082", "InertJP-10(g)", "IC10IH16", 136.23404, 390.04694),
+        ("NG-2084", "InertJet-A(L)", "IC12IH23", 167.31102, 421.12494000000004),
+        ("NG-2086", "InertJet-A(g)", "IC12IH23", 167.31102, 421.12494000000004),
+        ("NG-2101", "InertO2(L)", "IO2", 31.9988, 158.90247),
+        ("NG-2104", "InertRP-1", "ICIH1.95", 13.976183, 267.78554),
+        ("NG-2106", "ADN", "H4N4O4", 630.0, 124.056),
     ]
+    actual_identity = [
+        (
+            row["record_id"],
+            row["name"],
+            row["formula"],
+            row["printed_weight_g_mol"],
+        )
+        for row in refusals
+    ]
+    assert actual_identity == [row[:4] for row in expected], json.dumps(
+        refusals, sort_keys=True
+    )
+    assert len(refusals) == 19
+    for row, expected_row in zip(refusals, expected, strict=True):
+        assert row["parsed_weight_g_mol"] == pytest.approx(expected_row[4])
     with capsys.disabled():
         print("NASA_GLENN_FORMULA_WEIGHT_CENSUS " + json.dumps(refusals, sort_keys=True))
 
