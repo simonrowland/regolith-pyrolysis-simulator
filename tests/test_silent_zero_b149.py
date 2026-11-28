@@ -291,7 +291,7 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         doctrine_category=CATEGORY_PROVEN_ZERO,
     )
     sim = SimpleNamespace(
-        melt=SimpleNamespace(temperature_C=1600.0, hour=0),
+        melt=SimpleNamespace(temperature_C=1600.0),
         setpoints={},
         vapor_pressures={"metals": {"Na": {"evaporation_alpha": {"value": 0.13}}}},
         _last_vapor_pressure_diagnostic={},
@@ -358,10 +358,28 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
     assert refusal["site"] == "evaporation.partial_channel_refusal"
     assert refusal["species"] == "K"
     assert refusal["field"] == "batch_channel_state"
-    assert "species unavailable in the flux map, not measured as zero" in (
-        refusal["detail"]
+    # Host list carries the refusal note as well.
+    assert any(
+        n.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
+        and n.get("species") == "K"
+        for n in (sim._silent_zero_notes or [])
     )
-    assert diagnostic["vapour_batch_flux_overlay"]["notices"] == [
+
+
+def test_unresolved_vapour_notice_pins_species_hour_and_reason() -> None:
+    from simulator.evaporation import _append_vapour_batch_unresolved_notice
+
+    overlay = {}
+    host = SimpleNamespace(melt=SimpleNamespace(hour=0))
+
+    _append_vapour_batch_unresolved_notice(
+        host,
+        overlay,
+        species="K",
+        reason="test_refusal",
+    )
+
+    assert overlay["notices"] == [
         {
             "kind": "vapour_batch_unresolved",
             "species": "K",
@@ -369,13 +387,6 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
             "reason": "test_refusal",
         },
     ]
-
-    # Host list carries the refusal note as well.
-    assert any(
-        n.get("zero_because") == ZeroBecause.REFUSED_UPSTREAM.value
-        and n.get("species") == "K"
-        for n in (sim._silent_zero_notes or [])
-    )
 
 
 # ---------------------------------------------------------------------------

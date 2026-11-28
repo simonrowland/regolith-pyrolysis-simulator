@@ -7989,12 +7989,10 @@ def _run_interpolation_class_guard_hour(
     replay_interpolation_into_flux: bool = False,
 ) -> tuple[Any, Any, int]:
     sim = _build_pt0_sim(store)
-    class DeterministicMAGEMinBackend(RealBackendAuthority):
+    class CappedDeterministicBackend(RealBackendAuthority):
         real_backend_family = RealBackendFamily.MAGEMIN
         name = "magemin"
-
-        def __init__(self) -> None:
-            self.calls = 0
+        calls = 0
 
         def is_available(self):
             return True
@@ -8029,7 +8027,7 @@ def _run_interpolation_class_guard_hour(
                 diagnostics={"deterministic_engine_stub": "magemin"},
             )
 
-    backend = DeterministicMAGEMinBackend()
+    backend = CappedDeterministicBackend()
     sim.backend = backend
     from simulator.chemistry.kernel import ChemistryIntent
 
