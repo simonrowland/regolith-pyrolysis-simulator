@@ -386,13 +386,22 @@ def test_knudsen_defers_redox_diagnostic_probes_without_changing_result(
     from simulator.battery import residue
 
     original_balance = residue._residue_oxygen_balance
+    root_logp = math.log10(_closed_form_pressure_root_bar(q=0.5))
+    probe_logps = (root_logp - 0.1, root_logp + 0.1)
 
     def run(*, defer_diagnostics: bool):
         pressure_calls = 0
+        rhs_probe_calls = 0
+        inside_balance = False
 
         def pressure(_inventory, logp, _temperature):
-            nonlocal pressure_calls
+            nonlocal pressure_calls, rhs_probe_calls
             pressure_calls += 1
+            if inside_balance and any(
+                math.isclose(logp, probe, rel_tol=0.0, abs_tol=1.0e-9)
+                for probe in probe_logps
+            ):
+                rhs_probe_calls += 1
             p_o2_bar = 10.0**logp
             return PressureEvaluation(
                 {"Fe": p_o2_bar**-0.5, "O2": 1.0e5 * p_o2_bar},
@@ -402,28 +411,38 @@ def test_knudsen_defers_redox_diagnostic_probes_without_changing_result(
 
         pressure.declares_redox_active = True
 
-        if not defer_diagnostics:
-            def immediate_diagnostics(*args, **kwargs):
+        def instrumented_balance(*args, **kwargs):
+            nonlocal inside_balance
+            was_inside_balance = inside_balance
+            inside_balance = True
+            if not defer_diagnostics:
                 kwargs.pop("defer_pressure_law_diagnostics", None)
+            try:
                 return original_balance(*args, **kwargs)
+            finally:
+                inside_balance = was_inside_balance
 
-            monkeypatch.setattr(
-                residue, "_residue_oxygen_balance", immediate_diagnostics
+        with monkeypatch.context() as patcher:
+            patcher.setattr(
+                residue, "_residue_oxygen_balance", instrumented_balance
             )
-        result = integrate_knudsen_residue_inventory(
-            {"FeO": 1.0},
-            _channels(),
-            pressure,
-            temperature_path=((0.01, 1800.0),),
-            measured_mass_loss_fraction=0.01,
-            near_saturated=True,
-            source_fO2_log_by_interval=(None,),
-        )
-        monkeypatch.setattr(residue, "_residue_oxygen_balance", original_balance)
-        return result, pressure_calls
+            result = integrate_knudsen_residue_inventory(
+                {"FeO": 1.0},
+                _channels(),
+                pressure,
+                temperature_path=((0.01, 1800.0),),
+                measured_mass_loss_fraction=0.01,
+                near_saturated=True,
+                source_fO2_log_by_interval=(None,),
+            )
+        return result, rhs_probe_calls, pressure_calls
 
-    immediate, immediate_calls = run(defer_diagnostics=False)
-    deferred, deferred_calls = run(defer_diagnostics=True)
+    immediate, immediate_probe_calls, immediate_pressure_calls = run(
+        defer_diagnostics=False
+    )
+    deferred, deferred_probe_calls, deferred_pressure_calls = run(
+        defer_diagnostics=True
+    )
 
     assert deferred.residue_mol == immediate.residue_mol
     assert deferred.evaporated_mol == immediate.evaporated_mol
@@ -431,7 +450,11 @@ def test_knudsen_defers_redox_diagnostic_probes_without_changing_result(
     assert deferred.atom_closure_mol == immediate.atom_closure_mol
     assert deferred.pO2_bar_by_step == immediate.pO2_bar_by_step
     assert deferred.pressure_law_diagnostics == immediate.pressure_law_diagnostics
-    assert deferred_calls < immediate_calls
+    # Deferred closures still run after the integrator to preserve validation,
+    # so total callback calls cannot measure the saved RHS work. Count only
+    # slope-probe calls made while the balance is inside the ODE RHS.
+    assert deferred_pressure_calls == immediate_pressure_calls
+    assert deferred_probe_calls < immediate_probe_calls
 
 
 @pytest.mark.parametrize(

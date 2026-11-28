@@ -12134,8 +12134,11 @@ def test_langmuir_budget_refusal_retains_base_classification(monkeypatch) -> Non
         raise ResidueInventoryRefusal(_KNUDSEN_EXTENT_EVALUATION_LIMIT)
 
     monkeypatch.setattr(residue, "predict_langmuir_residue_composition", refuse)
+    # Production selects same-source mass-loss anchors from this collection.
     prediction = _langmuir_residue_prediction(
-        SimpleNamespace(experiments={}), reference, Engine.INTERNAL_ANALYTICAL
+        SimpleNamespace(experiments={}, observations={}),
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
     )
 
     assert prediction.execution.state is ExecutionState.NOT_PROBED
