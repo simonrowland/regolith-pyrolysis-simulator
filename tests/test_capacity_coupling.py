@@ -2352,7 +2352,15 @@ def test_lennard_jones_owner_uses_sourced_and_legacy_proxy_rows():
     )
 
     assert _resolve_lennard_jones_parameters("Na", {})["status"] == "tabulated"
-    assert _resolve_lennard_jones_parameters("CrO2", {})["status"] == "missing"
+    class_proxy = _resolve_lennard_jones_parameters("CrO2", {})
+    assert class_proxy["status"] == "estimated"
+    assert class_proxy["method"] == "legacy_code_proxy"
+    assert class_proxy["flag"] == "lj_estimated:legacy_code_proxy"
+    assert (
+        class_proxy["sigma_angstrom"],
+        class_proxy["epsilon_over_k_K"],
+        class_proxy["molar_mass_g_mol"],
+    ) == (3.374, 71.4, 83.9941)
     for species in ("Fe", "Mg", "Mn", "Cr", "Al", "Ti", "Ca", "SiO"):
         estimate = _resolve_lennard_jones_parameters(species, {})
         row = f"simulator.condensation._LENNARD_JONES_PARAMS[{species!r}]"
