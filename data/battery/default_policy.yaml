@@ -406,3 +406,21 @@ policies:
     canonized_by: null
     canonized_at: null
     history: []
+  - id: DP-119
+    condition: "Melt activity referenced to the source's 1630 C SiO2-saturated slag at activity one, with phase and convention unknown"
+    value: "source-saturated-slag reference state; phase/convention unresolved"
+    units: "activity reference state"
+    physical_basis: "Omori and Sanbongi report the activity-one saturated-slag reference, while the registered fallback target is a Raoultian pure-liquid endmember."
+    bias: "At 1903 K the liquid-SiO2 versus cristobalite-saturation difference is about 0.01 dex; the Al2O3 saturation phase and convention remain unknown."
+    flag: knob_defaulted
+    ruling: null
+    version: 1
+    status: proposed
+    proposed_by: Simon Rowland
+    proposed_at: "2026-11-27T23:58:42+00:00"
+    evidence:
+      - "source reference is SiO2-saturated slag at 1630 C, a = 1, phase and convention unknown; registered fallback Raoultian pure liquid; liquid vs cristobalite difference at 1903 K about 0.01 dex."
+      - "Omori and Sanbongi (1961), source_id omori-sanbongi-jjim-25-sio2-al2o3-activity; controller ruling seq 8."
+    canonized_by: null
+    canonized_at: null
+    history: []
