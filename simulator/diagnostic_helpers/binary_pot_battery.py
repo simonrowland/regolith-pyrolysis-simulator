@@ -1786,6 +1786,16 @@ def engine_flags_from_result(
         _ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX,
     )
 
+    activity_mapping_reason = diagnostics.get(
+        "activity_mapping_unavailable_reason"
+    )
+    if isinstance(activity_mapping_reason, str) and activity_mapping_reason:
+        notices.append({
+            "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+            "authority": None,
+            "reason": activity_mapping_reason,
+        })
+
     gas_only = diagnostics.get("fo2_gas_only")
     if isinstance(gas_only, Mapping):
         reason = gas_only.get("notice")

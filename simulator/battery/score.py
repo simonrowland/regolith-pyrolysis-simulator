@@ -8575,7 +8575,7 @@ def _activity_request_or_contract_refusal(
         if identity.composition is not None and identity.composition.is_value
         else None
     )
-    return None, _activity_contract_refusal(
+    refusal = _activity_contract_refusal(
         engine,
         channel=channel,
         sources=sources,
@@ -8583,6 +8583,27 @@ def _activity_request_or_contract_refusal(
         requested=requested,
         generated=generated,
     )
+    if (
+        engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+        and identity.species is not None
+        and identity.species.formula == 'CaO'
+        and requested is not None
+        and requested.value is not None
+        and requested.value.components
+    ):
+        from engines.alphamelts.domain import (
+            MELTS_CAO_EXCHANGE_UNAVAILABLE,
+            melts_liquid_contains_parent_oxide,
+        )
+
+        components = dict(requested.value.components)
+        if not melts_liquid_contains_parent_oxide(components, 'CaO'):
+            detail = dict(refusal.refusal_detail)
+            detail['candidate_unavailable_reason'] = (
+                MELTS_CAO_EXCHANGE_UNAVAILABLE
+            )
+            refusal = replace(refusal, refusal_detail=detail)
+    return None, refusal
 
 
 def _assumption_notice(
@@ -16900,6 +16921,7 @@ def _predict_with_engine(
 
     magnitude: float | None = None
     converter_reason = ""
+    candidate_unavailable_reason: str | None = None
     activity_repair_warnings: tuple[str, ...] = ()
     # The melt-activity gate already required the measured species to equal
     # the admitted endmember. Compare that exact identity; never substitute a
@@ -16996,6 +17018,7 @@ def _predict_with_engine(
             MELTS_PWO_G0_FIELD,
             _canonical_oxide_activity_map_with_notices,
             melts_endmember_to_parent_oxide_activity,
+            melts_liquid_contains_parent_oxide,
         )
         from simulator.melt_backend.pure_phase_janaf_score import (
             MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL,
@@ -17031,13 +17054,11 @@ def _predict_with_engine(
         )
         bridge_target = MELTS_ACTIVITY_BRIDGE_REFERENCES.get(compared)
         liquid_composition = getattr(cell, 'liquid_composition_wt_pct', None)
-        liquid_cao_wt_pct = finite_float(
-            liquid_composition.get('CaO')
+        liquid_contains_calcium = melts_liquid_contains_parent_oxide(
+            liquid_composition
             if isinstance(liquid_composition, Mapping)
-            else None
-        )
-        liquid_contains_calcium = (
-            liquid_cao_wt_pct is not None and liquid_cao_wt_pct > 0.0
+            else {},
+            'CaO',
         )
         positive_cao_pair = all(
             (activity := finite_float(reported.get(name))) is not None
@@ -17048,11 +17069,23 @@ def _predict_with_engine(
         if compared == 'CaO' and reference_triple == bridge_target:
             if not liquid_contains_calcium:
                 value = None
+                candidate_unavailable_reason = (
+                    MELTS_CAO_EXCHANGE_UNAVAILABLE
+                )
                 converter_reason = (
                     f'{MELTS_CAO_EXCHANGE_UNAVAILABLE}: '
-                    'solved_liquid_has_no_calcium'
+                    'solved_liquid_does_not_establish_calcium'
                 )
-            elif positive_cao_pair and mu_cao is not None:
+            elif mu_cao is None:
+                value = None
+                candidate_unavailable_reason = (
+                    MELTS_CAO_EXCHANGE_UNAVAILABLE
+                )
+                converter_reason = (
+                    f'{MELTS_CAO_EXCHANGE_UNAVAILABLE}: '
+                    'liquid_exchange_mu_unavailable_from_selected_route'
+                )
+            elif positive_cao_pair:
                 try:
                     value, reference_extrapolated = (
                         cao_activity_from_melts_exchange_mu(
@@ -17142,7 +17175,7 @@ def _predict_with_engine(
         if (
             compared == 'CaO'
             and reference_triple == bridge_target
-            and value is not None
+            and liquid_contains_calcium
         ):
             g0_casio3_liquid = finite_float(
                 getattr(cell, MELTS_CASIO3_LIQUID_G0_FIELD, None)
@@ -17226,6 +17259,10 @@ def _predict_with_engine(
         }
         if converter_reason:
             detail["converter"] = converter_reason
+        if candidate_unavailable_reason is not None:
+            detail["candidate_unavailable_reason"] = (
+                candidate_unavailable_reason
+            )
         refusal_reason = RefusalReason.UNSUPPORTED
         if engine is Engine.OPENIMCC and quantity in _VAPOUR_EQUILIBRIUM:
             refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
@@ -19001,15 +19038,20 @@ def _compile_residual_with_lineage(
         source_relation: SourceRelation = SourceRelation.UNKNOWN,
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
-        melts_cao_exchange_unavailable = (
-            engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
-            and quantity is Quantity.ACTIVITY
-            and formula == 'CaO'
-        )
         refusal_detail = dict(detail)
-        if melts_cao_exchange_unavailable:
+        melts_cao_exchange_unavailable = False
+        if (
+            engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+            and candidate is None
+            and isinstance(detail.get('candidate_unavailable_reason'), str)
+        ):
             from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_UNAVAILABLE
 
+            melts_cao_exchange_unavailable = (
+                detail.get('candidate_unavailable_reason')
+                == MELTS_CAO_EXCHANGE_UNAVAILABLE
+            )
+        if melts_cao_exchange_unavailable:
             refusal_detail['candidate_unavailable_reason'] = (
                 MELTS_CAO_EXCHANGE_UNAVAILABLE
             )
@@ -19019,6 +19061,7 @@ def _compile_residual_with_lineage(
                     channel=ENGINE_CHANNELS[engine],
                     execution=execution,
                     authority=Authority.REFUSED,
+                    notices=extra_notices,
                     coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
                     lineage_complete=False,
                     refusal_reason=reason,
@@ -19207,13 +19250,34 @@ def _compile_residual_with_lineage(
         and identity.reference_state is not None
         and identity.reference_state.is_unknown
     ):
+        refusal_detail: dict[str, object] = {
+            "fields": ["reference_state"],
+            "reason": "activity_reference_state_unknown",
+            "detail": identity.reference_state.reason,
+        }
+        composition = identity.composition
+        if (
+            engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+            and formula == "CaO"
+            and composition is not None
+            and composition.is_value
+            and composition.value is not None
+            and composition.value.components
+        ):
+            from engines.alphamelts.domain import (
+                MELTS_CAO_EXCHANGE_UNAVAILABLE,
+                melts_liquid_contains_parent_oxide,
+            )
+
+            if not melts_liquid_contains_parent_oxide(
+                dict(composition.value.components), "CaO"
+            ):
+                refusal_detail["candidate_unavailable_reason"] = (
+                    MELTS_CAO_EXCHANGE_UNAVAILABLE
+                )
         return _refused(
             RefusalReason.IDENTITY_UNKNOWN,
-            {
-                "fields": ["reference_state"],
-                "reason": "activity_reference_state_unknown",
-                "detail": identity.reference_state.reason,
-            },
+            refusal_detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("identity_equal", "status_match_or_mismatch"),
         )

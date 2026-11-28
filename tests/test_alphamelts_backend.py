@@ -6765,6 +6765,32 @@ def test_explicit_legacy_mu_maps_keep_non_cao_activity_extraction():
     })
 
 
+def test_petthermotools_does_not_mix_mu_and_mu0_from_different_sources():
+    from engines.alphamelts.domain import MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Na2O': 5.0},
+        'liquid1_prop': {'mass': 100.0, 'mu_Na': -900.0},
+        'chemical_potentials': {},
+        'pure_chemical_potentials': {'Na': -1000.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Na2O': 5.0},
+    )
+
+    assert result.activity_coefficients == {}
+    assert result.diagnostics['activity_mapping_unavailable_reason'] == (
+        MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+    )
+
+
 def test_petthermotools_result_parser_prefers_reported_oxide_activities():
     backend = AlphaMELTSBackend()
     results = ({

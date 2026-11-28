@@ -13,6 +13,7 @@ from engines.alphamelts.domain import (
     MELTS_CASIO3_FUSION_BAND_UNAVAILABLE,
     MELTS_CASIO3_LIQUID_G0_FIELD,
     MELTS_CAO_EXCHANGE_MU_FIELD,
+    MELTS_LIQUID_ACTIVITY_UNAVAILABLE,
     MELTS_PWO_G0_FIELD,
 )
 from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -147,6 +148,62 @@ def test_cao_exchange_mu_survives_the_compact_cell_cache() -> None:
         engine_id='alphamelts',
     )
     assert restored_equilibrium.diagnostics == equilibrium.diagnostics
+
+
+def test_melts_parent_oxide_presence_uses_compound_carrier_map():
+    from engines.alphamelts.domain import melts_liquid_contains_parent_oxide
+
+    assert melts_liquid_contains_parent_oxide({'CaSiO3': 0.2}, 'CaO')
+    assert not melts_liquid_contains_parent_oxide({'CaSiO3': 0.0}, 'CaO')
+
+
+def test_activity_mapping_unavailable_reason_survives_cache_and_cell_notice():
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+    from simulator.melt_backend.base import EquilibriumResult
+
+    equilibrium = EquilibriumResult(
+        liquid_fraction=1.0,
+        diagnostics={
+            'activity_mapping_unavailable_reason': (
+                MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+            ),
+        },
+    )
+    restored = EquilibriumResult.from_engine_cache_value(
+        equilibrium.to_engine_cache_value(engine_id='alphamelts'),
+        engine_id='alphamelts',
+    )
+    assert restored.diagnostics['activity_mapping_unavailable_reason'] == (
+        MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+    )
+    notices, _authority, _band = engine_flags_from_result(restored)
+    cell = EquilibrateCell(
+        pot_id='activity-map-gap',
+        engine='alphamelts',
+        temperature_K=1800.0,
+        po2=Po2Request(mode='engine_default', po2_bar=None),
+        status='ok',
+        refusal_reason=None,
+        engine_status='ok',
+        engine_reason=None,
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=1.0,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname='test',
+        notices=notices,
+    )
+    restored_cell = EquilibrateCell.from_engine_cache_value(
+        cell.to_engine_cache_value()
+    )
+    assert any(
+        row.get('kind') == 'engine_model_caveat'
+        and row.get('reason') == MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+        for row in restored_cell.notices
+    )
 
 
 def test_thermoengine_exchange_mu_requires_calcium_in_the_composition() -> None:
@@ -903,7 +960,7 @@ def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
             else {'CaO': 48.0, 'SiO2': 52.0}
         ),
         mu_CaO_J_per_mol_melts_berman_apparent=(
-            raw_mu
+            None if cell_mode == 'ca-bearing-gap' else raw_mu
         ),
         g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent=(
             g0_casio3_liquid if cell_mode == 'ca-bearing-band' else None
@@ -977,6 +1034,26 @@ def test_melts_cao_scoring_uses_raw_cell_exchange_and_scopes_model_caveats(
             for notice in cao_candidate.notices
             for marker in fusion_markers
         )
+    elif cell_mode == 'ca-bearing-gap':
+        assert cao_candidate.value.point is None
+        assert cao_candidate.value.unavailable_reason == (
+            MELTS_CAO_EXCHANGE_UNAVAILABLE
+        )
+        assert cao_refusal.refusal is not None
+        assert cao_refusal.refusal.detail['converter'] == (
+            f'{MELTS_CAO_EXCHANGE_UNAVAILABLE}: '
+            'liquid_exchange_mu_unavailable_from_selected_route'
+        )
+        assert cao_refusal.refusal.detail['candidate_unavailable_reason'] == (
+            MELTS_CAO_EXCHANGE_UNAVAILABLE
+        )
+        fusion_gap = next(
+            notice for notice in cao_candidate.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and fusion_markers[0] in notice.reason
+        )
+        assert fusion_gap.band is None
+        assert MELTS_CASIO3_FUSION_BAND_UNAVAILABLE in fusion_gap.reason
     else:
         expected, _ = cao_activity_from_melts_exchange_mu(
             raw_mu, temperature_K, phase='cr',
@@ -1170,6 +1247,102 @@ def test_melts_cao_single_component_ca_free_exit_retains_typed_candidate(
         gap['reason'] == 'single_species_charge'
         for gap in residual.refusal.detail['gaps']
     )
+
+
+@pytest.mark.parametrize('engine_name', ('alphamelts', 'thermoengine'))
+def test_melts_cao_identity_mismatch_does_not_mark_numeric_candidate_unavailable(
+    engine_name,
+) -> None:
+    from dataclasses import replace
+
+    from tests.battery import factories as F
+    from simulator.battery.enums import (
+        Authority,
+        Engine,
+        ExecutionState,
+        Phase,
+        RefusalReason,
+    )
+    from simulator.battery.records import (
+        AmountBasis,
+        Composition,
+        Execution,
+        State,
+    )
+    from simulator.battery.score import (
+        ENGINE_CHANNELS,
+        ENGINE_COEFFICIENT_SOURCES,
+        EnginePrediction,
+        ScoreContext,
+        compile_residual,
+    )
+
+    engine = Engine(engine_name)
+    work = F.work('cao-identity-mismatch-work')
+    experiment = F.tabulation_experiment(
+        'cao-identity-mismatch-exp',
+        work.work_id,
+        T_K=Decimal('1933'),
+    )
+    liquid_composition = Composition(
+        basis='ordered_complete_mole_inventory',
+        components=(('CaSiO3', Decimal('0.4')), ('SiO2', Decimal('0.6'))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula='CaO',
+        T_K=Decimal('1933'),
+        endmember_phase=Phase.CR,
+        component_basis='CaO',
+        composition=liquid_composition,
+    )
+    reference = F.observation(
+        'cao-identity-mismatch-observation',
+        experiment.experiment_id,
+        identity,
+        Decimal('0.4'),
+        source_id=work.work_id,
+    )
+    candidate_composition = Composition(
+        basis='ordered_complete_mole_inventory',
+        components=(('MgO', Decimal('0.5')), ('SiO2', Decimal('0.5'))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    candidate_identity = replace(
+        identity,
+        composition=State.of(candidate_composition),
+    )
+    prediction = EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence=f'{engine.value}:numeric-candidate',
+        ),
+        value=Decimal('0.5'),
+        unit='dimensionless',
+        authority=Authority.BRIDGE,
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        identity=candidate_identity,
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
+    )
+
+    residual, candidate = compile_residual(
+        reference,
+        engine,
+        context=context,
+        prediction=prediction,
+    )
+
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_MISMATCH
+    assert 'candidate_unavailable_reason' not in residual.refusal.detail
+    assert candidate is not None
+    assert candidate.value.point == Decimal('0.5')
 
 
 def test_melts_cao_cell_model_caveats_do_not_leak_to_other_activity_species() -> None:
