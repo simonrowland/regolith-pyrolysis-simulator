@@ -6745,6 +6745,8 @@ def test_explicit_legacy_mu_maps_keep_non_cao_activity_extraction():
         'Conditions': {'mass': 100.0},
         'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
         'liquid1_prop': {'mass': 80.0},
+        'olivine1': {'SiO2': 40.0, 'MgO': 50.0},
+        'olivine1_prop': {'mass': 20.0},
         'chemical_potentials': {'Na': -900.0, 'K': -1050.0},
         'pure_chemical_potentials': {'Na': -1000.0, 'K': -1000.0},
     }, {})
