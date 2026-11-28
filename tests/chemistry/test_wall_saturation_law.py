@@ -711,9 +711,12 @@ def test_nasa_record_identity_gate_refuses_inert_slot_cards(monkeypatch) -> None
     from simulator.vapour_rail import wall_saturation
 
     def assert_inert_record_refused() -> None:
-        with pytest.raises(WallSaturationLawRefusal) as exc_info:
+        try:
             nasa_record_g_over_rt("NG-2032", 500.0)
-        assert exc_info.value.reason == "wall_nasa_source_identity_mismatch"
+        except WallSaturationLawRefusal as exc_info:
+            assert exc_info.reason == "wall_nasa_source_identity_mismatch"
+        else:
+            raise AssertionError("inert NASA Glenn slot reached wall thermochemistry")
         assert math.isfinite(nasa_record_g_over_rt("NG-1858", _T_K))
 
     assert_inert_record_refused()
