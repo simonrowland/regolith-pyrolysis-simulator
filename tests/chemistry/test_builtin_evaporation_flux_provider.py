@@ -349,7 +349,7 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     # NaO0.5 activity evidence. This counter test only needs a flux-eligible
     # seam claim so the mocked EVAPORATION_FLUX path can record alpha fallbacks.
     equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"Fe": 1.0},
+        vapor_pressures_Pa={"CrO2": 1.0, "Mn": 1.0},
         vapor_pressures_source={},
         activity_coefficients={},
         diagnostics={},
@@ -1579,7 +1579,7 @@ def test_evaporation_caller_keeps_flagged_alpha_prediction(
 
     monkeypatch.setattr(sim, "_dispatch_only", dispatch)
     equilibrium = SimpleNamespace(
-        vapor_pressures_Pa={"Fe": 1.0},
+        vapor_pressures_Pa={"CrO": 100.0, "CrO2": 100.0},
         vapor_pressures_source={},
         activity_coefficients={},
         diagnostics={},
