@@ -2644,7 +2644,7 @@ def _pt1_row_key(raw: bytes, *, key_hash: str) -> Mapping[str, Any]:
     value = _pt1_row_json(raw, field="key", key_hash=key_hash)
     if not isinstance(value, Mapping):
         raise PT1PersistentStoreCorrupt(
-            f"PT-1 row request key is not a mapping: {key_hash}"
+            f"PT-1 row request key is not an object (mapping): {key_hash}"
         )
     pending = [(value, 1)]
     while pending:

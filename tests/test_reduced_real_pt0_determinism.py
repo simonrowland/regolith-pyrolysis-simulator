@@ -20,6 +20,7 @@ import yaml
 from engines.alphamelts import AlphaMELTSProvider
 from scripts.seed_reduced_real_cache import seed_cache
 import simulator.reduced_real_determinism as rrd
+from tests.pt1_index_oracle import independent_ladder_distance
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import (
@@ -12481,7 +12482,7 @@ def test_pt1_shard_copy_validates_physical_partial_indexes_then_fills_target(
             f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
         source_columns = tuple(
-            str(row["name"])
+            str(row[1])
             for row in conn.execute(
                 f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
             )
@@ -12508,9 +12509,19 @@ def test_pt1_shard_copy_validates_physical_partial_indexes_then_fills_target(
         )
     assert set(physical_bucket_columns) <= set(selected_columns)
     assert "physics_bucket_h40_distance" not in selected_columns
-    expected_h40 = rrd._derive_pt1_key_indexes(
-        json.loads(bytes(source_key_bytes))
-    ).ladder_values["h40"]
+    source_key = json.loads(bytes(source_key_bytes))
+    expected_h40_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        source_key,
+        "h40",
+    )
+    expected_h40_hash = hashlib.sha256(
+        canonical_json_bytes(expected_h40_key)
+    ).hexdigest()
+    expected_h40_distance = independent_ladder_distance(
+        source_key,
+        sig_figs=float(dict(rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS)["h40"]),
+        include_controls=False,
+    )
 
     result = rrd._copy_pt1_equilibrium_rows(
         (source_path,),
@@ -12525,8 +12536,8 @@ def test_pt1_shard_copy_validates_physical_partial_indexes_then_fills_target(
             f"FROM {PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
     assert tuple(row) == (
-        expected_h40["sha256"],
-        expected_h40["distance"],
+        expected_h40_hash,
+        expected_h40_distance,
     )
 
 

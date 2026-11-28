@@ -28,8 +28,10 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
     PT1_EQUILIBRIUM_TABLE,
+    PT1PersistentStoreCorrupt,
     UncacheableKey,
     UncacheablePayload,
+    _PT1_SOURCE_REQUIRED_TEXT_FIELDS,
     _admit_stored_row,
     _gate_row_for_write,
     _ladder_indexability,
@@ -125,6 +127,10 @@ def run_backfill(
             raise RuntimeError(f"missing table: {PT1_EQUILIBRIUM_TABLE}")
         columns = _table_columns(conn)
         source_columns = columns.copy()
+        current_layout = (
+            set(_PT1_SOURCE_REQUIRED_TEXT_FIELDS)
+            | {"key_bytes", "payload_bytes", "git_dirty"}
+        ) <= source_columns
         stats.missing_columns_before = tuple(
             column for column in PHYSICS_COLUMNS if column not in columns
         )
@@ -137,7 +143,9 @@ def run_backfill(
             rung_tag: set()
             for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
         }
-        cursor = conn.execute(_select_rows_sql(columns))
+        cursor = conn.execute(
+            _select_rows_sql(columns, current_layout=current_layout)
+        )
         while True:
             rows = cursor.fetchmany(batch_size)
             if not rows:
@@ -151,8 +159,41 @@ def run_backfill(
                         for column in row.keys()
                         if column in source_columns
                     }
-                    values = _physics_values_from_admitted_row(physical_row)
-                except (json.JSONDecodeError, UnicodeDecodeError, TypeError, ValueError):
+                    values = _physics_values_from_row_key(physical_row)
+                except PT1PersistentStoreCorrupt:
+                    raise
+                except (
+                    json.JSONDecodeError,
+                    UnicodeDecodeError,
+                    TypeError,
+                    ValueError,
+                    OverflowError,
+                ):
+                    stats.invalid_rows += 1
+                    continue
+                except RuntimeError:
+                    stats.invalid_rows += 1
+                    continue
+                state = _backfill_state(row, values)
+                if state == "conflict":
+                    stats.conflicts += 1
+                    raise RuntimeError(
+                        "existing physics-bucket columns conflict for row "
+                        f"{row['key_hash']}"
+                    )
+                try:
+                    _validate_backfill_row(
+                        physical_row,
+                        current_layout=current_layout,
+                    )
+                except PT1PersistentStoreCorrupt:
+                    raise
+                except (
+                    json.JSONDecodeError,
+                    UnicodeDecodeError,
+                    TypeError,
+                    ValueError,
+                ):
                     stats.invalid_rows += 1
                     continue
                 except RuntimeError:
@@ -163,13 +204,6 @@ def run_backfill(
                 distinct_ladder_hashes["h30"].add(values.physics_bucket_h30_sha256)
                 distinct_ladder_hashes["h40c"].add(values.physics_bucket_h40c_sha256)
                 distinct_ladder_hashes["h30c"].add(values.physics_bucket_h30c_sha256)
-                state = _backfill_state(row, values)
-                if state == "conflict":
-                    stats.conflicts += 1
-                    raise RuntimeError(
-                        "existing physics-bucket columns conflict for row "
-                        f"{row['key_hash']}"
-                    )
                 if state == "complete":
                     stats.rows_already_backfilled += 1
                     continue
@@ -200,19 +234,16 @@ def run_backfill(
                     except (UncacheableKey, UncacheablePayload):
                         stats.invalid_rows += 1
                         continue
-                    update_columns = tuple(PHYSICS_COLUMNS)
-                    if "store_schema_version" in columns:
-                        update_columns = ("store_schema_version", *update_columns)
                     updates.append(
-                        tuple(writable_row[column] for column in update_columns)
+                        tuple(
+                            writable_row[column]
+                            for column in PHYSICS_COLUMNS
+                        )
                         + (row["key_hash"],)
                     )
             if updates:
-                update_columns = tuple(PHYSICS_COLUMNS)
-                if "store_schema_version" in columns:
-                    update_columns = ("store_schema_version", *update_columns)
                 assignments = ", ".join(
-                    f"{column} = ?" for column in update_columns
+                    f"{column} = ?" for column in PHYSICS_COLUMNS
                 )
                 update_cursor = conn.executemany(
                     f"""
@@ -308,7 +339,25 @@ def _ensure_backfill_columns(conn: sqlite3.Connection, columns: set[str]) -> Non
         )
 
 
-def _select_rows_sql(columns: set[str]) -> str:
+def _select_rows_sql(
+    columns: set[str],
+    *,
+    current_layout: bool = False,
+) -> str:
+    if current_layout:
+        order_by = "key_hash" if "key_hash" in columns else "rowid"
+        missing_indexes = [
+            f"NULL AS {column}"
+            for column in PHYSICS_COLUMNS
+            if column not in columns
+        ]
+        selected = "*"
+        if missing_indexes:
+            selected += ", " + ", ".join(missing_indexes)
+        return (
+            f"SELECT {selected} FROM {PT1_EQUILIBRIUM_TABLE} "
+            f"ORDER BY {order_by}"
+        )
     required = [
         column if column in columns else f"NULL AS {column}"
         for column in (
@@ -334,35 +383,94 @@ def _select_rows_sql(columns: set[str]) -> str:
     """
 
 
-def _physics_values_from_admitted_row(
+def _physics_values_from_row_key(
     row: Mapping[str, Any],
 ) -> PhysicsBucketValues:
-    admitted = _admit_stored_row(row, store_kind="pt1")
-    assert admitted is not None
+    try:
+        key_bytes = _blob_bytes(row["key_bytes"])
+        key = json.loads(key_bytes.decode("utf-8"))
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        OverflowError,
+        UnicodeDecodeError,
+        RecursionError,
+    ) as exc:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 backfill row has invalid request key: {row.get('key_hash')}"
+        ) from exc
+    if not isinstance(key, Mapping):
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 backfill row request key is not an object: {row.get('key_hash')}"
+        )
+    _reject_internal_analytical_backend_key(key)
+    try:
+        return _physics_values_from_replay_key(key)
+    except UncacheableKey:
+        raise
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        OverflowError,
+        ZeroDivisionError,
+        RecursionError,
+    ) as exc:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 backfill row has invalid request key: {row.get('key_hash')}"
+        ) from exc
+
+
+def _validate_backfill_row(
+    row: Mapping[str, Any],
+    *,
+    current_layout: bool,
+) -> None:
+    admission_row = dict(row)
+    for column in PHYSICS_COLUMNS:
+        if admission_row.get(column) is None:
+            admission_row.pop(column, None)
+    admission_options = (
+        {
+            "validate_store_schema_version": True,
+            "strict_source_validation": True,
+            "validate_source_provenance": True,
+        }
+        if current_layout
+        else {}
+    )
+    admitted = _admit_stored_row(
+        admission_row,
+        store_kind="pt1",
+        **admission_options,
+    )
+    if admitted is None:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 backfill row was rejected: {row.get('key_hash')}"
+        )
     key = admitted.entry["key"]
     payload = admitted.entry["payload"]
     if not isinstance(key, Mapping):
         raise ValueError("replay key must decode to a JSON object")
     if not isinstance(payload, Mapping):
         raise ValueError("payload must decode to a JSON object")
-
     artifact = str(admitted.entry["artifact"] or key.get("artifact", "") or "")
     if not artifact:
         raise ValueError("row artifact is required")
     key_artifact = str(key.get("artifact", "") or "")
     if key_artifact and key_artifact != artifact:
         raise ValueError("row artifact does not match key artifact")
-
     _reject_internal_analytical_backend_key(key)
     validate_reduced_real_equilibrium_record_key(artifact, key, payload)
-    assert_strict_vapor_pt1_row(
-        artifact=artifact,
-        key=key,
-        payload=payload,
-        key_hash=str(admitted.entry["key_hash"]),
-        context=f"physics-bucket backfill {artifact}:{admitted.entry['key_hash']}",
-    )
-    return _physics_values_from_replay_key(key)
+    if not current_layout:
+        assert_strict_vapor_pt1_row(
+            artifact=artifact,
+            key=key,
+            payload=payload,
+            key_hash=str(admitted.entry["key_hash"]),
+            context=f"physics-bucket backfill {artifact}:{admitted.entry['key_hash']}",
+        )
 
 
 def _physics_values_from_replay_key(key: Mapping[str, Any]) -> PhysicsBucketValues:
@@ -450,6 +558,16 @@ def _backfill_state(row: sqlite3.Row, values: PhysicsBucketValues) -> str:
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _blob_bytes(value: Any) -> bytes:
+    if isinstance(value, bytes):
+        return value
+    if isinstance(value, memoryview):
+        return value.tobytes()
+    if isinstance(value, str):
+        return value.encode("utf-8")
+    return bytes(value)
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:

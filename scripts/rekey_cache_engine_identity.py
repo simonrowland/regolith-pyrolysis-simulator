@@ -20,10 +20,12 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
+    _PT1_SOURCE_REQUIRED_TEXT_FIELDS,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentStoreCorrupt,
     UncacheableKey,
+    _admit_stored_row,
     _derive_pt1_key_indexes,
     _physics_ladder_distance_column,
     _physics_ladder_hash_column,
@@ -78,9 +80,22 @@ def _json_loads(raw: bytes) -> dict[str, Any]:
 
 def _key_from_stored_row(
     row: sqlite3.Row,
+    *,
+    current_layout: bool = False,
 ) -> dict[str, Any]:
     values = dict(row)
     key_hash = str(values.get("key_hash", ""))
+    if current_layout:
+        admitted = _admit_stored_row(
+            row,
+            store_kind="pt1",
+            validate_store_schema_version=True,
+        )
+        if admitted is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 current-layout row was rejected during rekey: {key_hash}"
+            )
+        return dict(admitted.entry["key"])
     try:
         stored_key_bytes = values["key_bytes"]
         if not isinstance(stored_key_bytes, (bytes, bytearray, memoryview)):
@@ -125,6 +140,13 @@ def _table_columns(conn: sqlite3.Connection) -> set[str]:
     }
 
 
+def _has_current_layout(columns: set[str]) -> bool:
+    return (
+        set(_PT1_SOURCE_REQUIRED_TEXT_FIELDS)
+        | {"key_bytes", "payload_bytes", "git_dirty"}
+    ) <= columns
+
+
 def _count_rows_needing_rekey(
     conn: sqlite3.Connection,
     *,
@@ -132,10 +154,13 @@ def _count_rows_needing_rekey(
     target_corpus_version: str,
 ) -> int:
     count = 0
+    table_columns = _table_columns(conn)
+    current_layout = _has_current_layout(table_columns)
+    selection = "*" if current_layout else "key_bytes"
     for row in conn.execute(
-        f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        f"SELECT {selection} FROM {PT1_EQUILIBRIUM_TABLE}"
     ):
-        key = _key_from_stored_row(row)
+        key = _key_from_stored_row(row, current_layout=current_layout)
         if not rekey_row_matches_engine(key, engine):
             continue
         if cache_row_needs_rekey(key, target_corpus_version):
@@ -224,6 +249,7 @@ def rekey_cache(
         _ensure_corpus_column(conn)
         updated = 0
         table_columns = _table_columns(conn)
+        current_layout = _has_current_layout(table_columns)
         physics_index_columns = {
             "physics_bucket_schema_version",
             "physics_bucket_sha256",
@@ -239,23 +265,28 @@ def rekey_cache(
             ),
         }
         physics_columns_present = physics_index_columns & table_columns
-        selected_columns = ["key_hash", "key_bytes", "engine_version"]
-        selected_columns.extend(
-            column
-            for column in (
-                "key_sha256",
-                "store_schema_version",
-                "artifact",
+        if current_layout:
+            selection = "*"
+        else:
+            selected_columns = ["key_hash", "key_bytes", "engine_version"]
+            selected_columns.extend(
+                column
+                for column in (
+                    "key_sha256",
+                    "store_schema_version",
+                    "artifact",
+                )
+                if column in table_columns
             )
-            if column in table_columns
-        )
-        selected_columns.extend(sorted(physics_columns_present))
-        selection = ", ".join(f'"{column}"' for column in selected_columns)
+            selected_columns.extend(sorted(physics_columns_present))
+            selection = ", ".join(
+                f'"{column}"' for column in selected_columns
+            )
         for row in conn.execute(
             f"SELECT {selection} FROM {PT1_EQUILIBRIUM_TABLE}"
         ):
             row_values = dict(row)
-            key = _key_from_stored_row(row)
+            key = _key_from_stored_row(row, current_layout=current_layout)
             if not rekey_row_matches_engine(key, engine):
                 continue
             if not cache_row_needs_rekey(key, target):

@@ -9,6 +9,7 @@ from simulator import corpus_version
 from simulator import reduced_real_determinism as rrd
 from scripts import rekey_cache_engine_identity as rekey
 from tests.cache_rekey_fixtures import put_rekey_gate_row
+from tests.pt1_index_oracle import independent_ladder_distance
 
 
 @pytest.fixture
@@ -198,6 +199,73 @@ def test_rekey_deep_stored_key_is_typed_corruption(
         )
 
 
+def test_rekey_current_layout_admits_full_row_for_count_and_write(
+    tmp_path: Path,
+    target_corpus_version: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "current-layout-rekey-admission.db"
+    put_rekey_gate_row(
+        db_path,
+        {
+            "backend": {"backend_name": "alphamelts"},
+            "engine_version": "one",
+        },
+        engine_version="one",
+    )
+    admission_rows: list[tuple[set[str], dict[str, object]]] = []
+    original_admission = rekey._admit_stored_row
+
+    def record_admission(row: object, **kwargs: object) -> object:
+        admission_rows.append((set(row.keys()), dict(kwargs)))  # type: ignore[attr-defined]
+        return original_admission(row, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(rekey, "_admit_stored_row", record_admission)
+    result = rekey.rekey_cache(
+        db_path,
+        target_corpus_version=target_corpus_version,
+    )
+
+    assert result.rows_before == 1
+    assert result.rows_updated == 1
+    assert len(admission_rows) == 2
+    for columns, kwargs in admission_rows:
+        assert {"payload_bytes", "payload_sha256"} <= columns
+        assert kwargs["store_kind"] == "pt1"
+        assert kwargs["validate_store_schema_version"] is True
+
+
+def test_rekey_current_layout_rejects_legacy_stamp(
+    tmp_path: Path,
+    target_corpus_version: str,
+) -> None:
+    db_path = tmp_path / "current-layout-legacy-stamp.db"
+    key_hash, _payload_bytes = put_rekey_gate_row(
+        db_path,
+        {
+            "backend": {"backend_name": "alphamelts"},
+            "engine_version": "one",
+        },
+        engine_version="one",
+    )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = 'pt1' WHERE key_hash = ?",
+            (key_hash,),
+        )
+
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="store schema version drift",
+    ):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=target_corpus_version,
+            dry_run=True,
+        )
+
+
 def test_rekey_legacy_stamp_with_h40_column_preserves_stamp_and_payload(
     tmp_path: Path,
     target_corpus_version: str,
@@ -246,9 +314,11 @@ def test_rekey_legacy_stamp_with_h40_column_preserves_stamp_and_payload(
     assert after[0] != before[0]
     assert after[1:3] == ("pt1", before[2])
     rekeyed_key = json.loads(bytes(after[4]))
-    expected_h40 = rrd._derive_pt1_key_indexes(rekeyed_key).ladder_values[
-        "h40"
-    ]["distance"]
+    expected_h40 = independent_ladder_distance(
+        rekeyed_key,
+        sig_figs=float(dict(rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS)["h40"]),
+        include_controls=False,
+    )
     assert after[3] == expected_h40
 
 
