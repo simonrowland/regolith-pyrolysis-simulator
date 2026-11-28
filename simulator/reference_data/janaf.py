@@ -286,6 +286,10 @@ class JanafParseError(ValueError):
     """Unrecoverable JANAF table parse defect."""
 
 
+class JanafOutOfRangeError(ValueError):
+    """Requested temperature lies outside the printed JANAF table range."""
+
+
 @dataclass
 class ParsedTxtTable:
     """Native NIST ``.txt`` parse: 8-column rows plus short-row ambiguities."""
@@ -1192,11 +1196,15 @@ def _interpolate_table_points(
     """Linearly interpolate JANAF points, optionally extending an endpoint chord."""
     if temperature_K < points[0][0]:
         if not extrapolate:
-            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+            raise JanafOutOfRangeError(
+                f"{temperature_K} K is outside the JANAF table range"
+            )
         left, right = points[0], points[1]
     elif temperature_K > points[-1][0]:
         if not extrapolate:
-            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+            raise JanafOutOfRangeError(
+                f"{temperature_K} K is outside the JANAF table range"
+            )
         left, right = points[-2], points[-1]
     else:
         left, right = next(
@@ -1280,7 +1288,9 @@ def _interpolate_formation_gibbs(
     """
     outside = temperature_K < points[0][0] or temperature_K > points[-1][0]
     if outside and not extrapolate:
-        raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+        raise JanafOutOfRangeError(
+            f"{temperature_K} K is outside the JANAF table range"
+        )
     # For endpoint continuation the active chord must itself be complete.
     # Checking its midpoint subjects it to the same missing-node rule as
     # an interior query, rather than bridging a gap past the printed band.
@@ -1999,8 +2009,8 @@ def _janaf_fusion_energy_for_pair(
                 )
     try:
         delta_g = difference(temperature_K)
-    except ValueError as exc:
-        raise ValueError(
+    except JanafOutOfRangeError as exc:
+        raise JanafOutOfRangeError(
             f"{oxide}: {exc}; JANAF table ranges: "
             f"{crystal_table} [{crystal[0][0]}, {crystal[-1][0]}] K; "
             f"{liquid_table} [{liquid[0][0]}, {liquid[-1][0]}] K"

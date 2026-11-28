@@ -85,7 +85,7 @@ def _ellingham_metal_saturation_log10_fO2_bar(
     metal: str,
     temperature_K: float,
     oxide_activity: float,
-) -> float | None:
+) -> tuple[float | None, str | None]:
     """log10(fO2/bar) where a_M = 1 for one Ellingham couple.
 
     Premise. The certified reaction is written per mole of O2,
@@ -143,16 +143,16 @@ def _ellingham_metal_saturation_log10_fO2_bar(
 
     activity = float(oxide_activity)
     if not math.isfinite(activity) or activity <= 0.0:
-        return None
+        return None, None
     if (
         ellingham_metal_phase_kind(metal, temperature_K)
         != ELLINGHAM_METAL_PHASE_CONDENSED
     ):
-        return None
+        return None, None
     segment = ellingham_segment_for_temperature(metal, temperature_K)
     low_K, high_K = segment.range_K
     if temperature_K < low_K or temperature_K > high_K:
-        return None
+        return None, None
     # n_ox is the oxide coefficient on this segment's per-mole-O2 reaction.
     # a_M = 1, so the metal term -n_M log10(a_M) is zero.
     delta_g_j_per_mol = (
@@ -165,8 +165,9 @@ def _ellingham_metal_saturation_log10_fO2_bar(
     # The floor consumes the same liquid-standard formula activity as the
     # vapour channels. For Ellingham rows whose explicit oxide reference is
     # crystalline, convert K once per oxide unit using the shared JANAF
-    # fusion helper. If the pair is absent or outside its table, keep the
-    # Ellingham estimate; its source authority remains flagged by the owner.
+    # fusion helper. NiO has no fusion pair, and reconstructed Mn above 2058 K
+    # has no grounded liquid Gibbs basis; both retain this estimate with a
+    # typed caveat when their floor binds.
     crystal_phase_markers = {
         "SiO2": ("SiO2(II)", "SiO2(II)"),
         "Cr2O3": ("Cr2O3(s)", "Cr2O3"),
@@ -180,18 +181,40 @@ def _ellingham_metal_saturation_log10_fO2_bar(
         if candidate == metal
     )
     source_phase_marker, fusion_pair_key = crystal_phase_markers[oxide]
+    if metal == "Mn" and temperature_K > 2058.0:
+        source_phase_marker = "MnO(lit. liquid range)"
+    conversion_caveat: str | None = None
     if source_phase_marker in segment.phase_basis:
-        try:
-            liquid_standard_factor = _oxide_liquid_standard_log10_factor_per_oxide(
-                fusion_pair_key, temperature_K
+        if metal == "Ni":
+            conversion_caveat = (
+                "No JANAF NiO(s)/NiO(l) fusion pair grounds conversion of the "
+                "NiO(s) Ellingham K to liquid-standard melt activity."
             )
-        except ValueError:
-            pass
+        elif metal == "Mn" and temperature_K > 2058.0:
+            conversion_caveat = (
+                "The MnO liquid-range label above 2058 K uses the same "
+                "reconstructed coefficients as the crystalline segment; no "
+                "grounded liquid-standard MnO Gibbs energy is available."
+            )
         else:
-            # n_ox crystalline formula units enter the per-mole-O2 K, so
-            # the log-K correction is n_ox times the per-formula factor.
-            log10_fO2 += float(segment.n_ox) * liquid_standard_factor
-    return log10_fO2
+            from simulator.reference_data.janaf import JanafOutOfRangeError
+
+            try:
+                liquid_standard_factor = (
+                    _oxide_liquid_standard_log10_factor_per_oxide(
+                        fusion_pair_key, temperature_K
+                    )
+                )
+            except (JanafOutOfRangeError, FileNotFoundError) as exc:
+                conversion_caveat = (
+                    f"JANAF cannot ground the {oxide} liquid-standard "
+                    f"conversion at {temperature_K:g} K: {exc}."
+                )
+            else:
+                # n_ox crystalline formula units enter the per-mole-O2 K, so
+                # the log-K correction is n_ox times the per-formula factor.
+                log10_fO2 += float(segment.n_ox) * liquid_standard_factor
+    return log10_fO2, conversion_caveat
 
 
 def melt_metal_saturation_floor_log10_fO2_bar(
@@ -212,12 +235,26 @@ def melt_metal_saturation_floor_log10_fO2_bar(
     d-463 Fe floor.
     """
 
+    floor_log, binding_metal, _caveat = _melt_metal_saturation_floor_result(
+        temperature_K,
+        activities,
+    )
+    return floor_log, binding_metal
+
+
+def _melt_metal_saturation_floor_result(
+    temperature_K: float,
+    activities: Mapping[str, float] | None,
+) -> tuple[float | None, str | None, dict[str, object] | None]:
+    """Return the binding floor and its unresolved liquid-standard caveat."""
+
     temperature = float(temperature_K)
     if not math.isfinite(temperature) or temperature <= 0.0:
-        return None, None
+        return None, None, None
     present = activities or {}
     floor_log: float | None = None
     binding_metal: str | None = None
+    floor_caveat: dict[str, object] | None = None
     fe_activity = present.get("FeO")
     if (
         fe_activity is not None
@@ -233,7 +270,7 @@ def melt_metal_saturation_floor_log10_fO2_bar(
         raw_activity = present.get(oxide)
         if raw_activity is None:
             continue
-        couple_log = _ellingham_metal_saturation_log10_fO2_bar(
+        couple_log, conversion_caveat = _ellingham_metal_saturation_log10_fO2_bar(
             metal,
             temperature,
             float(raw_activity),
@@ -243,7 +280,26 @@ def melt_metal_saturation_floor_log10_fO2_bar(
         if floor_log is None or couple_log > floor_log:
             floor_log = couple_log
             binding_metal = metal
-    return floor_log, binding_metal
+            floor_caveat = None
+            if conversion_caveat is not None:
+                from simulator.policy.enums import NoticeKind
+
+                segment = ellingham_segment_for_temperature(metal, temperature)
+                floor_caveat = {
+                    "type": "typed_notice",
+                    "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+                    "metal": metal,
+                    "K_reference_phase": segment.phase_basis,
+                    "activity_reference_phase": (
+                        f"{oxide}(l), liquid-standard melt activity"
+                    ),
+                    "temperature_K": temperature,
+                    "floor_log10_fO2_bar": couple_log,
+                    "reference_phase_mismatch_magnitude": "unknown",
+                    "conversion_applied": False,
+                    "reason": conversion_caveat,
+                }
+    return floor_log, binding_metal, floor_caveat
 
 
 def apply_melt_metal_saturation_floor(
@@ -262,7 +318,7 @@ def apply_melt_metal_saturation_floor(
     """
 
     unfloored = float(unfloored_log10_fO2_bar)
-    floor_log, metal = melt_metal_saturation_floor_log10_fO2_bar(
+    floor_log, metal, floor_caveat = _melt_metal_saturation_floor_result(
         temperature_K,
         activities,
     )
@@ -273,7 +329,7 @@ def apply_melt_metal_saturation_floor(
         or unfloored + _FLOOR_BIND_TOLERANCE_DEX >= floor_log
     ):
         return unfloored, None
-    return floor_log, {
+    notice: dict[str, object] = {
         "type": "typed_notice",
         "kind": f"{METAL_SATURATION_FLOOR_NOTICE_PREFIX}{metal}",
         "metal": metal,
@@ -281,6 +337,9 @@ def apply_melt_metal_saturation_floor(
         "floor_log10_fO2_bar": floor_log,
         "unfloored_log10_fO2_bar": unfloored,
     }
+    if floor_caveat is not None:
+        notice["engine_model_caveat"] = floor_caveat
+    return floor_log, notice
 
 
 def activities_for_metal_saturation_floor(

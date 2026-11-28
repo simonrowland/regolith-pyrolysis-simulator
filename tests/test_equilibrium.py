@@ -13,6 +13,10 @@ from simulator.core import (
     _MeltRedoxLiquidusFloorFallback,
     _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
 )
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_CATIONS_PER_FORMULA,
+    single_cation_component_formula,
+)
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.equilibrium import (
     EquilibriumMixin,
@@ -108,7 +112,7 @@ def test_internal_analytical_zero_mbar_is_admitted_vacuum():
     assert result.pressure_bar == 0.0
 
 
-def _markova_surface_equilibrium(fO2_log: float):
+def _markova_core(fO2_log: float, temperature_K: float = 1883.0):
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _new_internal_analytical_core,
     )
@@ -129,7 +133,7 @@ def _markova_surface_equilibrium(fO2_log: float):
     )
     core.melt.composition_kg = dict(composition_kg)
     core.melt.update_total_mass()
-    core.melt.temperature_C = 1883.0
+    core.melt.temperature_C = temperature_K - CELSIUS_TO_KELVIN_OFFSET
     core.melt.p_total_mbar = 100.0
     core.melt.fO2_log = fO2_log
     core.melt.melt_fO2_log = fO2_log
@@ -140,7 +144,13 @@ def _markova_surface_equilibrium(fO2_log: float):
     core.melt.oxygen_reservoir.headspace_ledger_pO2_bar = (
         43.7 * 10.0**fO2_log
     )
-    return EquilibriumMixin._internal_analytical_equilibrium(core)
+    return core
+
+
+def _markova_surface_equilibrium(fO2_log: float):
+    return EquilibriumMixin._internal_analytical_equilibrium(
+        _markova_core(fO2_log)
+    )
 
 
 def test_internal_analytical_channels_share_exactly_one_surface_pO2():
@@ -391,16 +401,36 @@ def test_internal_analytical_cao_vapor_uses_liquid_standard_conversion(
     class Evaluator:
         pO2_reference_bar = 1.0
 
+        def __init__(self, species):
+            self.activity_exponent = 1.0 if species == 'CaO_gas' else 2.0
+            self.pO2_exponent = 0.0 if species == 'CaO_gas' else -1.0
+
         def evaluate(self, temperature_K, *, source_activity, pO2_bar):
             assert temperature_K == 1000.0
             assert source_activity == 1.0
-            assert pO2_bar == 1.0
-            return SimpleNamespace(pressure_pa=10.0, out_of_range=False)
+            return SimpleNamespace(
+                pressure_pa=(
+                    10.0
+                    * (pO2_bar / self.pO2_reference_bar)
+                    ** self.pO2_exponent
+                ),
+                out_of_range=False,
+            )
 
     class Catalog:
         def evaluator_for_hot_train(self, species):
             assert species in {'CaO_gas', 'Ca2'}
-            return Evaluator()
+            return Evaluator(species)
+
+        species = {
+            name: SimpleNamespace(
+                source_reaction_activity=SimpleNamespace(
+                    component_id='CaO',
+                    standard_state=SimpleNamespace(phase='liquid'),
+                )
+            )
+            for name in ('CaO_gas', 'Ca2')
+        }
 
     sim = _typed_omission_sim(
         oxide_vapors={
@@ -426,6 +456,7 @@ def test_internal_analytical_cao_vapor_uses_liquid_standard_conversion(
     )
     sim.vapour_rail_catalog = Catalog()
     oxide_activity = SimpleNamespace(
+        single_cation_component='CaO',
         activity=0.5,
         warning=None,
         thermodynamic_parent_activity=lambda: 0.5,
@@ -455,6 +486,7 @@ def test_internal_analytical_cao_vapor_uses_liquid_standard_conversion(
             sim, monkeypatch
         ).vapor_pressures_Pa
         oxide_activity = SimpleNamespace(
+            single_cation_component='CaO',
             activity=1.0,
             warning=None,
             thermodynamic_parent_activity=lambda: 1.0,
@@ -488,17 +520,27 @@ def test_internal_analytical_coo_keeps_prediction_with_typed_phase_caveat(
 ):
     class Evaluator:
         pO2_reference_bar = 1.0
+        activity_exponent = 1.0
+        pO2_exponent = 0.0
 
         def evaluate(self, temperature_K, *, source_activity, pO2_bar):
             assert temperature_K == 2000.0
             assert source_activity == 1.0
-            assert pO2_bar == 1.0
             return SimpleNamespace(pressure_pa=4.0, out_of_range=False)
 
     class Catalog:
         def evaluator_for_hot_train(self, species):
             assert species == 'CoO_gas'
             return Evaluator()
+
+        species = {
+            'CoO_gas': SimpleNamespace(
+                source_reaction_activity=SimpleNamespace(
+                    component_id='CoO',
+                    standard_state=SimpleNamespace(phase='liquid'),
+                )
+            )
+        }
 
     sim = _typed_omission_sim(
         oxide_vapors={
@@ -514,6 +556,7 @@ def test_internal_analytical_coo_keeps_prediction_with_typed_phase_caveat(
     sim.melt.temperature_C = 1726.85
     sim.vapour_rail_catalog = Catalog()
     oxide_activity = SimpleNamespace(
+        single_cation_component='CoO',
         activity=0.5,
         warning=None,
         thermodynamic_parent_activity=lambda: 0.5,
@@ -542,8 +585,6 @@ def test_internal_analytical_coo_keeps_prediction_with_typed_phase_caveat(
     [
         ('Mg2', 'MgO', '2 MgO(cr) -> Mg2(g) + O2(g)', 2.0, -1.0),
         ('MgO_gas', 'MgO', 'MgO(cr) -> MgO(g)', 1.0, 0.0),
-        ('NiO_gas', 'NiO', 'NiO(cr) -> NiO(g)', 1.0, 0.0),
-        ('MnO_gas', 'MnO', 'MnO(cr) -> MnO(g)', 1.0, 0.0),
     ],
 )
 def test_internal_analytical_predicts_compiled_oxide_vapors_without_antoine(
@@ -553,16 +594,36 @@ def test_internal_analytical_predicts_compiled_oxide_vapors_without_antoine(
         pO2_reference_bar = 1.0
         valid_temperature_K = (1000.0, 1000.0)
 
+        def __init__(self):
+            self.activity_exponent = activity_exponent
+            self.pO2_exponent = pO2_exponent
+
         def evaluate(self, temperature_K, *, source_activity, pO2_bar):
             assert temperature_K == 1000.0
             assert source_activity == 1.0
-            assert pO2_bar == 1.0
-            return SimpleNamespace(pressure_pa=10.0, out_of_range=False)
+            return SimpleNamespace(
+                pressure_pa=(
+                    10.0
+                    * (pO2_bar / self.pO2_reference_bar)
+                    ** self.pO2_exponent
+                ),
+                out_of_range=False,
+            )
 
     class Catalog:
         def evaluator_for_hot_train(self, species_id):
             assert species_id == species
             return Evaluator()
+
+        def __init__(self):
+            self.species = {
+                species: SimpleNamespace(
+                    source_reaction_activity=SimpleNamespace(
+                        component_id=single_cation_component_formula(oxide),
+                        standard_state=SimpleNamespace(phase='liquid'),
+                    )
+                )
+            }
 
     sim = _typed_omission_sim(
         oxide_vapors={
@@ -581,6 +642,7 @@ def test_internal_analytical_predicts_compiled_oxide_vapors_without_antoine(
     )
     sim.vapour_rail_catalog = Catalog()
     oxide_activity = SimpleNamespace(
+        single_cation_component=single_cation_component_formula(oxide),
         activity=0.5,
         warning=None,
         thermodynamic_parent_activity=lambda: 0.5,
@@ -605,56 +667,32 @@ def test_internal_analytical_predicts_compiled_oxide_vapors_without_antoine(
         )
         expected *= 10.0 ** (activity_exponent * factor)
         assert species not in result.diagnostics['activity_standard_state_flags']
-    else:
-        caveat = result.diagnostics['activity_standard_state_flags'][species]
-        assert caveat['type'] == 'typed_notice'
-        assert caveat['kind'] == 'engine_model_caveat'
-        assert caveat['conversion_applied'] is False
     assert result.vapor_pressures_Pa[species] == pytest.approx(expected)
 
 
-def test_internal_analytical_ca_channels_keep_estimates_at_3700k(monkeypatch):
-    class Evaluator:
-        pO2_reference_bar = 1.0
-        valid_temperature_K = (1757.0, 2273.15)
-
-        def evaluate(self, temperature_K, *, source_activity, pO2_bar):
-            assert temperature_K == 3700.0
-            assert source_activity == 1.0
-            assert pO2_bar == 1.0
-            return SimpleNamespace(pressure_pa=10.0, out_of_range=True)
-
-    class Catalog:
-        def evaluator_for_hot_train(self, species):
-            assert species == 'Ca2'
-            return Evaluator()
-
-    ca_metal = {
-        'parent_oxide': 'CaO',
-        'pure_component_antoine': {'A': 0.0, 'B': 0.0, 'C': 0.0},
-        'valid_range_K': [1000.0, 3000.0],
-    }
-    ca2_vapor = {
-        'parent_oxide': 'CaO',
-        'fit_target': 'standard_reaction_term',
-        'reference_pressure_model': {'evaluator_family': 'nasa_cea_9'},
-        'valid_range_K': [1757.0, 2273.15],
-        'reaction': {'formula': '2 CaO(cr) -> Ca2(g) + O2(g)'},
-        'oxide_activity_exponent': 2.0,
-        'pO2_exponent': -1.0,
-        'pO2_reference_bar': 1.0,
-    }
-    sim = _typed_omission_sim(
-        metals={'Ca': ca_metal},
-        oxide_vapors={'Ca2': ca2_vapor},
-        species=('Ca',),
+@pytest.mark.parametrize(
+    ('species', 'oxide'), [('NiO_gas', 'NiO'), ('MnO_gas', 'MnO')]
+)
+def test_internal_analytical_ni_mn_vapors_use_shipped_liquid_reactions(
+    monkeypatch, species, oxide
+):
+    core = _markova_core(-5.344, 2156.15)
+    row = dict(core.vapor_pressures['oxide_vapors'][species])
+    compiled_species = core.vapour_rail_catalog.species[species]
+    assert row['reaction']['formula'] == f'{oxide}(l) -> {oxide}(g)'
+    assert (
+        compiled_species.source_reaction_activity.standard_state.phase
+        == 'liquid'
     )
-    sim.melt.temperature_C = 3700.0 - CELSIUS_TO_KELVIN_OFFSET
-    sim.vapour_rail_catalog = Catalog()
+    assert row.get('reference_pressure_model')
+    row['antoine'] = {}
+    sim = _typed_omission_sim(oxide_vapors={species: row}, species=())
+    sim.melt.temperature_C = 2156.15 - CELSIUS_TO_KELVIN_OFFSET
+    sim.vapour_rail_catalog = core.vapour_rail_catalog
     oxide_activity = SimpleNamespace(
+        single_cation_component=single_cation_component_formula(oxide),
         activity=0.5,
         warning=None,
-        equivalent_parent_activity=lambda exponent: 0.5 ** (1.0 / exponent),
         thermodynamic_parent_activity=lambda: 0.5,
         provenance=lambda: {},
     )
@@ -665,6 +703,234 @@ def test_internal_analytical_ca_channels_keep_estimates_at_3700k(monkeypatch):
     )
 
     result = _run_typed_omission_sim(sim, monkeypatch)
+
+    assert species in result.vapor_pressures_Pa
+    # The shipped K is already liquid-standard, so no crystal/liquid
+    # conversion caveat belongs on either channel.
+    assert species not in result.diagnostics['activity_standard_state_flags']
+
+
+def test_internal_analytical_surface_channel_inherits_floor_caveat(monkeypatch):
+    class Evaluator:
+        activity_exponent = 0.0
+        pO2_exponent = 0.5
+        pO2_reference_bar = 1.0
+        valid_temperature_K = (2000.0, 2200.0)
+
+        def evaluate(self, temperature_K, *, source_activity, pO2_bar):
+            assert temperature_K == 2156.15
+            assert source_activity == 1.0
+            return SimpleNamespace(
+                pressure_pa=10.0 * (pO2_bar / self.pO2_reference_bar) ** 0.5,
+                out_of_range=False,
+            )
+
+    class Catalog:
+        species = {}
+
+        def evaluator_for_hot_train(self, species):
+            assert species == 'FeO_association_gas'
+            return Evaluator()
+
+    sim = _typed_omission_sim(
+        oxide_vapors={
+            'FeO_association_gas': {
+                'parent_oxide': 'FeO',
+                'reference_pressure_model': {'evaluator_family': 'nasa_cea_9'},
+                'valid_range_K': [2000.0, 2200.0],
+                'reaction': {
+                    'formula': 'Fe(g) + 0.5 O2(g) -> FeO(g)',
+                },
+            }
+        },
+        species=(),
+    )
+    sim.melt.temperature_C = 2156.15 - CELSIUS_TO_KELVIN_OFFSET
+    sim.melt.melt_fO2_log = -100.0
+    sim.melt.fO2_log = -100.0
+    sim.vapour_rail_catalog = Catalog()
+    monkeypatch.setattr(
+        equilibrium_module,
+        'activities_for_metal_saturation_floor',
+        lambda *_args, **_kwargs: {'NiO': 1.0},
+    )
+
+    result = _run_typed_omission_sim(sim, monkeypatch, a_feo=0.0)
+
+    floor_notice = result.diagnostics['melt_metal_saturation_floor_notice']
+    caveat = floor_notice['engine_model_caveat']
+    assert floor_notice['metal'] == 'Ni'
+    assert caveat['kind'] == 'engine_model_caveat'
+    assert caveat['floor_log10_fO2_bar'] == pytest.approx(
+        floor_notice['floor_log10_fO2_bar']
+    )
+    assert result.diagnostics['surface_oxygen_potential_inputs_bar'][
+        'FeO_association_gas'
+    ] == result.diagnostics['surface_oxygen_potential_bar']
+    channel_caveat = result.diagnostics['activity_standard_state_flags'][
+        'FeO_association_gas'
+    ]
+    assert channel_caveat['kind'] == 'engine_model_caveat'
+    assert channel_caveat['floor_log10_fO2_bar'] == pytest.approx(
+        floor_notice['floor_log10_fO2_bar']
+    )
+
+
+def test_internal_analytical_every_channel_obeys_mass_action_exponents(
+    monkeypatch,
+):
+    core = _markova_core(-5.344)
+    compiled_catalog = core.vapour_rail_catalog
+    projected_rows = core.vapor_pressures['oxide_vapors']
+
+    class ReactionExponentProbe:
+        def __init__(self, evaluator):
+            self.activity_exponent = evaluator.activity_exponent
+            self.pO2_exponent = evaluator.pO2_exponent
+            self.pO2_reference_bar = evaluator.pO2_reference_bar
+            self.valid_temperature_K = evaluator.valid_temperature_K
+
+        def evaluate(self, temperature_K, *, source_activity, pO2_bar):
+            assert source_activity == 1.0
+            pressure = 1000.0 * (
+                pO2_bar / self.pO2_reference_bar
+            ) ** self.pO2_exponent
+            return SimpleNamespace(pressure_pa=pressure, out_of_range=False)
+
+    class Catalog:
+        def __init__(self):
+            self.species = compiled_catalog.species
+
+        def evaluator_for_hot_train(self, species):
+            return ReactionExponentProbe(
+                compiled_catalog.evaluator_for_hot_train(species)
+            )
+
+    catalog = Catalog()
+    candidates = []
+    compiled_names = set()
+    for species, row in projected_rows.items():
+        if row.get('reference_pressure_model'):
+            evaluator = compiled_catalog.evaluator_for_hot_train(species)
+            candidates.append((species, row, evaluator, True))
+            compiled_names.add(species)
+        else:
+            try:
+                equilibrium_module._read_antoine_coefficients(
+                    row.get('antoine', {})
+                )
+            except equilibrium_module._AntoineCoefficientRefusal:
+                continue
+            candidates.append((species, row, None, False))
+
+    assert {
+        'Al2O', 'CrO', 'Ca2', 'Mg2', 'FeO_association_gas'
+    } <= compiled_names
+
+    monkeypatch.setattr(
+        equilibrium_module,
+        '_oxide_liquid_standard_log10_factor_per_oxide',
+        lambda *_args, **_kwargs: 0.0,
+    )
+    monkeypatch.setattr(
+        equilibrium_module,
+        'activities_for_metal_saturation_floor',
+        lambda *_args, **_kwargs: {},
+    )
+
+    def pressure_for(species, row, is_compiled, parent_activity, pO2):
+        parent_oxide = row.get('parent_oxide', '')
+        cation_count = float(
+            MELT_OXIDE_CATIONS_PER_FORMULA.get(parent_oxide, 1.0)
+        )
+        single_cation_activity = parent_activity ** (1.0 / cation_count)
+        monkeypatch.setattr(
+            equilibrium_module,
+            'melt_oxide_activity',
+            lambda requested_oxide, *_args, **_kwargs: SimpleNamespace(
+                parent_oxide=requested_oxide,
+                single_cation_component=single_cation_component_formula(
+                    requested_oxide
+                ),
+                activity=single_cation_activity,
+                warning=None,
+                thermodynamic_parent_activity=lambda: parent_activity,
+                provenance=lambda: {},
+            ),
+        )
+        monkeypatch.setattr(
+            equilibrium_module,
+            'physical_melt_dissociation_pO2_bar',
+            lambda _fO2: (pO2, False),
+        )
+        channel_row = dict(row)
+        channel_row['valid_range_K'] = [2000.0, 2200.0]
+        channel_row['antoine'] = (
+            {}
+            if is_compiled
+            else {'A': 3.0, 'B': 0.0, 'C': 0.0}
+        )
+        sim = _typed_omission_sim(
+            oxide_vapors={species: channel_row},
+            species=(),
+        )
+        sim.melt.temperature_C = 2156.15 - CELSIUS_TO_KELVIN_OFFSET
+        sim.vapour_rail_catalog = catalog
+        result = _run_typed_omission_sim(sim, monkeypatch)
+        assert species in result.vapor_pressures_Pa, species
+        return result.vapor_pressures_Pa[species]
+
+    tested_names = set()
+    for species, row, evaluator, is_compiled in candidates:
+        base = pressure_for(species, row, is_compiled, 0.8, 1.0e-8)
+        activity_changed = pressure_for(
+            species, row, is_compiled, 0.4, 1.0e-8
+        )
+        oxygen_changed = pressure_for(
+            species, row, is_compiled, 0.8, 4.0e-8
+        )
+        parent_oxide = row.get('parent_oxide', '')
+        if is_compiled:
+            activity_exponent = (
+                evaluator.activity_exponent
+                / float(MELT_OXIDE_CATIONS_PER_FORMULA.get(parent_oxide, 1.0))
+                if parent_oxide
+                else 0.0
+            )
+            pO2_exponent = evaluator.pO2_exponent
+        else:
+            activity_exponent = (
+                float(row.get('oxide_activity_exponent', 1.0))
+                if parent_oxide
+                else 0.0
+            )
+            pO2_exponent = float(row.get('pO2_exponent', 0.0) or 0.0)
+            if species == 'SiO' and pO2_exponent == 0.0:
+                # SiO's shared helper implements its declared half-O2 term.
+                pO2_exponent = -0.5
+        assert math.log(activity_changed / base) / math.log(0.5) == pytest.approx(
+            activity_exponent,
+            abs=1.0e-10,
+        ), species
+        assert math.log(oxygen_changed / base) / math.log(4.0) == pytest.approx(
+            pO2_exponent,
+            abs=1.0e-10,
+        ), species
+        tested_names.add(species)
+
+    assert compiled_names <= tested_names
+    assert tested_names
+
+
+def test_internal_analytical_ca_channels_keep_estimates_at_3700k():
+    from simulator.vapour_rail.catalog import CompiledPressureEvaluator
+
+    core = _markova_core(-5.344, 3700.0)
+    assert isinstance(
+        core.vapour_rail_catalog.evaluator_for_hot_train('Ca2'),
+        CompiledPressureEvaluator,
+    )
+    result = EquilibriumMixin._internal_analytical_equilibrium(core)
 
     assert result.status == 'ok'
     assert {'Ca', 'Ca2'} <= result.vapor_pressures_Pa.keys()
@@ -691,7 +957,7 @@ def test_internal_analytical_unresolved_mgo_standard_state_keeps_prediction(
     def missing_mgo_fusion_pair(oxide, *args, **kwargs):
         if oxide != "MgO":
             return original_fusion_energy(oxide, *args, **kwargs)
-        raise ValueError("MgO JANAF liquid/crystal pair is unavailable")
+        raise FileNotFoundError("MgO JANAF liquid/crystal table is unavailable")
 
     monkeypatch.setattr(janaf, "janaf_fusion_energy", missing_mgo_fusion_pair)
     result = _markova_surface_equilibrium(-5.344)
@@ -701,6 +967,78 @@ def test_internal_analytical_unresolved_mgo_standard_state_keeps_prediction(
     assert flag["kind"] == "engine_model_caveat"
     assert flag["conversion_applied"] is False
     assert "Mg" in result.vapor_pressures_Pa
+
+
+def test_internal_analytical_janaf_hash_mismatch_is_not_caught(monkeypatch):
+    from simulator.reference_data import janaf
+
+    original_fusion_energy = janaf.janaf_fusion_energy
+
+    def bad_source_hash(oxide, *args, **kwargs):
+        if oxide == "MgO":
+            raise ValueError("JANAF source hash mismatch")
+        return original_fusion_energy(oxide, *args, **kwargs)
+
+    monkeypatch.setattr(janaf, "janaf_fusion_energy", bad_source_hash)
+    with pytest.raises(ValueError, match="source hash mismatch"):
+        _markova_surface_equilibrium(-5.344)
+
+
+def _real_compiled_ca2_omission_sim(temperature_K):
+    core = _markova_core(-5.344, temperature_K)
+    ca2 = dict(core.vapor_pressures["oxide_vapors"]["Ca2"])
+    ca2["antoine"] = {}
+    assert ca2.get("reference_pressure_model")
+    sim = _typed_omission_sim(oxide_vapors={"Ca2": ca2}, species=())
+    sim.melt.temperature_C = temperature_K - CELSIUS_TO_KELVIN_OFFSET
+    sim.vapour_rail_catalog = core.vapour_rail_catalog
+    return sim
+
+
+@pytest.mark.parametrize(
+    ("failure_type", "failure_message", "expected_to_raise"),
+    [
+        (FileNotFoundError, "JANAF CaO table unavailable", False),
+        (ValueError, "JANAF source hash mismatch", True),
+    ],
+)
+def test_compiled_ca2_janaf_failures_keep_missing_data_and_raise_hash_bugs(
+    monkeypatch, failure_type, failure_message, expected_to_raise
+):
+    from simulator.reference_data import janaf
+
+    original_fusion_energy = janaf.janaf_fusion_energy
+
+    def injected_failure(oxide, *args, **kwargs):
+        if oxide == "CaO":
+            raise failure_type(failure_message)
+        return original_fusion_energy(oxide, *args, **kwargs)
+
+    monkeypatch.setattr(janaf, "janaf_fusion_energy", injected_failure)
+    oxide_activity = SimpleNamespace(
+        single_cation_component="CaO",
+        activity=0.5,
+        warning=None,
+        thermodynamic_parent_activity=lambda: 0.5,
+        provenance=lambda: {},
+    )
+    monkeypatch.setattr(
+        equilibrium_module,
+        "melt_oxide_activity",
+        lambda *_args, **_kwargs: oxide_activity,
+    )
+    sim = _real_compiled_ca2_omission_sim(2156.15)
+    if expected_to_raise:
+        with pytest.raises(ValueError, match="source hash mismatch"):
+            _run_typed_omission_sim(sim, monkeypatch)
+        return
+
+    result = _run_typed_omission_sim(sim, monkeypatch)
+    assert "Ca2" in result.vapor_pressures_Pa
+    caveat = result.diagnostics["activity_standard_state_flags"]["Ca2"]
+    assert caveat["type"] == "typed_notice"
+    assert caveat["kind"] == "engine_model_caveat"
+    assert caveat["conversion_applied"] is False
 
 
 def test_internal_analytical_equal_exponent_sio_mg_ratio_cancels_fO2():
