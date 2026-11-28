@@ -80,11 +80,20 @@ def test_a(): pass
             if line.startswith("test_order.py::")
         ]
 
-    expected = [
-        "test_b",
-        "test_a",
-        "test_c",
-        "test_serial",
+    # The plugin sorts by the committed hint file, so the expected order is derived from the same hints
+    # (longest group first; stable sort keeps ungrouped tests last in file order). A hard-coded order broke
+    # when the serial hint was raised above magemin_fullrun_c (Markova budget fold, 2026-11-27).
+    from tests._plugins.loadgroup_order import LOADGROUP_DURATION_HINTS_SECONDS as hints
+
+    grouped = {
+        "test_b": "magemin_fullrun_b",
+        "test_c": "magemin_fullrun_c",
+        "test_serial": "serial",
+        "test_a": "magemin_fullrun_a",
+    }
+    assert set(grouped.values()) <= set(hints)
+    assert len({hints[g] for g in grouped.values()}) == len(grouped), "hint ties would make the order file-dependent"
+    expected = sorted(grouped, key=lambda name: -hints[grouped[name]]) + [
         "test_unknown",
         "test_unknown_2",
     ]
