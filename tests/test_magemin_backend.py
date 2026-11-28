@@ -15,6 +15,7 @@ import ast
 import io
 import json
 import os
+import pickle
 import re
 import subprocess
 import sys
@@ -1090,12 +1091,30 @@ def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
         return original_submit(request, timeout_s=timeout_s)
 
     pool.submit = count_submit
+    # The old owner read this cap while waiting for host-wide slots. Keeping a
+    # short legacy value here makes the real lock wait exceed that limit
+    # without spending five minutes in the test.
+    monkeypatch.setattr(
+        magemin_module,
+        '_MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S',
+        0.01,
+        raising=False,
+    )
+    baseline = backend._call_magemin(
+        projection,
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-8.0,
+    )
+    baseline_bytes = pickle.dumps(baseline, protocol=pickle.HIGHEST_PROTOCOL)
+    baseline_submission_count = len(submissions)
+    assert isinstance(baseline, dict)
     slot_held = threading.Event()
     release_slot = threading.Event()
     slot_contended = threading.Event()
 
     def hold_slot():
-        with _magemin_subprocess_slot(30.0):
+        with _magemin_subprocess_slot():
             slot_held.set()
             release_slot.wait(25.0)
 
@@ -1138,7 +1157,9 @@ def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
         assert slot_contended.wait(timeout=5.0)
         time.sleep(MAGEMIN_WARM_CALL_TIMEOUT_S + 0.1)
         assert caller.is_alive()
-        assert not submissions, 'worker dispatch started before slot acquisition'
+        assert len(submissions) == baseline_submission_count, (
+            'worker dispatch started before slot acquisition'
+        )
     finally:
         release_slot.set()
         holder.join(timeout=2.0)
@@ -1150,7 +1171,10 @@ def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
     assert len(outcomes) == 1
     assert isinstance(outcomes[0], dict)
     assert outcomes[0]['phases']['liq']['mass_kg'] == 1.0
-    assert len(submissions) == 1
+    assert pickle.dumps(
+        outcomes[0], protocol=pickle.HIGHEST_PROTOCOL
+    ) == baseline_bytes
+    assert len(submissions) == baseline_submission_count + 1
 
 
 @pytest.mark.parametrize(
@@ -1374,50 +1398,7 @@ def test_magemin_in_process_budget_exhaustion_returns_typed_status():
     )
 
 
-def test_magemin_subprocess_slot_wait_limit_returns_environment_refusal(
-    monkeypatch, tmp_path,
-):
-    from simulator.melt_backend import magemin as magemin_module
-
-    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
-    backend = MAGEMinBackend()
-    backend._available = True
-    backend._bridge = 'subprocess'
-    backend._binary_path = Path('/fake/MAGEMin')
-    backend._config = {'timeout_s': 0.001}
-    monkeypatch.setattr(
-        magemin_module, '_magemin_subprocess_slot_count', lambda: 1
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S', 0.001
-    )
-
-    def contended_flock(*_args, **_kwargs):
-        raise BlockingIOError
-
-    monkeypatch.setattr(magemin_module.fcntl, 'flock', contended_flock)
-    patch_module_time(
-        monkeypatch, magemin_module, sleep=lambda _seconds: None
-    )
-
-    result = backend.equilibrate(
-        1500.0,
-        composition_mol={'SiO2': 1.0},
-        fO2_log=-8.0,
-        pressure_bar=1.0,
-    )
-
-    assert result.status == 'not_converged'
-    assert result.diagnostics['backend_failure_exception'] == (
-        'MAGEMinSubprocessSlotWaitLimitExceeded'
-    )
-    assert result.diagnostics['backend_failure_disposition'] == 'environment'
-    assert 'slot wait limit exceeded' in result.diagnostics[
-        'backend_failure_message'
-    ]
-
-
-def test_magemin_subprocess_slot_permission_error_returns_not_converged(
+def test_magemin_subprocess_slot_permission_error_is_typed_environment_failure(
     monkeypatch, tmp_path,
 ):
     from simulator.melt_backend import magemin as magemin_module
@@ -1443,6 +1424,15 @@ def test_magemin_subprocess_slot_permission_error_returns_not_converged(
 
     monkeypatch.setattr(Path, 'mkdir', deny_lock_dir)
 
+    with pytest.raises(
+        magemin_module._MAGEMinEngineLifecycleError
+    ) as slot_error:
+        with magemin_module._magemin_subprocess_slot():
+            pytest.fail('slot unexpectedly acquired after directory failure')
+
+    assert slot_error.value.exception_type == 'MAGEMinSubprocessSlotUnavailable'
+    assert slot_error.value.failure_disposition == 'environment'
+
     result = backend.equilibrate(
         1500.0,
         composition_mol={'SiO2': 1.0},
@@ -1454,6 +1444,7 @@ def test_magemin_subprocess_slot_permission_error_returns_not_converged(
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinSubprocessSlotUnavailable'
     )
+    assert result.diagnostics['backend_failure_disposition'] == 'environment'
     assert 'read-only filesystem' in result.diagnostics['backend_failure_message']
 
 
@@ -4332,7 +4323,7 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     ]
     from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
 
-    with _magemin_subprocess_slot(20.0):
+    with _magemin_subprocess_slot():
         with tempfile.TemporaryDirectory() as tmpdir:
             completed = _run_alphamelts_subprocess(
                 direct_args,
@@ -4531,7 +4522,7 @@ def _run_magemin_gam_o(binary: Path, *, buffer_n: float) -> float:
     bulk = "49,14,11,9,10.899810,0.8,2.5,1.5,1.0,0.2,0"
     from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
 
-    with _magemin_subprocess_slot(120):
+    with _magemin_subprocess_slot():
         with tempfile.TemporaryDirectory() as tmpdir:
             completed = _run_alphamelts_subprocess(
                 [
@@ -4591,7 +4582,7 @@ def _run_magemin_adapter_buffer_probe(
     )
     from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
 
-    with _magemin_subprocess_slot(120):
+    with _magemin_subprocess_slot():
         with tempfile.TemporaryDirectory() as tmpdir:
             completed = _run_alphamelts_subprocess(
                 [
@@ -4915,14 +4906,14 @@ def test_magemin_subprocess_slots_bound_concurrency(monkeypatch, tmp_path):
     barrier = threading.Barrier(4, timeout=20.0)
 
     def hold(index):
-        with magemin_module._magemin_subprocess_slot(5.0):
+        with magemin_module._magemin_subprocess_slot():
             held.append(index)
             barrier.wait()
             time.sleep(0.6)
 
     def fourth():
         started = time.monotonic()
-        with magemin_module._magemin_subprocess_slot(5.0):
+        with magemin_module._magemin_subprocess_slot():
             waited.append(time.monotonic() - started)
 
     holders = [

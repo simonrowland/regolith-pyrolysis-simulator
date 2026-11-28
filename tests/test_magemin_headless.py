@@ -50,7 +50,7 @@ def test_every_launch_uses_headless_env_and_slot(monkeypatch, tmp_path, launch):
     seen = []
 
     @contextmanager
-    def slot(_timeout):
+    def slot():
         held.append(True)
         try:
             yield
@@ -106,7 +106,7 @@ def test_every_launch_uses_headless_env_and_slot(monkeypatch, tmp_path, launch):
     assert held == []
 
 
-def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
+def test_version_probe_is_cached_by_binary_and_slot_is_uncapped(
     monkeypatch, tmp_path,
 ):
     import simulator.engine_local_config as local_config
@@ -117,8 +117,8 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
     slot_calls = []
 
     @contextmanager
-    def slot(timeout_s):
-        slot_calls.append(timeout_s)
+    def slot():
+        slot_calls.append(True)
         yield
 
     def run(args, **kwargs):
@@ -139,22 +139,7 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
     assert first.get_engine_version() == 'MAGEMin 1.9.6'
     assert second.get_engine_version() == 'MAGEMin 1.9.6'
     assert len(run_calls) == 1
-    assert slot_calls == [magemin._MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S]
-
-    @contextmanager
-    def timed_out_slot(_timeout_s):
-        raise magemin._MAGEMinEngineLifecycleError(
-            'MAGEMinSubprocessSlotTimeout', 'slot timed out'
-        )
-        yield
-
-    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', timed_out_slot)
-    busy = MAGEMinBackend()
-    busy._binary_path = tmp_path / 'BusyMAGEMin'
-    assert busy.get_engine_version() == (
-        f'MAGEMin subprocess ({busy._binary_path.resolve()})'
-    )
-    assert len(run_calls) == 1
+    assert slot_calls == [True]
 
 
 def test_failed_version_probe_is_cached_for_the_process(
@@ -170,20 +155,15 @@ def test_failed_version_probe_is_cached_for_the_process(
     run_calls = []
 
     @contextmanager
-    def timed_out_slot(timeout_s):
-        slot_calls.append(timeout_s)
-        raise magemin._MAGEMinEngineLifecycleError(
-            'MAGEMinSubprocessSlotTimeout', 'slot timed out'
-        )
+    def slot():
+        slot_calls.append(True)
         yield
 
     def run(args, **kwargs):
         run_calls.append((args, kwargs))
-        return subprocess.CompletedProcess(
-            args, 0, stdout='MAGEMin 1.9.6\n', stderr=''
-        )
+        raise subprocess.TimeoutExpired(args, 5)
 
-    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', timed_out_slot)
+    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', slot)
     monkeypatch.setattr(magemin.subprocess, 'run', run)
     first = MAGEMinBackend()
     first._binary_path = binary
@@ -192,12 +172,11 @@ def test_failed_version_probe_is_cached_for_the_process(
 
     first_identity = first.get_engine_version()
     assert first_identity == f'MAGEMin subprocess ({binary.resolve()})'
-    # A failed probe is cached for the life of the process. The identity
-    # stays the path fallback, and the typed slot failure is recorded
-    # beside it, so a later call must not enter the 300 s slot wait again.
+    # A subprocess version-probe timeout is cached for the life of the
+    # process. It must not be confused with a slot-acquisition failure.
     assert second.get_engine_version() == first_identity
     assert len(slot_calls) == 1
-    assert run_calls == []
+    assert len(run_calls) == 1
 
     stat = binary.stat()
     version_key = (
@@ -210,8 +189,54 @@ def test_failed_version_probe_is_cached_for_the_process(
         magemin._MAGEMIN_ENGINE_VERSION_CACHE[version_key]
     )
     assert stored_identity == first_identity
-    assert isinstance(stored_failure, magemin._MAGEMinEngineLifecycleError)
-    assert stored_failure.exception_type == 'MAGEMinSubprocessSlotTimeout'
+    assert isinstance(stored_failure, subprocess.TimeoutExpired)
+
+
+def test_version_probe_propagates_slot_acquire_failure_without_identity_fallback(
+    monkeypatch, tmp_path,
+):
+    import simulator.engine_local_config as local_config
+
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(local_config, 'warn_legacy_once', lambda *_args: None)
+    binary = tmp_path / 'MAGEMin'
+    binary.write_bytes(b'fake MAGEMin executable')
+    run_calls = []
+
+    @contextmanager
+    def unavailable_slot():
+        raise magemin._MAGEMinEngineLifecycleError(
+            'MAGEMinSubprocessSlotUnavailable',
+            'MAGEMin subprocess slot is unavailable: permission denied',
+            failure_disposition='environment',
+        )
+        yield
+
+    def run(args, **kwargs):
+        run_calls.append((args, kwargs))
+        return subprocess.CompletedProcess(
+            args, 0, stdout='MAGEMin 1.9.6\n', stderr=''
+        )
+
+    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', unavailable_slot)
+    monkeypatch.setattr(magemin.subprocess, 'run', run)
+    backend = MAGEMinBackend()
+    backend._binary_path = binary
+
+    with pytest.raises(magemin._MAGEMinEngineLifecycleError) as error:
+        backend.get_engine_version()
+
+    assert error.value.exception_type == 'MAGEMinSubprocessSlotUnavailable'
+    assert error.value.failure_disposition == 'environment'
+    assert run_calls == []
+    stat = binary.stat()
+    version_key = (
+        str(binary.resolve()),
+        stat.st_ino,
+        stat.st_size,
+        stat.st_mtime_ns,
+    )
+    assert version_key not in magemin._MAGEMIN_ENGINE_VERSION_CACHE
 
 
 def test_version_probe_repeats_when_binary_changes_at_same_path(
@@ -297,7 +322,7 @@ def _parallel_slot_caller(scratch, locks, start, release, full, state, mutex):
     module._MAGEMIN_SUBPROCESS_LOCK_DIR = Path(locks)
     module._MAGEMIN_SUBPROCESS_LOCK = Path(locks) / 'magemin.lock'
     start.wait(timeout=30)
-    with module._magemin_subprocess_slot(30):
+    with module._magemin_subprocess_slot():
         with mutex:
             state[0] += 1
             state[1] = max(state[1], state[0])
@@ -362,7 +387,7 @@ def test_live_phase_and_melt_output_identical_with_headless_env():
             '--buffer=qfm', '--buffer_n=0']
     outputs = []
     for env in (os.environ.copy(), magemin._magemin_subprocess_env()):
-        with magemin._magemin_subprocess_slot(30):
+        with magemin._magemin_subprocess_slot():
             with tempfile.TemporaryDirectory() as cwd:
                 completed = _run_alphamelts_subprocess(
                     args, cwd=cwd, timeout=30, env=env,
