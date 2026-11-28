@@ -440,8 +440,8 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
 # Stage-4 carryover moves 8.77425273074e-07 -> 1.73891535398e-06 kg (lunar,
 # x1.98) and 8.9850073745e-07 -> 5.20124403045e-07 kg (Mars, x0.58). The fume
 # split follows the b274 physics fold: the oxide-Fe debit lowers p_SiO, the
-# alkali resinter bounds change the Stage-4 alkali partial pressures, and the
-# Fe vapour line moves. The Mars value is already 5.20133e-07 at 1ec9fd8786;
+# Stage-4 alkali partial pressures change (the resinter bounds respond to
+# them), and the Fe vapour line moves. The Mars value is already 5.20133e-07 at 1ec9fd8786;
 # 23c5bd4436 (shared Fe Langmuir residual) moves it by -1.7e-5 relative.
 # Previous pin: 8.77425273074e-07 / 8.9850073745e-07 at a2299343eb (b271).
 BASELINE_STAGE4_SIO2_KG = {
@@ -597,15 +597,18 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
         BASELINE_STAGE4_SIO2_KG[feedstock], rel=1e-8
     )
     # 2026-07-29 t-475: bounded flowing-gas partial pressures keep Na/K/SiO
-    # off the hot train as dew-point condensate. Lunar Cr has a tiny admissible
-    # deposit instead of being erased by an out-of-range melt-P_sat refusal.
+    # off the hot train as dew-point condensate. Cr is the admissible metal
+    # wall deposit (t-475 kept it from being erased by an out-of-range
+    # melt-P_sat refusal); in the current b274 fixtures lunar wall Cr is 0.0.
     # b274: the oxidative SiO2 wall leg is a reactive sink, not dew-point
     # condensation: SiO(g) + 1/2 O2 -> SiO2(s) on the wall. It deposits SiO2
     # even when p_SiO is below SiO's own saturation pressure. The oxygen is
     # the O the oxide-Fe debit leaves (b274 fold, declared Mars wall leaf).
     # So SiO2 is the one non-Cr species allowed on the wall, pinned per
     # feedstock from the regenerated studio fixture. Every other non-Cr
-    # species stays zero.
+    # species stays zero. The Mars deposit lands in stage_2_to_stage_4_bypass
+    # at 1773.15 K: the same oxidative mechanism and segment as part of the
+    # t-1994 duct-fouling finding.
     wall = {k: float(v) for k, v in actual["wall_deposit_kg"].items()}
     other_wall_total = sum(
         value for species, value in wall.items() if species not in ("Cr", "SiO2")
