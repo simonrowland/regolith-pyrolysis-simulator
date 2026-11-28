@@ -1039,19 +1039,48 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
         'FeO_association_gas'
     ] == surface_pO2_bar
 
-    # Raise a real silica saturation floor by perturbing only the activity
-    # supplied to the production floor calculation. Melt activities and the
-    # production pressure evaluators remain unchanged, so measured pressure
-    # ratios must follow each channel's stoichiometric pO2 exponent.
+    # Raise the real binding saturation floor without changing melt
+    # activities. Scaling each floor-couple activity by its reaction
+    # stoichiometry raises every candidate floor by the same amount; the
+    # production pressure evaluators then expose each channel's real pO2 slope.
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_segment_for_temperature,
+        ellingham_stoichiometry,
+    )
+    from simulator.metal_saturation_floor import METAL_SATURATION_FLOOR_OXIDES
+
     floor_activity_provider = (
         equilibrium_module.activities_for_metal_saturation_floor
     )
     floor_offset_dex = 0.2
+    metal_rail_composition_kg = {
+        'SiO2': 0.65,
+        'Al2O3': 0.20,
+        'CaO': 0.05,
+        'MgO': 0.05,
+        'Na2O': 0.02,
+        'K2O': 0.01,
+        'TiO2': 1.0e-5,
+        'Cr2O3': 1.0e-5,
+        'MnO': 1.0e-5,
+        'FeO': 1.0e-5,
+    }
+    floor_activity_log_slopes = {'FeO': 2.0}
+    floor_activity_log_slopes.update(
+        {
+            oxide: float(
+                ellingham_segment_for_temperature(metal, 2156.15).n_ox
+            )
+            for metal, oxide in METAL_SATURATION_FLOOR_OXIDES
+        }
+    )
 
-    def solve_silica_floor_with_offset(offset_dex):
+    def solve_metal_rails_with_floor_offset(offset_dex):
         def floor_activities(*args, **kwargs):
             activities = floor_activity_provider(*args, **kwargs)
-            activities['SiO2'] *= 10.0 ** offset_dex
+            for oxide, log_slope in floor_activity_log_slopes.items():
+                if oxide in activities:
+                    activities[oxide] *= 10.0 ** (offset_dex / log_slope)
             return activities
 
         monkeypatch.setattr(
@@ -1061,12 +1090,12 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
         )
         core = _markova_core(
             -100.0,
-            composition_kg={'SiO2': 1.0},
+            composition_kg=metal_rail_composition_kg,
         )
         return EquilibriumMixin._internal_analytical_equilibrium(core)
 
-    silica_floor_base = solve_silica_floor_with_offset(0.0)
-    silica_floor_raised = solve_silica_floor_with_offset(floor_offset_dex)
+    silica_floor_base = solve_metal_rails_with_floor_offset(0.0)
+    silica_floor_raised = solve_metal_rails_with_floor_offset(floor_offset_dex)
     base_floor_notice = silica_floor_base.diagnostics[
         'melt_metal_saturation_floor_notice'
     ]
@@ -1087,6 +1116,25 @@ def test_internal_analytical_every_channel_obeys_mass_action_exponents(
         'SiO2_gas': 0.0,
     }
     for species, exponent in silica_channel_pO2_exponents.items():
+        base_pressure = silica_floor_base.vapor_pressures_Pa[species]
+        raised_pressure = silica_floor_raised.vapor_pressures_Pa[species]
+        measured_pressure_shift = math.log10(raised_pressure / base_pressure)
+        assert measured_pressure_shift == pytest.approx(
+            exponent * measured_floor_shift,
+            abs=1e-8,
+        ), species
+
+    # The fixture includes major Al/Ca/Mg/Na/K sources and trace Ti/Cr/Mn/Fe
+    # sources. Those trace oxides keep their saturation floors below the
+    # silica floor while still publishing uncapped metal pressures.
+    metal_channel_pO2_exponents = {
+        metal: -1.0 / ellingham_stoichiometry(metal)[0]
+        for metal in ('Al', 'Ca', 'Mg', 'Ti', 'Cr', 'Mn', 'Fe')
+    }
+    metal_channel_pO2_exponents.update({'Na': -0.25, 'K': -0.25})
+    for species, exponent in metal_channel_pO2_exponents.items():
+        assert species in silica_floor_base.vapor_pressures_Pa, species
+        assert species in silica_floor_raised.vapor_pressures_Pa, species
         base_pressure = silica_floor_base.vapor_pressures_Pa[species]
         raised_pressure = silica_floor_raised.vapor_pressures_Pa[species]
         measured_pressure_shift = math.log10(raised_pressure / base_pressure)
