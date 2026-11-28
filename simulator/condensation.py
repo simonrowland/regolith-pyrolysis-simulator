@@ -545,14 +545,13 @@ def _resolve_lennard_jones_parameters(
             "reason": "missing_transport_parameters_possible_continuum",
             "inputs": inputs,
         }
+    estimated_molar_mass = positive("molar_mass_g_mol")
     return {
         "species": str(species), "status": "estimated", "method": method,
         "flag": flag, "sigma_angstrom": sigma,
         "epsilon_over_k_K": epsilon_over_k,
         "molar_mass_g_mol": (
-            float(row["molar_mass_g_mol"])
-            if row.get("molar_mass_g_mol") is not None
-            else None
+            estimated_molar_mass[1] if estimated_molar_mass is not None else None
         ),
         "inputs": inputs,
     }

@@ -862,22 +862,25 @@ _SHADOW_PA_RTOL = 1.0e-9
 
 def _finite_live_map(
     live_pressures_Pa: Mapping[str, float] | None,
-) -> tuple[dict[str, float], list[str]]:
-    """Split finite live pressures from non-finite keys (never silent drop)."""
+) -> tuple[dict[str, float], dict[str, str]]:
+    """Split usable pressures from invalid keys (never silent drop)."""
 
     live: dict[str, float] = {}
-    dropped: list[str] = []
+    invalid: dict[str, str] = {}
     for species, pressure in dict(live_pressures_Pa or {}).items():
         try:
             value = float(pressure)
-        except (TypeError, ValueError):
-            dropped.append(str(species))
+        except (TypeError, ValueError, OverflowError):
+            invalid[str(species)] = "nonfinite_effective_pressure"
             continue
         if not math.isfinite(value):
-            dropped.append(str(species))
+            invalid[str(species)] = "nonfinite_effective_pressure"
+            continue
+        if value < 0.0:
+            invalid[str(species)] = "negative_effective_pressure"
             continue
         live[str(species)] = value
-    return live, sorted(dropped)
+    return live, invalid
 
 
 def finite_live_pressure_species_ids(
@@ -915,14 +918,20 @@ def finite_live_pressure_map(
     """
 
     if read_context is None:
-        live, dropped = _finite_live_map(live_pressures_Pa)
+        live, invalid = _finite_live_map(live_pressures_Pa)
     else:
         with compatibility_pressure_read_context(read_context):
-            live, dropped = _finite_live_map(live_pressures_Pa)
-    if refuse_nonfinite and dropped:
+            live, invalid = _finite_live_map(live_pressures_Pa)
+    if refuse_nonfinite and invalid:
+        invalid_reasons = set(invalid.values())
+        label = (
+            "invalid"
+            if "negative_effective_pressure" in invalid_reasons
+            else "non-finite"
+        )
         raise ValueError(
-            "non-finite live pressures for species "
-            f"{dropped}; refusing silent drop (unknown pressure is not "
+            f"{label} live pressures for species "
+            f"{sorted(invalid)}; refusing silent drop (unknown pressure is not "
             "zero pressure / un-claimed species)"
         )
     return live
@@ -1359,7 +1368,7 @@ def compare_live_shadow_to_batch_flux(
             "catalog_pa_shadow_outcome": shadow_outcome,
         }
 
-    live, dropped_nonfinite = _finite_live_map(live_pressures_Pa)
+    live, invalid_pressures = _finite_live_map(live_pressures_Pa)
     refused_live: list[str] = []
     missing_channel_keys: list[str] = []
     catalog_pa_by_species: dict[str, float] = {}
@@ -1402,7 +1411,7 @@ def compare_live_shadow_to_batch_flux(
         ),
         refused_live_species=refused_live,
         missing_batch_keys=missing_channel_keys,
-        dropped_nonfinite_live_species=dropped_nonfinite,
+        dropped_nonfinite_live_species=sorted(invalid_pressures),
         batch_present=batch is not None,
         resolution_error=resolution_error,
     )
@@ -1424,7 +1433,7 @@ def compare_live_shadow_to_batch_flux(
             )
             if batch is not None
             else sorted(live),
-            "dropped_nonfinite_live_species": dropped_nonfinite,
+            "dropped_nonfinite_live_species": sorted(invalid_pressures),
         }
     )
 
