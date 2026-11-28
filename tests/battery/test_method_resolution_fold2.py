@@ -527,8 +527,8 @@ def test_treating_assay_prose_as_a_method_field_mints_a_second_id(
     extract = _assay_on_named_run_extract()
     original = migrate_module._method_claim_fields
 
-    def assay_as_method_field(obs, values):
-        regime, raw, printed, evidence, notice_evidence = original(obs, values)
+    def assay_as_method_field(obs, values, **kwargs):
+        regime, raw, printed, evidence, notice_evidence = original(obs, values, **kwargs)
         return regime, (*raw, *printed), (), evidence, notice_evidence
 
     monkeypatch.setattr(migrate_module, "_method_claim_fields", assay_as_method_field)
