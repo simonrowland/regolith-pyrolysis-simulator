@@ -1361,6 +1361,7 @@ def _match_reported_species_with_notices(
     reported: Mapping[str, float],
     *,
     oxide_activity: bool = False,
+    phase_composition: bool = False,
     species: Species | None = None,
     notice_field: str = "diagnostic_oxide_activities",
     notice_phase: str = "liquid",
@@ -1377,11 +1378,22 @@ def _match_reported_species_with_notices(
     ``SiO2_gaseous``, and a stem that does not parse do not. An exact formula
     hit in the first pass wins over the suffixed key for non-oxide quantities.
     Oxide activity uses the shared canonical projection so the first reported
-    oxide alias wins, including when it has ``_Liq``.
+    oxide alias wins, including when it has ``_Liq``. Phase-composition
+    amounts use ``phase_composition`` for exact-formula matching, preserving
+    explicit zero values for the caller's domain refusal.
     """
 
     target = parse_species_formula(formula, species=species)
     if target is None:
+        return None, ()
+    if phase_composition:
+        # Phase amounts retain the historical exact-formula pass. In
+        # particular, keep an explicit zero so the caller can issue the
+        # typed nonpositive_phase_amount refusal, and accept formula labels
+        # such as FeO(l) that are not oxide-activity aliases.
+        for name, value in reported.items():
+            if parse_species_formula(str(name), species=species) == target:
+                return (str(name), float(value)), ()
         return None, ()
     if oxide_activity and _is_raw_element_label(formula, species=species):
         return None, ()
@@ -12095,6 +12107,7 @@ def _component_wt(
         formula,
         phase_map,
         oxide_activity=oxide,
+        phase_composition=True,
         notice_field="phase_compositions",
         notice_phase=phase,
     )

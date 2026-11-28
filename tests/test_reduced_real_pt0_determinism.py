@@ -745,48 +745,142 @@ def _pt0_equilibrium_capture_context(
     return sim, result
 
 
-def test_direct_activity_alias_precedence_survives_compact_and_pt1_replay(
+@pytest.mark.parametrize(
+    "producer_path",
+    (
+        "melt_oxide_activities",
+        "activities_table_lower",
+        "activities_table",
+        "gamma_times_x",
+        "phase_activity_fields",
+        "chemical_potentials",
+        "subprocess_activity_table",
+    ),
+)
+def test_activity_alias_precedence_survives_all_producers_and_replays(
     tmp_path: Path,
+    producer_path: str,
 ) -> None:
-    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    import math
 
-    db_path = tmp_path / "activity-alias-replay.sqlite"
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EquilibrateCell,
+        Po2Request,
+        extract_reported_quantities,
+    )
+    from simulator.physical_constants import (
+        CELSIUS_TO_KELVIN_OFFSET,
+        GAS_CONSTANT,
+    )
+
+    db_path = tmp_path / f"activity-alias-replay-{producer_path}.sqlite"
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim, result = _pt0_equilibrium_capture_context(capture)
     backend = AlphaMELTSBackend()
-    live = backend._parse_petthermotools_result(
-        (
-            {
-                "Conditions": {"mass": 100.0},
-                "liquid1": {"SiO2": 100.0},
-                "liquid1_prop": {"mass": 100.0},
-                "Activities": {
-                    "liquid1": {"SiO2_Liq": 0.6, "SiO2": 0.4},
-                },
-            },
-            {},
-        ),
-        temperature_C=float(sim.melt.temperature_C),
-        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
-        fO2_log=sim._compute_intrinsic_melt_fO2(),
-        comp_wt={"SiO2": 100.0},
-        total_input_kg=1.0,
-    )
+    temperature_C = float(sim.melt.temperature_C)
+    pressure_bar = float(sim.melt.p_total_mbar) / 1000.0
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+    raw_activities = {"SiO2_Liq": 0.6, "SiO2": 0.4}
+    run_result: dict[str, object] = {
+        "Conditions": {"mass": 100.0},
+        "liquid1": {"SiO2": 100.0},
+        "liquid1_prop": {"mass": 100.0},
+    }
+    if producer_path == "melt_oxide_activities":
+        run_result[producer_path] = raw_activities
+    elif producer_path == "activities_table_lower":
+        run_result["activities"] = {"liquid1": raw_activities}
+    elif producer_path == "activities_table":
+        run_result["Activities"] = {"liquid1": raw_activities}
+    elif producer_path == "gamma_times_x":
+        run_result["activity_coefficients"] = raw_activities
+    elif producer_path == "phase_activity_fields":
+        run_result["liquid1_prop"] = {
+            "mass": 100.0,
+            "SiO2_Liq_activity": 0.6,
+            "SiO2_activity": 0.4,
+        }
+    elif producer_path == "chemical_potentials":
+        temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        run_result["chemical_potentials"] = {
+            label: GAS_CONSTANT * temperature_K * math.log(value)
+            for label, value in raw_activities.items()
+        }
+        run_result["pure_chemical_potentials"] = {
+            label: 0.0 for label in raw_activities
+        }
+    elif producer_path == "subprocess_activity_table":
+        from tests.test_alphamelts_backend import _parse_subprocess_fixture
+
+        live = _parse_subprocess_fixture(
+            backend,
+            f"""
+<> Stable phase assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T {temperature_C:.6f} (C)
+liquid: SiO2 Al2O3 FeO Na2O
+100.0 g 50.0 15.0 10.0 5.0
+Melt fraction = 1.0
+Liquid activities:
+SiO2_Liq SiO2
+0.6 0.4
+""",
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            total_input_kg=1.0,
+            fO2_log=fO2_log,
+        )
+    else:
+        raise AssertionError(f"unknown activity producer: {producer_path}")
+
+    if producer_path != "subprocess_activity_table":
+        live = backend._parse_petthermotools_result(
+            (run_result, {}),
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            comp_wt={"SiO2": 100.0},
+            total_input_kg=1.0,
+        )
 
     assert live.activity_coefficients == {"SiO2": pytest.approx(0.6)}
-    assert live.diagnostics["diagnostic_reported_activities"] == {
-        "SiO2_Liq": 0.6,
-        "SiO2": 0.4,
-    }
+    assert live.diagnostics["diagnostic_reported_activities"] == pytest.approx(
+        raw_activities
+    )
     result.activity_coefficients = live.activity_coefficients
     result.diagnostics.update(live.diagnostics)
     result.warnings.extend(live.warnings)
 
     compact = EquilibriumResult.from_hot(
-        result.to_engine_cache_value(engine_id="alphamelts"),
+        live.to_engine_cache_value(engine_id="alphamelts"),
         engine_id="alphamelts",
     )
     assert compact.activity_coefficients == live.activity_coefficients
+    cell_activities, gas_pressures, invalid_gas_pressures = (
+        extract_reported_quantities(live)
+    )
+    assert cell_activities == live.activity_coefficients
+    cell = EquilibrateCell(
+        pot_id="suffix-first-activity",
+        engine="alphamelts",
+        temperature_K=live.temperature_C + CELSIUS_TO_KELVIN_OFFSET,
+        po2=Po2Request(mode="fixed", po2_bar=1e-9),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities=cell_activities,
+        gas_partial_pressures_Pa=gas_pressures,
+        liquid_fraction=live.liquid_fraction,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+        invalid_gas_partial_pressure_components=invalid_gas_pressures,
+    )
+    compact_cell = EquilibrateCell.from_engine_cache_value(
+        cell.to_engine_cache_value()
+    )
+    assert compact_cell.melt_activities == live.activity_coefficients
 
     capture.capture_equilibrium(sim, result)
     assert capture.capture_sequence
@@ -795,6 +889,9 @@ def test_direct_activity_alias_precedence_survives_compact_and_pt1_replay(
     replayed = replay.replay_equilibrium(replay_sim)
 
     assert replayed.activity_coefficients == live.activity_coefficients
+    assert replayed.diagnostics["diagnostic_reported_activities"] == pytest.approx(
+        raw_activities
+    )
 
 
 def _alphamelts_silicate_equilibrium_key(

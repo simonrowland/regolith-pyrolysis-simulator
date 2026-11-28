@@ -51,7 +51,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from engines.alphamelts.domain import (
-    _activity_alias_conflict_notice,
     _canonical_oxide_activity_projection,
     _canonical_oxide_activity_map_with_notices,
     canonical_melt_oxide_activity_name,
@@ -2658,13 +2657,27 @@ class _MELTSBackendSupport(MeltBackend):
         reported_activity_provenance = result_diagnostics.get(
             'diagnostic_reported_activities'
         )
+        activity_source_values = (
+            reported_activity_provenance
+            if isinstance(reported_activity_provenance, Mapping)
+            else reported_activities
+        )
         activity_diagnostics, activity_notices = (
             self._activity_diagnostic_payload(
-                reported_activity_provenance
-                if isinstance(reported_activity_provenance, Mapping)
-                else reported_activities
+                activity_source_values
             )
         )
+        if self.backend_name == 'alphamelts':
+            # Resolve native AlphaMELTS aliases here, in report order, before
+            # compact or PT-1 serialization can sort keys and change the winner.
+            reported_activities = {
+                str(label): float(value)
+                for label, value in activity_source_values.items()
+                if canonical_melt_oxide_activity_name(str(label)) is None
+            }
+            reported_activities.update(
+                activity_diagnostics.get('diagnostic_oxide_activities', {})
+            )
         result_diagnostics.update(activity_diagnostics)
         result_warnings = list(warnings or [])
         result_warnings.extend(
@@ -5904,16 +5917,13 @@ class _MELTSBackendSupport(MeltBackend):
                 failed_conversion_sources=failed_conversion_sources,
             )
             if mapped:
-                resolved, source_diagnostics = (
-                    self._resolve_direct_activity_mapping(mapped, key)
-                )
                 self._record_skipped_activity_sources(
                     skipped_sources,
                     key,
                     repair_issues,
                     failed_sources,
                 )
-                return resolved, source_diagnostics
+                return mapped, {'diagnostic_activity_source': key}
             skipped_sources.append(key)
 
         for key in ('activities', 'Activities'):
@@ -5927,16 +5937,13 @@ class _MELTSBackendSupport(MeltBackend):
                 failed_conversion_sources=failed_conversion_sources,
             )
             if mapped:
-                resolved, source_diagnostics = (
-                    self._resolve_direct_activity_mapping(mapped, key)
-                )
                 self._record_skipped_activity_sources(
                     skipped_sources,
                     key,
                     repair_issues,
                     failed_sources,
                 )
-                return resolved, source_diagnostics
+                return mapped, {'diagnostic_activity_source': key}
             skipped_sources.append(key)
 
         coefficient_source = 'activity_coefficients_times_oxide_mole_fraction'
@@ -6020,38 +6027,16 @@ class _MELTSBackendSupport(MeltBackend):
             failed_conversion_sources=failed_conversion_sources,
         )
         if mapped:
-            resolved, source_diagnostics = self._resolve_direct_activity_mapping(
-                mapped,
-                'phase_activity_fields',
-            )
             self._record_skipped_activity_sources(
                 skipped_sources,
                 'phase_activity_fields',
                 repair_issues,
                 failed_sources,
             )
-            return resolved, source_diagnostics
+            return mapped, {
+                'diagnostic_activity_source': 'phase_activity_fields'
+            }
         return {}, {}
-
-    @staticmethod
-    def _resolve_direct_activity_mapping(
-        values: Mapping[str, float],
-        source: str,
-    ) -> tuple[dict[str, float], dict[str, object]]:
-        """Resolve oxide aliases before direct activities reach a cache."""
-        oxide_activities, _conflicts, _invalid = (
-            _canonical_oxide_activity_projection(values)
-        )
-        resolved = {
-            str(label): float(value)
-            for label, value in values.items()
-            if canonical_melt_oxide_activity_name(str(label)) is None
-        }
-        resolved.update(oxide_activities)
-        return resolved, {
-            'diagnostic_activity_source': source,
-            'diagnostic_reported_activities': dict(values),
-        }
 
     @staticmethod
     def _record_skipped_activity_sources(
@@ -6101,17 +6086,6 @@ class _MELTSBackendSupport(MeltBackend):
                 'producer=PetThermoTools field=activity_coefficients '
                 f'oxide={item!r} source={source!r} action=dropped '
                 f'reason={reason} selected_source={selected_source!r}'
-            )
-        if site == 'SR14':
-            return _activity_alias_conflict_notice(
-                item,
-                issue['kept_label'],
-                float(issue['kept_activity']),
-                issue['conflicting_label'],
-                float(issue['conflicting_activity']),
-                producer='PetThermoTools',
-                field='activity_coefficients',
-                selected_source=selected_source,
             )
         return (
             'SR02:alphamelts_direct_activity_repaired '
@@ -6174,31 +6148,7 @@ class _MELTSBackendSupport(MeltBackend):
             # a=0.01, not the 0.5 value that inflated vapor flux by 50x.
             gammas[str(raw_name)] = gamma
             activity_candidates[str(raw_name)] = gamma * mole_fraction
-        activities, conflicts, _invalid = _canonical_oxide_activity_projection(
-            activity_candidates,
-            positive_only=False,
-        )
-        if repair_issues is not None:
-            repair_issues.extend(
-                {
-                    'site': 'SR14',
-                    'source': 'activity_coefficients_times_oxide_mole_fraction',
-                    'item': oxide,
-                    'reason': 'different_canonical_oxide_activity_values',
-                    'kept_label': kept_label,
-                    'kept_activity': repr(kept_activity),
-                    'conflicting_label': conflicting_label,
-                    'conflicting_activity': repr(conflicting_activity),
-                }
-                for (
-                    oxide,
-                    kept_label,
-                    kept_activity,
-                    conflicting_label,
-                    conflicting_activity,
-                ) in conflicts
-            )
-        return activities, gammas
+        return activity_candidates, gammas
 
     def _finite_activity_mapping(
         self,

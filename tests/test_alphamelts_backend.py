@@ -1706,14 +1706,26 @@ def test_activity_from_coefficients_pins_mixed_oxide_projection():
 
 
 def test_activity_from_suffixed_coefficients_uses_canonical_oxide_key():
-    activities, gammas = AlphaMELTSBackend()._activities_from_coefficients(
-        {'SiO2_Liq': 0.5},
-        {'SiO2': 100.0},
+    backend = AlphaMELTSBackend()
+    composition = {'SiO2': 100.0}
+    result = backend._parse_petthermotools_result(
+        ({
+            'Conditions': {'mass': 100.0},
+            'liquid1': composition,
+            'liquid1_prop': {'mass': 100.0},
+            'activity_coefficients': {'SiO2_Liq': 0.5},
+        }, {}),
+        temperature_C=1600.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt=composition,
+        total_input_kg=1.0,
     )
 
-    assert activities == {'SiO2': pytest.approx(0.5)}
-    assert 'SiO2_Liq' not in activities
-    assert gammas == {'SiO2_Liq': 0.5}
+    assert result.activity_coefficients == {'SiO2': pytest.approx(0.5)}
+    assert result.diagnostics['diagnostic_reported_activities'] == {
+        'SiO2_Liq': pytest.approx(0.5),
+    }
 
 
 def test_activities_from_coefficients_propagates_formula_resolution_key_error(
@@ -6938,12 +6950,22 @@ def test_suffix_first_oxide_alias_order_matches_score_and_antoine_consumers():
     backend = AlphaMELTSBackend()
     aliases = {'SiO2_Liq': 0.6, 'SiO2': 0.4}
     composition = {'SiO2': 100.0}
-    activities, _gammas = backend._activities_from_coefficients(
-        aliases,
-        composition,
+    result = backend._parse_petthermotools_result(
+        ({
+            'Conditions': {'mass': 100.0},
+            'liquid1': composition,
+            'liquid1_prop': {'mass': 100.0},
+            'activity_coefficients': aliases,
+        }, {}),
+        temperature_C=1600.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt=composition,
+        total_input_kg=1.0,
     )
 
-    assert activities == {'SiO2': pytest.approx(0.6)}
+    assert result.activity_coefficients == {'SiO2': pytest.approx(0.6)}
+    assert result.diagnostics['diagnostic_reported_activities'] == aliases
     assert _canonical_activity_mapping(aliases) == {
         'SiO2': pytest.approx(0.6)
     }
@@ -6979,7 +7001,7 @@ def test_suffix_first_oxide_alias_order_matches_score_and_antoine_consumers():
     assert pressures['Si'] != pytest.approx(later_alias_pressures['Si'])
 
 
-def test_subprocess_stdout_parser_reports_activity_labels_and_exact_oxide_diagnostic():
+def test_subprocess_stdout_parser_canonicalizes_activity_and_keeps_raw_provenance():
     backend = AlphaMELTSBackend()
     output = """
 <> Stable phase assemblage achieved.
@@ -7000,6 +7022,12 @@ SiO2_Liq Na K Fe
     )
 
     assert result.activity_coefficients == pytest.approx({
+        'SiO2': 0.42,
+        'Na': 0.08,
+        'K': 0.03,
+        'Fe': 0.25,
+    })
+    assert result.diagnostics['diagnostic_reported_activities'] == pytest.approx({
         'SiO2_Liq': 0.42,
         'Na': 0.08,
         'K': 0.03,

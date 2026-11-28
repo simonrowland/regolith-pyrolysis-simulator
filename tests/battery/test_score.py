@@ -12139,6 +12139,73 @@ def test_equilibrium_phase_composition_is_retained_but_not_predicted() -> None:
         predict_with_engine(Engine.PROPRIETARY_REMOTE, observation)
 
 
+@pytest.mark.parametrize(
+    ("phase_components", "expected_result"),
+    (({"FeO": 0.0}, "nonpositive"), ({"FeO(l)": 1.0}, "matched")),
+)
+def test_phase_composition_uses_exact_formula_before_activity_alias_rules(
+    monkeypatch: pytest.MonkeyPatch,
+    phase_components: dict[str, float],
+    expected_result: str,
+) -> None:
+    from simulator.battery.enums import PhaseRole
+    from simulator.battery.records import Composition, Species
+    from simulator.melt_backend.base import EquilibriumResult
+
+    identity = Identity(
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        species=Species("FeO", Phase.L),
+        subtype=State.of("wt_percent"),
+        temperature_K=State.of(Decimal("1773.15")),
+        composition=State.of(
+            Composition(
+                "ordered_complete_mole_inventory",
+                (("SiO2", Decimal("0.9")), ("FeO", Decimal("0.1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        fO2_Pa=State.of(Decimal("0.001")),
+        total_pressure_Pa=State.of(Decimal("101325")),
+        phase_role=State.of(PhaseRole.MELT),
+    )
+    observation = F.observation(
+        f"phase-composition-{expected_result}",
+        "phase-composition-matcher",
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="phase-composition-matcher",
+    )
+    result = EquilibriumResult(
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        fO2_log=-8.0,
+        phases_present=["liquid"],
+        phase_masses_kg={"liquid": 1.0},
+        phase_compositions={"liquid": phase_components},
+        liquid_fraction=1.0,
+        status="ok",
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_equilibrate_phase_assemblage",
+        lambda *_args, **_kwargs: result,
+    )
+
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS,
+        observation,
+        handles={},
+    )
+
+    if expected_result == "nonpositive":
+        assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+        assert prediction.refusal_detail["reason"] == "nonpositive_phase_amount"
+    else:
+        assert prediction.execution.state is ExecutionState.PRODUCED
+        assert prediction.value == Decimal("1.0")
+
+
 def test_residue_metric_uses_dex_for_element_ppm_and_absolute_for_oxide() -> None:
     from simulator.battery.score import (
         metric_operation_for_identity,
