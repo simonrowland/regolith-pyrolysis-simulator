@@ -7,7 +7,6 @@ import math
 import warnings
 
 from engines.alphamelts.domain import (
-    MELTS_CASIO3_FUSION_CAVEAT_PHRASE,
     MELTS_CASIO3_LIQUID_G0_FIELD,
     MELTS_CAO_EXCHANGE_MU_FIELD,
     MELTS_PWO_G0_FIELD,
@@ -53,9 +52,6 @@ from simulator.melt_backend.pure_phase import (
     PurePhaseAccessError,
     PurePhaseProperties,
     PurePhaseUnknownSymbolError,
-)
-from simulator.melt_backend.pure_phase_janaf_score import (
-    casio3_fusion_model_systematic_dex,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
 from simulator.melt_backend.vaporock import VapoRockBackend
@@ -597,7 +593,6 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         base_source='thermoengine',
                     )
                 )
-            cao_model_systematic_notices = []
             cao_fusion_reference_values: dict[str, float] = {}
             cao_exchange_mu = (
                 payload.mu_CaO_J_per_mol_melts_berman_apparent
@@ -608,20 +603,10 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 cao_exchange_mu is not None
                 and 'CaSiO3' in components
             ):
-                # Keep this dynamic fusion disclosure at the ThermoEngine
-                # cell boundary: it requires the live Berman G0(CaSiO3,l) and
-                # G0(pWo) query below. The existing diagnostics path reads
-                # imcc_notices into EquilibrateCell in
-                # binary_pot_battery.py:1708-1742, and score.py:8334-8352
-                # scopes the resulting notice to CaO. AlphaMELTS cells expose
-                # neither pure-phase value, so sharing this calculation with
-                # AlphaMELTS would require another worker/cache field.
-                # Premise: μ(CaSiO3)=G0(CaSiO3,l)+RT ln(a), and both the
-                # liquid component and named pWo standard state use the same
-                # apparent Berman basis. Remove the activity term, then compare
-                # G0(l)−G0(pWo) with calorimetric fusion. The signed residual is
-                # a model caveat, never a correction to μ_CaO. J/mol divided by
-                # RT ln(10) is dimensionless dex.
+                # Expose both pure-phase G0 values to score.py, the sole owner
+                # of the shared alphaMELTS/ThermoEngine fusion disclosure.
+                # Premise: μ(CaSiO3)=G0(CaSiO3,l)+RT ln(a); removing the
+                # activity term gives the apparent-basis liquid G0.
                 try:
                     mu_casio3 = float(components['CaSiO3'])
                     activity_casio3_value = (
@@ -640,38 +625,31 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         or activity_casio3 <= 0.0
                     ):
                         raise ValueError('CaSiO3 activity is not positive')
-                    pwo = self.pure_phase_properties(
-                        'pWo',
-                        temperature_K=temperature_K,
-                        pressure_bar=solved_pressure_bar,
-                    )
-                    if pwo.G_J_mol is None:
-                        raise ValueError('ThermoEngine pWo G is absent')
                     g0_casio3_liquid = (
                         mu_casio3
                         - GAS_CONSTANT * temperature_K
                         * math.log(activity_casio3)
                     )
-                    fusion_residual_dex = casio3_fusion_model_systematic_dex(
-                        g0_casio3_liquid - float(pwo.G_J_mol),
-                        temperature_K,
+                    if not math.isfinite(g0_casio3_liquid):
+                        raise ValueError('ThermoEngine CaSiO3 liquid G0 is nonfinite')
+                    cao_fusion_reference_values[
+                        MELTS_CASIO3_LIQUID_G0_FIELD
+                    ] = g0_casio3_liquid
+                    pwo = self.pure_phase_properties(
+                        'pWo',
+                        temperature_K=temperature_K,
+                        pressure_bar=solved_pressure_bar,
                     )
-                    cao_fusion_reference_values = {
-                        MELTS_CASIO3_LIQUID_G0_FIELD: g0_casio3_liquid,
-                        MELTS_PWO_G0_FIELD: float(pwo.G_J_mol),
-                    }
-                    fusion_notice = {
-                        'kind': 'engine_model_caveat',
-                        'reason': (
-                            f'ThermoEngine {MELTS_CASIO3_FUSION_CAVEAT_PHRASE} '
-                            'against Adamkovičová et al. (1980), Eq. (8)'
-                        ),
-                        'band': (
-                            f'{fusion_residual_dex:+.8g} dex at '
-                            f'{temperature_K:g} K'
-                        ),
-                    }
-                    cao_model_systematic_notices.append(fusion_notice)
+                    if (
+                        pwo.G_J_mol is None
+                        or not math.isfinite(float(pwo.G_J_mol))
+                    ):
+                        raise ValueError(
+                            'ThermoEngine pWo G is absent or nonfinite'
+                        )
+                    cao_fusion_reference_values[MELTS_PWO_G0_FIELD] = float(
+                        pwo.G_J_mol
+                    )
                 # The pure-phase API raises the isolation and validation
                 # errors directly, retypes remote unknown-symbol/access errors
                 # as PurePhaseUnknownSymbolError/PurePhaseAccessError, and
@@ -692,21 +670,9 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     EngineWorkerTimeout,
                     TimeoutError,
                 ) as exc:
-                    # Report failed disclosure work; keep the raw exchange
-                    # potential scoreable and let score.py scope this CaSiO3
-                    # caveat to CaO activity, away from redox and other rows.
-                    cao_model_systematic_notices.append(
-                        {
-                            'kind': 'engine_model_caveat',
-                            'reason': (
-                                f'ThermoEngine {MELTS_CASIO3_FUSION_CAVEAT_PHRASE} '
-                                'band could not be computed; '
-                                f'{type(exc).__name__}: {exc}'
-                            ),
-                        }
-                    )
-            emitted_imcc_notices = []
-            emitted_imcc_notices.extend(cao_model_systematic_notices)
+                    # Keep the successful exchange scoreable. Missing G0
+                    # values reach score.py, which emits the typed gap caveat.
+                    pass
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=solved_pressure_bar,
@@ -744,11 +710,6 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                                     cao_exchange_mu
                             }
                             if cao_exchange_mu is not None
-                            else {}
-                        ),
-                        **(
-                            {'imcc_notices': emitted_imcc_notices}
-                            if emitted_imcc_notices
                             else {}
                         ),
                         'thermodynamic_basis': dict(

@@ -48,6 +48,12 @@ _MELTS_OXIDE_SET = frozenset(MELTS_OXIDE_BASIS)
 MELTS_CAO_EXCHANGE_MU_FIELD = (
     'mu_CaO_J_per_mol_melts_berman_apparent'
 )
+MELTS_CAO_EXCHANGE_UNAVAILABLE = (
+    'typed-refusal:melts_cao_exchange_unavailable'
+)
+MELTS_CASIO3_FUSION_BAND_UNAVAILABLE = (
+    'typed-refusal:melts_casio3_fusion_band_unavailable'
+)
 MELTS_CASIO3_LIQUID_G0_FIELD = (
     'g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent'
 )
