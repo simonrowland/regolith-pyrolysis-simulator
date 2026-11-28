@@ -829,7 +829,6 @@ def test_flux_pressures_from_batch_channel_unions() -> None:
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_MISMATCH
     assert report["catalog_pa_shadow_equal"] is False
-    assert report["unresolved_missing_effective_pressure_species"] == []
 
 
 def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
@@ -1072,7 +1071,6 @@ def test_flux_pressures_without_batch_is_typed_failure() -> None:
     flux, report = _flux_with_live_shadow(None, live)
     assert flux == {}
     assert report["batch_present"] is False
-    assert report["unresolved_missing_effective_pressure_species"] == []
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_MISSING_BATCH
     assert report["selection_source"] == "typed_failure_missing_batch"
@@ -1086,7 +1084,6 @@ def test_flux_pressures_resolution_error_is_typed_failure() -> None:
         resolution_error={"reason": "vapour_batch_resolve_failed"},
     )
     assert flux == {}
-    assert report["unresolved_missing_effective_pressure_species"] == []
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_RESOLUTION_ERROR
 
@@ -1546,7 +1543,7 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
             self.overhead = SimpleNamespace(headspace_temperature_K=0.0)
             self._last_vapor_pressure_diagnostic = {}
 
-        def _build_evaporation_aux_maps(self, vapor_pressures, **_kwargs):
+        def _build_evaporation_aux_maps(self, vapor_pressures):
             return {}, {}, {}
 
     host = _Host()

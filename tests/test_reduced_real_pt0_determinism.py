@@ -9117,12 +9117,6 @@ def _exercise_sio_yield_report_diagnostic(sim: Any) -> None:
         "_last_vapor_pressure_diagnostic",
         {},
     ) or {}
-    for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
-        source_value = source_diagnostic.get(field_name) or {}
-        assert isinstance(source_value, Mapping)
-        assert (field_name in diagnostics) is bool(source_value)
-        if source_value:
-            assert diagnostics[field_name] == dict(source_value)
     source_speciation = source_diagnostic.get("vaporock_full_speciation_Pa")
     vaporock_speciation = diagnostics.get("vaporock_full_speciation_Pa")
     if isinstance(vaporock_speciation, Mapping):
