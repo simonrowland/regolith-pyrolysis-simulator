@@ -2749,50 +2749,55 @@ def test_capacity_resolution_decision_is_owned_by_evaporation() -> None:
     ) is None
 
 
-def test_live_typed_non_debit_continues_with_unresolved_species_flagged():
-    from simulator.evaporation import _provider_flux_outcome_refusal
-    from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
-
-    overlay = {
-        "batch_channel_states": {"Na": "refusal", "Fe": "eligible"},
-        "batch_channel_refusal_codes": {
-            "Na": REFUSAL_INAPPLICABLE_PREDICATE,
-        },
-        "notices": [{
-            "kind": "vapour_batch_unresolved",
-            "species": "Fe",
-            "hour": 3,
-            "reason": "missing_transport_parameters_possible_continuum",
-        }],
+@pytest.mark.parametrize("path", ["live", "capacity"])
+def test_mixed_unresolved_non_debit_requires_a_resolved_value(path):
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1600.0
+    equilibrium = copy.deepcopy(sim._get_equilibrium())
+    pressures = {
+        str(species): 0.0
+        for species in equilibrium.vapor_pressures_Pa
     }
+    pressures["Fe"] = math.nan
+    pressures["Na"] = 0.0
+    equilibrium.vapor_pressures_Pa.clear()
+    equilibrium.vapor_pressures_Pa.update(pressures)
+    sim._last_vapor_pressure_diagnostic[
+        "backend_vapor_pressures_Pa"
+    ] = dict(pressures)
 
-    capacity_outcome = _provider_flux_outcome_refusal(
-        SimpleNamespace(),
-        "ok",
-        {},
-        {"Fe": "missing_transport_parameters_possible_continuum"},
-        overlay,
-        selector_overlay={},
-    )
-    live_outcome = _provider_flux_outcome_refusal(
-        SimpleNamespace(),
-        "ok",
-        {},
-        {"Fe": "missing_transport_parameters_possible_continuum"},
-        overlay,
-        selector_overlay={},
-        allow_typed_non_debit_with_unresolved=True,
-    )
+    if path == "capacity":
+        capacity = FiniteCapacity(0.05)
+        cold_train = SimpleNamespace(
+            accumulator_enabled=False,
+            relief={
+                "k_relief_kg_hr_Pa": 1.0e-30,
+                "p_open_Pa": 1.0e9,
+                "vessel_rating_Pa": 1.0e12,
+            },
+        )
+        sim._cold_train_capacity_policy = lambda: (capacity, cold_train)
 
-    assert isinstance(capacity_outcome, EvaporationFluxRefusal)
-    assert capacity_outcome.reason == "vapour_batch_no_debiting_pressure_outcome"
-    assert live_outcome is None
-    assert overlay["notices"] == [{
-        "kind": "vapour_batch_unresolved",
-        "species": "Fe",
-        "hour": 3,
-        "reason": "missing_transport_parameters_possible_continuum",
-    }]
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
+        if path == "live":
+            sim._calculate_evaporation(equilibrium)
+        else:
+            PyrolysisSimulator._compute_capacity_coupling_shadow_impl(
+                sim,
+                equilibrium,
+            )
+
+    assert refusal.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+    overlay = refusal.value.diagnostic["vapour_batch_flux_overlay"]
+    assert overlay["selected_runtime_pa_by_species"]["Na"] == 0.0
+    assert any(
+        notice.get("kind") == "vapour_batch_unresolved"
+        and notice.get("species") == "Fe"
+        and notice.get("reason") == "nonfinite_effective_pressure"
+        for notice in overlay["notices"]
+        if isinstance(notice, dict)
+    )
 
 
 def test_provider_terminal_classifier_uses_shared_resolved_inventory(
@@ -4798,6 +4803,10 @@ def test_live_and_picard_transport_sidecar_match_at_same_state(monkeypatch):
     from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
     from simulator.capacity_coupling import _headspace_partial_pressures_Pa
     from simulator.condensation import _LENNARD_JONES_PARAMS
+    from simulator.evaporation import (
+        CONTROL_FLUX_PRESSURES_KEY,
+        _load_hkl_upper_bound_transport_species,
+    )
 
     monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Fe")
     captures = {"live": [], "capacity": []}
@@ -4809,6 +4818,16 @@ def test_live_and_picard_transport_sidecar_match_at_same_state(monkeypatch):
         overlay = control_inputs.get("vapour_batch_flux_overlay")
         captures[active_path[0]].append({
             "controls": dict(control_inputs),
+            "film": {
+                "partials": copy.deepcopy(
+                    control_inputs.get("overhead_partials_Pa")
+                ),
+                "total_pressure": control_inputs.get("overhead_pressure_pa"),
+                "flux_pressures": copy.deepcopy(
+                    control_inputs.get(CONTROL_FLUX_PRESSURES_KEY)
+                ),
+                "oxygen_drive": control_inputs.get("surface_oxygen_bound"),
+            },
             "sidecar": copy.deepcopy(
                 getattr(overlay, "transport_sidecar", {})
             ),
@@ -4869,6 +4888,7 @@ def test_live_and_picard_transport_sidecar_match_at_same_state(monkeypatch):
     live_request = captures["live"][0]
     capacity_request = captures["capacity"][0]
     assert live_request["sidecar"] == capacity_request["sidecar"]
+    assert live_request["film"] == capacity_request["film"]
     sidecar = live_request["sidecar"]
     assert sidecar["transport_eligibility_by_species"]["Fe"] == (
         "chapman_enskog"
@@ -4881,12 +4901,31 @@ def test_live_and_picard_transport_sidecar_match_at_same_state(monkeypatch):
             "controls"
         ]
         assert "transport_eligibility_by_species" not in request["controls"]
+        assert "hkl_upper_bound_transport_species" in request["controls"]
+        assert (
+            "hkl_upper_bound_transport_species" not in request["sidecar"]
+        )
         overlay = request["controls"]["vapour_batch_flux_overlay"]
         assert not any(
             notice.get("kind") == "transport_parameters_estimated"
             for notice in overlay.get("notices", ())
             if isinstance(notice, dict)
         )
+
+    no_overlay_sim = _real_capacity_sim()
+    no_overlay_sim.start_campaign(CampaignPhase.C0)
+    no_overlay_sim.melt.temperature_C = 1600.0
+    no_overlay_equilibrium = no_overlay_sim._get_equilibrium()
+    no_overlay_controls, _ = no_overlay_sim._evaporation_flux_control_inputs(
+        no_overlay_equilibrium,
+        overhead_partials_Pa={},
+    )
+    assert "vapour_batch_flux_overlay" not in no_overlay_controls
+    assert no_overlay_controls["hkl_upper_bound_transport_species"] == tuple(
+        sorted(_load_hkl_upper_bound_transport_species(
+            no_overlay_sim.vapor_pressures
+        ))
+    )
     for path in ("live", "capacity"):
         published_overlay = simulators[path]._last_vapour_batch_flux_overlay
         assert any(

@@ -7960,7 +7960,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             EvaporationMixin,
             _provider_resolved_flux_species,
             _capacity_provider_trial_decision,
+            _capacity_zero_load_evidence,
             _take_vapour_batch_selector_overlay,
+            _take_vapour_batch_terminal_outcome,
             _publish_transport_parameter_notices,
             _is_interpolated_vapour_equilibrium,
             _zero_liquid_precedes_interpolation,
@@ -8007,14 +8009,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             selector_overlay = _take_vapour_batch_selector_overlay(
                 self, unresolved_overlay
             )
-            outcome = EvaporationMixin._vapour_batch_resolution_outcome(
-                self,
-                unresolved_error,
-                unresolved_overlay,
-                selector_overlay=selector_overlay,
-                include_unresolved_notices=True,
-                requested_species_ids=None,
-            )
+            outcome = _take_vapour_batch_terminal_outcome(self)
+            if outcome is None:
+                outcome = EvaporationMixin._vapour_batch_resolution_outcome(
+                    self,
+                    unresolved_error,
+                    unresolved_overlay,
+                    selector_overlay=selector_overlay,
+                    include_unresolved_notices=True,
+                    requested_species_ids=None,
+                )
             assert outcome.refusal is not None
             raise outcome.refusal
 
@@ -8066,30 +8070,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             selection_flux_overlay = _take_vapour_batch_selector_overlay(
                 self, batch_flux_overlay
             )
-            outcome = EvaporationMixin._vapour_batch_resolution_outcome(
-                self,
-                resolve_error,
-                batch_flux_overlay,
-                selector_overlay=selection_flux_overlay,
-                flux_pressures=batch_flux_pressures,
-                include_unresolved_notices=True,
-                requested_species_ids=(
-                    getattr(vapour_batch, 'requested_species_ids', None)
-                    if vapour_batch is not None
-                    else None
-                ),
-                liquid_fraction=getattr(
-                    equilibrium, 'liquid_fraction', None
-                ),
-                temperature_K=temperature_K,
-                equilibrium_status=getattr(equilibrium, 'status', None),
-                equilibrium_zero_reason=(
-                    vapor_pressure_diagnostic.get('vapor_pressure_zero_reason')
-                    or (getattr(equilibrium, 'diagnostics', {}) or {}).get(
-                        'vapor_pressure_zero_reason'
-                    )
-                ),
-            )
+            outcome = _take_vapour_batch_terminal_outcome(self)
+            if outcome is None:
+                outcome = EvaporationMixin._vapour_batch_resolution_outcome(
+                    self,
+                    resolve_error,
+                    batch_flux_overlay,
+                    selector_overlay=selection_flux_overlay,
+                    flux_pressures=batch_flux_pressures,
+                    include_unresolved_notices=True,
+                    requested_species_ids=(
+                        getattr(vapour_batch, 'requested_species_ids', None)
+                        if vapour_batch is not None
+                        else None
+                    ),
+                    liquid_fraction=getattr(
+                        equilibrium, 'liquid_fraction', None
+                    ),
+                    temperature_K=temperature_K,
+                    equilibrium_status=getattr(equilibrium, 'status', None),
+                    equilibrium_zero_reason=(
+                        vapor_pressure_diagnostic.get(
+                            'vapor_pressure_zero_reason'
+                        )
+                        or (getattr(equilibrium, 'diagnostics', {}) or {}).get(
+                            'vapor_pressure_zero_reason'
+                        )
+                    ),
+                )
             if outcome.refusal is not None:
                 raise outcome.refusal
             capacity_flux_overlay = copy.deepcopy(batch_flux_overlay)
@@ -8153,19 +8161,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     equilibrium,
                     capacity_restart_used=True,
                 )
-        zero_load_evidence = (
-            'zero_liquid'
-            if zero_liquid
-            else outcome.reason
-            if outcome is not None
-            and outcome.reason in {
-                'below_400K',
-                'internal_analytical_below_400K',
-                'proven_empty_inventory',
-            }
-            else 'below_400K'
-            if temperature_K < 400.0
-            else None
+        zero_load_evidence = _capacity_zero_load_evidence(
+            zero_liquid=zero_liquid,
+            outcome_reason=(outcome.reason if outcome is not None else None),
+            temperature_K=temperature_K,
         )
         solver_molar_masses = dict(provider_molar_masses)
         availability = getattr(
