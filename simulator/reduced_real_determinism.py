@@ -286,6 +286,88 @@ def _is_finite_cache_number(value: Any) -> bool:
         return False
 
 
+def _gate_curve_identity_rejection(
+    curve: Mapping[str, Any],
+    keys: Sequence[Mapping[str, Any]],
+    *,
+    reader_context_policy: bool,
+    write_integrity_only: bool = False,
+) -> str | None:
+    if not keys:
+        return None
+    identity_keys = keys if reader_context_policy else keys[:1]
+    magemin_identities = []
+    for key in identity_keys:
+        if not isinstance(key, Mapping):
+            return "gate.key.type"
+        identity_key = key.get("freeze_gate_cache_key")
+        identity_is_required = (
+            getattr(identity_key, "magemin_domain_identity", None) is not None
+            or (
+                isinstance(identity_key, Mapping)
+                and identity_key.get("magemin_domain_identity") is not None
+            )
+            or (
+                isinstance(identity_key, (list, tuple))
+                and len(identity_key) == 9
+                and identity_key[7] is not None
+            )
+        )
+        try:
+            identity = _magemin_identity_from_replay_key(key)
+        except (OverflowError, TypeError, ValueError):
+            identity = None
+        if identity is None and identity_is_required:
+            return "gate.key.identity"
+        if identity is None:
+            continue
+        if identity.silica_verdict not in {"in_band", "extrapolated"}:
+            return "gate.key.silica_verdict"
+        magemin_identities.append(identity)
+    extrapolated_identities = [
+        identity
+        for identity in magemin_identities
+        if identity.silica_verdict == "extrapolated"
+    ]
+    if extrapolated_identities:
+        stored_or_query_identity = extrapolated_identities[0]
+        if (
+            reader_context_policy
+            and len(identity_keys) > 1
+            and len(magemin_identities) != len(identity_keys)
+        ) or any(
+            not stored_or_query_identity.matches(identity)
+            for identity in magemin_identities
+        ):
+            return "gate.key.identity_mismatch"
+        certified_band = curve.get("certified_band")
+        silica_bounds = (
+            certified_band.get("sio2_wt_pct")
+            if isinstance(certified_band, Mapping)
+            else None
+        )
+        band_shape_valid = (
+            isinstance(silica_bounds, (list, tuple))
+            and not isinstance(silica_bounds, (str, bytes))
+            and len(silica_bounds) == 2
+            and all(_is_finite_cache_number(bound) for bound in silica_bounds)
+            and silica_bounds[0] < silica_bounds[1]
+            and curve.get("authority") == "extrapolated"
+        )
+        if stored_or_query_identity.certified_band is None:
+            return "gate.key.certified_band_mismatch"
+        if not band_shape_valid:
+            if write_integrity_only:
+                return None
+            return "gate.key.certified_band_mismatch"
+        if (
+            tuple(float(bound) for bound in silica_bounds)
+            != stored_or_query_identity.certified_band
+        ):
+            return "gate.key.certified_band_mismatch"
+    return None
+
+
 def _admission_rejection(
     artifact: str,
     payload: Any,
@@ -469,71 +551,13 @@ def _admission_rejection(
             and not valid_composition_projected_notice(projected_notice)
         ):
             return "gate.composition_projected_notice"
-        if reader_context_policy:
-            magemin_identities = []
-            for key in keys:
-                if not isinstance(key, Mapping):
-                    return "gate.key.type"
-                identity_key = key.get("freeze_gate_cache_key")
-                identity_is_required = (
-                    getattr(identity_key, "magemin_domain_identity", None) is not None
-                    or (
-                        isinstance(identity_key, Mapping)
-                        and identity_key.get("magemin_domain_identity") is not None
-                    )
-                    or (
-                        isinstance(identity_key, (list, tuple))
-                        and len(identity_key) == 9
-                        and identity_key[7] is not None
-                    )
-                )
-                try:
-                    identity = _magemin_identity_from_replay_key(key)
-                except (OverflowError, TypeError, ValueError):
-                    identity = None
-                if identity is None and identity_is_required:
-                    return "gate.key.identity"
-                if identity is None:
-                    continue
-                if identity.silica_verdict not in {"in_band", "extrapolated"}:
-                    return "gate.key.silica_verdict"
-                magemin_identities.append(identity)
-            extrapolated_identities = [
-                identity
-                for identity in magemin_identities
-                if identity.silica_verdict == "extrapolated"
-            ]
-            if extrapolated_identities:
-                stored_or_query_identity = extrapolated_identities[0]
-                if (
-                    len(keys) > 1
-                    and len(magemin_identities) != len(keys)
-                ) or any(
-                    not stored_or_query_identity.matches(identity)
-                    for identity in magemin_identities
-                ):
-                    return "gate.key.identity_mismatch"
-                certified_band = curve.get("certified_band")
-                silica_bounds = (
-                    certified_band.get("sio2_wt_pct")
-                    if isinstance(certified_band, Mapping)
-                    else None
-                )
-                if (
-                    not isinstance(silica_bounds, (list, tuple))
-                    or isinstance(silica_bounds, (str, bytes))
-                    or len(silica_bounds) != 2
-                    or not all(
-                        _is_finite_cache_number(bound)
-                        for bound in silica_bounds
-                    )
-                    or silica_bounds[0] >= silica_bounds[1]
-                    or stored_or_query_identity.certified_band is None
-                    or curve.get("authority") != "extrapolated"
-                    or tuple(float(bound) for bound in silica_bounds)
-                    != stored_or_query_identity.certified_band
-                ):
-                    return "gate.key.certified_band_mismatch"
+        identity_rejection = _gate_curve_identity_rejection(
+            curve,
+            keys,
+            reader_context_policy=reader_context_policy,
+        )
+        if identity_rejection is not None:
+            return identity_rejection
         return None
     if artifact == "equilibrium_post_record":
         equilibrium_result = payload.get("equilibrium_result")
@@ -586,7 +610,7 @@ def _admission_rejection(
                 return "equilibrium.authority.provider_shape"
         elif "authority" in payload and not isinstance(authority, Mapping):
             return "equilibrium.authority.type"
-        if not interpolation_synthesized and reader_context_policy and keys:
+        if not interpolation_synthesized and keys:
             try:
                 validate_reduced_real_equilibrium_record_key(
                     artifact,
@@ -1369,8 +1393,9 @@ class PT0DeterminismStore:
         payload = canonical_replay_output_projection(
             "equilibrium_post_record", sim, result
         )
+        readback_policy_miss = False
         try:
-            self._store(
+            readback_policy_miss = self._store(
                 "equilibrium_post_record",
                 key,
                 payload,
@@ -1380,6 +1405,8 @@ class PT0DeterminismStore:
         except (UncacheableKey, UncacheablePayload) as exc:
             self._mark_uncacheable_capture(sim, reason=exc)
             return
+        if readback_policy_miss:
+            self._record_capture_readback_policy_miss(sim)
         sim._last_reduced_real_cache_state = self.last_cache_state
 
     def cached_equilibrium(self, sim: Any) -> EquilibriumResult | None:
@@ -1632,8 +1659,9 @@ class PT0DeterminismStore:
         ):
             self._mark_uncacheable_capture(sim)
             return
+        readback_policy_miss = False
         try:
-            self._store(
+            readback_policy_miss = self._store(
                 "freeze_gate_curve",
                 key,
                 {"curve": _curve_payload(curve)},
@@ -1648,6 +1676,8 @@ class PT0DeterminismStore:
         except (UncacheableKey, UncacheablePayload) as exc:
             self._mark_uncacheable_capture(sim, reason=exc)
             return
+        if readback_policy_miss:
+            self._record_capture_readback_policy_miss(sim)
         sim._last_reduced_real_cache_state = self.last_cache_state
 
     def _mark_uncacheable_capture(
@@ -1667,6 +1697,16 @@ class PT0DeterminismStore:
                     "reason": reason.reason,
                 },
             )
+
+    @staticmethod
+    def _record_capture_readback_policy_miss(sim: Any) -> None:
+        record_repair_notice(
+            sim,
+            {
+                "kind": "reduced_real_cache_capture_readback_miss",
+                "reason": "reader policy did not admit the stored row",
+            },
+        )
 
     def replay_gate_curve(
         self,
@@ -1854,21 +1894,32 @@ class PT0DeterminismStore:
         engine_version_provenance: str | None = None,
         repair_notices: Sequence[Mapping[str, Any]] = (),
         law_disclosures: Any = _FROM_COMPUTATION,
-    ) -> None:
+    ) -> bool:
         indexability_error = _ladder_indexability(key)
         if indexability_error is not None:
             raise indexability_error
-        validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
         payload_codec_version = _payload_codec_version(artifact)
         repair_notices_json = encode_repair_notices_json(repair_notices)
         key_hash = _sha256(key_bytes)
+        if artifact == "freeze_gate_curve":
+            curve_payload = payload.get("curve")
+            if isinstance(curve_payload, Mapping):
+                identity_rejection = _gate_curve_identity_rejection(
+                    curve_payload,
+                    (key,),
+                    reader_context_policy=False,
+                    write_integrity_only=True,
+                )
+                if identity_rejection is not None:
+                    raise UncacheablePayload(artifact, key_hash)
         payload_hash = _sha256(payload_bytes)
         physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
         physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
         physics_bucket_hash = _sha256(physics_bucket_bytes)
+        readback_policy_miss = False
         self.capture_sequence.append(
             {
                 "artifact": artifact,
@@ -1934,14 +1985,13 @@ class PT0DeterminismStore:
                 key_hash=key_hash,
             )
             if persisted is None:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 capture disappeared after write: {key_hash}"
+                readback_policy_miss = True
+            else:
+                effective_notices_json = persisted["repair_notices_json"]
+                incoming_disclosures = _prefer_law_disclosures(
+                    persisted.get("law_disclosures"),
+                    incoming_disclosures,
                 )
-            effective_notices_json = persisted["repair_notices_json"]
-            incoming_disclosures = _prefer_law_disclosures(
-                persisted.get("law_disclosures"),
-                incoming_disclosures,
-            )
         if existing is not None and not stale_payload:
             existing["repair_notices_json"] = effective_notices_json
             existing["law_disclosures"] = _prefer_law_disclosures(
@@ -1950,7 +2000,7 @@ class PT0DeterminismStore:
             )
             self._entries[key_hash] = existing
             self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
-            return
+            return readback_policy_miss
         entry = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),
@@ -1965,19 +2015,12 @@ class PT0DeterminismStore:
             "physics_bucket_hash": physics_bucket_hash,
             "cache_state": "live_fill",
         }
-        if self.persistent_store is None:
-            _require_pt0_memory_candidate_admission(
-                entry,
-                artifact=artifact,
-                key=key,
-                key_bytes=key_bytes,
-                key_hash=key_hash,
-            )
         self._entries[key_hash] = entry
         self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
         self.live_fills += 1
         self.last_cache_state = "live_fill"
         self._record_cache_event(artifact, "live_fill")
+        return readback_policy_miss
 
     def _lookup(
         self,
@@ -3260,11 +3303,13 @@ def _admit_stored_row(
 
 
 def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
-    """Canonicalize and admit one final PT1 row before its SQL mutation.
+    """Validate one final PT1 row's key and index integrity before writing.
 
     Private ``_write_*`` values carry the caller's inputs to this boundary so
     that serialization failures are converted to the same typed write refusal
-    as failures discovered while decoding the encoded row.
+    as failures discovered while deriving the stored indexes. Payload replay
+    shape remains reader admission policy; extrapolated gate identity is the
+    one payload-to-key identity checked here.
     """
 
     try:
@@ -3280,6 +3325,19 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
     rebuild_indexes = row.pop("_write_rebuild_indexes", False)
     artifact = row.get("artifact")
     artifact_name = artifact if isinstance(artifact, str) else "unknown"
+    row_columns = set(row)
+    legacy_layout = (
+        (
+            _payload_codec_version(artifact_name) is not None
+            and row.get("payload_codec_version") is None
+        )
+        or not {
+            "artifact",
+            "payload_codec_version",
+            "payload_bytes",
+            "payload_sha256",
+        }.issubset(row_columns)
+    )
     try:
         key_hash = str(row.get("key_hash", ""))
     except Exception as exc:
@@ -3289,19 +3347,25 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
     try:
         if type(replace_key) is not bool or type(rebuild_indexes) is not bool:
             raise TypeError("invalid PT1 write-gate options")
-        if not isinstance(artifact, str):
+        if not legacy_layout and not isinstance(artifact, str):
             raise TypeError("PT1 write row artifact must be a string")
 
         if expected_key is not None:
             if not isinstance(expected_key, Mapping):
                 raise TypeError("caller key must be a mapping")
+            if not legacy_layout:
+                indexability_error = _ladder_indexability(expected_key)
+                if indexability_error is not None:
+                    raise indexability_error
             canonical_key_bytes = canonical_json_bytes(expected_key)
             if replace_key:
                 key_hash = _sha256(canonical_key_bytes)
                 row["key_hash"] = key_hash
-                row["key_sha256"] = key_hash
+                if "key_sha256" in row_columns:
+                    row["key_sha256"] = key_hash
                 row["key_bytes"] = sqlite3.Binary(canonical_key_bytes)
-                row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+                if not legacy_layout:
+                    row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
                 stored_key = dict(_json_ready(expected_key))
             else:
                 supplied_key_bytes = _pt1_row_bytes(
@@ -3331,11 +3395,54 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                 "write_candidate_key_bytes",
             )
         key_hash = _sha256(canonical_key_bytes)
-        if row.get("key_hash") != key_hash or row.get("key_sha256") != key_hash:
+        if row.get("key_hash") != key_hash or (
+            "key_sha256" in row_columns and row.get("key_sha256") != key_hash
+        ):
             raise UncacheableKey(
                 PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
                 "write_candidate_key_hash",
             )
+
+        if legacy_layout:
+            index_columns = {
+                "physics_bucket_schema_version",
+                "physics_bucket_sha256",
+                "replay_scope_sha256",
+                "physics_key_bytes",
+                *(
+                    column
+                    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                    for column in (
+                        _physics_ladder_hash_column(rung_tag),
+                        _physics_ladder_distance_column(rung_tag),
+                    )
+                ),
+            }
+            if rebuild_indexes and index_columns.intersection(row_columns):
+                bucket_key = canonical_physics_bucket_key_from_replay_key(
+                    stored_key
+                )
+                bucket_bytes = canonical_json_bytes(bucket_key)
+                ladder_values = _physics_ladder_values_from_replay_key(
+                    stored_key
+                )
+                legacy_indexes = {
+                    "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
+                    "physics_bucket_sha256": _sha256(bucket_bytes),
+                    "replay_scope_sha256": _replay_scope_hash(bucket_key),
+                    "physics_key_bytes": sqlite3.Binary(bucket_bytes),
+                }
+                for rung_tag, values in ladder_values.items():
+                    legacy_indexes[_physics_ladder_hash_column(rung_tag)] = values[
+                        "sha256"
+                    ]
+                    legacy_indexes[_physics_ladder_distance_column(rung_tag)] = values[
+                        "distance"
+                    ]
+                for column in index_columns.intersection(row_columns):
+                    row[column] = legacy_indexes[column]
+            return row
+
         indexability_error = _ladder_indexability(stored_key)
         if indexability_error is not None:
             raise indexability_error
@@ -3394,6 +3501,29 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                     PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
                     "write_candidate_physics_bucket_bytes",
                 )
+            if (
+                row.get("physics_bucket_schema_version")
+                != PHYSICS_BUCKET_SCHEMA_VERSION
+                or row.get("physics_bucket_sha256") != bucket_hash
+                or row.get("replay_scope_sha256") != _replay_scope_hash(bucket_key)
+            ):
+                raise UncacheableKey(
+                    PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                    "write_candidate_physics_bucket_index",
+                )
+            for rung_tag, values in ladder_values.items():
+                indexed_distance = row.get(
+                    _physics_ladder_distance_column(rung_tag)
+                )
+                if (
+                    row.get(_physics_ladder_hash_column(rung_tag))
+                    != values["sha256"]
+                    or isinstance(indexed_distance, bool)
+                    or not isinstance(indexed_distance, (int, float))
+                    or not math.isfinite(float(indexed_distance))
+                    or float(indexed_distance) != float(values["distance"])
+                ):
+                    raise UncacheableKey(rung_tag, "write_candidate_ladder_index")
 
         stage = "payload"
         payload_bytes = _pt1_row_bytes(
@@ -3412,34 +3542,24 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
             canonical_json_bytes(expected_payload) != payload_bytes
         ):
             raise UncacheablePayload(artifact_name, key_hash)
+        validate_repair_notices_json(row.get("repair_notices_json"))
 
-        try:
-            admitted = _admit_stored_row(
-                row,
-                store_kind="pt1",
-                reader_context_policy=False,
+        if artifact_name == "freeze_gate_curve":
+            curve_payload = (
+                payload_value.get("curve")
+                if isinstance(payload_value, Mapping)
+                else None
             )
-        except PT1PersistentStoreCorrupt as exc:
-            message = str(exc).lower()
-            if any(
-                marker in message
-                for marker in (
-                    "key",
-                    "bucket",
-                    "scope",
-                    "ladder",
-                    "distance",
-                    "replay key",
+            if isinstance(curve_payload, Mapping):
+                identity_rejection = _gate_curve_identity_rejection(
+                    curve_payload,
+                    (stored_key,),
+                    reader_context_policy=False,
+                    write_integrity_only=True,
                 )
-            ):
-                raise UncacheableKey(
-                    PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
-                    "write_candidate_index",
-                ) from exc
-            raise UncacheablePayload(artifact_name, key_hash) from exc
-        if admitted is None or admitted.decoded_payload is None:
-            raise UncacheablePayload(artifact_name, key_hash)
-        return dict(admitted.stored_columns or row)
+                if identity_rejection is not None:
+                    raise UncacheablePayload(artifact_name, key_hash)
+        return row
     except (UncacheableKey, UncacheablePayload):
         raise
     except Exception as exc:
@@ -3449,27 +3569,6 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                 "write_candidate_index",
             ) from exc
         raise UncacheablePayload(artifact_name, key_hash) from exc
-
-
-def _require_pt0_memory_candidate_admission(
-    row: Mapping[str, Any],
-    *,
-    artifact: str,
-    key: Mapping[str, Any],
-    key_bytes: bytes,
-    key_hash: str,
-) -> None:
-    admitted = _admit_stored_row(
-        row,
-        store_kind="pt0",
-        artifact=artifact,
-        key=key,
-        key_bytes=key_bytes,
-        key_hash=key_hash,
-        reader_context_policy=False,
-    )
-    if admitted is None or admitted.decoded_payload is None:
-        raise UncacheablePayload(artifact, key_hash)
 
 
 class PT1PersistentEquilibriumStore:
@@ -3523,20 +3622,34 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str | None = None,
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
-        # Preserve the capture-side authority rule; replay policy is excluded
-        # from the shared PT1 write gate below.
+        if not isinstance(key, Mapping):
+            raise UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "write_candidate_key",
+            )
+        indexability_error = _ladder_indexability(key)
+        if indexability_error is not None:
+            raise indexability_error
         try:
-            validate_reduced_real_equilibrium_record_key(artifact, key, payload)
-        except (PT1PersistentStoreCorrupt, RuntimeError) as exc:
-            raise UncacheablePayload(artifact, key_hash) from exc
-        payload_codec_version = _payload_codec_version(artifact)
-        if self.strict_vapor_gate:
-            assert_strict_vapor_pt1_row(
-                artifact=artifact,
-                key=key,
-                payload=payload,
+            key_bytes = _pt1_row_bytes(
+                key_bytes,
+                field="key",
                 key_hash=key_hash,
             )
+        except PT1PersistentStoreCorrupt as exc:
+            raise UncacheableKey(
+                PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
+                "write_candidate_key_bytes",
+            ) from exc
+        try:
+            payload_bytes = _pt1_row_bytes(
+                payload_bytes,
+                field="payload",
+                key_hash=key_hash,
+            )
+        except PT1PersistentStoreCorrupt as exc:
+            raise UncacheablePayload(artifact, key_hash) from exc
+        payload_codec_version = _payload_codec_version(artifact)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
 
         insert_columns = (

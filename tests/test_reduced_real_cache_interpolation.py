@@ -52,7 +52,8 @@ def test_interpolation_and_ladder_reject_non_string_control_names() -> None:
     assert rci.interpolation_key_domain_violation(key) == "controls"
     refusal = rrd._ladder_indexability(key)
     assert isinstance(refusal, rrd.UncacheableKey)
-    assert refusal.reason == "controls"
+    assert refusal.field == "controls"
+    assert refusal.reason.endswith("for controls")
 
 
 def _interpolation_key(

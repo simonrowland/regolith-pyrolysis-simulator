@@ -2492,32 +2492,65 @@ def test_marker_only_melt_envelope_is_rejected_before_replay_reconstruction(
         replay()
 
 
-def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
+def test_pt1_put_does_not_apply_strict_vapor_reader_policy(
     tmp_path: Path,
 ) -> None:
-    key = _strict_vapor_key()
-    payload = {
-        "authority": _alphamelts_record_authority(),
-        "equilibrium_result": {"status": "ok"},
-        "last_vapor_pressures_source": {"Na": "builtin_fallback"},
-    }
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record",
+        sim,
+        result,
+    )
+    payload["last_vapor_pressures_source"] = {"SiO": "builtin_fallback"}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     db_path = tmp_path / "strict-pt1.sqlite"
     store = rrd.PT1PersistentEquilibriumStore(db_path, strict_vapor_gate=True)
 
-    with pytest.raises(GrindSourceGateError, match="builtin_fallback"):
+    store.put(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 1
+
+
+@pytest.mark.parametrize("bad_input", ("control_name", "key_bytes"))
+def test_pt1_put_refuses_raw_unindexable_key_inputs_with_typed_error(
+    tmp_path: Path,
+    bad_input: str,
+) -> None:
+    key = _freeze_gate_key()
+    key_bytes: Any = canonical_json_bytes(key)
+    if bad_input == "control_name":
+        key["controls"][7] = 1.0
+        key_bytes = canonical_json_bytes(key)
+    else:
+        key_bytes = "not-bytes"
+    payload = _valid_test_gate_payload()
+    payload_bytes = canonical_json_bytes(payload)
+    db_path = tmp_path / f"pt1-invalid-key-{bad_input}.sqlite"
+    store = PT1PersistentEquilibriumStore(db_path)
+
+    with pytest.raises(rrd.UncacheableKey):
         store.put(
-            artifact="equilibrium_post_record",
+            artifact="freeze_gate_curve",
             key=key,
             key_bytes=key_bytes,
-            key_hash=hashlib.sha256(key_bytes).hexdigest(),
+            key_hash=rrd._sha256(canonical_json_bytes(key)),
             payload=payload,
             payload_bytes=payload_bytes,
-            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+            payload_hash=rrd._sha256(payload_bytes),
         )
 
-    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
+    assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
 
 
 def _lookup_c3a_payload(db_path: Path, key: dict) -> tuple[dict, PT0DeterminismStore]:
@@ -2842,6 +2875,8 @@ def test_pt0_production_gate_curve_cold_replays_across_isochemical_ramp(
     replay_sim.melt.oxygen_reservoir.reference_T_K = 1723.15
     replay_sim._sync_oxygen_reservoir_mirror()
     assert replay_sim._freeze_gate_curve() == curve
+    assert replay.hits == 1
+    assert replay.last_cache_state == "cached_exact"
     replay_controls = replay.replay_sequence[-1]["key"]["controls"]
     assert replay_controls == capture_controls
 
@@ -5084,12 +5119,12 @@ def test_ladder_indexability_special_float_class(
             rung_hash=rung_hash,
             query_key=key,
         )
-        policy_refusal = (
-            field == "pO2_bar"
-            and value == 0.0
-            and key.get("vapor_pressure_provider_selection") is not None
-            and rung_tag in {"h40c", "h30c"}
-        )
+        policy_refusal = not rrd.physics_control_rung_error_budget(
+            key,
+            key,
+            rung_tag,
+            source_payload=payload,
+        )["accepted"]
         assert (rung_hit is None) is policy_refusal
     interpolation_candidates = pt1._list_interpolation_candidates(
         artifact=artifact,
@@ -6998,20 +7033,35 @@ def test_extrapolated_gate_rows_that_miss_d447_are_replaceable(
         **stale_curve,
         "certified_band": {"sio2_wt_pct": [30.0, 80.0]},
     }
-    _store_unadmitted_test_payload(
-        store,
-        "freeze_gate_curve",
-        key,
-        {"curve": stale_curve},
-        law_disclosures=[],
-    )
-    miss = (
-        PT0DeterminismStore("replay", db_path=db_path)
-        if persistent
-        else store
-    )
-    with pytest.raises(PT0CacheMiss):
-        miss._lookup("freeze_gate_curve", key)
+    if bad_band is None:
+        _store_unadmitted_test_payload(
+            store,
+            "freeze_gate_curve",
+            key,
+            {"curve": stale_curve},
+            law_disclosures=[],
+        )
+        miss = (
+            PT0DeterminismStore("replay", db_path=db_path)
+            if persistent
+            else store
+        )
+        with pytest.raises(PT0CacheMiss):
+            miss._lookup("freeze_gate_curve", key)
+    else:
+        with pytest.raises(rrd.UncacheablePayload):
+            store._store(
+                "freeze_gate_curve",
+                key,
+                {"curve": stale_curve},
+                law_disclosures=[],
+            )
+        assert store._entries == {}
+        if persistent:
+            assert _persistent_artifact_count(
+                db_path,
+                "freeze_gate_curve",
+            ) == 0
 
     store._store(
         "freeze_gate_curve",
@@ -7084,6 +7134,27 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
             }
         }
 
+    memory_bad_capture = PT0DeterminismStore("capture")
+    with pytest.raises(rrd.UncacheablePayload):
+        memory_bad_capture._store(
+            "freeze_gate_curve",
+            key,
+            payload_for([0.0, 100.0]),
+            law_disclosures=[],
+        )
+    assert memory_bad_capture._entries == {}
+
+    bad_capture_db = tmp_path / "extrapolated-gate-write-band-mismatch.sqlite"
+    bad_capture = PT0DeterminismStore("capture", db_path=bad_capture_db)
+    with pytest.raises(rrd.UncacheablePayload):
+        bad_capture._store(
+            "freeze_gate_curve",
+            key,
+            payload_for([0.0, 100.0]),
+            law_disclosures=[],
+        )
+    assert _persistent_artifact_count(bad_capture_db, "freeze_gate_curve") == 0
+
     def row_for(
         payload: Mapping[str, Any],
         *,
@@ -7114,6 +7185,10 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
 
     stale_payload = payload_for([0.0, 100.0])
     valid_payload = payload_for([30.0, 80.0])
+    current_write_row = row_for(stale_payload)
+    current_write_row["store_schema_version"] = rrd.PT1_STORE_SCHEMA_VERSION
+    with pytest.raises(rrd.UncacheablePayload):
+        rrd._gate_row_for_write(current_write_row)
     assert not rrd._pt1_row_admission(row_for(stale_payload))
     assert rrd._pt1_row_admission(row_for(valid_payload))
     reversed_band_key = copy.deepcopy(rrd._json_ready(key))
@@ -7563,7 +7638,7 @@ def test_empty_gate_curve_path_misses_and_is_replaceable(
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
-def test_empty_gate_curve_capture_skips_write_with_notice(
+def test_empty_gate_curve_capture_is_a_reader_miss_and_can_be_replaced(
     tmp_path: Path,
     persistent: bool,
 ) -> None:
@@ -7588,18 +7663,37 @@ def test_empty_gate_curve_capture_skips_write_with_notice(
         law_disclosures=[],
     )
 
+    key = capture.capture_sequence[-1]["key"]
+    assert len(capture._entries) == 1
+    assert capture.last_cache_state == "live_fill"
     if persistent:
-        assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
-    assert capture._entries == {}
-    assert capture.last_cache_state is None
+        assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
+    assert capture._lookup_optional("freeze_gate_curve", key) is None
     notices = getattr(sim, rrd.REPAIR_NOTICE_COLLECTOR_ATTRIBUTE)
-    assert len(notices) == 1
-    assert notices[0]["kind"] == "reduced_real_cache_write_skipped"
-    assert notices[0]["category"] == "invalid-payload"
-    assert "freeze_gate_curve payload is not replayable" in notices[0]["reason"]
+    if persistent:
+        assert len(notices) == 1
+        assert notices[0]["kind"] == "reduced_real_cache_capture_readback_miss"
+    else:
+        assert notices == []
+
+    replacement_curve = {**curve, "path": ((1200.0, 0.0), (1300.0, 1.0))}
+    seed_gate_curve_memo_record(sim, replacement_curve)
+    capture.capture_gate_curve(
+        sim,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        curve=replacement_curve,
+        repair_notices=[],
+        law_disclosures=[],
+    )
+    assert capture._lookup("freeze_gate_curve", key) == {
+        "curve": rrd._curve_payload(replacement_curve)
+    }
+    assert capture.hits == 1
+    if persistent:
+        assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
 
 
-def test_pt1_legacy_stamp_upgrade_gates_final_row(
+def test_pt1_legacy_store_stamp_upgrade_preserves_reader_miss_payload(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -7624,17 +7718,15 @@ def test_pt1_legacy_stamp_upgrade_gates_final_row(
             (rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,),
         )
 
-    gate_refusals: list[BaseException] = []
+    gate_calls: list[dict[str, Any]] = []
     original_gate = rrd._gate_row_for_write
 
-    def record_gate_refusal(row):
-        try:
-            return original_gate(row)
-        except (rrd.UncacheableKey, rrd.UncacheablePayload) as exc:
-            gate_refusals.append(exc)
-            raise
+    def record_gate_call(row):
+        result = original_gate(row)
+        gate_calls.append(result)
+        return result
 
-    monkeypatch.setattr(rrd, "_gate_row_for_write", record_gate_refusal)
+    monkeypatch.setattr(rrd, "_gate_row_for_write", record_gate_call)
     store = rrd.PT1PersistentEquilibriumStore(db_path)
     key_bytes = canonical_json_bytes(key)
     assert store.get(
@@ -7643,15 +7735,16 @@ def test_pt1_legacy_stamp_upgrade_gates_final_row(
         key_bytes=key_bytes,
         key_hash=key_hash,
     ) is None
-    assert len(gate_refusals) == 1
-    assert isinstance(gate_refusals[0], rrd.UncacheablePayload)
+    assert len(gate_calls) == 1
     with sqlite3.connect(db_path) as conn:
-        (store_stamp,) = conn.execute(
-            f"SELECT store_schema_version FROM {PT1_EQUILIBRIUM_TABLE} "
+        store_stamp, payload_bytes = conn.execute(
+            f"SELECT store_schema_version, payload_bytes "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} "
             "WHERE key_hash = ?",
             (key_hash,),
         ).fetchone()
-    assert store_stamp == rrd.PT1_LEGACY_STORE_SCHEMA_VERSION
+    assert store_stamp == rrd.PT1_STORE_SCHEMA_VERSION
+    assert bytes(payload_bytes) == canonical_json_bytes(invalid_payload)
 
 
 def test_pt1_write_gate_maps_nonfinite_caller_bucket_key_to_uncacheable_key(
@@ -8791,6 +8884,74 @@ def test_pt1_capture_gate_curve_skips_non_cacheable_status(
     assert capture.last_cache_state == "live_fill"
     assert sim._last_reduced_real_cache_state == "live_fill"
     assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
+
+
+def test_gate_capture_keeps_live_result_on_postwrite_policy_miss(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "pt1-gate-readback-policy-miss.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+    curve = {
+        "source": "unit-test",
+        "status": "ok",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    seed_gate_curve_memo_record(sim, curve)
+    monkeypatch.setattr(capture.persistent_store, "get", lambda **_kwargs: None)
+
+    capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve)
+
+    notices = getattr(sim, rrd.REPAIR_NOTICE_COLLECTOR_ATTRIBUTE)
+    assert len(notices) == 1
+    assert notices[0]["kind"] == "reduced_real_cache_capture_readback_miss"
+    assert capture.last_cache_state == "live_fill"
+    assert sim._last_reduced_real_cache_state == "live_fill"
+    assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
+
+
+def test_equilibrium_capture_keeps_live_result_on_postwrite_policy_miss(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "pt1-equilibrium-readback-policy-miss.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    original_projection = rrd.canonical_replay_output_projection
+
+    def omit_replay_diagnostic(artifact, projected_sim, projected_result):
+        payload = original_projection(artifact, projected_sim, projected_result)
+        if artifact == "equilibrium_post_record":
+            payload.pop("last_vapor_pressure_diagnostic")
+        return payload
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            rrd,
+            "canonical_replay_output_projection",
+            omit_replay_diagnostic,
+        )
+        capture.capture_equilibrium(sim, result)
+
+    notices = getattr(sim, rrd.REPAIR_NOTICE_COLLECTOR_ATTRIBUTE)
+    assert len(notices) == 1
+    assert notices[0]["kind"] == "reduced_real_cache_capture_readback_miss"
+    assert capture.last_cache_state == "live_fill"
+    assert sim._last_reduced_real_cache_state == "live_fill"
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 1
+
+    capture.capture_equilibrium(sim, result)
+    key = capture._equilibrium_key(sim)
+    assert capture._lookup("equilibrium_post_record", key) == original_projection(
+        "equilibrium_post_record",
+        sim,
+        result,
+    )
 
 
 def test_gate_capture_rechecks_receipt_after_memo_hit(

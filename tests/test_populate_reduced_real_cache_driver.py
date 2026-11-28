@@ -194,14 +194,12 @@ def _write_equilibrium_post_record_row(
     )
 
 
-def test_populate_equilibrium_post_record_write_passes_artifact_decoder(
+def test_populate_equilibrium_post_record_write_does_not_decode_payload(
     tmp_path,
     monkeypatch,
 ):
     gate_rows = []
-    decoded_payloads = []
     original_gate = rrd._gate_row_for_write
-    original_decode = rrd._decode_payload_for_admission
 
     def record_gate(row):
         admitted_row = original_gate(row)
@@ -209,29 +207,41 @@ def test_populate_equilibrium_post_record_write_passes_artifact_decoder(
             gate_rows.append(admitted_row)
         return admitted_row
 
-    def record_decode(artifact, payload, **kwargs):
-        decoded = original_decode(artifact, payload, **kwargs)
-        if (
-            artifact == "equilibrium_post_record"
-            and kwargs.get("reader_context_policy") is False
-        ):
-            decoded_payloads.append(decoded)
-        return decoded
+    def unexpected_decode(*_args, **_kwargs):
+        pytest.fail("the write gate must not apply reader payload admission")
 
     monkeypatch.setattr(rrd, "_gate_row_for_write", record_gate)
-    monkeypatch.setattr(rrd, "_decode_payload_for_admission", record_decode)
 
     db_path = tmp_path / "populate-equilibrium-write-gate.db"
     key = _strict_vapor_pt1_key("write-gate-trace")
-    _write_equilibrium_post_record_row(
-        db_path,
-        key=key,
-        payload=_strict_vapor_pt1_payload(),
-    )
+    payload = _strict_vapor_pt1_payload()
+    payload.pop("last_vapor_pressure_diagnostic")
+    key_bytes = _canonical_bytes(key)
+    with monkeypatch.context() as patch:
+        patch.setattr(rrd, "_decode_payload_for_admission", unexpected_decode)
+        _write_equilibrium_post_record_row(
+            db_path,
+            key=key,
+            payload=payload,
+        )
 
     assert gate_rows
-    assert any(decoded is not None for decoded in decoded_payloads)
     assert gate_rows[-1]["artifact"] == "equilibrium_post_record"
+    with sqlite3.connect(db_path) as conn:
+        (stored_payload_bytes,) = conn.execute(
+            f"SELECT payload_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (hashlib.sha256(key_bytes).hexdigest(),),
+        ).fetchone()
+    assert bytes(stored_payload_bytes) == _canonical_bytes(payload)
+
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    assert store.get(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+    ) is None
 
 
 def _write_equilibrium_post_record_row_raw(
@@ -988,7 +998,7 @@ def test_merge_cache_shard_rejects_builtin_fallback_vapor_source(tmp_path):
         ),
     ),
 )
-def test_strict_pt1_write_paths_share_vapor_gate(
+def test_strict_vapor_policy_is_outside_the_pt1_write_gate(
     tmp_path,
     write_path,
     case_name,
@@ -999,7 +1009,12 @@ def test_strict_pt1_write_paths_share_vapor_gate(
     target_db = tmp_path / f"{write_path}-{case_name}-target.db"
     key = _strict_vapor_pt1_key(case_name, **key_kwargs)
     payload = _strict_vapor_pt1_payload(**key_kwargs)
-    payload.update(payload_update)
+    if case_name == "payload_kernel_fallback":
+        payload["equilibrium_result"].update(
+            {"kernel_fallback_used": True}
+        )
+    else:
+        payload.update(payload_update)
 
     def write_put():
         _write_equilibrium_post_record_row(
@@ -1019,11 +1034,13 @@ def test_strict_pt1_write_paths_share_vapor_gate(
         )
         driver._merge_cache_shard(shard_db, target_db)
 
-    write = write_put if write_path == "put" else write_merge
-    with pytest.raises(driver.GrindSourceGateError, match=match):
-        write()
-
-    assert driver._cache_row_summary(target_db)["rows"] == 0
+    if write_path == "put":
+        write_put()
+        assert driver._cache_row_summary(target_db)["rows"] == 1
+    else:
+        with pytest.raises(driver.GrindSourceGateError, match=match):
+            write_merge()
+        assert driver._cache_row_summary(target_db)["rows"] == 0
 
     clean_target_db = tmp_path / f"{write_path}-{case_name}-clean-target.db"
     clean_key = _strict_vapor_pt1_key(f"{case_name}-clean")
