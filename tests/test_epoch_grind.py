@@ -1858,6 +1858,18 @@ def test_epoch_child_cache_gate_receives_profile_strict_vapor_flag(
     ]
 
 
+def test_epoch_strict_vapor_gate_real_partial_uses_cache_path_first(
+    tmp_path: Path,
+) -> None:
+    missing_cache = tmp_path / "missing-cache.sqlite"
+
+    assert epoch_grind.assert_strict_vapor_result_store(missing_cache) == {
+        "rows": 0,
+        "vapor_active_rows": 0,
+        "source_reports": 0,
+    }
+
+
 def test_seed_job_cache_removes_stale_sqlite_sidecars(tmp_path: Path) -> None:
     base = tmp_path / "base.sqlite"
     shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"

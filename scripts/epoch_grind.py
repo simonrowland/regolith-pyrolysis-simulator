@@ -86,7 +86,7 @@ from simulator.interpolation_uncertainty import (
 
 assert_strict_vapor_result_store = partial(
     _assert_strict_vapor_result_store,
-    _decode_result_payload,
+    decode_result_payload=_decode_result_payload,
 )
 
 

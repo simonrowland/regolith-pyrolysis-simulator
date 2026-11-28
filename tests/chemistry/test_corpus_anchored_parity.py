@@ -2150,6 +2150,53 @@ def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
     assert replay_scope == "stale-scope"
 
 
+def test_rekey_legacy_h40_index_rejects_subnormal_derived_distance(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "legacy-subnormal-h40.db"
+    key = {
+        "backend": {"backend_name": "alphamelts"},
+        "engine_version": "legacy-engine",
+        "namespace_id": "legacy-subnormal-test",
+        "composition_mol_fraction": [["FeO", 0.5], ["SiO2", 0.5]],
+        "controls": {"T_K": 5e-324},
+    }
+    key_bytes = rekey.canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"""
+            CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
+                key_hash TEXT PRIMARY KEY,
+                key_sha256 TEXT,
+                key_bytes BLOB,
+                engine_version TEXT,
+                corpus_version TEXT,
+                physics_bucket_h40_distance REAL
+            )
+            """
+        )
+        conn.execute(
+            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?, ?)",
+            (key_hash, key_hash, key_bytes, "legacy-engine", None, None),
+        )
+
+    with pytest.raises(UncacheableKey):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=current_corpus_version(),
+        )
+
+    with sqlite3.connect(db_path) as conn:
+        corpus_version, stored_key_bytes, distance = conn.execute(
+            f"SELECT corpus_version, key_bytes, physics_bucket_h40_distance "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert corpus_version is None
+    assert stored_key_bytes == key_bytes
+    assert distance is None
+
+
 def test_rekey_rejects_legacy_key_that_is_not_a_json_object(
     tmp_path: Path,
 ) -> None:

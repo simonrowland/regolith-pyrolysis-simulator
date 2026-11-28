@@ -40,7 +40,10 @@ from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
 )
-from simulator.grind_preflight import GrindSourceGateError
+from simulator.grind_preflight import (
+    GrindSourceGateError,
+    assert_strict_vapor_result_store,
+)
 from simulator.melt_backend.base import (
     EquilibriumResult,
     RealBackendAuthority,
@@ -2523,6 +2526,118 @@ def test_pt1_strict_vapor_policy_rejects_builtin_fallback_exact_hit(
             key_hash=hashlib.sha256(key_bytes).hexdigest(),
         )
     assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 1
+
+
+@pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))
+def test_pt1_strict_vapor_policy_rejects_fallback_on_approximate_readers(
+    tmp_path: Path,
+    reader: str,
+) -> None:
+    key = _put_strict_pt1_equilibrium_row(
+        tmp_path / f"strict-pt1-{reader}.sqlite",
+        source="builtin_fallback",
+    )
+    db_path = tmp_path / f"strict-pt1-{reader}.sqlite"
+    strict_reader = rrd.PT1PersistentEquilibriumStore(
+        db_path,
+        strict_vapor_gate=True,
+    )
+
+    with pytest.raises(GrindSourceGateError, match="builtin_fallback"):
+        if reader == "bucket":
+            bucket_key = rrd.canonical_physics_bucket_key_from_replay_key(key)
+            bucket_bytes = canonical_json_bytes(bucket_key)
+            strict_reader.get_by_physics_bucket(
+                artifact="equilibrium_post_record",
+                physics_bucket_key=bucket_key,
+                physics_bucket_bytes=bucket_bytes,
+                physics_bucket_hash=hashlib.sha256(bucket_bytes).hexdigest(),
+            )
+        elif reader == "ladder":
+            rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+                key,
+                "h40",
+            )
+            rung_bytes = canonical_json_bytes(rung_key)
+            strict_reader.get_by_physics_ladder_bucket(
+                artifact="equilibrium_post_record",
+                rung_tag="h40",
+                rung_key=rung_key,
+                rung_hash=hashlib.sha256(rung_bytes).hexdigest(),
+            )
+        else:
+            bucket_key = rrd.canonical_physics_bucket_key_from_replay_key(key)
+            strict_reader.list_interpolation_candidates(
+                artifact="equilibrium_post_record",
+                replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
+            )
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 1
+
+
+def test_strict_preflight_counts_current_pt1_rows(tmp_path: Path) -> None:
+    db_path = tmp_path / "strict-pt1-summary.sqlite"
+    _put_strict_pt1_equilibrium_row(db_path, source="builtin_authoritative")
+
+    summary = assert_strict_vapor_result_store(
+        db_path,
+        lambda _path, _payload: (None, None),
+        strict_vapor_gate=True,
+    )
+
+    assert summary == {"rows": 1, "vapor_active_rows": 1, "source_reports": 1}
+
+
+def test_strict_preflight_rejects_current_pt1_bad_payload_checksum(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "strict-pt1-bad-payload-checksum.sqlite"
+    _put_strict_pt1_equilibrium_row(db_path, source="builtin_authoritative")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET payload_sha256 = ?",
+            ("0" * 64,),
+        )
+
+    with pytest.raises(GrindSourceGateError, match="stored row is corrupt"):
+        assert_strict_vapor_result_store(
+            db_path,
+            lambda _path, _payload: (None, None),
+            strict_vapor_gate=True,
+        )
+
+
+def _put_strict_pt1_equilibrium_row(db_path: Path, *, source: str) -> dict[str, Any]:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record",
+        sim,
+        result,
+    )
+    payload["last_vapor_pressures_source"] = {"SiO": source}
+    key["vapor_pressure_provider_selection"] = "builtin_authoritative"
+    payload["authority"]["vapor_pressure"] = {
+        "resolved_provider_id": "builtin_authoritative",
+        "resolved_role": "authoritative",
+        "authoritative_provider_id": "builtin_authoritative",
+        "fallback_provider_id": None,
+        "fallback_allowed": False,
+        "model": None,
+        "mode": None,
+    }
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    rrd.PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+    return key
 
 
 @pytest.mark.parametrize("bad_input", ("control_name", "key_bytes"))

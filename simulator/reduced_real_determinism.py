@@ -236,6 +236,17 @@ class _PT1KeyIndexValidation:
     nonfinite_requested_rung: bool
 
 
+@dataclasses.dataclass(frozen=True)
+class _PT1DerivedKeyIndexes:
+    key: Mapping[str, Any]
+    key_bytes: bytes
+    bucket_key: Mapping[str, Any]
+    bucket_bytes: bytes
+    bucket_hash: str
+    replay_scope_sha256: str
+    ladder_values: dict[str, dict[str, float | str]]
+
+
 _MAGEMIN_SHADOW_PROVIDER_ID = "magemin-shadow"
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
@@ -2318,6 +2329,7 @@ class PT0DeterminismStore:
                 key_bytes=key_bytes,
                 key_hash=key_hash,
                 validate_interpolation_domain=True,
+                strict_vapor_gate=self.strict_vapor_gate,
             )
             decoded = None if admitted is None else admitted.decoded_payload
             if decoded is None:
@@ -2352,6 +2364,7 @@ class PT0DeterminismStore:
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
                 validate_interpolation_domain=True,
+                strict_vapor_gate=self.strict_vapor_gate,
             )
             if admitted is not None and admitted.decoded_payload is not None:
                 return admitted.entry, admitted.decoded_payload
@@ -2369,6 +2382,7 @@ class PT0DeterminismStore:
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
                 validate_interpolation_domain=True,
+                strict_vapor_gate=self.strict_vapor_gate,
             )
             if admitted is not None and admitted.decoded_payload is not None:
                 return admitted.entry, admitted.decoded_payload
@@ -2580,6 +2594,7 @@ class PT0DeterminismStore:
             physics_bucket_bytes=physics_bucket_bytes,
             physics_bucket_hash=physics_bucket_hash,
             validate_interpolation_domain=True,
+            strict_vapor_gate=self.strict_vapor_gate,
         )
         return None if admitted is None else admitted.decoded_payload
 
@@ -2661,6 +2676,7 @@ def _validate_pt1_key_indexes(
     expected_replay_scope_sha256: str | None = None,
     check_key_dependencies: bool = True,
     require_indexable: bool = False,
+    derived_indexes: _PT1DerivedKeyIndexes | None = None,
 ) -> _PT1KeyIndexValidation:
     """Validate PT1 row key and index integrity for both writes and reads."""
 
@@ -2801,12 +2817,21 @@ def _validate_pt1_key_indexes(
         indexability_error = _ladder_indexability(row_key)
         if indexability_error is not None:
             raise indexability_error
+    if derived_indexes is None:
+        derived_indexes = _derive_pt1_key_indexes(row_key)
+    elif (
+        derived_indexes.key != row_key
+        or derived_indexes.key_bytes != row_key_bytes
+    ):
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 precomputed indexes do not match stored key: {row_hash}"
+        )
 
-    bucket_key = canonical_physics_bucket_key_from_replay_key(row_key)
-    bucket_bytes = canonical_json_bytes(bucket_key)
-    bucket_hash = _sha256(bucket_bytes)
+    bucket_key = derived_indexes.bucket_key
+    bucket_bytes = derived_indexes.bucket_bytes
+    bucket_hash = derived_indexes.bucket_hash
     stored_bucket_schema = row.get("physics_bucket_schema_version")
-    replay_scope_sha256 = _replay_scope_hash(bucket_key)
+    replay_scope_sha256 = derived_indexes.replay_scope_sha256
     if stored_bucket_schema is not None:
         if stored_bucket_bytes is None:
             _pt1_row_bytes(
@@ -2840,7 +2865,7 @@ def _validate_pt1_key_indexes(
             f"PT-1 row exact key does not reproduce physics bucket: {physics_bucket_hash}"
         )
 
-    ladder_values = _physics_ladder_values_from_replay_key(row_key)
+    ladder_values = derived_indexes.ladder_values
     nonfinite_requested_rung = False
     if rung_tag is not None:
         assert rung_key is not None and rung_hash is not None
@@ -2942,6 +2967,7 @@ def _admit_stored_row(
     approved_sources: frozenset[str] = APPROVED_LIVE_VAPOR_SOURCES,
     validate_interpolation_domain: bool = False,
     reader_context_policy: bool = True,
+    strict_vapor_gate: bool = False,
 ) -> _AdmittedStoredRow | None:
     """Admit one stored row using a single PT1 integrity-check sequence.
 
@@ -3068,6 +3094,13 @@ def _admit_stored_row(
                 decode_repair_notices_json(raw_row.get("repair_notices_json"))
                 if reader_context_policy and not _disclosures_known(raw_row):
                     decoded = None
+            if strict_vapor_gate and decoded is not None:
+                assert_strict_vapor_pt1_row(
+                    artifact=str(stored_artifact),
+                    key=stored_key,
+                    key_hash=str(stored_key_hash or ""),
+                    payload=payload,
+                )
             return _AdmittedStoredRow(
                 dict(raw_row), decoded, physics_ladder_values=stored_ladder_values
             )
@@ -3076,6 +3109,8 @@ def _admit_stored_row(
             # SQLite are an integrity failure with a distinct typed outcome.
             return None
         except PT0CacheCollision:
+            raise
+        except GrindSourceGateError:
             raise
         except Exception:
             return None
@@ -3367,6 +3402,13 @@ def _admit_stored_row(
         )
         if nonfinite_requested_rung:
             decoded = None
+        if strict_vapor_gate and decoded is not None:
+            assert_strict_vapor_pt1_row(
+                artifact=row_artifact,
+                key=row_key,
+                key_hash=row_hash,
+                payload=row_payload,
+            )
         return _AdmittedStoredRow(
             entry,
             decoded,
@@ -3407,7 +3449,8 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
     artifact_name = artifact if isinstance(artifact, str) else "unknown"
     row_columns = set(row)
     legacy_layout = (
-        (
+        row.get("store_schema_version") != PT1_STORE_SCHEMA_VERSION
+        or (
             _payload_codec_version(artifact_name) is not None
             and row.get("payload_codec_version") is None
         )
@@ -3441,6 +3484,13 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                 )
                 if _sha256(payload_bytes) != row.get("payload_sha256"):
                     raise ValueError("payload checksum does not match stored bytes")
+                payload_value = _pt1_row_json(
+                    payload_bytes,
+                    field="payload",
+                    key_hash=key_hash,
+                )
+                if _payload_integrity_bytes(payload_value) != payload_bytes:
+                    raise ValueError("payload bytes are not canonical JSON")
                 validate_repair_notices_json(_row_repair_notices(row))
             except Exception as exc:
                 raise UncacheablePayload(artifact_name, key_hash) from exc
@@ -3464,6 +3514,7 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
             )
             stored_key = _pt1_row_key(stored_key_bytes, key_hash=key_hash)
 
+        derived_indexes = _derive_pt1_key_indexes(stored_key)
         if any(
             value is not None
             for value in (
@@ -3472,14 +3523,9 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                 input_bucket_hash,
             )
         ):
-            derived_bucket_key = canonical_physics_bucket_key_from_replay_key(
-                stored_key
-            )
-            derived_bucket_bytes = canonical_json_bytes(derived_bucket_key)
-            derived_bucket_hash = _sha256(derived_bucket_bytes)
             if (
                 input_bucket_key is not None
-                and _json_ready(input_bucket_key) != derived_bucket_key
+                and _json_ready(input_bucket_key) != derived_indexes.bucket_key
             ):
                 raise UncacheableKey(
                     PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
@@ -3497,22 +3543,22 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
                         PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
                         "write_candidate_physics_bucket_bytes",
                     ) from exc
-                if supplied_bucket_bytes != derived_bucket_bytes:
+                if supplied_bucket_bytes != derived_indexes.bucket_bytes:
                     raise UncacheableKey(
                         PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
                         "write_candidate_physics_bucket_bytes",
                     )
             if (
                 input_bucket_hash is not None
-                and input_bucket_hash != derived_bucket_hash
+                and input_bucket_hash != derived_indexes.bucket_hash
             ):
                 raise UncacheableKey(
                     PHYSICS_BUCKET_ALL_LADDER_RUNGS[0][0],
                     "write_candidate_physics_bucket_hash",
                 )
-            input_bucket_key = derived_bucket_key
-            input_bucket_bytes = derived_bucket_bytes
-            input_bucket_hash = derived_bucket_hash
+            input_bucket_key = derived_indexes.bucket_key
+            input_bucket_bytes = derived_indexes.bucket_bytes
+            input_bucket_hash = derived_indexes.bucket_hash
 
         derive_indexes = False
         if legacy_layout:
@@ -3532,31 +3578,10 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
             }
             if rebuild_indexes and index_columns.intersection(row_columns):
                 derive_indexes = True
-                bucket_key = canonical_physics_bucket_key_from_replay_key(
-                    stored_key
-                )
-                bucket_bytes = canonical_json_bytes(bucket_key)
-                ladder_values = _physics_ladder_values_from_replay_key(stored_key)
-                legacy_indexes = {
-                    "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
-                    "physics_bucket_sha256": _sha256(bucket_bytes),
-                    "replay_scope_sha256": _replay_scope_hash(bucket_key),
-                    "physics_key_bytes": sqlite3.Binary(bucket_bytes),
-                }
-                for rung_tag, values in ladder_values.items():
-                    legacy_indexes[_physics_ladder_hash_column(rung_tag)] = values[
-                        "sha256"
-                    ]
-                    legacy_indexes[_physics_ladder_distance_column(rung_tag)] = values[
-                        "distance"
-                    ]
+                legacy_indexes = _pt1_physics_index_columns(derived_indexes)
                 for column in index_columns.intersection(row_columns):
                     row[column] = legacy_indexes[column]
         else:
-            bucket_key = canonical_physics_bucket_key_from_replay_key(stored_key)
-            canonical_bucket_bytes = canonical_json_bytes(bucket_key)
-            bucket_hash = _sha256(canonical_bucket_bytes)
-            ladder_values = _physics_ladder_values_from_replay_key(stored_key)
             rebuild_indexes = rebuild_indexes or (
                 row.get("store_schema_version") != PT1_STORE_SCHEMA_VERSION
                 or row.get("physics_bucket_schema_version") is None
@@ -3564,15 +3589,7 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
             derive_indexes = rebuild_indexes
             if rebuild_indexes:
                 row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
-                row["physics_bucket_schema_version"] = PHYSICS_BUCKET_SCHEMA_VERSION
-                row["physics_bucket_sha256"] = bucket_hash
-                row["replay_scope_sha256"] = _replay_scope_hash(bucket_key)
-                row["physics_key_bytes"] = sqlite3.Binary(canonical_bucket_bytes)
-                for rung_tag, values in ladder_values.items():
-                    row[_physics_ladder_hash_column(rung_tag)] = values["sha256"]
-                    row[_physics_ladder_distance_column(rung_tag)] = values[
-                        "distance"
-                    ]
+                row.update(_pt1_physics_index_columns(derived_indexes))
 
         if input_bucket_bytes is not None:
             try:
@@ -3594,8 +3611,14 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
             physics_bucket_key=input_bucket_key,
             physics_bucket_bytes=input_bucket_bytes,
             physics_bucket_hash=input_bucket_hash,
+            expected_replay_scope_sha256=(
+                derived_indexes.replay_scope_sha256
+                if "replay_scope_sha256" in row
+                else None
+            ),
             check_key_dependencies=not legacy_layout,
             require_indexable=derive_indexes or not legacy_layout,
+            derived_indexes=derived_indexes,
         )
         return row
     except (UncacheableKey, UncacheablePayload):
@@ -4018,14 +4041,8 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                     return_decoded=True,
+                    strict_vapor_gate=self.strict_vapor_gate,
                 )
-                if self.strict_vapor_gate and decoded is not None:
-                    assert_strict_vapor_pt1_row(
-                        artifact=artifact,
-                        key=entry["key"],
-                        payload=entry["payload"],
-                        key_hash=key_hash,
-                    )
                 if decoded is None:
                     continue
                 return entry, decoded
@@ -4091,6 +4108,7 @@ class PT1PersistentEquilibriumStore:
                         physics_bucket_bytes=physics_bucket_bytes,
                         physics_bucket_hash=physics_bucket_hash,
                         query_key=query_key,
+                        strict_vapor_gate=self.strict_vapor_gate,
                     )
                     if decoded is not None:
                         return (entry, decoded) if return_decoded else entry
@@ -4151,6 +4169,7 @@ class PT1PersistentEquilibriumStore:
                         expected_replay_scope_sha256=replay_scope_sha256,
                         admission_keys=(query_key,) if query_key is not None else (),
                         validate_interpolation_domain=True,
+                        strict_vapor_gate=self.strict_vapor_gate,
                     )
                     assert admitted is not None
                     if admitted.stale_payload_codec:
@@ -4243,6 +4262,7 @@ class PT1PersistentEquilibriumStore:
                         rung_key=rung_key,
                         rung_hash=rung_hash,
                         query_key=query_key,
+                        strict_vapor_gate=self.strict_vapor_gate,
                     )
                     if decoded is None:
                         continue
@@ -4276,6 +4296,7 @@ class PT1PersistentEquilibriumStore:
         rung_key: Mapping[str, Any],
         rung_hash: str,
         query_key: Mapping[str, Any] | None = None,
+        strict_vapor_gate: bool = False,
     ) -> tuple[dict[str, Any], Any]:
         admitted = _admit_stored_row(
             row,
@@ -4286,6 +4307,7 @@ class PT1PersistentEquilibriumStore:
             rung_key=rung_key,
             rung_hash=rung_hash,
             validate_interpolation_domain=True,
+            strict_vapor_gate=strict_vapor_gate,
         )
         assert admitted is not None
         return admitted.entry, admitted.decoded_payload
@@ -4652,6 +4674,7 @@ class PT1PersistentEquilibriumStore:
         return_decoded: bool = False,
         admission_keys: Sequence[Mapping[str, Any]] | None = None,
         expected_replay_scope_sha256: str | None = None,
+        strict_vapor_gate: bool = False,
     ) -> Any:
         admitted = _admit_stored_row(
             row,
@@ -4663,6 +4686,7 @@ class PT1PersistentEquilibriumStore:
             admission_keys=admission_keys,
             expected_replay_scope_sha256=expected_replay_scope_sha256,
             validate_interpolation_domain=True,
+            strict_vapor_gate=strict_vapor_gate,
         )
         assert admitted is not None
         return (
@@ -4680,6 +4704,7 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_bytes: bytes,
         physics_bucket_hash: str,
         query_key: Mapping[str, Any] | None = None,
+        strict_vapor_gate: bool = False,
     ) -> tuple[dict[str, Any], Any]:
         admitted = _admit_stored_row(
             row,
@@ -4690,6 +4715,7 @@ class PT1PersistentEquilibriumStore:
             physics_bucket_bytes=physics_bucket_bytes,
             physics_bucket_hash=physics_bucket_hash,
             validate_interpolation_domain=True,
+            strict_vapor_gate=strict_vapor_gate,
         )
         assert admitted is not None
         return admitted.entry, admitted.decoded_payload
@@ -7575,6 +7601,39 @@ def _physics_ladder_values_from_replay_key(
             ),
         }
     return values
+
+
+def _derive_pt1_key_indexes(key: Mapping[str, Any]) -> _PT1DerivedKeyIndexes:
+    key_bytes = canonical_json_bytes(key)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    bucket_hash = _sha256(bucket_bytes)
+    return _PT1DerivedKeyIndexes(
+        key=key,
+        key_bytes=key_bytes,
+        bucket_key=bucket_key,
+        bucket_bytes=bucket_bytes,
+        bucket_hash=bucket_hash,
+        replay_scope_sha256=_replay_scope_hash(bucket_key),
+        ladder_values=_physics_ladder_values_from_replay_key(key),
+    )
+
+
+def _pt1_physics_index_columns(
+    indexes: _PT1DerivedKeyIndexes,
+) -> dict[str, Any]:
+    columns: dict[str, Any] = {
+        "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
+        "physics_bucket_sha256": indexes.bucket_hash,
+        "replay_scope_sha256": indexes.replay_scope_sha256,
+        "physics_key_bytes": sqlite3.Binary(indexes.bucket_bytes),
+    }
+    for rung_tag, values in indexes.ladder_values.items():
+        columns[_physics_ladder_hash_column(rung_tag)] = values["sha256"]
+        columns[_physics_ladder_distance_column(rung_tag)] = values[
+            "distance"
+        ]
+    return columns
 
 
 def _replay_key_composition_shape(

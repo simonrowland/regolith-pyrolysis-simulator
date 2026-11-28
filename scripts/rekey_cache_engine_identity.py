@@ -19,19 +19,20 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from simulator.reduced_real_determinism import (  # noqa: E402
-    PHYSICS_BUCKET_SCHEMA_VERSION,
+    PHYSICS_BUCKET_ALL_LADDER_RUNGS,
     PT1_EQUILIBRIUM_TABLE,
     PT1_LEGACY_STORE_SCHEMA_VERSION,
     PT1_STORE_SCHEMA_VERSION,
     PT1PersistentStoreCorrupt,
     _admit_stored_row,
     _gate_row_for_write,
-    _physics_ladder_values_from_replay_key,
-    _replay_scope_hash,
+    _physics_ladder_distance_column,
+    _physics_ladder_hash_column,
+    _payload_codec_stamp_matches,
+    _payload_codec_version,
     _sha256,
     cache_row_needs_rekey,
     canonical_json_bytes,
-    canonical_physics_bucket_key_from_replay_key,
     rekey_engine_version_provenance,
     rekey_row_matches_engine,
     replace_rekey_cache_identity,
@@ -131,26 +132,6 @@ def _table_columns(conn: sqlite3.Connection) -> set[str]:
     return {
         str(row["name"])
         for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
-    }
-
-
-def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
-    physics_key = canonical_physics_bucket_key_from_replay_key(key)
-    physics_bytes = canonical_json_bytes(physics_key)
-    ladder_values = _physics_ladder_values_from_replay_key(key)
-    return {
-        "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
-        "physics_bucket_sha256": _sha256(physics_bytes),
-        "replay_scope_sha256": _replay_scope_hash(physics_key),
-        "physics_key_bytes": sqlite3.Binary(physics_bytes),
-        "physics_bucket_h40_sha256": ladder_values["h40"]["sha256"],
-        "physics_bucket_h40_distance": ladder_values["h40"]["distance"],
-        "physics_bucket_h30_sha256": ladder_values["h30"]["sha256"],
-        "physics_bucket_h30_distance": ladder_values["h30"]["distance"],
-        "physics_bucket_h40c_sha256": ladder_values["h40c"]["sha256"],
-        "physics_bucket_h40c_distance": ladder_values["h40c"]["distance"],
-        "physics_bucket_h30c_sha256": ladder_values["h30c"]["sha256"],
-        "physics_bucket_h30c_distance": ladder_values["h30c"]["distance"],
     }
 
 
@@ -269,58 +250,61 @@ def rekey_cache(
                 continue
             old_key_hash = str(row["key_hash"])
             row_columns = set(row.keys())
-            legacy_layout = not {
-                "artifact",
-                "payload_codec_version",
-                "payload_bytes",
-                "payload_sha256",
-                "store_schema_version",
-            }.issubset(row_columns)
+            artifact = row["artifact"] if "artifact" in row_columns else None
+            expected_codec_version = (
+                _payload_codec_version(artifact)
+                if isinstance(artifact, str)
+                else None
+            )
+            stored_codec_version = (
+                row["payload_codec_version"]
+                if "payload_codec_version" in row_columns
+                else None
+            )
+            store_schema_version = (
+                row["store_schema_version"]
+                if "store_schema_version" in row_columns
+                else None
+            )
+            legacy_layout = (
+                store_schema_version != PT1_STORE_SCHEMA_VERSION
+                or expected_codec_version is None
+                or not _payload_codec_stamp_matches(
+                    expected_codec_version, stored_codec_version
+                )
+            )
+            rebuild_indexes = not legacy_layout
             if legacy_layout:
-                key_bytes = canonical_json_bytes(key)
-                key_hash = _sha256(key_bytes)
-                candidate_row = {
-                    "key_hash": key_hash,
-                    "key_bytes": sqlite3.Binary(key_bytes),
-                    "corpus_version": target,
-                    "engine_version": provenance,
-                }
-                if "key_sha256" in row_columns:
-                    candidate_row["key_sha256"] = key_hash
+                candidate_row = dict(row)
+                candidate_row["corpus_version"] = target
+                candidate_row["engine_version"] = provenance
                 physics_columns_present = {
                     "physics_bucket_schema_version",
                     "physics_bucket_sha256",
                     "replay_scope_sha256",
                     "physics_key_bytes",
-                    "physics_bucket_h40_sha256",
-                    "physics_bucket_h40_distance",
-                    "physics_bucket_h30_sha256",
-                    "physics_bucket_h30_distance",
-                    "physics_bucket_h40c_sha256",
-                    "physics_bucket_h40c_distance",
-                    "physics_bucket_h30c_sha256",
-                    "physics_bucket_h30c_distance",
+                    *(
+                        column
+                        for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                        for column in (
+                            _physics_ladder_hash_column(rung_tag),
+                            _physics_ladder_distance_column(rung_tag),
+                        )
+                    ),
                 } & table_columns
-                if physics_columns_present:
-                    candidate_row.update(
-                        {
-                            column: value
-                            for column, value in _physics_columns(key).items()
-                            if column in physics_columns_present
-                        }
-                    )
+                rebuild_indexes = bool(physics_columns_present)
             else:
                 candidate_row = dict(row)
                 candidate_row["corpus_version"] = target
                 candidate_row["engine_version"] = provenance
-                candidate_row.update(
-                    {
-                        "_write_key": key,
-                        "_write_replace_key": True,
-                        "_write_rebuild_indexes": True,
-                    }
-                )
-                candidate_row = _gate_row_for_write(candidate_row)
+            candidate_row.update(
+                {
+                    "_write_key": key,
+                    "_write_replace_key": True,
+                    "_write_rebuild_indexes": rebuild_indexes,
+                }
+            )
+            candidate_row = _gate_row_for_write(candidate_row)
             update_columns = tuple(
                 column for column in table_columns if column in candidate_row
             )

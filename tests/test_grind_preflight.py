@@ -633,15 +633,21 @@ def test_strict_vapor_result_store_pt1_strict_on_rejects_vaporock(
         )
 
 
+@pytest.mark.parametrize("corrupt_key", ("deep", "invalid-utf8"))
 def test_strict_vapor_pt1_preflight_uses_stored_row_admission(
     tmp_path: Path,
+    corrupt_key: str,
 ) -> None:
     db_path = tmp_path / "strict-pt1-deep-key.sqlite"
     _write_pt1_store(db_path, source="builtin-vapor-pressure")
+    if corrupt_key == "deep":
+        key_bytes = b'{"nested":' + b"[" * 1200 + b"0" + b"]" * 1200 + b"}"
+    else:
+        key_bytes = b'{"source":"\xff"}'
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} SET key_bytes = ?",
-            (sqlite3.Binary(b"{"),),
+            (sqlite3.Binary(key_bytes),),
         )
 
     with pytest.raises(GrindSourceGateError, match="invalid JSON"):

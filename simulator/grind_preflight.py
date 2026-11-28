@@ -533,9 +533,15 @@ def _strict_vapor_pt1_store_summary(
     approved_sources: frozenset[str],
     strict_vapor_gate: bool,
 ) -> dict[str, int]:
+    from simulator.reduced_real_determinism import (
+        PT1PersistentStoreCorrupt,
+        PT1_STORE_SCHEMA_VERSION,
+        _admit_stored_row,
+    )
+
     rows = conn.execute(
         f"""
-        SELECT key_hash, artifact, key_bytes, payload_bytes
+        SELECT *
         FROM {_PT1_EQUILIBRIUM_TABLE}
         """
     ).fetchall()
@@ -549,12 +555,36 @@ def _strict_vapor_pt1_store_summary(
 
     vapor_active_rows = 0
     source_reports = 0
-    for row in rows:
-        row_context = f"{context}:{row['key_hash']}"
-        key = _json_mapping(row["key_bytes"], f"{row_context}.key")
-        payload = _json_mapping(row["payload_bytes"], f"{row_context}.payload")
+    for stored_row in rows:
+        row = dict(stored_row)
+        row_context = f"{context}:{row.get('key_hash', '<missing>')}"
+        if row.get("store_schema_version") == PT1_STORE_SCHEMA_VERSION:
+            try:
+                admitted = _admit_stored_row(
+                    row,
+                    store_kind="pt1",
+                    strict_source_validation=True,
+                    approved_sources=approved_sources,
+                )
+            except PT1PersistentStoreCorrupt as exc:
+                raise GrindSourceGateError(
+                    f"{row_context}: PT-1 stored row is corrupt"
+                ) from exc
+            row_summary = (
+                None if admitted is None else admitted.strict_vapor_summary
+            )
+            if row_summary is not None:
+                source_reports += int(row_summary["source_reports"])
+                if row_summary["vapor_active"]:
+                    vapor_active_rows += 1
+            continue
+
+        key = _json_mapping(row.get("key_bytes"), f"{row_context}.key")
+        payload = _json_mapping(
+            row.get("payload_bytes"), f"{row_context}.payload"
+        )
         row_summary = assert_strict_vapor_pt1_row(
-            artifact=str(row["artifact"]),
+            artifact=str(row.get("artifact", "")),
             key=key,
             payload=payload,
             key_hash=str(row["key_hash"]),
@@ -760,13 +790,13 @@ def _json_mapping(raw: Any, context: str) -> Mapping[str, Any]:
 def _json_value(raw: Any, context: str) -> Any:
     if raw is None:
         return None
-    if isinstance(raw, (dict, list)):
-        return raw
-    if isinstance(raw, (bytes, bytearray, memoryview)):
-        raw = bytes(raw).decode("utf-8")
     try:
+        if isinstance(raw, (dict, list)):
+            return raw
+        if isinstance(raw, (bytes, bytearray, memoryview)):
+            raw = bytes(raw).decode("utf-8")
         return json.loads(str(raw))
-    except json.JSONDecodeError as exc:
+    except (ValueError, UnicodeDecodeError, RecursionError) as exc:
         raise GrindSourceGateError(f"{context}: invalid JSON") from exc
 
 

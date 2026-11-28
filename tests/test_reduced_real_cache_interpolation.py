@@ -1174,6 +1174,7 @@ def test_pt1_put_maps_fresh_candidate_integrity_rejections_to_typed_refusals(
     ("bad_input", "expected_error"),
     (
         ("repair_notices_json", rrd.UncacheablePayload),
+        ("payload_noncanonical", rrd.UncacheablePayload),
         ("key_bytes", rrd.UncacheableKey),
         ("physics_bucket_hash", rrd.UncacheableKey),
         ("physics_bucket_bytes", rrd.UncacheableKey),
@@ -1213,11 +1214,13 @@ def test_pt1_put_preflights_fresh_inputs_before_attached_row_lookup(
     write_key_bytes = key_bytes
     if bad_input == "repair_notices_json":
         kwargs["repair_notices_json"] = "["
+    elif bad_input == "payload_noncanonical":
+        payload_bytes = b" " + payload_bytes
     elif bad_input == "key_bytes":
         write_key_bytes = b"{}"
     elif bad_input == "physics_bucket_bytes":
         kwargs["physics_bucket_bytes"] = b"bad"
-    else:
+    elif bad_input == "physics_bucket_hash":
         kwargs.update(
             physics_bucket_key=bucket_key,
             physics_bucket_bytes=bucket_bytes,
@@ -1251,6 +1254,45 @@ def test_pt1_put_preflights_fresh_inputs_before_attached_row_lookup(
         ).fetchone()
     assert local_rows == 0
     assert base_rows == 1
+
+
+def test_pt1_write_gate_derives_key_indexes_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    key = _interpolation_key(
+        "single-index-derivation",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    original_derive = rrd._derive_pt1_key_indexes
+    derivations = 0
+    gate_derivation_counts: list[int] = []
+
+    def record_derivation(candidate_key):
+        nonlocal derivations
+        derivations += 1
+        return original_derive(candidate_key)
+
+    original_gate = rrd._gate_row_for_write
+
+    def record_gate(candidate_row):
+        before = derivations
+        result = original_gate(candidate_row)
+        gate_derivation_counts.append(derivations - before)
+        return result
+
+    monkeypatch.setattr(rrd, "_derive_pt1_key_indexes", record_derivation)
+    monkeypatch.setattr(rrd, "_gate_row_for_write", record_gate)
+    _put_interpolation_row(
+        tmp_path / "single-index-derivation.sqlite",
+        key,
+        liquid_fraction=0.7,
+        sio_pa=7.0,
+    )
+
+    assert gate_derivation_counts
+    assert set(gate_derivation_counts) == {1}
 
 
 @pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))
