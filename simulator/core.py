@@ -8268,11 +8268,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     vapor_pressure_diagnostic=vapor_pressure_diagnostic,
                     overhead_partials_Pa=partials_Pa,
                 )
-                closure_failures = {
-                    species: reason
-                    for species, reason in closure_failures.items()
-                    if species in (iteration_flux_pressures or {})
-                }
                 EvaporationMixin._include_cap_proven_zero_pressure_values(
                     reclosed_pressures,
                     iteration_overlay,
@@ -8345,9 +8340,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 diagnostic,
                 iteration_overlay,
                 expected_species=iteration_flux_pressures or {},
-                stoich_by_species=iteration_controls.get(
-                    'stoich_by_species', {}
-                ),
+                provider_status=getattr(result, 'status', None),
             )
             if provider_unavailable:
                 restart_or_refuse_capacity_members(

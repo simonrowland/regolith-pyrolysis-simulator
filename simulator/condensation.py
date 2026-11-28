@@ -557,6 +557,40 @@ def _resolve_lennard_jones_parameters(
         "inputs": inputs,
     }
 
+
+def _lennard_jones_collision_parameters(
+    parameters: Mapping[str, Any] | None,
+    *,
+    request_molar_mass_kg_per_mol: float,
+) -> tuple[float, float, float] | None:
+    """Convert resolved LJ data to the shared collision triple.
+
+    The request carrier mass supplies collision mass only when an estimate
+    omits its own. Keeping this conversion beside the LJ resolver makes the
+    publisher and Langmuir probe use the same selected pair and fallback.
+    """
+    if not isinstance(parameters, Mapping) or parameters.get("status") not in {
+        "tabulated", "estimated"
+    }:
+        return None
+    collision_mass = parameters.get("molar_mass_g_mol")
+    if collision_mass is None:
+        try:
+            collision_mass = float(request_molar_mass_kg_per_mol) * 1000.0
+        except (TypeError, ValueError, OverflowError):
+            return None
+    try:
+        result = (
+            float(parameters["sigma_angstrom"]),
+            float(parameters["epsilon_over_k_K"]),
+            float(collision_mass),
+        )
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return None
+    if not all(math.isfinite(value) and value > 0.0 for value in result):
+        return None
+    return result
+
 _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     'N2': {
         'status': 'sourced',

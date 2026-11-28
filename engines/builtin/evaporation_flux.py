@@ -661,6 +661,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         DEFAULT_CARRIER_GAS,
         GAS_CONSTANT_J_MOL_K,
         _chapman_enskog_d_ab_m2_s,
+        _lennard_jones_collision_parameters,
         _knudsen_number,
         _resolve_lennard_jones_parameters,
         _stirring_enhanced_sherwood,
@@ -815,15 +816,10 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                     else {}
                 ),
             )
-            if parameters.get("status") in {"tabulated", "estimated"}:
-                collision_mass_g_mol = parameters.get("molar_mass_g_mol")
-                if collision_mass_g_mol is None:
-                    collision_mass_g_mol = M_kg_mol * 1000.0
-                species_params = (
-                    float(parameters["sigma_angstrom"]),
-                    float(parameters["epsilon_over_k_K"]),
-                    float(collision_mass_g_mol),
-                )
+            species_params = _lennard_jones_collision_parameters(
+                parameters,
+                request_molar_mass_kg_per_mol=M_kg_mol,
+            )
         d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
             species,
             max(effective_T_gas_K, 1.0),
@@ -1369,6 +1365,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
         from simulator.state import MOLAR_MASS
+        from simulator.condensation import (
+            _lennard_jones_collision_parameters,
+        )
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.EVAPORATION_FLUX
@@ -1908,18 +1907,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 species_transport_params = None
                 if uses_gas_resistance and species not in hkl_upper_bound_transport_species:
                     parameters = transport_parameters_by_species.get(species)
-                    if (
-                        isinstance(parameters, Mapping)
-                        and parameters.get("status") in {"tabulated", "estimated"}
-                    ):
-                        species_transport_params = (
-                            float(parameters["sigma_angstrom"]),
-                            float(parameters["epsilon_over_k_K"]),
-                            float(
-                                parameters.get("molar_mass_g_mol")
-                                or M_kg_mol * 1000.0
-                            ),
+                    species_transport_params = (
+                        _lennard_jones_collision_parameters(
+                            parameters,
+                            request_molar_mass_kg_per_mol=M_kg_mol,
                         )
+                    )
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                     species=species,
                     P_eq_pa=P_eq_Pa,

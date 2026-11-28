@@ -1133,6 +1133,7 @@ def _publisher_net_law_with_transport(
         _series_resistance_evaporation_flux_kg_m2_s,
         species_drive_bulk_Pa,
     )
+    from simulator.condensation import _lennard_jones_collision_parameters
 
     ideal = _ideal_molar_conductance(
         alpha, molar_mass_kg_per_mol, transport.temperature_K
@@ -1161,19 +1162,10 @@ def _publisher_net_law_with_transport(
         return ideal, drive_bulk
 
     parameters = transport.lennard_jones_parameters_by_species.get(species)
-    species_params = None
-    if (
-        isinstance(parameters, Mapping)
-        and parameters.get("status") in {"tabulated", "estimated"}
-    ):
-        species_params = (
-            float(parameters["sigma_angstrom"]),
-            float(parameters["epsilon_over_k_K"]),
-            float(
-                parameters.get("molar_mass_g_mol")
-                or molar_mass_kg_per_mol * 1000.0
-            ),
-        )
+    species_params = _lennard_jones_collision_parameters(
+        parameters,
+        request_molar_mass_kg_per_mol=molar_mass_kg_per_mol,
+    )
     property_row = transport.lennard_jones_property_rows_by_species.get(
         species, {}
     )

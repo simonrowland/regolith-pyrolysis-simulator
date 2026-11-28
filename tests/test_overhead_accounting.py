@@ -820,12 +820,18 @@ def test_vapor_species_without_parent_oxide_fails_before_flux():
     assert flux.species_kg_hr["Na"] > 0.0
     assert "Fe" not in flux.species_kg_hr
     overlay = sim._last_vapour_batch_flux_overlay
-    assert overlay["notices"] == [{
-        "kind": "vapour_batch_unresolved",
-        "species": "Fe",
-        "hour": 0,
-        "reason": "missing_evaporation_stoichiometry",
-    }]
+    assert any(
+        notice.get("kind") == "vapour_batch_unresolved"
+        and notice.get("species") == "Fe"
+        and notice.get("reason") == "missing_evaporation_stoichiometry"
+        for notice in overlay["notices"]
+    )
+    assert any(
+        notice.get("kind") == "transport_parameters_estimated"
+        and notice.get("species") == "Fe"
+        and notice.get("flag") == "lj_estimated:legacy_code_proxy"
+        for notice in overlay["notices"]
+    )
 
 
 def test_sio_vapor_explicit_stoich_must_mass_close():

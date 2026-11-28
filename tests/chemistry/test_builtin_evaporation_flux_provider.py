@@ -1848,7 +1848,6 @@ def test_provider_keeps_computed_zero_when_peer_lacks_transport(monkeypatch):
         result.diagnostic,
         overlay,
         expected_species=("Fe", "Si"),
-        stoich_by_species=stoich,
         flux=flux,
     )
     assert set(unavailable) == {"Si"}
@@ -2052,11 +2051,11 @@ def test_missing_transport_channel_is_unavailable_downstream(
         (
             "missing_stoichiometry",
             "Si",
-            "missing_evaporation_stoichiometry",
+            None,
         ),
     ),
 )
-def test_provider_omissions_remain_typed_unavailable_with_a_peer(
+def test_provider_omission_requires_explicit_failure_to_be_unavailable(
     case,
     species,
     expected_reason,
@@ -2109,21 +2108,65 @@ def test_provider_omissions_remain_typed_unavailable_with_a_peer(
         result.diagnostic,
         overlay,
         expected_species=("Na", species),
-        stoich_by_species=stoich,
         flux=flux,
     )
 
     assert result.status == "ok"
     assert flux.species_kg_hr["Na"] > 0.0
     assert species not in flux.species_kg_hr
-    assert unavailable == {species: expected_reason}
-    assert overlay["notices"] == [{
-        "kind": "vapour_batch_unresolved",
-        "species": species,
-        "hour": 5,
-        "reason": expected_reason,
-    }]
-    assert flux.carrier_authority_by_species[species]["is_refused"] is True
+    if expected_reason is None:
+        assert unavailable == {}
+        assert overlay == {}
+        assert species not in flux.carrier_authority_by_species
+    else:
+        assert unavailable == {species: expected_reason}
+        assert overlay["notices"] == [{
+            "kind": "vapour_batch_unresolved",
+            "species": species,
+            "hour": 5,
+            "reason": expected_reason,
+        }]
+        assert flux.carrier_authority_by_species[species]["is_refused"] is True
+
+
+def test_explicit_provider_refusal_marks_missing_selected_channels_unavailable():
+    from types import SimpleNamespace
+
+    from simulator.evaporation import (
+        _record_unavailable_provider_flux_channels,
+    )
+
+    result = _w3_result_with_controls(
+        1.0,
+        vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
+        molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
+        stoich_by_species={
+            "Na": {"parent_oxide": "Na2O", "oxide_per_product_kg": 1.347},
+            "Si": {"parent_oxide": "SiO2", "oxide_per_product_kg": 2.139},
+        },
+        available_oxide_kg={"Na": 10.0, "Si": 10.0},
+        alpha={"Na": 0.5, "Si": 0.5},
+        melt_surface_area_m2=-1.0,
+    )
+
+    assert result.status == "refused"
+    overlay = {}
+    unavailable = _record_unavailable_provider_flux_channels(
+        SimpleNamespace(melt=SimpleNamespace(hour=5)),
+        result.diagnostic,
+        overlay,
+        expected_species=("Na", "Si"),
+        provider_status=result.status,
+    )
+
+    assert unavailable == {
+        "Na": "invalid_melt_surface_area_m2",
+        "Si": "invalid_melt_surface_area_m2",
+    }
+    assert [notice["species"] for notice in overlay["notices"]] == [
+        "Na",
+        "Si",
+    ]
 
 
 @pytest.mark.parametrize(

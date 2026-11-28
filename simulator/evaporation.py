@@ -1570,10 +1570,10 @@ def _record_unavailable_provider_flux_channels(
     overlay: dict[str, Any],
     *,
     expected_species: Iterable[str],
-    stoich_by_species: Mapping[str, Any] | None = None,
     flux: Any = None,
+    provider_status: Any = None,
 ) -> dict[str, str]:
-    """Keep every omitted provider channel typed as unavailable."""
+    """Record explicit species-local provider failures as unavailable."""
     missing_transport = diagnostic.get('missing_transport_parameters', {})
     missing_molar_mass = diagnostic.get('missing_molar_mass', {})
     missing_alpha = diagnostic.get('missing_alpha', {})
@@ -1584,12 +1584,11 @@ def _record_unavailable_provider_flux_channels(
         missing_molar_mass if isinstance(missing_molar_mass, Mapping) else {}
     )
     missing_alpha = missing_alpha if isinstance(missing_alpha, Mapping) else {}
-    stoich_by_species = (
-        stoich_by_species if isinstance(stoich_by_species, Mapping) else {}
-    )
     computed_species = _provider_resolved_flux_species(diagnostic, overlay)
     unavailable: dict[str, str] = {}
     candidates = {str(species) for species in expected_species}
+    provider_status = str(provider_status or '').strip().lower()
+    refusal_species = diagnostic.get('species')
     for species_id in sorted(candidates - computed_species):
         refusal = missing_transport.get(species_id)
         mass_failure = missing_molar_mass.get(species_id)
@@ -1608,14 +1607,19 @@ def _record_unavailable_provider_flux_channels(
             reason = str(alpha_failure.get('reason') or 'missing_alpha')
             refusal_code = reason
             extra = dict(alpha_failure)
-        elif species_id not in stoich_by_species:
-            reason = 'missing_evaporation_stoichiometry'
-            refusal_code = reason
-            extra = {'stoich_by_species': 'species entry is absent'}
+        elif provider_status in {'refused', 'unavailable'}:
+            if refusal_species is not None and str(refusal_species) != species_id:
+                continue
+            reason = str(
+                diagnostic.get('reason') or f'provider_{provider_status}'
+            )
+            refusal_code = str(diagnostic.get('refusal_type') or reason)
+            extra = dict(diagnostic)
         else:
-            reason = 'provider_flux_outcome_unavailable'
-            refusal_code = reason
-            extra = {}
+            # Green treats a status-ok omission with no typed species-local
+            # refusal as no debit. In particular, the selected channel is not
+            # made unavailable and cannot trigger a late retry from silence.
+            continue
         unavailable[species_id] = reason
         if flux is not None:
             authorities = getattr(flux, 'carrier_authority_by_species', None)
@@ -1954,6 +1958,21 @@ class EvaporationMixin:
             pressure = sum(cleaned.values())
         return cleaned, pressure
 
+    def _evaporation_gas_resistance_enabled(self) -> bool:
+        """Resolve the publisher film switch for classification and closure."""
+        from engines.builtin.evaporation_flux import (
+            resolve_gas_resistance_enabled,
+        )
+
+        kernel_config = dict(
+            (getattr(self, "setpoints", {}) or {}).get("chemistry_kernel", {})
+            or {}
+        )
+        series_config = dict(
+            kernel_config.get("evaporation_series_resistance", {}) or {}
+        )
+        return resolve_gas_resistance_enabled(series_config, {})
+
     def _langmuir_transport(
         self,
         partials_Pa: Mapping[str, float],
@@ -1966,27 +1985,17 @@ class EvaporationMixin:
         for these partials. This method does not sum them again.
         """
 
-        from engines.builtin.evaporation_flux import (
-            resolve_gas_resistance_enabled,
-        )
         from simulator.condensation import _knudsen_number
         from simulator.langmuir_surface_oxygen import LangmuirTransport
         from simulator.transport_regime import continuum_validity_refuses
 
-        kernel_config = dict(
-            (getattr(self, "setpoints", {}) or {}).get("chemistry_kernel", {})
-            or {}
-        )
-        series_config = dict(
-            kernel_config.get("evaporation_series_resistance", {}) or {}
-        )
         # Green's publisher film policy, the same parent the flux
         # controls will have. Nested ``evaporation_series_resistance``
         # wins; otherwise the film is on. The top-level kernel flag is
         # not that parent and is not copied onto the controls: a
         # buffered in-band melt keeps green's film. b-906 round 7.
-        gas_resistance_enabled = resolve_gas_resistance_enabled(
-            series_config, {}
+        gas_resistance_enabled = (
+            EvaporationMixin._evaporation_gas_resistance_enabled(self)
         )
         overhead_model = getattr(self, "overhead_model", None)
         try:
@@ -3305,6 +3314,9 @@ class EvaporationMixin:
             restarted_unavailable_species = set(
                 cached.get('restarted_unavailable_species', ()) or ()
             )
+            late_unavailability_restart_used = bool(
+                cached.get('late_unavailability_restart_used', False)
+            )
         else:
             unavailable = {
                 str(species): str(reason)
@@ -3327,6 +3339,7 @@ class EvaporationMixin:
             )
             hkl_upper_bound_species = set()
             restarted_unavailable_species = set()
+            late_unavailability_restart_used = False
             self._langmuir_flux_closure_context = None
             from simulator.condensation import (
                 _resolve_lennard_jones_parameters,
@@ -3336,8 +3349,15 @@ class EvaporationMixin:
                 FREE_MOLECULAR_KNUDSEN_MIN,
             )
             vapor_data = getattr(self, 'vapor_pressures', {}) or {}
+            gas_resistance_enabled = (
+                EvaporationMixin._evaporation_gas_resistance_enabled(self)
+            )
             for species in sorted(member_species):
                 if species in unavailable:
+                    continue
+                if str(species) in catalog_hkl_upper_bound_species:
+                    transport_eligibility[str(species)] = 'hkl_upper_bound'
+                    hkl_upper_bound_species.add(str(species))
                     continue
                 row = _evaporation_vapor_row(vapor_data, species)
                 if row is not None:
@@ -3377,9 +3397,10 @@ class EvaporationMixin:
                 transport_parameters[str(species)] = dict(parameters)
                 if parameters.get('status') == 'estimated':
                     estimated_transport[str(species)] = parameters
-                if str(species) in catalog_hkl_upper_bound_species:
-                    transport_eligibility[str(species)] = 'hkl_upper_bound'
-                    hkl_upper_bound_species.add(str(species))
+                if not gas_resistance_enabled:
+                    transport_eligibility[str(species)] = (
+                        'gas_resistance_disabled'
+                    )
                     continue
                 if free_molecular_to_rating:
                     # LJ estimates remain disclosed, but the rated regime
@@ -3461,6 +3482,9 @@ class EvaporationMixin:
             'restarted_unavailable_species': tuple(
                 sorted(restarted_unavailable_species)
             ),
+            'late_unavailability_restart_used': (
+                late_unavailability_restart_used
+            ),
         }
 
         for species, estimate in estimated_transport.items():
@@ -3493,9 +3517,9 @@ class EvaporationMixin:
     ) -> dict[str, str]:
         """Exclude newly refused frozen members before deterministic re-close.
 
-        Capacity Picard permits one restart of the whole solve. Live dispatch
-        retains its per-member restart because a provider can discover a later
-        species-local refusal after the first re-dispatch.
+        One late-unavailability restart is shared by every cause in this
+        batch hour. Frozen membership, rather than a current pressure map,
+        decides which late failures can trigger that restart.
         """
         cache = getattr(self, '_vapour_batch_hour_availability', None)
         restarted = set(
@@ -3503,8 +3527,12 @@ class EvaporationMixin:
             if isinstance(cache, Mapping)
             else ()
         )
-        if capacity_solve and capacity_restart_used:
-            return {}
+        restart_used = bool(
+            (isinstance(cache, Mapping) and cache.get(
+                'late_unavailability_restart_used'
+            ))
+            or (capacity_solve and capacity_restart_used)
+        )
         members = set(
             str(species)
             for species in (
@@ -3516,9 +3544,9 @@ class EvaporationMixin:
         fresh = {
             str(species): str(reason)
             for species, reason in unavailable_by_species.items()
-            if str(species) in members and str(species) not in restarted
+            if str(species) in members
         }
-        if not fresh:
+        if not fresh or restart_used:
             return {}
         EvaporationMixin._classify_hour_vapour_availability(
             self,
@@ -3532,6 +3560,7 @@ class EvaporationMixin:
         if isinstance(cache, dict):
             restarted.update(fresh)
             cache['restarted_unavailable_species'] = tuple(sorted(restarted))
+            cache['late_unavailability_restart_used'] = True
         return fresh
 
     def _restart_or_refuse_capacity_members(
@@ -3544,11 +3573,16 @@ class EvaporationMixin:
         capacity_restart_used: bool,
         detail_key: str,
         resolved_species: Iterable[str],
+        capacity_solve: bool = True,
     ) -> dict[str, str]:
-        bound_notice = _append_capacity_solve_exclusion_notice(
-            self,
-            flux_overlay,
-            resolved_species=resolved_species,
+        bound_notice = (
+            _append_capacity_solve_exclusion_notice(
+                self,
+                flux_overlay,
+                resolved_species=resolved_species,
+            )
+            if capacity_solve
+            else None
         )
         fresh = EvaporationMixin._restart_for_late_unavailability(
             self,
@@ -3556,7 +3590,7 @@ class EvaporationMixin:
             flux_pressures,
             flux_overlay,
             unavailable_by_species,
-            capacity_solve=True,
+            capacity_solve=capacity_solve,
             capacity_restart_used=capacity_restart_used,
         )
         if fresh:
@@ -4118,12 +4152,16 @@ class EvaporationMixin:
             getattr(control_result, 'unavailable_by_species', {}) or {}
         )
         if new_aux_parent_failures:
-            late_parent_species = EvaporationMixin._restart_for_late_unavailability(
+            late_parent_species = EvaporationMixin._restart_or_refuse_capacity_members(
                 self,
                 equilibrium,
                 pre_aux_vapor_pressures,
                 flux_overlay_report,
                 new_aux_parent_failures,
+                capacity_restart_used=False,
+                detail_key='auxiliary_map_unavailable',
+                resolved_species=vapor_pressures,
+                capacity_solve=False,
             )
             if late_parent_species:
                 return EvaporationMixin._calculate_evaporation(
@@ -4220,18 +4258,24 @@ class EvaporationMixin:
             diagnostic,
             flux_overlay_report,
             expected_species=vapor_pressures,
-            stoich_by_species=control_inputs.get('stoich_by_species', {}),
             flux=flux,
+            provider_status=getattr(kernel_result, 'status', None),
         )
         diagnostic['vapour_batch_flux_overlay'] = flux_overlay_report
         if provider_unavailable:
             fresh_provider_unavailable = (
-                EvaporationMixin._restart_for_late_unavailability(
+                EvaporationMixin._restart_or_refuse_capacity_members(
                     self,
                     equilibrium,
                     vapor_pressures,
                     flux_overlay_report,
                     provider_unavailable,
+                    capacity_restart_used=False,
+                    detail_key='provider_unavailable',
+                    resolved_species=flux_overlay_report.get(
+                        'batch_channel_states', {}
+                    ),
+                    capacity_solve=False,
                 )
             )
             if fresh_provider_unavailable:
