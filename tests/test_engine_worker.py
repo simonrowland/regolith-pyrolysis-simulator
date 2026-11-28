@@ -1801,6 +1801,26 @@ def test_queue_pool_keeps_draining_while_one_slot_hangs(monkeypatch):
                 hung.result(timeout=_RENDEZVOUS_TIMEOUT_S)
 
 
+def test_pool_records_worker_call_elapsed_without_queue_wait():
+    with EngineWorkerPool(
+        lambda _index: _test_worker(timeout_s=2.0),
+        size=1,
+    ) as pool:
+        first = pool.submit({**_points()[0], 'delay': 0.2}, timeout_s=2.0)
+        second_submitted_at = time.monotonic()
+        second = pool.submit({**_points()[1], 'delay': 0.01}, timeout_s=2.0)
+
+        assert first.result(timeout=5.0)
+        assert second.result(timeout=5.0)
+
+        queue_and_call_elapsed_s = time.monotonic() - second_submitted_at
+        worker_call_elapsed_s = second._engine_call_elapsed_s
+
+    assert worker_call_elapsed_s is not None
+    assert 0.0 < worker_call_elapsed_s < 0.1
+    assert queue_and_call_elapsed_s - worker_call_elapsed_s >= 0.1
+
+
 def test_submit_with_no_live_consumer_refuses_instead_of_hanging_forever():
     """A queued item with no consumer must refuse, not park the caller forever.
 

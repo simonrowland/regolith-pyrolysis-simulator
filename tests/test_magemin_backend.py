@@ -1576,6 +1576,9 @@ def test_magemin_liquidus_uses_same_hang_guard_for_all_modes(
 
     def fake_finder(_sample_fraction, **kwargs):
         captured.update(kwargs)
+        captured['budget_elapsed_s'] = (
+            liquidus_module._LIQUIDUS_BUDGET_ELAPSED_S.get()
+        )
         return liquidus_module.LiquidusSolidusResult(status='not_converged')
 
     monkeypatch.setattr(
@@ -1624,6 +1627,7 @@ def test_magemin_liquidus_budget_excludes_slot_wait(monkeypatch):
         )
 
     monkeypatch.setattr(backend, 'equilibrate', slow_waiting_equilibrium)
+    started_at = time.monotonic()
     result = backend.find_liquidus_solidus(
         composition_mol={'SiO2': 1.0},
         fO2_log=-8.0,
@@ -1634,6 +1638,7 @@ def test_magemin_liquidus_budget_excludes_slot_wait(monkeypatch):
         tolerance_C=1.0,
     )
 
+    assert time.monotonic() - started_at > 0.05
     assert len(temperatures) >= 2
     assert result.status == 'ok'
     assert (result.diagnostics or {}).get('reason') != (
