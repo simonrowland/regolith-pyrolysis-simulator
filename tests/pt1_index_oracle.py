@@ -49,7 +49,7 @@ def independent_ladder_distance(
     # Recompute the documented normalized offsets directly; this deliberately
     # avoids the production ladder-distance resolver used by the writer.
     components = []
-    for component in key["composition_mol_fraction"]:
+    for component in key.get("composition_mol_fraction", []):
         if isinstance(component, Mapping):
             species = str(component["species"])
             exact = float(component["mol_fraction"])

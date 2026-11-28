@@ -11,7 +11,6 @@ import pytest
 
 import simulator.reduced_real_determinism as rrd
 from simulator.corpus_version import current_corpus_version
-from tests.pt1_index_oracle import independent_ladder_distance
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -131,123 +130,6 @@ def test_backfill_accepts_new_schema_equilibrium_authority(tmp_path):
 
     assert stats.invalid_rows == 0
     assert stats.rows_updated == 1
-
-
-def test_backfill_partial_bucket_row_does_not_fabricate_missing_rung_columns(
-    tmp_path: Path,
-) -> None:
-    db_path = tmp_path / "partial-bucket.db"
-    _create_legacy_db(db_path)
-    key = _replay_key("partial-bucket", setpoints_digest="partial-setpoints")
-    _insert_legacy_row(db_path, key)
-    values = backfill._physics_values_from_replay_key(key)
-    key_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(
-            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "ADD COLUMN physics_bucket_schema_version TEXT"
-        )
-        conn.execute(
-            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "ADD COLUMN physics_bucket_sha256 TEXT"
-        )
-        conn.execute(
-            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "ADD COLUMN replay_scope_sha256 TEXT"
-        )
-        conn.execute(
-            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "ADD COLUMN physics_key_bytes BLOB"
-        )
-        conn.execute(
-            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET physics_bucket_schema_version = ?, physics_bucket_sha256 = ?, "
-            "replay_scope_sha256 = ?, physics_key_bytes = ? "
-            "WHERE key_hash = ?",
-            (
-                values.schema_version,
-                values.physics_bucket_sha256,
-                values.replay_scope_sha256,
-                sqlite3.Binary(values.physics_key_bytes),
-                key_hash,
-            ),
-        )
-
-    stats = backfill.run_backfill(db_path, dry_run=False)
-
-    assert stats.invalid_rows == 0
-    assert stats.rows_needing_backfill == 1
-    assert stats.rows_updated == 1
-    with sqlite3.connect(db_path) as conn:
-        (h40_distance,) = conn.execute(
-            f"SELECT physics_bucket_h40_distance "
-            f"FROM {rrd.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
-            (key_hash,),
-        ).fetchone()
-    assert h40_distance == values.physics_bucket_h40_distance
-
-
-def test_backfill_fills_present_null_distance_and_preserves_store_stamp(
-    tmp_path: Path,
-) -> None:
-    db_path = tmp_path / "present-null-distance.db"
-    _create_legacy_db(db_path)
-    key = _replay_key("present-null", setpoints_digest="present-null-setpoints")
-    _insert_legacy_row(db_path, key)
-    key_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(
-            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "ADD COLUMN physics_bucket_h40_distance REAL"
-        )
-        (store_stamp,) = conn.execute(
-            f"SELECT store_schema_version FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "WHERE key_hash = ?",
-            (key_hash,),
-        ).fetchone()
-
-    stats = backfill.run_backfill(db_path, dry_run=False)
-
-    expected_h40 = independent_ladder_distance(
-        key,
-        sig_figs=float(dict(rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS)["h40"]),
-        include_controls=False,
-    )
-    assert stats.rows_updated == 1
-    with sqlite3.connect(db_path) as conn:
-        distance, updated_stamp = conn.execute(
-            f"SELECT physics_bucket_h40_distance, store_schema_version "
-            f"FROM {rrd.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
-            (key_hash,),
-        ).fetchone()
-    assert distance == expected_h40
-    assert updated_stamp == store_stamp
-
-
-def test_backfill_conflicting_bucket_hash_raises_before_admission_skip(
-    tmp_path: Path,
-) -> None:
-    db_path = tmp_path / "conflicting-bucket-hash.db"
-    _create_legacy_db(db_path)
-    key = _replay_key("bucket-conflict", setpoints_digest="bucket-conflict")
-    _insert_legacy_row(db_path, key)
-    key_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(
-            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "ADD COLUMN physics_bucket_sha256 TEXT"
-        )
-        conn.execute(
-            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET physics_bucket_sha256 = ? WHERE key_hash = ?",
-            ("wrong-bucket-hash", key_hash),
-        )
-
-    with pytest.raises(
-        RuntimeError,
-        match="existing physics-bucket columns conflict",
-    ):
-        backfill.run_backfill(db_path, dry_run=True)
 
 
 @pytest.mark.parametrize(

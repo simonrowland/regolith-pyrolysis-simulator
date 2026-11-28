@@ -90,6 +90,7 @@ def _key_from_stored_row(
             row,
             store_kind="pt1",
             validate_store_schema_version=True,
+            validate_interpolation_domain=True,
         )
         if admitted is None:
             raise PT1PersistentStoreCorrupt(

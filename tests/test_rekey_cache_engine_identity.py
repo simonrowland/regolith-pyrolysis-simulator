@@ -233,6 +233,63 @@ def test_rekey_current_layout_admits_full_row_for_count_and_write(
         assert {"payload_bytes", "payload_sha256"} <= columns
         assert kwargs["store_kind"] == "pt1"
         assert kwargs["validate_store_schema_version"] is True
+        assert kwargs["validate_interpolation_domain"] is True
+
+
+def test_rekey_current_layout_rejects_null_controls_with_carried_indexes(
+    tmp_path: Path,
+    target_corpus_version: str,
+) -> None:
+    db_path = tmp_path / "current-layout-null-controls-rekey.db"
+    original_hash, _payload_bytes = put_rekey_gate_row(
+        db_path,
+        {
+            "backend": {"backend_name": "alphamelts"},
+            "engine_version": "one",
+        },
+        engine_version="one",
+    )
+    with sqlite3.connect(db_path) as conn:
+        (key_bytes,) = conn.execute(
+            f"SELECT key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (original_hash,),
+        ).fetchone()
+        carried_indexes = conn.execute(
+            f"SELECT physics_bucket_h40_sha256, physics_bucket_h40_distance "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (original_hash,),
+        ).fetchone()
+        assert all(value is not None for value in carried_indexes)
+        key = json.loads(bytes(key_bytes))
+        key["controls"] = None
+        stored_key_bytes = rrd.canonical_json_bytes(key)
+        stored_key_hash = rrd._sha256(stored_key_bytes)
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_sha256 = ?, key_bytes = ? "
+            "WHERE key_hash = ?",
+            (
+                stored_key_hash,
+                stored_key_hash,
+                sqlite3.Binary(stored_key_bytes),
+                original_hash,
+            ),
+        )
+
+    exact_reader = rrd.PT1PersistentEquilibriumStore(db_path)
+    assert exact_reader.get(
+        artifact="freeze_gate_curve",
+        key=key,
+        key_bytes=stored_key_bytes,
+        key_hash=stored_key_hash,
+    ) is None
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=target_corpus_version,
+            dry_run=True,
+        )
 
 
 def test_rekey_current_layout_rejects_legacy_stamp(
@@ -273,6 +330,25 @@ def test_rekey_legacy_stamp_with_h40_column_preserves_stamp_and_payload(
     db_path = tmp_path / "legacy-pt1-h40-rekey.db"
     _write_rekeyable_rows(db_path, ("one",))
     with sqlite3.connect(db_path) as conn:
+        old_hash, original_key_bytes = conn.execute(
+            f"SELECT key_hash, key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        off_centre_key = rekey._json_loads(bytes(original_key_bytes))
+        off_centre_key["composition_mol_fraction"] = [["SiO2", 0.123456]]
+        off_centre_key["controls"] = {"T_K": 1234.567}
+        off_centre_key_bytes = rekey.canonical_json_bytes(off_centre_key)
+        off_centre_hash = hashlib.sha256(off_centre_key_bytes).hexdigest()
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_sha256 = ?, key_bytes = ? "
+            "WHERE key_hash = ?",
+            (
+                off_centre_hash,
+                off_centre_hash,
+                sqlite3.Binary(off_centre_key_bytes),
+                old_hash,
+            ),
+        )
         conn.execute(
             f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
             "ADD COLUMN store_schema_version TEXT"
@@ -319,6 +395,7 @@ def test_rekey_legacy_stamp_with_h40_column_preserves_stamp_and_payload(
         sig_figs=float(dict(rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS)["h40"]),
         include_controls=False,
     )
+    assert expected_h40 > 0.0
     assert after[3] == expected_h40
 
 

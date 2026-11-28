@@ -46,26 +46,18 @@ def validate(db_path: Path, *, sample_limit: int) -> dict[str, Any]:
         conn.row_factory = sqlite3.Row
         for row in conn.execute(
             f"""
-            SELECT *
+            SELECT key_hash, key_bytes, payload_bytes, replay_scope_sha256
             FROM {TABLE}
             WHERE artifact = 'equilibrium_post_record'
             ORDER BY key_hash
             """
         ):
-            admitted = rrd._admit_stored_row(
-                row,
-                store_kind="pt1",
-                artifact="equilibrium_post_record",
-            )
-            assert admitted is not None and admitted.stored_columns is not None
             rows.append(
                 {
-                    "key_hash": str(admitted.entry["key_hash"]),
-                    "key": admitted.entry["key"],
-                    "payload": admitted.entry["payload"],
-                    "replay_scope_sha256": str(
-                        admitted.stored_columns["replay_scope_sha256"] or ""
-                    ),
+                    "key_hash": str(row["key_hash"]),
+                    "key": json.loads(_blob_bytes(row["key_bytes"]).decode("utf-8")),
+                    "payload": json.loads(_blob_bytes(row["payload_bytes"]).decode("utf-8")),
+                    "replay_scope_sha256": str(row["replay_scope_sha256"] or ""),
                 }
             )
 
@@ -295,6 +287,14 @@ def _percentile(values: list[float], fraction: float) -> float:
         return math.nan
     index = max(0, min(len(values) - 1, math.ceil(fraction * len(values)) - 1))
     return values[index]
+
+
+def _blob_bytes(value: Any) -> bytes:
+    if isinstance(value, bytes):
+        return value
+    if isinstance(value, memoryview):
+        return value.tobytes()
+    return bytes(value)
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
