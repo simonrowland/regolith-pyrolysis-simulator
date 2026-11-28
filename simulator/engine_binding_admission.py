@@ -299,6 +299,11 @@ def publish_live_backend_admission(backend: Any) -> None:
         authorize_binding(identity, provenance)
         fingerprint = admission_fingerprint(identity, provenance)
     except Exception as exc:  # noqa: BLE001 - an unadmitted backend still computes live
+        from simulator.melt_backend.magemin import (
+            _raise_if_magemin_subprocess_slot_unavailable,
+        )
+
+        _raise_if_magemin_subprocess_slot_unavailable(exc)
         try:
             # MAGEMin's finalizer retains backend.close. Keeping this live
             # traceback here can lead back through sim to its provider, so
@@ -1844,6 +1849,11 @@ def _version_getter_state(getter: Any) -> State[str]:
             raise ValueError("empty version")
         return State.of(str(value).strip())
     except Exception as exc:  # noqa: BLE001 - version is provenance only
+        from simulator.melt_backend.magemin import (
+            _raise_if_magemin_subprocess_slot_unavailable,
+        )
+
+        _raise_if_magemin_subprocess_slot_unavailable(exc)
         return State.unknown(f"version getter failed: {type(exc).__name__}")
 
 

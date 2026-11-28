@@ -513,7 +513,7 @@ def verify(python: Path, lock: EngineLock, root: Path) -> None:
             _magemin_subprocess_slot,
         )
 
-        with _magemin_subprocess_slot(30):
+        with _magemin_subprocess_slot():
             proc = _run_alphamelts_subprocess(
                 [str(magemin), "--version"],
                 capture_output=True,

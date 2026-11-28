@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import contextvars
 import math
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Callable, Mapping, Optional, Tuple
+from typing import Any, Callable, Iterator, Mapping, Optional, Tuple
 
 from simulator.melt_backend.base import (
     LiquidFractionInvalidError,
@@ -22,6 +24,9 @@ from simulator.melt_regime import liquid_fraction_invalidity
 # leave normal runs ample headroom. Unit check: 163 s * 10 is seconds.
 DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 1800.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
+_LIQUIDUS_BUDGET_ELAPSED_S: contextvars.ContextVar[
+    Callable[[], float] | None
+] = contextvars.ContextVar('liquidus_budget_elapsed_s', default=None)
 # frac_M >= 1 - LIQUIDUS_LIQUID_EPSILON is liquid. This is the finder's
 # declaration tolerance. The freeze-gate consumer may snap a supplied
 # liquidus fraction to 1 only inside this band. One owner: do not copy
@@ -80,6 +85,18 @@ class LiquidusSampleError(RuntimeError):
         self.warnings = tuple(str(warning) for warning in warnings)
         self.diagnostics = dict(diagnostics or {})
         super().__init__('; '.join(self.warnings) or self.status)
+
+
+@contextmanager
+def _liquidus_budget_clock(
+    elapsed_s: Callable[[], float],
+) -> Iterator[None]:
+    """Use caller-measured compute time for one synchronous liquidus search."""
+    token = _LIQUIDUS_BUDGET_ELAPSED_S.set(elapsed_s)
+    try:
+        yield
+    finally:
+        _LIQUIDUS_BUDGET_ELAPSED_S.reset(token)
 
 
 def _sample_error_with_exception_context(
@@ -388,9 +405,10 @@ def find_liquidus_solidus_by_fraction(
 ) -> LiquidusSolidusResult:
     """Bracket and bisect solidus/liquidus on monotone melt fraction.
 
-    ``budget_s`` defaults to ``None``. A finite value is a generous hang
-    guard, checked between samples; its residual is never passed to the
-    engine. The search work is bounded by the scan grid and the two
+    ``budget_s`` defaults to ``None``. A finite value is checked between
+    samples. Normally it measures finder wall time; a backend can scope a
+    measured-compute clock around this call when queue waits must not spend
+    the budget. The search work is bounded by the scan grid and the two
     tolerance-bounded bisections.
 
     ``warm_solidus_T_C`` and ``warm_liquidus_T_C`` are optional previous
@@ -478,10 +496,13 @@ def find_liquidus_solidus_by_fraction(
     smoothing_warnings: list[str] = []
     iterations = 0
     start_time = time.monotonic()
-    deadline = start_time + budget if budget is not None else None
+    budget_elapsed_s = _LIQUIDUS_BUDGET_ELAPSED_S.get()
     last_T_C: Optional[float] = None
 
     def _elapsed_s() -> float:
+        if budget_elapsed_s is not None:
+            elapsed = float(budget_elapsed_s())
+            return max(0.0, elapsed) if math.isfinite(elapsed) else math.inf
         return max(0.0, time.monotonic() - start_time)
 
     def _budget_diagnostics() -> dict[str, Any]:
@@ -502,7 +523,7 @@ def find_liquidus_solidus_by_fraction(
         )
 
     def check_budget() -> None:
-        if deadline is not None and time.monotonic() >= deadline:
+        if budget is not None and _elapsed_s() >= budget:
             raise _LiquidusFinderBudgetExceeded(budget_warning())
 
     def sample(T_C: float) -> MeltFractionSample:

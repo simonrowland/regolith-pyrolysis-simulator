@@ -666,7 +666,12 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         if callable(getter):
             try:
                 return str(getter())
-            except Exception:
+            except Exception as exc:
+                from simulator.melt_backend.magemin import (
+                    _raise_if_magemin_subprocess_slot_unavailable,
+                )
+
+                _raise_if_magemin_subprocess_slot_unavailable(exc)
                 return 'unavailable'
         return 'unavailable'
 

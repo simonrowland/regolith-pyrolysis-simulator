@@ -771,44 +771,6 @@ class _EngineWorkerLaunch:
 class WarmEngineWorker:
     """Persistent spawned worker with deadlines and crash/hang replacement."""
 
-    @staticmethod
-    def _caller_future_timeout_s(
-        call_timeout_s: float,
-        startup_timeout_s: float,
-        watchdog_grace_s: float = ENGINE_WORKER_WATCHDOG_GRACE_S,
-    ) -> float:
-        """Bound a caller wait across cold start, call, and timeout cleanup.
-
-        Premise: ``start()`` spawns before its handshake wall begins, the job
-        wall begins after READY, and a job timeout is reported only after the
-        watchdog grace and bounded stop joins. In seconds, the caller envelope
-        is call + startup + healthy-spawn slack + watchdog grace + stop joins
-        + one consumer poll tick. Default MAGEMin is 15 + 30 + 1 + 0.25 +
-        1.1 + 0.05 = 47.4 seconds. The adapter may cap this by its remaining
-        aggregate budget, which remains the stronger deadline.
-        """
-        call_s = float(call_timeout_s)
-        startup_s = float(startup_timeout_s)
-        grace_s = float(watchdog_grace_s)
-        if not math.isfinite(call_s) or call_s <= 0.0:
-            raise ValueError('worker call timeout must be finite and positive')
-        if not math.isfinite(startup_s) or startup_s <= 0.0:
-            raise ValueError(
-                'worker startup timeout must be finite and positive'
-            )
-        if not math.isfinite(grace_s) or grace_s < 0.0:
-            raise ValueError(
-                'worker watchdog grace must be finite and nonnegative'
-            )
-        return (
-            call_s
-            + startup_s
-            + ENGINE_WORKER_SPAWN_SLACK_S
-            + grace_s
-            + ENGINE_WORKER_STOP_PAIR_JOIN_S
-            + ENGINE_WORKER_CANCEL_POLL_S
-        )
-
     def __init__(
         self,
         *,
@@ -840,6 +802,7 @@ class WarmEngineWorker:
         self.ready_payload = None
         self.start_count = 0
         self.disabled = False
+        self._last_call_elapsed_s: float | None = None
         self._state_lock = threading.Lock()
         self._launch_owner: _EngineWorkerLaunch | None = None
         self._native_output_capture: tuple[
@@ -1627,6 +1590,7 @@ class WarmEngineWorker:
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
         """Run one request; replace a dead or timed-out worker before return."""
+        self._last_call_elapsed_s = None
         timeout = self.call_timeout_s if timeout_s is None else max(
             0.001, float(timeout_s))
         with self._state_lock:
@@ -1788,6 +1752,7 @@ class WarmEngineWorker:
                 abort_event=abort_event,
                 debug_timeout_s=remaining,
             )
+            call_finished_at = time.monotonic()
         except TimeoutError:
             raise
         except (BrokenPipeError, EOFError, OSError) as exc:
@@ -1830,6 +1795,10 @@ class WarmEngineWorker:
 
             _record_engine_cache_counters(counters)
         if message[0] == 'ok':
+            self._last_call_elapsed_s = max(
+                0.0,
+                call_finished_at - started_at,
+            )
             return message[1]
         if message[0] == 'timeout':
             _tag, worker_name, timeout_s, phase = message[:4]
@@ -3137,6 +3106,9 @@ class EngineWorkerPool:
                     future.set_exception(exc)
                     del exc
                 else:
+                    future._engine_call_elapsed_s = (
+                        worker._last_call_elapsed_s
+                    )
                     call_finished.set()
                     with self._active_requests_lock:
                         self._active_requests.pop(future, None)

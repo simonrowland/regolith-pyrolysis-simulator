@@ -1629,7 +1629,12 @@ def _live_backend_identity(backend: Any) -> tuple[str, str | None]:
                 if value and value.lower() != "unavailable"
                 else None
             )
-        except Exception:  # noqa: BLE001 - version is provenance only
+        except Exception as exc:  # noqa: BLE001 - version is provenance only
+            from simulator.melt_backend.magemin import (
+                _raise_if_magemin_subprocess_slot_unavailable,
+            )
+
+            _raise_if_magemin_subprocess_slot_unavailable(exc)
             version = None
     return name, version
 

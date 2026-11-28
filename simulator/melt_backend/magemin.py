@@ -95,7 +95,6 @@ from __future__ import annotations
 
 import builtins
 import copy
-from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager, nullcontext
 from decimal import Decimal, InvalidOperation
 import fcntl
@@ -150,6 +149,7 @@ from simulator.melt_backend.liquidus import (
     DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
     LiquidusSampleError,
     LiquidusSolidusResult,
+    _liquidus_budget_clock,
     find_liquidus_solidus_by_fraction,
 )
 from simulator.melt_backend.pure_phase import (
@@ -254,10 +254,8 @@ def _magemin_subprocess_slot() -> Iterator[None]:
         try:
             _MAGEMIN_SUBPROCESS_LOCK_DIR.mkdir(parents=True, exist_ok=True)
         except OSError as exc:
-            raise _MAGEMinEngineLifecycleError(
-                'MAGEMinSubprocessSlotUnavailable',
+            raise _MAGEMinSubprocessSlotUnavailable(
                 f'MAGEMin subprocess slot is unavailable: {exc}',
-                failure_disposition='environment',
             ) from exc
         slots = _magemin_subprocess_slot_count()
         try:
@@ -268,10 +266,8 @@ def _magemin_subprocess_slot() -> Iterator[None]:
                 )
                 lock_files.append(path.open('a+b'))
         except OSError as exc:
-            raise _MAGEMinEngineLifecycleError(
-                'MAGEMinSubprocessSlotUnavailable',
+            raise _MAGEMinSubprocessSlotUnavailable(
                 f'MAGEMin subprocess slot is unavailable: {exc}',
-                failure_disposition='environment',
             ) from exc
         while True:
             for index, lock_file in enumerate(lock_files):
@@ -284,10 +280,8 @@ def _magemin_subprocess_slot() -> Iterator[None]:
                 except BlockingIOError:
                     continue
                 except OSError as exc:
-                    raise _MAGEMinEngineLifecycleError(
-                        'MAGEMinSubprocessSlotUnavailable',
+                    raise _MAGEMinSubprocessSlotUnavailable(
                         f'MAGEMin subprocess slot is unavailable: {exc}',
-                        failure_disposition='environment',
                     ) from exc
             if acquired_index >= 0:
                 break
@@ -417,6 +411,25 @@ class _MAGEMinDeclaredInputError(_MAGEMinEngineCallError):
 
 class _MAGEMinEngineLifecycleError(_MAGEMinEngineCallError):
     """A MAGEMin worker, budget, or subprocess slot lifecycle failure."""
+
+
+class _MAGEMinSubprocessSlotUnavailable(_MAGEMinEngineLifecycleError):
+    """The operating system could not acquire a MAGEMin host slot."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(
+            'MAGEMinSubprocessSlotUnavailable',
+            message,
+            failure_disposition='environment',
+        )
+
+
+def _raise_if_magemin_subprocess_slot_unavailable(
+    exc: BaseException,
+) -> None:
+    """Keep slot acquisition failures terminal across broad provenance catches."""
+    if isinstance(exc, _MAGEMinSubprocessSlotUnavailable):
+        raise exc
 
 
 def _admit_magemin_call_scalars(
@@ -1630,6 +1643,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
         self._subprocess_pool: Optional[EngineWorkerPool] = None
+        self._liquidus_compute_clock = threading.local()
 
     # ------------------------------------------------------------------
     # MeltBackend interface
@@ -1843,8 +1857,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         transition and fails closed (see the module "Authority posture"
         note).  The result is only meaningful to a shadow comparator.
 
-        On library error returns an empty result with a warning rather
-        than raising.
+        Ordinary engine call failures return an empty result with a
+        warning. A worker timeout or a typed host-slot acquisition error
+        propagates so orchestration cannot turn a control-plane failure
+        into a physics fallback.
         """
         # The subprocess bridge has no Python module (the binary is the
         # bridge); the other bridges do.  Either way the backend must be
@@ -2010,6 +2026,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics=diagnostics,
             )
 
+        self._liquidus_compute_clock.elapsed_s = None
+        engine_call_started = time.monotonic()
         try:
             raw = self._call_magemin(
                 bulk_projection=bulk_projection,
@@ -2024,6 +2042,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             # A hang is a control-plane event, not an equilibrium refusal.
             # The pool has already killed the slot; preserve the typed signal
             # so the caller can retry while the next call respawns it.
+            raise
+        except _MAGEMinSubprocessSlotUnavailable:
             raise
         except _MAGEMinEngineCallError as exc:
             # MAGEMin is present but the minimisation did not produce a
@@ -2052,6 +2072,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 ),
                 warnings=[*prior_warnings, *bulk_projection.warnings, message],
                 diagnostics=failure_diagnostics,
+            )
+
+        if self._liquidus_compute_clock.elapsed_s is None:
+            self._liquidus_compute_clock.elapsed_s = max(
+                0.0,
+                time.monotonic() - engine_call_started,
             )
 
         # ledger_transition is left None: MAGEMin holds no AtomLedger
@@ -2301,9 +2327,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         sample_warnings: list[str] = []
         renormalised_notices: list[dict] = []
+        sample_compute_s = 0.0
 
-        # MAGEMin uses a finite hang guard; sample count, not wall time,
-        # bounds the search work. A per-call engine timeout remains separate.
+        # The aggregate guard charges measured MAGEMin solve time only;
+        # host-slot and worker-queue waiting stay outside the budget.
         raw_budget = self._config.get(
             'liquidus_finder_budget_s',
             DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
@@ -2362,6 +2389,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         def sample_fraction(
             temperature_C: float,
         ) -> float:
+            nonlocal sample_compute_s
             sample_fO2_log = (
                 fO2_log
                 if redox_state is None
@@ -2377,6 +2405,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 species_formula_registry=species_formula_registry,
                 projected_oxide_wt_pct=projected_oxide_wt_pct,
             )
+            measured_compute_s = getattr(
+                self._liquidus_compute_clock,
+                'elapsed_s',
+                None,
+            )
+            if measured_compute_s is not None:
+                sample_compute_s += max(
+                    0.0,
+                    float(measured_compute_s),
+                )
             if result.status != 'ok':
                 warning = '; '.join(result.warnings) or result.status
                 # Raise the TYPED sample error so the finder preserves which
@@ -2424,16 +2462,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     return fraction, notice
             return fraction
 
-        result = find_liquidus_solidus_by_fraction(
-            sample_fraction,
-            min_T_C=min_T_C,
-            max_T_C=max_T_C,
-            scan_step_C=scan_step_C,
-            tolerance_C=tolerance_C,
-            budget_s=budget_s,
-            warm_solidus_T_C=warm_solidus_T_C,
-            warm_liquidus_T_C=warm_liquidus_T_C,
-        )
+        with _liquidus_budget_clock(lambda: sample_compute_s):
+            result = find_liquidus_solidus_by_fraction(
+                sample_fraction,
+                min_T_C=min_T_C,
+                max_T_C=max_T_C,
+                scan_step_C=scan_step_C,
+                tolerance_C=tolerance_C,
+                budget_s=budget_s,
+                warm_solidus_T_C=warm_solidus_T_C,
+                warm_liquidus_T_C=warm_liquidus_T_C,
+            )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})
         _record_mode_bracket_notices(
@@ -2663,9 +2702,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 lines = (result.stdout or result.stderr).strip().splitlines()
                 if result.returncode == 0 and lines:
                     probed = lines[0].strip()
+            except _MAGEMinSubprocessSlotUnavailable:
+                raise
             except _MAGEMinEngineLifecycleError as exc:
-                if exc.exception_type.startswith('MAGEMinSubprocessSlot'):
-                    raise
                 probe_failure = exc
             except (OSError, subprocess.TimeoutExpired) as exc:
                 probe_failure = exc
@@ -3290,57 +3329,39 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         float(call_timeout_s),
                     )
                 )
-                startup_timeout_s = float(self._config.get(
-                    'worker_startup_timeout_s', 30.0
-                ))
-                future_timeout_s = WarmEngineWorker._caller_future_timeout_s(
-                    timeout_s,
-                    startup_timeout_s,
-                )
-                if call_timeout_s is not None:
-                    future_timeout_s = min(
-                        future_timeout_s,
-                        float(call_timeout_s),
-                    )
                 try:
                     # The 15 s warm-call wall means the engine is stuck, not
                     # busy. Acquire its host-wide slot before starting that
                     # wall so normal queueing cannot trigger a retry.
-                    slot_wait_started = time.monotonic()
                     with _magemin_subprocess_slot():
-                        if call_timeout_s is not None:
-                            slot_wait_duration = max(
-                                0.0,
-                                time.monotonic() - slot_wait_started,
-                            )
-                            remaining_aggregate = (
-                                self._residual_call_timeout_s(
-                                    call_timeout_s,
-                                    call_started + slot_wait_duration,
-                                )
-                            )
-                            timeout_s = min(timeout_s, remaining_aggregate)
-                            future_timeout_s = min(
-                                WarmEngineWorker._caller_future_timeout_s(
-                                    timeout_s,
-                                    startup_timeout_s,
-                                ),
-                                remaining_aggregate,
-                            )
                         future = self._subprocess_pool.submit({
                             'bulk_projection': bulk_projection,
                             'temperature_C': temperature_C,
                             'pressure_kbar': pressure_kbar,
                             'fO2_log': fO2_log,
-                            # The pool's job wall starts after worker startup;
-                            # Future.result below also bounds queue/startup waits.
-                            # This subprocess wall is secondary containment for
-                            # platforms without process-group cleanup.
+                            # The worker starts its job wall after dequeue and
+                            # startup. This subprocess wall is secondary
+                            # containment for platforms without process-group
+                            # cleanup.
                             'call_timeout_s': timeout_s + 0.5,
                             'capture_native_activities': capture_native_activities,
                         }, timeout_s=timeout_s)
                         try:
-                            return future.result(timeout=future_timeout_s)
+                            # Queue time is not engine time. The worker owns
+                            # the solve wall after dequeue; wait for its result
+                            # without a caller-side queue deadline.
+                            result = future.result()
+                            measured_compute_s = getattr(
+                                future,
+                                '_engine_call_elapsed_s',
+                                None,
+                            )
+                            if measured_compute_s is not None:
+                                self._liquidus_compute_clock.elapsed_s = max(
+                                    0.0,
+                                    float(measured_compute_s),
+                                )
+                            return result
                         except EngineWorkerTimeout as timeout:
                             diagnostic_detail = (
                                 self._magemin_timeout_diagnostic_detail_safely(
@@ -3361,32 +3382,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 diagnostic_detail,
                             )
                             raise
-                        except FutureTimeoutError as exc:
-                            future.cancel()
-                            diagnostic_detail = (
-                                self._magemin_timeout_diagnostic_detail_safely(
-                                    bulk_projection=bulk_projection,
-                                    composition_mol=composition_mol,
-                                    temperature_C=temperature_C,
-                                    pressure_bar=pressure_bar,
-                                    pressure_kbar=pressure_kbar,
-                                    fO2_log=fO2_log,
-                                )
-                            )
-                            self._subprocess_pool._abort_request(
-                                future,
-                                diagnostic_detail=diagnostic_detail,
-                            )
-                            timeout = EngineWorkerTimeout(
-                                'MAGEMin subprocess pool',
-                                future_timeout_s,
-                                phase='job',
-                            )
-                            self._attach_magemin_timeout_diagnostic(
-                                timeout,
-                                diagnostic_detail,
-                            )
-                            raise timeout from exc
                         except (
                             OSError,
                             subprocess.SubprocessError,
@@ -3513,6 +3508,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
             )
+        except _MAGEMinSubprocessSlotUnavailable:
+            raise
         except _MAGEMinEngineCallError as subprocess_exc:
             raise _MAGEMinEngineCallError(
                 subprocess_exc.exception_type,
@@ -3621,6 +3618,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             # The engine wall begins after the busy slot wait. It measures a
             # stuck run, not ordinary host-wide queue contention.
             call_started = time.monotonic()
+            engine_compute_s = 0.0
             matlab_text = ''
             remaining_timeout_s = timeout_s
             with tempfile.TemporaryDirectory() as tmpdir:
@@ -3628,6 +3626,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     remaining_timeout_s = self._residual_call_timeout_s(
                         timeout_s, call_started,
                     )
+                    engine_started_at = time.monotonic()
                     try:
                         completed = subprocess.run(  # noqa: S603 - adapter-built
                             args,
@@ -3637,6 +3636,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             timeout=remaining_timeout_s,
                             check=False,
                             env=_magemin_subprocess_env(),
+                        )
+                        engine_compute_s += max(
+                            0.0,
+                            time.monotonic() - engine_started_at,
                         )
                     except subprocess.TimeoutExpired as exc:
                         raise _MAGEMinEngineCallError(
@@ -3717,6 +3720,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 completed.stdout or '', metadata=stdout_metadata
             )
         except _MAGEMinModeVectorMassDeficit as exc:
+            self._liquidus_compute_clock.elapsed_s = engine_compute_s
             return {
                 'mode_vector_mass_deficit': {
                     'mode_sum': exc.mode_sum,
@@ -3771,6 +3775,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     completed.stdout or ''
                 ),
             })
+        self._liquidus_compute_clock.elapsed_s = engine_compute_s
         return result
 
     def _build_ig_bulk_vector(
