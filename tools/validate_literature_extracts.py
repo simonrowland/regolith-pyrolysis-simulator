@@ -157,8 +157,7 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
   only when it parses back to the stored number, so
   ``format(0.24000000000000002, ".16g")`` is 0.24 and does not certify
-  it. A sample value within ``rel_tol`` of a different stored
-  number does not certify that stored number; the opened source must
+  it. A sample may not supply ``rel_tol``; the opened source must
   contain the resolved leaf. Unicode numeric signs are folded onto that
   grammar before the match, so a Unicode minus is a minus and −0.24 is
   not 0.24. An observation id that names more than one scored row is not
@@ -1773,17 +1772,10 @@ def pre_policy_source_ids(policy: Mapping[str, Any] | None = None) -> set[str]:
 # ---------------------------------------------------------------------------
 
 
-def _values_equal(
-    expected: Any,
-    actual: Any,
-    *,
-    rel_tol: float | None = None,
-) -> bool:
+def _values_equal(expected: Any, actual: Any) -> bool:
     """Exact structural equality for fidelity pins.
 
-    Default is exact equality (no float tolerance, no bool/int coercion).
-    ``rel_tol`` is only applied when the sample explicitly requests it (and
-    both sides are non-bool numbers).
+    Fidelity pins never supply a tolerance or coerce bool/int or int/float.
     """
     if expected is None or actual is None:
         return expected is actual
@@ -1793,10 +1785,6 @@ def _values_equal(
     if isinstance(expected, (int, float)) and isinstance(actual, (int, float)):
         if type(expected) is not type(actual):
             return False
-        if rel_tol is not None:
-            return math.isclose(
-                float(expected), float(actual), rel_tol=float(rel_tol), abs_tol=0.0
-            )
         return expected == actual
     if isinstance(expected, str) and isinstance(actual, str):
         return expected == actual
@@ -1817,16 +1805,14 @@ def _values_equal(
             if match_index is None:
                 return False
             actual_key = unmatched_actual_keys.pop(match_index)
-            if not _values_equal(
-                expected_value, actual[actual_key], rel_tol=rel_tol
-            ):
+            if not _values_equal(expected_value, actual[actual_key]):
                 return False
         return True
     if isinstance(expected, (list, tuple)) and isinstance(actual, (list, tuple)):
         if type(expected) is not type(actual) or len(expected) != len(actual):
             return False
         return all(
-            _values_equal(a, b, rel_tol=rel_tol) for a, b in zip(expected, actual)
+            _values_equal(a, b) for a, b in zip(expected, actual)
         )
     if isinstance(expected, AbstractSet) and isinstance(actual, AbstractSet):
         if type(expected) is not type(actual) or len(expected) != len(actual):
@@ -1837,7 +1823,7 @@ def _values_equal(
                 (
                     i
                     for i, actual_item in enumerate(unmatched_actual)
-                    if _values_equal(expected_item, actual_item, rel_tol=rel_tol)
+                    if _values_equal(expected_item, actual_item)
                 ),
                 None,
             )
@@ -1943,10 +1929,20 @@ def _sample_addressing_keys(sample: Mapping[str, Any]) -> tuple[list[str], list[
     return path_keys, structured_keys
 
 
+def _sample_rel_tol_error(sample: Mapping[str, Any]) -> str | None:
+    """Caller-supplied tolerances cannot widen a fidelity sample match."""
+    if "rel_tol" in sample:
+        return "rel_tol is not permitted in fidelity samples"
+    return None
+
+
 def _sample_mode_errors(sample: Mapping[str, Any]) -> list[str]:
     """Return ambiguity errors for aliases/selectors with precedence semantics."""
     path_keys, structured_keys = _sample_addressing_keys(sample)
     errors: list[str] = []
+    rel_tol_error = _sample_rel_tol_error(sample)
+    if rel_tol_error:
+        errors.append(rel_tol_error)
     for key in (
         "path",
         "field_path",
@@ -1975,21 +1971,6 @@ def _sample_mode_errors(sample: Mapping[str, Any]) -> list[str]:
     if "index" in sample and temperature_keys:
         errors.append("use index or a temperature selector, not both")
     return errors
-
-
-def _validated_rel_tol(sample: Mapping[str, Any]) -> tuple[float | None, str | None]:
-    """Validate explicit numeric tolerance without bool/NaN/inf/crash bypasses."""
-    if "rel_tol" not in sample:
-        return None, None
-    rel_tol = sample["rel_tol"]
-    if isinstance(rel_tol, bool) or not isinstance(rel_tol, (int, float)):
-        return None, f"rel_tol must be a real number (not bool), got {rel_tol!r}"
-    rel_tol_f = float(rel_tol)
-    if not math.isfinite(rel_tol_f) or rel_tol_f < 0.0 or rel_tol_f >= 1.0:
-        return None, (
-            f"rel_tol must be finite and satisfy 0 <= rel_tol < 1, got {rel_tol!r}"
-        )
-    return rel_tol_f, None
 
 
 def resolve_field_path(doc: Mapping[str, Any], path: str) -> Any:
@@ -2236,6 +2217,9 @@ def check_fidelity_sample_matches(
     Rejects null/empty pins, shared sample/body object identity (YAML aliases),
     and type-coerced near-matches (bool/int, float isclose drift).
     """
+    rel_tol_error = _sample_rel_tol_error(sample)
+    if rel_tol_error:
+        return [f"{label}: {rel_tol_error}"]
     errors: list[str] = []
     if "value" not in sample and "draft_value" not in sample:
         return [f"{label}: sample missing value/draft_value"]
@@ -2264,10 +2248,7 @@ def check_fidelity_sample_matches(
             f"extract body at some nesting depth (YAML alias); rewrite pin as an "
             f"independent literal"
         ]
-    rel_tol_f, rel_tol_error = _validated_rel_tol(sample)
-    if rel_tol_error:
-        return [f"{label}: {rel_tol_error}"]
-    if not _values_equal(expected, actual, rel_tol=rel_tol_f):
+    if not _values_equal(expected, actual):
         errors.append(
             f"{label}: fidelity sample value mismatch: "
             f"sample={expected!r} extract={actual!r}"
@@ -4026,8 +4007,9 @@ def _certification_scalar_leaves(
     """Scalar leaves the opened source must contain.
 
     The sample spelling and the resolved extract value are both required.
-    ``rel_tol`` can make those numbers differ. Dropping the resolved leaf
-    would certify a stored number the source was never searched for.
+    A malformed sample can still spell a different number; dropping the
+    resolved leaf would certify a stored number the source was never searched
+    for.
     ``formula`` and ``species`` strings carry the formula-label mark.
     """
     try:
@@ -4883,8 +4865,6 @@ def _derivation_shape_defects(
     verification = sample.get("verification")
     if not isinstance(verification, Mapping):
         return ["derivation verification is required"]
-    if "rel_tol" in sample:
-        defects.append("derivation samples may not supply rel_tol")
     declared = verification.get("closure")
     values = observation.get("values") if isinstance(observation, Mapping) else None
     closure = (
@@ -5341,8 +5321,8 @@ def fidelity_source_warnings(
     separator. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
-    that token. The sample's own spelling is not a substitute: a ``rel_tol``
-    match of a different number does not certify the stored leaf. A scored
+    that token. The sample's own spelling is not a substitute for the
+    resolved extract leaf. A scored
     row with no usable observation id is a typed refusal, never omitted.
     A Unicode minus is a minus. Duplicate observation ids are a typed
     refusal, never one coverage entry.
@@ -5805,9 +5785,8 @@ def certify_extract_source_fidelity(
     from the sliced lines. A leading decimal
     is a numeric token. A spelling
     that rounds the stored float to a different number is not that token.
-    The sample's own
-    spelling is not a substitute: a ``rel_tol`` match of a different number
-    does not certify the stored leaf. A scored row with no usable
+    The sample's own spelling is not a substitute for the resolved extract
+    leaf. A scored row with no usable
     observation id refuses; the row is not omitted. A non-finite measured
     value (NaN, +Inf, -Inf) refuses that observation. It is not omitted
     and a finite sibling pin does not clear it. Every measured leaf of
@@ -6274,9 +6253,6 @@ def _check_fidelity_sample_shape(
                         f"{sp}: resolved extract value must be non-null and non-empty "
                         f"(content-free pins do not satisfy the fidelity gate)"
                     )
-    _rel_tol, rel_tol_error = _validated_rel_tol(sample)
-    if rel_tol_error:
-        errors.append(f"{sp}: {rel_tol_error}")
     locator_keys = [key for key in ("locator", "source_locator") if key in sample]
     loc = sample.get(locator_keys[0]) if len(locator_keys) == 1 else None
     note = sample.get("note")

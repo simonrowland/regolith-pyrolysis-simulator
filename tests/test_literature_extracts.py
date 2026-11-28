@@ -3202,13 +3202,27 @@ def test_by_difference_composition_current_numeric_pin():
     }
 
 
-def test_derivation_rejects_extract_value_drift_despite_sample_rel_tol():
+def test_derivation_rejects_extract_value_drift_and_sample_rel_tol():
     doc = _derivation_extract()
     observation = doc["species"]["Fe"]["observations"][0]
-    observation["point_conditions"]["composition"]["state"]["value"][
-        "components"
-    ][0][1] = "30.00000000"
+    stored_cao = observation["point_conditions"]["composition"]["state"][
+        "value"
+    ]["components"]
+    sample_cao = doc["fidelity_samples"][1]["value"]["composition"]["state"][
+        "value"
+    ]["components"]
+    stored_cao[0][1] = 19.81460152
+    sample_cao[0][1] = 19.81460152
+    stored_cao[0][1] = 30.0
     doc["fidelity_samples"][1]["rel_tol"] = 0.5
+
+    match_errors = vle.check_fidelity_sample_matches(
+        doc, doc["fidelity_samples"][1], label="rel-tol-attack"
+    )
+    assert any("rel_tol is not permitted" in error for error in match_errors), (
+        "sample rel_tol must be refused",
+        match_errors,
+    )
 
     warnings = vle.fidelity_source_warnings(doc, label="rel-tol-attack")
     detail = " ".join(
@@ -3447,7 +3461,26 @@ def test_derivation_destination_mutation_turns_sample_rel_tol_attack_red(monkeyp
 
     monkeypatch.setattr(vle, "resolve_fidelity_sample", use_sample_payload)
     with pytest.raises(AssertionError, match="recomputed value differs from stored"):
-        test_derivation_rejects_extract_value_drift_despite_sample_rel_tol()
+        test_derivation_rejects_extract_value_drift_and_sample_rel_tol()
+
+
+def test_sample_rel_tol_guard_mutation_turns_attack_green(monkeypatch):
+    monkeypatch.setattr(vle, "_sample_rel_tol_error", lambda sample: None)
+    exact_equal = vle._values_equal
+
+    def accept_sample_relative_tolerance(expected, actual):
+        if (
+            type(expected) is type(actual)
+            and isinstance(expected, (int, float))
+            and not isinstance(expected, bool)
+        ):
+            return math.isclose(expected, actual, rel_tol=0.5, abs_tol=0.0)
+        return exact_equal(expected, actual)
+
+    monkeypatch.setattr(vle, "_values_equal", accept_sample_relative_tolerance)
+
+    with pytest.raises(AssertionError, match="sample rel_tol must be refused"):
+        test_derivation_rejects_extract_value_drift_and_sample_rel_tol()
 
 
 def test_derivation_basis_mutation_turns_mole_fraction_attack_red(monkeypatch):
@@ -5839,17 +5872,18 @@ def test_fidelity_rejects_locator_alias_decoration(source_locator):
 
 
 @pytest.mark.parametrize(
-    "rel_tol", [True, float("inf"), float("nan"), -0.1, None, "0.1"]
+    "rel_tol",
+    [True, float("inf"), float("nan"), -0.1, None, "0.1", 0.0, 0.001, 0.5],
 )
-def test_fidelity_rejects_invalid_relative_tolerance(rel_tol):
-    """Null-hypothesis (P2): invalid tolerance bypasses or crashes exact match."""
+def test_fidelity_rejects_any_sample_supplied_relative_tolerance(rel_tol):
+    """Tolerance is derived by the validator, never accepted from a sample."""
     doc = _minimal_extract()
     doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": 10.0}
     sample = {
         "path": "species.Fe.observations[fe_alpha_1].values.alpha",
         "value": 20.0,
         "rel_tol": rel_tol,
-        "note": "invalid tolerance",
+        "note": "caller supplied tolerance",
         "locator": {"page": 1},
     }
     doc["fidelity_samples"] = [sample]
@@ -5859,25 +5893,9 @@ def test_fidelity_rejects_invalid_relative_tolerance(rel_tol):
         pre_policy_ids=set(),
         check_fidelity_match=True,
     )
-    assert any("rel_tol" in e for e in errs), errs
+    assert any("rel_tol is not permitted" in e for e in errs), errs
     direct_errs = vle.check_fidelity_sample_matches(doc, sample)
-    assert any("rel_tol" in e for e in direct_errs), direct_errs
-
-
-def test_fidelity_accepts_bounded_relative_tolerance_without_type_coercion():
-    """A finite explicit tolerance relaxes magnitude only for equal numeric types."""
-    doc = _minimal_extract()
-    doc["species"]["Fe"]["observations"][0]["values"] = {"alpha": 10.0}
-    sample = {
-        "path": "species.Fe.observations[fe_alpha_1].values.alpha",
-        "value": 10.001,
-        "rel_tol": 0.001,
-        "note": "bounded tolerance",
-        "locator": {"page": 1},
-    }
-    assert vle.check_fidelity_sample_matches(doc, sample) == []
-    sample["value"] = 10
-    assert vle.check_fidelity_sample_matches(doc, sample), "rel_tol must not coerce int"
+    assert any("rel_tol is not permitted" in e for e in direct_errs), direct_errs
 
 
 def test_new_extract_null_sample_value_refused():
@@ -13787,294 +13805,47 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
     assert failures == []
 
 
-# Stored value versus the sample spelling. ``within`` pairs satisfy
-# abs(sample-stored) <= 0.6 * max(abs(sample), abs(stored)) and fail that
-# test at 0.1. The pass/fail oracle below uses only these labels. It does
-# not call the gate's matcher or its numeric regex.
-_TOLERANCE_EXTRACT = {
-    "float": 0.48,
-    "int": 14,
-    "list": [0.48, 0.52],
-    "dict": {"alpha": 0.48, "beta": 0.52},
-    "range": [1700.0, 1800.0],
-}
-_TOLERANCE_SAMPLE = {
-    "float": 0.24,
-    "int": 10,
-    "list": [0.24, 0.31],
-    "dict": {"alpha": 0.24, "beta": 0.31},
-    "range": [1000.0, 1200.0],
-}
-_TOLERANCE_SHAPES = ("float", "int", "list", "dict", "range")
-_TOLERANCE_RELATIONS = ("equal", "within", "outside")
-_TOLERANCE_SOURCES = ("sample", "extract", "both", "neither")
-
-
-def _tolerance_cases() -> list[tuple[str, str, str, str]]:
-    cases = []
-    for shape in _TOLERANCE_SHAPES:
-        addressings = ("path",) if shape == "range" else ("path", "structured")
-        for addressing in addressings:
-            for relation in _TOLERANCE_RELATIONS:
-                for source in _TOLERANCE_SOURCES:
-                    cases.append((shape, addressing, relation, source))
-    return cases
-
-
-def _tolerance_pair(shape: str, relation: str) -> tuple[object, object]:
-    extract = copy.deepcopy(_TOLERANCE_EXTRACT[shape])
-    if relation == "equal":
-        return copy.deepcopy(extract), extract
-    return copy.deepcopy(_TOLERANCE_SAMPLE[shape]), extract
-
-
-def _literal_number_tokens(value: object) -> list[str]:
-    """Spellings this fixture writes. Not the gate's token grammar."""
-    if isinstance(value, bool) or value is None:
-        raise AssertionError(value)
-    if isinstance(value, (int, float)):
-        return [str(value)]
-    if isinstance(value, str):
-        return [value]
-    if isinstance(value, dict):
-        tokens: list[str] = []
-        for child in value.values():
-            tokens.extend(_literal_number_tokens(child))
-        return tokens
-    if isinstance(value, list):
-        tokens = []
-        for child in value:
-            tokens.extend(_literal_number_tokens(child))
-        return tokens
-    raise AssertionError(type(value))
-
-
-def _resolved_tokens_are_cited(relation: str, source: str) -> bool:
-    """True when the fixture's cited text contains the stored number."""
-    if relation == "equal":
-        return source != "neither"
-    return source in {"extract", "both"}
-
-
-def _sample_tokens_are_cited(relation: str, source: str) -> bool:
-    """True when the fixture's cited text contains the sample number."""
-    if relation == "equal":
-        return source != "neither"
-    return source in {"sample", "both"}
-
-
-def _tolerance_match_holds(relation: str) -> bool:
-    return relation != "outside"
-
-
-def _tolerance_certifies(relation: str, source: str) -> bool:
-    """Independent of the gate.
-
-    Certification passes only when the sample matches the stored leaf
-    (exactly, or within the declared tolerance) and the cited text contains
-    both the sample spelling and the stored number. A within-tolerance
-    sample whose text cites only the sample number does not pass.
-    """
-    return (
-        _tolerance_match_holds(relation)
-        and _resolved_tokens_are_cited(relation, source)
-        and _sample_tokens_are_cited(relation, source)
-    )
-
-
-def _tolerance_source_text(shape: str, relation: str, source: str) -> str:
-    sample, extract = _tolerance_pair(shape, relation)
-    sample_line = "sample " + " ".join(_literal_number_tokens(sample))
-    extract_line = "stored " + " ".join(_literal_number_tokens(extract))
-    if shape == "range":
-        # The values pin is a separate leaf and is always cited.
-        prefix = "alpha 0.24\n"
-    else:
-        prefix = ""
-    if source == "sample":
-        body = sample_line
-    elif source == "extract":
-        body = extract_line
-    elif source == "both":
-        body = sample_line + "\n" + extract_line
-    elif source == "neither":
-        body = "no measured numbers"
-    else:
-        raise AssertionError(source)
-    return prefix + body + "\n"
-
-
-def _attested_sample(value: object, *, rel_tol: float | None, path: str, structured: dict | None) -> dict:
-    sample: dict = {
-        "value": copy.deepcopy(value),
-        "reviewed_by": "independent reviewer",
-        "reviewed_on": "2026-11-10",
-        "locator": {"source_path": "text/paper.txt", "page": 1},
-    }
-    if rel_tol is not None:
-        sample["rel_tol"] = rel_tol
-    if structured is None:
-        sample["path"] = path
-        return sample
-    sample.update(structured)
-    return sample
-
-
-def _tolerance_document(root: Path, shape: str, addressing: str, relation: str, source: str) -> dict:
-    """One attested pin. The cited text is the fixture literal, not a gate spelling."""
-    sample_value, extract_value = _tolerance_pair(shape, relation)
-    artifact = root / "text" / "paper.txt"
-    artifact.parent.mkdir(parents=True, exist_ok=True)
-    artifact.write_text(
-        _tolerance_source_text(shape, relation, source),
-        encoding="utf-8",
-    )
-    doc = _minimal_extract()
-    _strip_scored_conditions(doc)
-    row = doc["species"]["Fe"]["observations"][0]
-    rel_tol = {"within": 0.6, "outside": 0.1, "equal": None}[relation]
-    if shape == "range":
-        row["values"] = {"alpha": 0.24}
-        row["T_range_K"] = copy.deepcopy(extract_value)
-        values_pin = _attested_sample(
-            0.24,
-            rel_tol=None,
-            path="species.Fe.observations[fe_alpha_1].values.alpha",
-            structured=None,
-        )
-        range_pin = _attested_sample(
-            sample_value,
-            rel_tol=rel_tol,
-            path="species.Fe.observations[fe_alpha_1].T_range_K",
-            structured=None,
-        )
-        doc["fidelity_samples"] = [values_pin, range_pin]
-        return doc
-    if shape == "list":
-        row["values"] = copy.deepcopy(extract_value)
-        path = "species.Fe.observations[fe_alpha_1].values"
-        structured = {
-            "species": "Fe",
-            "observable": "alpha",
-            "observation_id": "fe_alpha_1",
-        }
-    elif shape == "dict":
-        row["values"] = copy.deepcopy(extract_value)
-        path = "species.Fe.observations[fe_alpha_1].values"
-        structured = {
-            "species": "Fe",
-            "observable": "alpha",
-            "observation_id": "fe_alpha_1",
-        }
-    else:
-        row["values"] = {"alpha": copy.deepcopy(extract_value)}
-        path = "species.Fe.observations[fe_alpha_1].values.alpha"
-        structured = {
-            "species": "Fe",
-            "observable": "alpha",
-            "observation_id": "fe_alpha_1",
-            "field": "alpha",
-        }
-    doc["fidelity_samples"] = [
-        _attested_sample(
-            sample_value,
-            rel_tol=rel_tol,
-            path=path,
-            structured=structured if addressing == "structured" else None,
-        )
-    ]
-    return doc
-
-
-def test_tolerance_pairs_sit_on_the_declared_side_of_rel_tol():
-    """The matrix labels are the language tolerance, not the gate's matcher."""
-    for shape in _TOLERANCE_SHAPES:
-        sample, extract = _tolerance_pair(shape, "within")
-        assert _fixture_isclose(sample, extract, 0.6), shape
-        assert not _fixture_isclose(sample, extract, 0.1), shape
-
-
-def _fixture_isclose(sample: object, extract: object, rel_tol: float) -> bool:
-    if isinstance(sample, bool) or isinstance(extract, bool):
-        return False
-    if isinstance(sample, (int, float)) and isinstance(extract, (int, float)):
-        return math.isclose(float(sample), float(extract), rel_tol=rel_tol, abs_tol=0.0)
-    if isinstance(sample, dict) and isinstance(extract, dict):
-        if set(sample) != set(extract):
-            return False
-        return all(
-            _fixture_isclose(sample[key], extract[key], rel_tol) for key in sample
-        )
-    if isinstance(sample, list) and isinstance(extract, list):
-        if len(sample) != len(extract):
-            return False
-        return all(
-            _fixture_isclose(left, right, rel_tol)
-            for left, right in zip(sample, extract)
-        )
-    return False
-
-
-@pytest.mark.parametrize(
-    ("shape", "addressing", "relation", "source"),
-    _tolerance_cases(),
-    ids=lambda item: item if isinstance(item, str) else str(item),
-)
 @pytest.mark.parametrize("entry", _PROMOTION_ENTRIES)
-def test_resolved_extract_value_is_what_certification_searches(
-    shape: str,
-    addressing: str,
-    relation: str,
-    source: str,
+def test_sample_rel_tol_is_rejected_by_every_promoter(
     entry: str,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ):
-    """Invariant: the stored leaf is in the opened source, or certification refuses.
+    doc = _literal_source_document(tmp_path, 0.24, "0.24 measured\n")
+    doc["fidelity_samples"][0]["rel_tol"] = 0.5
 
-    ``float`` / ``within`` / ``sample`` is the bypass: stored 0.48, sample
-    0.24, rel_tol 0.6, and cited text that contains only 0.24. Coverage used
-    to clear on the tolerance and the source check searched the sample
-    spelling. Every stored shape and every promoter goes through
-    ``certify_extract_source_fidelity``.
-    """
-    doc = _tolerance_document(tmp_path, shape, addressing, relation, source)
-    cited = (tmp_path / "text" / "paper.txt").read_text(encoding="utf-8")
-    _sample, extract = _tolerance_pair(shape, relation)
-    if relation != "equal" and source == "sample":
-        for token in _literal_number_tokens(extract):
-            assert token not in cited, (shape, token, cited)
     errors = _promotion_errors(entry, doc, tmp_path, monkeypatch)
-    expects = _tolerance_certifies(relation, source)
-    if expects:
-        assert errors == [], (shape, addressing, relation, source, entry, errors)
-        return
-    assert errors, (shape, addressing, relation, source, entry)
-    if entry != "certify":
-        return
+
+    assert "rel_tol is not permitted" in "\n".join(errors), (entry, errors)
+
+
+def test_fidelity_certification_searches_the_resolved_extract_value(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    doc = _literal_source_document(tmp_path, 0.48, "0.24 measured\n")
+    doc["fidelity_samples"][0]["value"] = 0.24
+
+    errors = _promotion_errors("certify", doc, tmp_path, monkeypatch)
     joined = "\n".join(errors)
-    if not _resolved_tokens_are_cited(relation, source) or not _sample_tokens_are_cited(
-        relation, source
-    ):
-        assert "source_blind_pin" in joined, (shape, addressing, relation, source, errors)
-    if relation == "outside":
-        assert "fidelity sample value mismatch" in joined
-    if relation == "within" and source == "sample":
-        for token in _literal_number_tokens(extract):
-            assert token in joined, (shape, addressing, token, errors)
-    if shape == "float" and relation == "within" and source == "sample":
-        draft = copy.deepcopy(doc)
-        draft["review_status"] = "draft"
-        draft_errors = vle.validate_extract_document(
-            draft,
-            expected_source_id="fixture-source",
-            artifact_root=tmp_path,
+
+    assert "fidelity sample value mismatch" in joined, joined
+    assert "source_blind_pin" in joined and "0.48" in joined, joined
+
+
+def test_sample_rel_tol_guard_mutation_makes_direct_match_accept(monkeypatch):
+    doc = _minimal_extract()
+    sample = doc["fidelity_samples"][0]
+    sample["rel_tol"] = 0.5
+    monkeypatch.setattr(vle, "_sample_rel_tol_error", lambda _sample: None)
+
+    errors = vle.check_fidelity_sample_matches(doc, sample)
+
+    with pytest.raises(AssertionError, match="sample rel_tol rejection mutation"):
+        assert "rel_tol is not permitted" in "\n".join(errors), (
+            "sample rel_tol rejection mutation",
+            errors,
         )
-        assert draft_errors == [], draft_errors
-        warnings = vle.fidelity_source_warnings(
-            draft, label="draft", artifact_root=tmp_path
-        )
-        assert any(warning.kind == "source_blind_pin" for warning in warnings)
 
 
 # Scored rows that schema validation rejects and certification used to omit.
