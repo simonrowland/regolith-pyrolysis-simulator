@@ -435,14 +435,18 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
 
 # Stage-3 purity admission bypasses rejected parcels; downstream Stage-4
 # collector values below are pinned from the production CLI and Studio fixture.
-# Repinned on studio-2 at a2299343eb (b271 regen tip) from the regenerated
-# sio_yield fixtures. sio_evolved_kg is unchanged; the Stage-4 carryover rises
-# 8.76551515134e-07 -> 8.77425273074e-07 kg (lunar, +0.10 %) and
-# 8.90876677849e-07 -> 8.9850073745e-07 kg (Mars, +0.86 %) under the b265
-# condenser physics (d-402 wall-saturation capture).
+# Repinned for b274 from the sio_yield fixtures regenerated on mac-studio-256-1
+# (the same values as the fixture field stage_4_alkali_mg_carryover). The
+# Stage-4 carryover moves 8.77425273074e-07 -> 1.73891535398e-06 kg (lunar,
+# x1.98) and 8.9850073745e-07 -> 5.20124403045e-07 kg (Mars, x0.58). The fume
+# split follows the b274 physics fold: the oxide-Fe debit lowers p_SiO, the
+# alkali resinter bounds change the Stage-4 alkali partial pressures, and the
+# Fe vapour line moves. The Mars value is already 5.20133e-07 at 1ec9fd8786;
+# 23c5bd4436 (shared Fe Langmuir residual) moves it by -1.7e-5 relative.
+# Previous pin: 8.77425273074e-07 / 8.9850073745e-07 at a2299343eb (b271).
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 8.77425273074e-07,
-    "mars_basalt": 8.9850073745e-07,
+    "lunar_mare_low_ti": 1.73891535398e-06,
+    "mars_basalt": 5.20124403045e-07,
 }
 
 # Production Stage-3 product after the d-402 flagged pO2-free solid-state wall
