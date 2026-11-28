@@ -446,7 +446,9 @@ def test_all_stored_nasa_glenn_inert_rows_are_typed_scoring_refusals(
 ) -> None:
     from simulator.reference_data import nasa_glenn
 
-    context = load_score_context(sources=("nasa-glenn",))
+    context = load_score_context(
+        Path(__file__).resolve().parents[2], sources=("nasa-glenn",)
+    )
     inert_observation_ids = set()
     for record in nasa_glenn.load_all_record_documents():
         _parsed, diagnostic = nasa_glenn.accepted_formula(record)
