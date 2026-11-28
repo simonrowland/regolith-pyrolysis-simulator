@@ -2722,6 +2722,42 @@ def _is_figure_read_leaf(value: Any) -> bool:
     )
 
 
+_FIGURE_RENDER_PROVENANCE_KEYS = frozenset(
+    {"locator", "source_locator", "calibration_audit"}
+)
+
+
+def _figure_render_measured_addresses(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[
+    tuple[str, str] | None,
+    tuple[Any, ...] | None,
+    set[tuple[Any, ...]],
+    list[str],
+]:
+    """Resolve a figure sample once for its exact measured leaf addresses."""
+    sample_key = _fidelity_sample_observation_key(doc, sample)
+    sample_address = _sample_evidence_address(doc, sample)
+    try:
+        sample_value = resolve_fidelity_sample(doc, sample)
+    except KeyError:
+        sample_value = None
+    if sample_key is None or sample_address is None or sample_value is None:
+        return (
+            sample_key,
+            sample_address,
+            set(),
+            ["figure-read evidence does not resolve from a scored sample"],
+        )
+    measured = {
+        sample_address + leaf
+        for leaf in _measured_leaf_addresses(
+            sample_value, skip_keys=_FIGURE_RENDER_PROVENANCE_KEYS
+        )
+    }
+    return sample_key, sample_address, measured, []
+
+
 def _figure_render_cover_addresses(
     doc: Mapping[str, Any], sample: Mapping[str, Any]
 ) -> tuple[list[tuple[Any, ...]], list[str]]:
@@ -2735,19 +2771,12 @@ def _figure_render_cover_addresses(
     if len(covers) != len(set(covers)):
         return [], ["figure-read covers must not repeat a leaf path"]
 
-    sample_key = _fidelity_sample_observation_key(doc, sample)
-    sample_address = _sample_evidence_address(doc, sample)
-    try:
-        sample_value = resolve_fidelity_sample(doc, sample)
-    except KeyError:
-        sample_value = None
-    if sample_key is None or sample_address is None or sample_value is None:
-        return [], ["figure-read covers do not resolve from a scored sample"]
-    measured_addresses = {
-        sample_address + leaf for leaf in _measured_leaf_addresses(sample_value)
-    }
+    sample_key, _sample_address, measured_addresses, defects = (
+        _figure_render_measured_addresses(doc, sample)
+    )
+    if defects or sample_key is None:
+        return [], defects or ["figure-read covers do not resolve from a scored sample"]
     addresses: list[tuple[Any, ...]] = []
-    defects: list[str] = []
     for path in covers:
         key = _fidelity_sample_observation_key(doc, {"path": path})
         address = _path_evidence_address(doc, path)
@@ -2761,6 +2790,67 @@ def _figure_render_cover_addresses(
             )
         else:
             addresses.append(address)
+    return addresses, defects
+
+
+def _figure_render_locator_addresses(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[list[tuple[Any, ...]], list[str]]:
+    """Resolve explicit per-leaf text locators for render samples."""
+    verification = sample.get("verification")
+    locators = verification.get("locators") if isinstance(verification, Mapping) else None
+    if not isinstance(locators, Mapping):
+        return [], ["figure-read verification requires a locators mapping"]
+
+    sample_key, _sample_address, measured_addresses, defects = (
+        _figure_render_measured_addresses(doc, sample)
+    )
+    if defects or sample_key is None:
+        return [], defects or ["figure-read locators do not resolve from a scored sample"]
+
+    addresses: list[tuple[Any, ...]] = []
+    for path, locator in locators.items():
+        if not isinstance(path, str) or not path.strip():
+            defects.append("figure-read locator keys must be non-empty absolute leaf paths")
+            continue
+        key = _fidelity_sample_observation_key(doc, {"path": path})
+        address = _path_evidence_address(doc, path)
+        if key != sample_key:
+            defects.append(
+                f"figure-read located leaf belongs to a different observation: {path}"
+            )
+            continue
+        if address is None or address not in measured_addresses:
+            defects.append(
+                f"figure-read locator is not a measured leaf under the sample destination: {path}"
+            )
+            continue
+        if (
+            not isinstance(locator, Mapping)
+            or not _locator_ok(locator)
+            or not isinstance(locator.get("source_path"), str)
+            or not locator.get("source_path", "").strip()
+        ):
+            defects.append(
+                f"figure-read leaf locator requires a valid source_path: {path}"
+            )
+            continue
+        page = locator.get("page")
+        folio = locator.get("published_page")
+        has_page = isinstance(page, int) and not isinstance(page, bool) and page > 0
+        has_folio = isinstance(folio, int) and not isinstance(folio, bool) and folio > 0
+        line_range = locator.get("line_range")
+        has_lines = _parse_line_range(line_range) is not None
+        has_table_cell = all(
+            isinstance(locator.get(key), (str, int)) and str(locator[key]).strip()
+            for key in ("table", "row", "column")
+        )
+        if not has_page or not has_folio or not (has_lines or has_table_cell):
+            defects.append(
+                f"figure-read leaf locator requires page, folio, and line or table-cell address: {path}"
+            )
+            continue
+        addresses.append(address)
     return addresses, defects
 
 
@@ -2890,8 +2980,29 @@ def _sample_attestation_defects(
         ):
             defects.append("figure-read verification figure disagrees with its locator")
         if doc is not None:
-            _addresses, cover_defects = _figure_render_cover_addresses(doc, sample)
+            cover_addresses, cover_defects = _figure_render_cover_addresses(
+                doc, sample
+            )
             defects.extend(cover_defects)
+            locator_addresses, locator_defects = (
+                _figure_render_locator_addresses(doc, sample)
+            )
+            defects.extend(locator_defects)
+            _key, _base, measured_addresses, measured_defects = (
+                _figure_render_measured_addresses(doc, sample)
+            )
+            defects.extend(measured_defects)
+            cover_set = set(cover_addresses)
+            locator_set = set(locator_addresses)
+            if cover_set & locator_set:
+                defects.append(
+                    "figure-read measured leaf appears in both covers and locators"
+                )
+            if measured_addresses - (cover_set | locator_set):
+                defects.append(
+                    "figure-read verification requires every measured leaf in "
+                    "exactly one of covers or locators"
+                )
     elif len(locator_keys) != 1 or (
         not _locator_ok(locator) and not malformed_locator_keys
     ):
@@ -4265,6 +4376,43 @@ def _locator_source_blind_reason(
     return None
 
 
+def _figure_render_locator_source_blind_reason(
+    doc: Mapping[str, Any],
+    sample: Mapping[str, Any],
+    *,
+    artifact_root: Path,
+    corpus_root: Path | None,
+    corpus_mount: CorpusMountTally | None = None,
+) -> _LocatorSourceBlindReason | None:
+    """Open every explicit text or table locator for its own source leaf."""
+    verification = sample.get("verification")
+    locators = verification.get("locators") if isinstance(verification, Mapping) else None
+    if not isinstance(verification, Mapping) or not isinstance(locators, Mapping):
+        return _LocatorSourceBlindReason(
+            "figure-read locator map was not opened: verification.locators is missing"
+        )
+    for path, locator in locators.items():
+        if not isinstance(path, str) or not isinstance(locator, Mapping):
+            continue
+        try:
+            leaf_value = resolve_field_path(doc, path)
+        except KeyError:
+            return _LocatorSourceBlindReason(
+                f"figure-read locator was not opened: unresolved leaf {path}"
+            )
+        blind = _locator_source_blind_reason(
+            {"value": leaf_value, "locator": locator},
+            artifact_root=artifact_root,
+            corpus_root=corpus_root,
+            corpus_mount=corpus_mount,
+        )
+        if blind is not None:
+            return _LocatorSourceBlindReason(
+                f"{path}: {blind.detail}", blind.reason_codes
+            )
+    return None
+
+
 _DERIVATION_ROLES = frozenset(
     {"mole_fraction", "mole_percent", "mass_percent", "copied"}
 )
@@ -4842,10 +4990,18 @@ def _sample_covers(
         value = None
     if _is_figure_read_leaf(value):
         key = _fidelity_sample_observation_key(doc, sample)
-        addresses, defects = _figure_render_cover_addresses(doc, sample)
-        if key is None or defects:
+        render_addresses, render_defects = _figure_render_cover_addresses(
+            doc, sample
+        )
+        locator_addresses, locator_defects = _figure_render_locator_addresses(
+            doc, sample
+        )
+        if key is None or render_defects or locator_defects:
             return []
-        return [(key, address) for address in addresses]
+        return [
+            (key, address)
+            for address in (*render_addresses, *locator_addresses)
+        ]
     cover = _sample_cover(doc, sample)
     return [cover] if cover is not None else []
 
@@ -5354,16 +5510,25 @@ def fidelity_source_warnings(
                         unattested_extra,
                         f"{sample_label}: {defect}",
                     )
-            elif not figure_read_sample:
+            else:
                 # Attestation-complete pins are the ones that would otherwise certify
                 # without opening the text source. Unattested pins stay on that count.
-                blind = _locator_source_blind_reason(
-                    sample,
-                    artifact_root=root,
-                    corpus_root=corpus_root,
-                    doc=doc,
-                    corpus_mount=corpus_mount,
-                )
+                if figure_read_sample:
+                    blind = _figure_render_locator_source_blind_reason(
+                        doc,
+                        sample,
+                        artifact_root=root,
+                        corpus_root=corpus_root,
+                        corpus_mount=corpus_mount,
+                    )
+                else:
+                    blind = _locator_source_blind_reason(
+                        sample,
+                        artifact_root=root,
+                        corpus_root=corpus_root,
+                        doc=doc,
+                        corpus_mount=corpus_mount,
+                    )
                 if blind:
                     source_blind += 1
                     source_blind_reason_codes.append(blind.reason_codes)
@@ -5395,8 +5560,19 @@ def fidelity_source_warnings(
                 render_addresses, render_defects = _figure_render_cover_addresses(
                     doc, sample
                 )
-                if not defects and not render_defects:
-                    covered_addresses[observation_key].update(render_addresses)
+                locator_addresses, locator_defects = (
+                    _figure_render_locator_addresses(doc, sample)
+                )
+                if (
+                    not defects
+                    and blind is None
+                    and not match_errors
+                    and not render_defects
+                    and not locator_defects
+                ):
+                    covered_addresses[observation_key].update(
+                        (*render_addresses, *locator_addresses)
+                    )
             else:
                 for leaf in needed_addresses[observation_key]:
                     if leaf[: len(pin_address)] == pin_address:

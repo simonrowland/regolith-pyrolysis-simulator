@@ -90,26 +90,6 @@ FIG5_READS = {
     "omori_fig5_17": ("-2.1845", 665.5, 359.0, "50.9", 10),
     "omori_fig5_18": ("-2.3095", 651.0, 380.0, "48.9", 20),
 }
-FIG6_BASICITY = {
-    "omori_fig5_01": "1.437073",
-    "omori_fig5_02": "1.813971",
-    "omori_fig5_03": "1.176000",
-    "omori_fig5_04": "1.927380",
-    "omori_fig5_05": "1.255796",
-    "omori_fig5_06": "0.939827",
-    "omori_fig5_07": "1.023546",
-    "omori_fig5_08": "0.830371",
-    "omori_fig5_09": "0.762563",
-    "omori_fig5_10": "1.016414",
-    "omori_fig5_11": "1.621328",
-    "omori_fig5_12": "0.926309",
-    "omori_fig5_13": "1.496274",
-    "omori_fig5_14": "1.174701",
-    "omori_fig5_15": "0.637782",
-    "omori_fig5_16": "0.562070",
-    "omori_fig5_17": "0.728669",
-    "omori_fig5_18": "0.809423",
-}
 FIG5_WIDENED_UNCERTAINTY = {
     "omori_fig5_04",
     "omori_fig5_10",
@@ -143,29 +123,29 @@ def _figure_audit_rows(document: dict) -> list[dict[str, str]]:
     for block in document["species"].values():
         for observation in block["observations"]:
             values = observation["values"]
-            reads = [(observation["locator"], values["figure_read"])]
-            if "secondary_figure_read" in values:
-                reads.append(
-                    (values["fig6_secondary_locator"], values["secondary_figure_read"])
-                )
-            for locator, read in reads:
-                audit = by_point[(str(locator["figure"]), locator["row"])]
-                uncertainty = read["read_uncertainty"]
-                pixel = read["crop_pixel_xy"]
-                assert audit["printed_column"] == locator["column"]
-                assert audit["printed_value"] == ""
-                assert audit["pdftotext_cell"] == "not tabular; digitized figure point"
-                assert audit["render_read"] == (
-                    f"x={read['x_coordinate_as_read']}; "
-                    f"y={read['y_coordinate_as_read']}; "
-                    f"pixel=({pixel[0]},{pixel[1]}); "
-                    f"uncertainty=({uncertainty['x']} {uncertainty['unit_x']}, "
-                    f"{uncertainty['y']} {uncertainty['unit_y']})"
-                )
-                if locator["figure"] == "3":
-                    assert audit["audit"] == "350 dpi crop reread against calibrated ticks"
-                else:
-                    assert "350 dpi crop and overlay checked" in audit["audit"]
+            assert "secondary_figure_read" not in values
+            assert "fig6_secondary_locator" not in values
+            assert "N_CaO_plus_MgO_over_N_SiO2_as_plotted" not in values
+            assert "secondary_locator" not in observation
+            locator = observation["locator"]
+            read = values["figure_read"]
+            audit = by_point[(str(locator["figure"]), locator["row"])]
+            uncertainty = read["read_uncertainty"]
+            pixel = read["crop_pixel_xy"]
+            assert audit["printed_column"] == locator["column"]
+            assert audit["printed_value"] == ""
+            assert audit["pdftotext_cell"] == "not tabular; digitized figure point"
+            assert audit["render_read"] == (
+                f"x={read['x_coordinate_as_read']}; "
+                f"y={read['y_coordinate_as_read']}; "
+                f"pixel=({pixel[0]},{pixel[1]}); "
+                f"uncertainty=({uncertainty['x']} {uncertainty['unit_x']}, "
+                f"{uncertainty['y']} {uncertainty['unit_y']})"
+            )
+            if locator["figure"] == "3":
+                assert audit["audit"] == "350 dpi crop reread against calibrated ticks"
+            else:
+                assert "350 dpi crop and overlay checked" in audit["audit"]
     return rows
 
 
@@ -247,31 +227,39 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
     for sample in document["fidelity_samples"]:
         figure = sample["locator"]["figure"]
         assert figure in {"3", "5"}
-        if figure == "3" and str(sample["path"]).endswith(".values"):
-            # Independent render check (w1127omoriat3).
-            assert sample["reviewed_by"] == "w1127omoriat3 (grok)"
-            assert sample["reviewed_on"] == "2026-11-27"
-            assert sample["verification"] == {"method": "render", "dpi": 350}
-        elif figure == "3":
-            _assert_omori_derivation(sample, mole_role="mole_fraction")
-        elif (
-            figure == "5"
-            and str(sample["path"]).endswith(".values")
-            and sample["path"].split("observations[", 1)[1].split("]", 1)[0]
-            in {
+        sample_path = str(sample["path"])
+        if sample_path.endswith(".values"):
+            verification = sample["verification"]
+            assert verification["method"] == "render"
+            assert verification["dpi"] == 350
+            assert verification["page"] == sample["locator"]["page"]
+            assert verification["figure"] == figure
+            assert verification["covers"]
+            assert len(verification["covers"]) == len(set(verification["covers"]))
+            assert set(verification["locators"]) == {
+                f"{sample_path}.T_C",
+                f"{sample_path}.standard_state_as_printed",
+                f"{sample_path}.phase_as_printed",
+                f"{sample_path}.composition_closure.system_as_printed",
+            }
+            if figure == "3":
+                # Independent render check (w1127omoriat3).
+                assert sample["reviewed_by"] == "w1127omoriat3 (grok)"
+                assert sample["reviewed_on"] == "2026-11-27"
+            elif sample_path.split("observations[", 1)[1].split("]", 1)[0] in {
                 "omori_fig5_04",
                 "omori_fig5_06",
                 "omori_fig5_08",
                 "omori_fig5_11",
                 "omori_fig5_14",
                 "omori_fig5_15",
-            }
-        ):
-            # Independent 350 dpi re-read (w1127omorisq). Other Fig. 5 pins stay as found.
-            assert sample["reviewed_by"] == "w1127omorisq (grok)"
-            assert sample["reviewed_on"] == "2026-11-27"
-            assert sample["verification"] == {"method": "render", "dpi": 350}
-        elif figure == "5" and not str(sample["path"]).endswith(".values"):
+            }:
+                # Independent 350 dpi re-read (w1127omorisq).
+                assert sample["reviewed_by"] == "w1127omorisq (grok)"
+                assert sample["reviewed_on"] == "2026-11-27"
+        elif figure == "3":
+            _assert_omori_derivation(sample, mole_role="mole_fraction")
+        elif figure == "5":
             _assert_omori_derivation(sample, mole_role="mole_percent")
 
     for row_id, (activity, px, py, n_sio2, mgo_wt) in FIG5_READS.items():
@@ -288,20 +276,11 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
         assert Decimal(read["y_coordinate_as_read"]).quantize(Decimal("0.0001")) == Decimal(activity)
         assert values["composition_as_plotted"]["N_SiO2_percent_as_printed"] == n_sio2
         assert values["composition_as_plotted"]["MgO_mass_percent_as_series"] == mgo_wt
-        assert values["N_CaO_plus_MgO_over_N_SiO2_as_plotted"] == FIG6_BASICITY[row_id]
-        if row_id in {"omori_fig5_02", "omori_fig5_04"}:
-            assert "secondary_figure_read" not in values
-            assert "fig6_secondary_locator" not in values
-            assert "secondary_locator" not in row
-            continue
-        assert values["secondary_figure_read"]["x_coordinate_as_read"] == FIG6_BASICITY[row_id]
-        fig6_activity = "-3.4290" if row_id == "omori_fig5_03" else activity
-        assert Decimal(values["secondary_figure_read"]["y_coordinate_as_read"]).quantize(
-            Decimal("0.0001")
-        ) == Decimal(fig6_activity)
+        assert "secondary_figure_read" not in values
+        assert "fig6_secondary_locator" not in values
+        assert "N_CaO_plus_MgO_over_N_SiO2_as_plotted" not in values
+        assert "secondary_locator" not in row
         assert row["locator"]["figure"] == "5"
-        assert row["secondary_locator"]["figure"] == "6"
-        assert row["secondary_locator"]["page"] == 3
     audit_rows = {
         (row["printed_table"], row["printed_row"]): row
         for row in _figure_audit_rows(document)
@@ -310,7 +289,22 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
         audit = audit_rows[("6", f"{sample_id} same sample as Fig. 5 point {2 if sample_id == '33_6' else 4}")]
         assert "non-matching marker series" in audit["render_read"]
         assert "filled MgO 10%" in audit["render_read"]
+        assert "Fig. 5 label is open MgO 20%" in audit["render_read"]
         assert "no Fig. 6 marker read retained" in audit["audit"]
+    fig6_audit_rows = [row for row in audit_rows.values() if row["printed_table"] == "6"]
+    assert len(fig6_audit_rows) == 18
+    nonmatching_rows = [
+        row for row in fig6_audit_rows if "non-matching marker series" in row["render_read"]
+    ]
+    crosscheck_rows = [
+        row for row in fig6_audit_rows if "non-matching marker series" not in row["render_read"]
+    ]
+    assert len(nonmatching_rows) == 2
+    assert len(crosscheck_rows) == 16
+    for row in crosscheck_rows:
+        assert row["render_read"].startswith("x=")
+        assert "pixel=" in row["render_read"]
+        assert row["audit"].endswith("unscored cross-check only")
     for row_id, expected in {
         "omori_fig5_03": (
             "34.96174689",
