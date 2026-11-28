@@ -48,6 +48,7 @@ from simulator.fe_redox import (
 )
 from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.engine_cache import (
+    ENGINE_CHEMISTRY_VERSION,
     _mask_quantize as _quantize,
     _mask_sigfig as _sigfig,
 )
@@ -2572,30 +2573,43 @@ def record_dependency_vector(
         sim, intent, provider_role
     )
     sulfsat_gate = getattr(sim, "_sulfsat_gate", None)
+    namespace_id = _engine_result_namespace_id(
+        artifact=artifact,
+        intent=intent,
+        backend=resolved_backend,
+    )
+    vapor_provider_id = vapor_provider.get("resolved_provider_id")
+    sulfur_side = {
+        "S_input_ppm": _sigfig(sim._stage0_sulfur_input_ppm(), 6),
+        "inventory": _json_ready(
+            {
+                "salt_phase": _positive_float_map(
+                    getattr(sim.inventory, "salt_phase_kg", {}) or {}
+                ),
+                "sulfide_matte": _positive_float_map(
+                    getattr(sim.inventory, "sulfide_matte_kg", {}) or {}
+                ),
+            }
+        ),
+        "sulfsat_available": _sulfsat_available(sulfsat_gate),
+        "sulfsat_provider_selection": type(sulfsat_gate).__name__,
+    }
+    non_backend_producers = _pt1_non_backend_producer_ids(
+        sim,
+        artifact=artifact,
+        vapor_provider_id=vapor_provider_id,
+        sulfur_side=sulfur_side,
+    )
     return {
-        "namespace_id": _engine_result_namespace_id(
+        "namespace_id": namespace_id,
+        "engine_chemistry_versions": _pt1_engine_chemistry_versions(
+            namespace_id,
             artifact=artifact,
-            intent=intent,
-            backend=resolved_backend,
+            vapor_provider_id=vapor_provider_id,
+            non_backend_producers=non_backend_producers,
         ),
-        "vapor_pressure_provider_selection": vapor_provider.get(
-            "resolved_provider_id"
-        ),
-        "sulfur_side": {
-            "S_input_ppm": _sigfig(sim._stage0_sulfur_input_ppm(), 6),
-            "inventory": _json_ready(
-                {
-                    "salt_phase": _positive_float_map(
-                        getattr(sim.inventory, "salt_phase_kg", {}) or {}
-                    ),
-                    "sulfide_matte": _positive_float_map(
-                        getattr(sim.inventory, "sulfide_matte_kg", {}) or {}
-                    ),
-                }
-            ),
-            "sulfsat_available": _sulfsat_available(sulfsat_gate),
-            "sulfsat_provider_selection": type(sulfsat_gate).__name__,
-        },
+        "vapor_pressure_provider_selection": vapor_provider_id,
+        "sulfur_side": sulfur_side,
         "model": {
             "model": provider.get("model"),
             "mode": provider.get("mode"),
@@ -2606,6 +2620,73 @@ def record_dependency_vector(
                 resolve_default=resolve_magemin_database_default,
             ),
         },
+    }
+
+
+def _pt1_non_backend_producer_ids(
+    sim: Any,
+    *,
+    artifact: str,
+    vapor_provider_id: Any,
+    sulfur_side: Mapping[str, Any],
+) -> tuple[str, ...]:
+    if artifact == "freeze_gate_curve":
+        return ()
+    if artifact != "equilibrium_post_record":
+        raise ValueError(f"unsupported replay artifact: {artifact}")
+
+    selected: list[str] = []
+    if vapor_provider_id == "builtin-vapor-pressure":
+        selected.append("builtin-vapor-pressure")
+        from engines.builtin.vapor_pressure import (
+            openimcc_binding_selected_by_inputs,
+        )
+
+        temperature_C = float(sim.melt.temperature_C)
+        controls = dict(getattr(sim, "setpoints", {}) or {})
+        controls["high_t_melt_activity"] = getattr(
+            sim,
+            "_high_t_melt_activity",
+            controls.get("high_t_melt_activity", "openimcc"),
+        )
+        if openimcc_binding_selected_by_inputs(
+            temperature_K=temperature_C + CELSIUS_TO_KELVIN_OFFSET,
+            controls=controls,
+            quantity_class="activity",
+        ):
+            selected.append("openimcc")
+
+    sulfur_input = float(sulfur_side.get("S_input_ppm", 0.0) or 0.0)
+    if sulfur_input > 0.0 and getattr(sim, "_sulfsat_gate", None) is not None:
+        selected.append("sulfsat")
+    return tuple(selected)
+
+
+def _pt1_engine_chemistry_versions(
+    namespace_id: str,
+    *,
+    artifact: str,
+    vapor_provider_id: Any,
+    non_backend_producers: Sequence[str],
+) -> dict[str, int]:
+    """Read current versions for every engine producing a PT-1 payload."""
+    engines = {str(namespace_id).partition(":")[0]}
+    if artifact == "equilibrium_post_record":
+        if vapor_provider_id == "builtin-vapor-pressure":
+            # Builtin melt vapor pressure is owned by the analytical engine
+            # chemistry epoch; the provider label itself is not an engine id.
+            engines.add("internal-analytical")
+        elif str(vapor_provider_id or "") in ENGINE_CHEMISTRY_VERSION:
+            engines.add(str(vapor_provider_id))
+        engines.update(
+            producer
+            for producer in non_backend_producers
+            if producer in ENGINE_CHEMISTRY_VERSION
+        )
+    return {
+        engine: int(ENGINE_CHEMISTRY_VERSION[engine])
+        for engine in sorted(engines)
+        if engine in ENGINE_CHEMISTRY_VERSION
     }
 
 
@@ -2627,33 +2708,12 @@ def record_binding_producer_ids(
         artifact=artifact,
         provider_role=provider_role,
     )
-    selected: list[str] = []
-    pressure_provider = vector.get("vapor_pressure_provider_selection")
-    if pressure_provider == "builtin-vapor-pressure":
-        selected.append("builtin-vapor-pressure")
-        from engines.builtin.vapor_pressure import (
-            openimcc_binding_selected_by_inputs,
-        )
-
-        temperature_C = float(sim.melt.temperature_C)
-        controls = dict(getattr(sim, "setpoints", {}) or {})
-        controls["high_t_melt_activity"] = getattr(
-            sim,
-            "_high_t_melt_activity",
-            controls.get("high_t_melt_activity", "openimcc"),
-        )
-        if openimcc_binding_selected_by_inputs(
-            temperature_K=temperature_C + CELSIUS_TO_KELVIN_OFFSET,
-            controls=controls,
-            quantity_class="activity",
-        ):
-            selected.append("openimcc")
-
-    sulfur_side = vector.get("sulfur_side", {})
-    sulfur_input = float(sulfur_side.get("S_input_ppm", 0.0) or 0.0)
-    if sulfur_input > 0.0 and getattr(sim, "_sulfsat_gate", None) is not None:
-        selected.append("sulfsat")
-    return tuple(selected)
+    return _pt1_non_backend_producer_ids(
+        sim,
+        artifact=artifact,
+        vapor_provider_id=vector.get("vapor_pressure_provider_selection"),
+        sulfur_side=vector.get("sulfur_side", {}),
+    )
 
 
 def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
@@ -2662,6 +2722,9 @@ def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
         sulfur_side = {}
     vector: dict[str, Any] = {
         "namespace_id": key.get("namespace_id"),
+        "engine_chemistry_versions": _json_ready(
+            key.get("engine_chemistry_versions", {})
+        ),
         "vapor_pressure_provider_selection": key.get(
             "vapor_pressure_provider_selection"
         ),
@@ -2692,6 +2755,7 @@ def dependency_vector_from_replay_key(
 
     fields = (
         "namespace_id",
+        "engine_chemistry_versions",
         "vapor_pressure_provider_selection",
         "sulfur_side",
         "model",
@@ -2699,6 +2763,8 @@ def dependency_vector_from_replay_key(
     if any(field not in key for field in fields):
         return None
     if not isinstance(key.get("sulfur_side"), Mapping):
+        return None
+    if not isinstance(key.get("engine_chemistry_versions"), Mapping):
         return None
     if not isinstance(key.get("model"), Mapping):
         return None
@@ -3364,6 +3430,9 @@ def canonical_physics_bucket_key_from_replay_key(
     return {
         "physics_bucket": {
             "namespace_id": str(key.get("namespace_id")),
+            "engine_chemistry_versions": _json_ready(
+                key.get("engine_chemistry_versions", {})
+            ),
             "composition_mol_fraction": _json_ready(
                 key.get("composition_mol_fraction", [])
             ),

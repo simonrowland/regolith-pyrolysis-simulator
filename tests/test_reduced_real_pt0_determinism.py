@@ -191,6 +191,7 @@ def _repair_notice_test_record() -> tuple[dict[str, str], dict[str, object]]:
             "schema_version": "test",
             "tag": "notice-recapture",
             "namespace_id": "test:notice-recapture",
+            "engine_chemistry_versions": {},
             "vapor_pressure_provider_selection": "test-vapor-provider",
             "sulfur_side": {},
             "model": {},
@@ -307,7 +308,7 @@ def test_pt0_supplied_finite_fo2_quantization_is_golden_neutral() -> None:
 
 def test_control_quantization_default_production_key_is_byte_identical() -> None:
     key = _freeze_gate_key()
-    key_hash = _key_hash(key)
+    key_hash = _key_hash_without_engine_chemistry_versions(key)
     fine_key = _freeze_gate_key(control_quantization=ControlQuantization.PRODUCTION)
 
     # 2026-07-04: rebaselined for #89 — the reduced-real production key now hashes
@@ -361,9 +362,15 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-10-31 b-929: Studio-2 canonical bytes after gate replay identity
     # began embedding the owner freeze-gate key. The key now binds the submitted
     # post-inert composition and inert membership, plus water/formula identity.
+    # The chemistry-version map is asserted separately; this pin keeps the
+    # exact-request fields stable across the deliberate cache-epoch addition.
     assert key_hash == "4cee08747e68f2c46df68ef2fbbe4b5141cd1395c9345d8315daa83305d5a2df"
+    backend_engine = key["namespace_id"].partition(":")[0]
+    assert key["engine_chemistry_versions"] == {
+        backend_engine: rrd.ENGINE_CHEMISTRY_VERSION[backend_engine]
+    }
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
-    assert _key_hash(fine_key) == key_hash
+    assert _key_hash_without_engine_chemistry_versions(fine_key) == key_hash
 
 
 def test_control_quantization_tiers_produce_distinct_key_hashes() -> None:
@@ -757,6 +764,12 @@ def _key_hash(key: dict) -> str:
     return hashlib.sha256(canonical_json_bytes(key)).hexdigest()
 
 
+def _key_hash_without_engine_chemistry_versions(key: dict) -> str:
+    request = copy.deepcopy(key)
+    request.pop("engine_chemistry_versions", None)
+    return _key_hash(request)
+
+
 def _physics_bucket_hash(key: dict) -> str:
     return _key_hash(canonical_physics_bucket_key_from_replay_key(key))
 
@@ -820,13 +833,91 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
     }
     # Studio-2 canonical bytes at 35c987e96 after the equilibrium key was
     # narrowed to the submitted inert-filtered composition and its formulas.
-    assert _key_hash(base) == (
+    # The chemistry-version map is separately pinned to its single owner below.
+    assert _key_hash_without_engine_chemistry_versions(base) == (
         "79d74e79f9f00d458f048acbcd1da25f19cad645d0d0efc8f060cba22dd9373d"
+    )
+    assert base["engine_chemistry_versions"]["alphamelts"] == (
+        rrd.ENGINE_CHEMISTRY_VERSION["alphamelts"]
     )
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
-    assert _key_hash(base) != _key_hash(thermoengine)
-    assert _key_hash(base) == _key_hash(next_engine)
+    assert _key_hash_without_engine_chemistry_versions(base) != (
+        _key_hash_without_engine_chemistry_versions(thermoengine)
+    )
+    assert _key_hash_without_engine_chemistry_versions(base) == (
+        _key_hash_without_engine_chemistry_versions(next_engine)
+    )
+
+
+def test_pt1_replay_indexes_expire_when_a_producer_chemistry_version_changes(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    composite_versions = rrd._pt1_engine_chemistry_versions(
+        "alphamelts:equilibrium-composite",
+        artifact="equilibrium_post_record",
+        vapor_provider_id="builtin-vapor-pressure",
+        non_backend_producers=("builtin-vapor-pressure", "openimcc"),
+    )
+    assert composite_versions == {
+        "alphamelts": rrd.ENGINE_CHEMISTRY_VERSION["alphamelts"],
+        "internal-analytical": rrd.ENGINE_CHEMISTRY_VERSION[
+            "internal-analytical"
+        ],
+        "openimcc": rrd.ENGINE_CHEMISTRY_VERSION["openimcc"],
+    }
+
+    db_path = tmp_path / "producer-chemistry-version.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    before = capture._equilibrium_key(sim)
+    before_bucket = canonical_physics_bucket_key_from_replay_key(before)
+    before_ladder = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        before,
+        "h40",
+    )
+    previous_version = before["engine_chemistry_versions"]["alphamelts"]
+    assert previous_version == rrd.ENGINE_CHEMISTRY_VERSION["alphamelts"]
+    capture._store(
+        "equilibrium_post_record",
+        before,
+        rrd.equilibrium_payload(sim, result),
+    )
+
+    monkeypatch.setitem(
+        rrd.ENGINE_CHEMISTRY_VERSION,
+        "alphamelts",
+        previous_version + 1,
+    )
+    after = capture._equilibrium_key(sim)
+    after_bucket = canonical_physics_bucket_key_from_replay_key(after)
+    after_ladder = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        after,
+        "h40",
+    )
+
+    assert after["engine_chemistry_versions"]["alphamelts"] == (
+        previous_version + 1
+    )
+    assert after != before
+    assert after_bucket["physics_bucket"]["engine_chemistry_versions"] != (
+        before_bucket["physics_bucket"]["engine_chemistry_versions"]
+    )
+    assert after_bucket["replay_scope"]["engine_chemistry_versions"] != (
+        before_bucket["replay_scope"]["engine_chemistry_versions"]
+    )
+    assert after_ladder != before_ladder
+    assert not rrd.replay_dependency_vectors_match(after, before)
+    legacy_row_key = copy.deepcopy(before)
+    legacy_row_key.pop("engine_chemistry_versions")
+    assert not rrd.replay_dependency_vectors_match(after, legacy_row_key)
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    assert replay._lookup_optional(
+        "equilibrium_post_record",
+        after,
+        physics_bucket_key=after_bucket,
+    ) is None
 
 
 def test_equilibrium_key_tracks_inert_and_refuses_cross_replay() -> None:
@@ -1108,11 +1199,15 @@ def test_python_api_accepted_replay_key_hashes_include_provider_input_identity(
     model: str | None,
     expected_hash: str,
 ) -> None:
-    # Studio-2 canonical hashes at 35c987e96 after keying on submitted inputs.
+    # Studio-2 exact-request hashes at 35c987e96; chemistry versions have
+    # separate assertions because they now form an additional cache-key field.
     key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
 
-    actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
+    actual_hash = _key_hash_without_engine_chemistry_versions(key)
     assert actual_hash == expected_hash
+    assert key["engine_chemistry_versions"]["alphamelts"] == (
+        rrd.ENGINE_CHEMISTRY_VERSION["alphamelts"]
+    )
 
 
 @pytest.mark.parametrize(
@@ -1151,14 +1246,18 @@ def test_cached_real_python_api_replay_key_hashes_include_provider_input_identit
     )
 
     key = store._equilibrium_key(sim)
-    actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
+    actual_hash = _key_hash_without_engine_chemistry_versions(key)
 
-    # Studio-2 canonical hashes at 35c987e96 after identity was narrowed to
-    # submitted provider inputs. The cached-real fixture has no PT-0 store,
+    # Studio-2 exact-request hashes at 35c987e96 after identity was narrowed to
+    # submitted provider inputs. Chemistry versions have a separate assertion.
+    # The cached-real fixture has no PT-0 store,
     # while the live fixture uses fine PT-0 quantization; their submitted oxide
     # values differ by a few last-place digits, so those replay identities must
     # differ even though their backend model fields match.
     assert actual_hash == expected_hash
+    assert key["engine_chemistry_versions"]["alphamelts"] == (
+        rrd.ENGINE_CHEMISTRY_VERSION["alphamelts"]
+    )
     if model is None:
         live_key, _authority = _alphamelts_pt0_identity(
             model,
@@ -1312,7 +1411,16 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fO2_log=sim._compute_intrinsic_melt_fO2(),
         fe_redox_policy="intrinsic",
     )
-    magemin_bytes = canonical_json_bytes(magemin_key)
+    assert magemin_key["engine_chemistry_versions"]["magemin"] == (
+        rrd.ENGINE_CHEMISTRY_VERSION["magemin"]
+    )
+    magemin_bytes = canonical_json_bytes(
+        {
+            key: value
+            for key, value in magemin_key.items()
+            if key != "engine_chemistry_versions"
+        }
+    )
     assert len(magemin_bytes) == 1319
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
         "00f40658d0a344757029e661d4574a75c72b13521066689f205e6194a5dcea0a"
@@ -1321,7 +1429,16 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     generic_store = PT0DeterminismStore("capture")
     generic_sim = _build_pt0_sim(generic_store)
     generic_key = generic_store._equilibrium_key(generic_sim)
-    generic_bytes = canonical_json_bytes(generic_key)
+    assert generic_key["engine_chemistry_versions"]["internal-analytical"] == (
+        rrd.ENGINE_CHEMISTRY_VERSION["internal-analytical"]
+    )
+    generic_bytes = canonical_json_bytes(
+        {
+            key: value
+            for key, value in generic_key.items()
+            if key != "engine_chemistry_versions"
+        }
+    )
     assert generic_key["namespace_id"] == "internal-analytical:equilibrium-composite"
     assert len(generic_bytes) == 1687
     assert hashlib.sha256(generic_bytes).hexdigest() == (

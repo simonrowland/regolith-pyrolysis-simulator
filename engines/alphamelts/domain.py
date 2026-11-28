@@ -520,6 +520,82 @@ def canonical_oxide_activity_map(values: Mapping[str, object] | None) -> dict[st
     return activities
 
 
+def _canonical_oxide_activity_projection(
+    values: Mapping[str, object] | None,
+    *,
+    positive_only: bool = True,
+    include_liquid_endmembers: bool = False,
+) -> tuple[
+    dict[str, float],
+    tuple[tuple[str, str, float, str, float], ...],
+    tuple[tuple[str, object, str], ...],
+]:
+    """Project activity aliases with one first-reported precedence rule.
+
+    In PetThermoTools ``gamma * x`` output, ``SiO2`` and ``SiO2_Liq`` map to
+    the same liquid oxide and use the same liquid mole fraction. ``_Liq`` is
+    a phase label, not a separately ranked standard state. No producer
+    contract ranks the two gamma labels, so preserve report order. Conflicting
+    later values are returned for notice emission.
+    """
+    activities: dict[str, float] = {}
+    labels: dict[str, str] = {}
+    conflicts: list[tuple[str, str, float, str, float]] = []
+    invalid: list[tuple[str, object, str]] = []
+    for raw_name, raw_value in dict(values or {}).items():
+        oxide = canonical_melt_oxide_activity_name(raw_name)
+        if oxide is None and include_liquid_endmembers:
+            oxide = _liquid_oxide_endmember_label(raw_name)
+        if oxide is None:
+            continue
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError):
+            invalid.append((str(raw_name), raw_value, "nonnumeric"))
+            continue
+        if not math.isfinite(value):
+            invalid.append((str(raw_name), raw_value, "nonfinite"))
+            continue
+        if positive_only and value <= 0.0:
+            invalid.append((str(raw_name), raw_value, "nonpositive"))
+            continue
+        if oxide in activities:
+            if value != activities[oxide]:
+                conflicts.append(
+                    (oxide, labels[oxide], activities[oxide], str(raw_name), value)
+                )
+            continue
+        activities[oxide] = value
+        labels[oxide] = str(raw_name)
+    return activities, tuple(conflicts), tuple(invalid)
+
+
+def _activity_alias_conflict_notice(
+    oxide: str,
+    kept_label: str,
+    kept_activity: float,
+    conflicting_label: str,
+    conflicting_activity: float,
+    *,
+    producer: str,
+    field: str,
+    selected_source: str | None = None,
+) -> str:
+    selected = (
+        "" if selected_source is None
+        else f" selected_source={selected_source!r}"
+    )
+    return (
+        "SR14:alphamelts_activity_alias_conflict "
+        f"producer={producer} field={field} oxide={oxide!r} "
+        f"kept_label={kept_label!r} kept_activity={kept_activity!r} "
+        f"conflicting_label={conflicting_label!r} "
+        f"conflicting_activity={conflicting_activity!r} "
+        f"action=kept_first_reported "
+        f"reason=different_canonical_oxide_activity_values{selected}"
+    )
+
+
 def _canonical_oxide_activity_map_with_notices(
     values: Mapping[str, object] | None,
 ) -> tuple[dict[str, float], tuple[str, ...]]:
@@ -546,29 +622,31 @@ def _canonical_oxide_value_map_with_notices(
     retained for downstream consumers. ``field`` and ``phase`` identify the
     source map in the warning.
     """
-    activities: dict[str, float] = {}
     notices: list[str] = []
-    for raw_name, raw_value in dict(values or {}).items():
-        oxide = canonical_melt_oxide_activity_name(raw_name)
-        if oxide is None:
-            continue
-        try:
-            value = float(raw_value)
-        except (TypeError, ValueError):
-            reason = 'nonnumeric'
-        else:
-            if math.isfinite(value):
-                reason = 'nonpositive' if value <= 0.0 else ''
-            else:
-                reason = 'nonfinite'
-        if reason:
-            notices.append(
-                f'{_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX} '
-                f'{reason} {field} field '
-                f'{str(raw_name)!r} for phase {phase}: {raw_value!r}'
-            )
-            continue
-        activities.setdefault(oxide, value)
+    activities, conflicts, invalid = _canonical_oxide_activity_projection(values)
+    notices.extend(
+        f'{_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX} '
+        f'{reason} {field} field {raw_name!r} for phase {phase}: {raw_value!r}'
+        for raw_name, raw_value, reason in invalid
+    )
+    notices.extend(
+        _activity_alias_conflict_notice(
+            oxide,
+            kept_label,
+            kept_activity,
+            conflicting_label,
+            conflicting_activity,
+            producer='reported',
+            field=field,
+        )
+        for (
+            oxide,
+            kept_label,
+            kept_activity,
+            conflicting_label,
+            conflicting_activity,
+        ) in conflicts
+    )
     return activities, tuple(notices)
 
 
@@ -613,8 +691,9 @@ def melts_endmember_to_parent_oxide_activity(
     Therefore: identity when the parent is a reported oxide endmember.
     A same-named key is not that identity for any other oxide. Na2O,
     CaO, MgO, FeO, and K2O are typed refusals even when the map
-    contains their names. Typed refusal otherwise, naming the compound
-    carriers.
+    contains their names. When ``SiO2`` and ``SiO2_Liq`` both report the
+    same endmember, the shared activity projection keeps the first reported
+    value. Typed refusal otherwise, naming the compound carriers.
     """
     parent = canonical_melt_oxide_activity_name(parent_oxide)
     if parent is None:
@@ -627,18 +706,12 @@ def melts_endmember_to_parent_oxide_activity(
     if parent not in MELTS_LIQUID_OXIDE_ENDMEMBERS:
         return _parent_oxide_not_endmember(parent, endmember_activities)
 
-    for label, raw in endmember_activities.items():
-        oxide = canonical_melt_oxide_activity_name(label)
-        if oxide is None and _liquid_oxide_endmember_label(label) == parent:
-            oxide = parent
-        if oxide != parent:
-            continue
-        try:
-            value = float(raw)
-        except (TypeError, ValueError):
-            continue
-        if value > 0.0 and math.isfinite(value):
-            return value, ''
+    activities, _conflicts, _invalid = _canonical_oxide_activity_projection(
+        endmember_activities,
+        include_liquid_endmembers=True,
+    )
+    if parent in activities:
+        return activities[parent], ''
 
     return None, f'engine returned no positive activity for {parent}'
 

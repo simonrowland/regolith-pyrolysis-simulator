@@ -51,6 +51,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from engines.alphamelts.domain import (
+    _activity_alias_conflict_notice,
+    _canonical_oxide_activity_projection,
     _canonical_oxide_activity_map_with_notices,
     canonical_melt_oxide_activity_name,
 )
@@ -6067,16 +6069,15 @@ class _MELTSBackendSupport(MeltBackend):
                 f'reason={reason} selected_source={selected_source!r}'
             )
         if site == 'SR14':
-            return (
-                'SR14:alphamelts_activity_alias_conflict '
-                'producer=PetThermoTools field=activity_coefficients '
-                f'oxide={item!r} '
-                f'kept_label={issue["kept_label"]!r} '
-                f'kept_activity={issue["kept_activity"]} '
-                f'conflicting_label={issue["conflicting_label"]!r} '
-                f'conflicting_activity={issue["conflicting_activity"]} '
-                f'action=kept_first_reported reason={reason} '
-                f'selected_source={selected_source!r}'
+            return _activity_alias_conflict_notice(
+                item,
+                issue['kept_label'],
+                float(issue['kept_activity']),
+                issue['conflicting_label'],
+                float(issue['conflicting_activity']),
+                producer='PetThermoTools',
+                field='activity_coefficients',
+                selected_source=selected_source,
             )
         return (
             'SR02:alphamelts_direct_activity_repaired '
@@ -6111,8 +6112,7 @@ class _MELTSBackendSupport(MeltBackend):
         if total_moles <= 0.0:
             return {}, {}
 
-        activities: dict[str, float] = {}
-        activity_labels: dict[str, str] = {}
+        activity_candidates: dict[str, float] = {}
         gammas: dict[str, float] = {}
         for raw_name, raw_gamma in dict(coefficients or {}).items():
             oxide = canonical_melt_oxide_activity_name(raw_name)
@@ -6139,28 +6139,31 @@ class _MELTSBackendSupport(MeltBackend):
             # activity is dimensionless. Sanity: gamma=0.5 and x=0.02 gives
             # a=0.01, not the 0.5 value that inflated vapor flux by 50x.
             gammas[str(raw_name)] = gamma
-            activity = gamma * mole_fraction
-            if oxide in activities:
-                # In this gamma*x projection, these aliases share one oxide
-                # component basis; `_Liq` tags its phase, not a second activity
-                # standard state. Keep the first reported value, matching the
-                # prior first-match consumers. If aliases disagree, the output
-                # supplies no physical basis to prefer one, so disclose it.
-                kept_activity = activities[oxide]
-                if activity != kept_activity and repair_issues is not None:
-                    repair_issues.append({
-                        'site': 'SR14',
-                        'source': 'activity_coefficients_times_oxide_mole_fraction',
-                        'item': str(oxide),
-                        'reason': 'different_canonical_oxide_activity_values',
-                        'kept_label': activity_labels[oxide],
-                        'kept_activity': repr(kept_activity),
-                        'conflicting_label': str(raw_name),
-                        'conflicting_activity': repr(activity),
-                    })
-                continue
-            activities[oxide] = activity
-            activity_labels[oxide] = str(raw_name)
+            activity_candidates[str(raw_name)] = gamma * mole_fraction
+        activities, conflicts, _invalid = _canonical_oxide_activity_projection(
+            activity_candidates,
+            positive_only=False,
+        )
+        if repair_issues is not None:
+            repair_issues.extend(
+                {
+                    'site': 'SR14',
+                    'source': 'activity_coefficients_times_oxide_mole_fraction',
+                    'item': oxide,
+                    'reason': 'different_canonical_oxide_activity_values',
+                    'kept_label': kept_label,
+                    'kept_activity': repr(kept_activity),
+                    'conflicting_label': conflicting_label,
+                    'conflicting_activity': repr(conflicting_activity),
+                }
+                for (
+                    oxide,
+                    kept_label,
+                    kept_activity,
+                    conflicting_label,
+                    conflicting_activity,
+                ) in conflicts
+            )
         return activities, gammas
 
     def _finite_activity_mapping(
@@ -7333,10 +7336,12 @@ class _MELTSBackendSupport(MeltBackend):
         if target_oxide is None:
             return None
 
-        canonical_activities: dict[str, list[object]] = {}
-        for raw_key, raw_activity in activities.items():
-            key = canonical_melt_oxide_activity_name(raw_key) or str(raw_key)
-            canonical_activities.setdefault(key, []).append(raw_activity)
+        canonical_activities, _conflicts, _invalid = (
+            _canonical_oxide_activity_projection(
+                activities,
+                positive_only=False,
+            )
+        )
 
         # A melt endmember activity cannot be converted into a pure-oxide
         # liquid activity without a matching standard-state definition.
@@ -7344,13 +7349,17 @@ class _MELTSBackendSupport(MeltBackend):
             canonical_key = canonical_melt_oxide_activity_name(key) or key
             if canonical_key not in {str(species), target_oxide}:
                 continue
-            for raw_activity in canonical_activities.get(canonical_key, ()):
-                try:
-                    activity = float(raw_activity)
-                except (TypeError, ValueError):
-                    continue
-                if math.isfinite(activity):
+            if canonical_key == target_oxide:
+                activity = canonical_activities.get(target_oxide)
+                if activity is not None:
                     return activity
+                continue
+            try:
+                activity = float(activities[canonical_key])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if math.isfinite(activity):
+                return activity
         return None
 
     def _load_vapor_pressure_table(self) -> dict:

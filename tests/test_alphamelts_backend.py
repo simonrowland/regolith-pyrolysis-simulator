@@ -6923,6 +6923,44 @@ def test_petthermotools_activity_alias_conflict_keeps_first_for_antoine_and_cach
     assert restored.notices == notices
 
 
+def test_suffix_first_oxide_alias_order_matches_score_and_antoine_consumers():
+    from engines.alphamelts.domain import melts_endmember_to_parent_oxide_activity
+    from simulator.battery.score import match_reported_species
+
+    backend = AlphaMELTSBackend()
+    aliases = {'SiO2_Liq': 0.6, 'SiO2': 0.4}
+    composition = {'SiO2': 100.0}
+    activities, _gammas = backend._activities_from_coefficients(
+        aliases,
+        composition,
+    )
+
+    assert activities == {'SiO2': pytest.approx(0.6)}
+    assert match_reported_species(
+        'SiO2', aliases, oxide_activity=True
+    ) == ('SiO2', pytest.approx(0.6))
+    scored_activity, reason = melts_endmember_to_parent_oxide_activity(
+        aliases,
+        'SiO2',
+    )
+    assert scored_activity == pytest.approx(0.6)
+    assert reason == ''
+
+    pressures = backend._activities_times_antoine(
+        1600.0,
+        aliases,
+        composition,
+        pO2_bar=1e-9,
+    )
+    first_alias_pressures = backend._activities_times_antoine(
+        1600.0,
+        {'SiO2': 0.6},
+        composition,
+        pO2_bar=1e-9,
+    )
+    assert pressures['Si'] == pytest.approx(first_alias_pressures['Si'])
+
+
 def test_subprocess_stdout_parser_reports_activity_labels_and_exact_oxide_diagnostic():
     backend = AlphaMELTSBackend()
     output = """

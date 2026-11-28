@@ -226,6 +226,23 @@ def _key_hash(key: Mapping[str, Any]) -> str:
     return hashlib.sha256(canonical_json_bytes(key)).hexdigest()
 
 
+def _key_hash_without_engine_chemistry_versions(
+    key: Mapping[str, Any],
+) -> str:
+    request = dict(key)
+    request.pop("engine_chemistry_versions", None)
+    return _key_hash(request)
+
+
+def _physics_bucket_hash_without_engine_chemistry_versions(
+    key: Mapping[str, Any],
+) -> str:
+    bucket = canonical_physics_bucket_key_from_replay_key(key)
+    bucket["physics_bucket"].pop("engine_chemistry_versions", None)
+    bucket["replay_scope"].pop("engine_chemistry_versions", None)
+    return _key_hash(bucket)
+
+
 def _restamp_first_pt1_row_corpus(db_path: Path, corpus_version: str) -> None:
     with sqlite3.connect(db_path) as conn:
         conn.execute(
@@ -639,7 +656,7 @@ def test_cached_real_identity_matches_live_alphamelts_identity(
     }
     # Studio-2 canonical equilibrium key at 35c987e96 after identity was
     # narrowed to submitted provider inputs.
-    assert _key_hash(blank_key) == (
+    assert _key_hash_without_engine_chemistry_versions(blank_key) == (
         "484c612688d6d253983173947fe59d9b7e47d135587177f1abc8d35dbf5298ee"
     )
 
@@ -1032,9 +1049,11 @@ def test_cached_real_provider_fallback_resolves_absent_or_blank_model(
     )
 
     assert replay_key["model"]["model"] == "MELTSv1.0.2"
-    assert _key_hash(replay_key) == _DEFAULT_MELTS_REPLAY_KEY_HASH
-    assert _key_hash(
-        canonical_physics_bucket_key_from_replay_key(replay_key)
+    assert _key_hash_without_engine_chemistry_versions(replay_key) == (
+        _DEFAULT_MELTS_REPLAY_KEY_HASH
+    )
+    assert _physics_bucket_hash_without_engine_chemistry_versions(
+        replay_key
     ) == _DEFAULT_MELTS_PROVIDER_KEY_HASH
 
 
@@ -1100,7 +1119,9 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
             fO2_log=None,
             fe_redox_policy="intrinsic",
         )
-        key_bytes = canonical_json_bytes(key)
+        request_without_versions = dict(key)
+        request_without_versions.pop("engine_chemistry_versions", None)
+        key_bytes = canonical_json_bytes(request_without_versions)
 
         assert len(key_bytes) == expected_size, label
         assert hashlib.sha256(key_bytes).hexdigest() == expected_sha256, label
@@ -1117,7 +1138,9 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
         fO2_log=None,
         fe_redox_policy="intrinsic",
     )
-    direct_bytes = canonical_json_bytes(direct_key)
+    direct_request_without_versions = dict(direct_key)
+    direct_request_without_versions.pop("engine_chemistry_versions", None)
+    direct_bytes = canonical_json_bytes(direct_request_without_versions)
     assert direct_key["model"] == {
         "model": "alphamelts-diagnostic",
         "mode": "AlphaMELTSProvider",

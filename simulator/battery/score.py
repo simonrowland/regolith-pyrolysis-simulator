@@ -1375,8 +1375,9 @@ def _match_reported_species_with_notices(
     the requested formula plus ``_gas``, and only when that stem's closed
     formula equals the target. ``SiO2_gas`` matches ``SiO2``. ``SiO2gas``,
     ``SiO2_gaseous``, and a stem that does not parse do not. An exact formula
-    hit in the first pass wins over the suffixed key. Oxide activity does
-    not use this alias.
+    hit in the first pass wins over the suffixed key for non-oxide quantities.
+    Oxide activity uses the shared canonical projection so the first reported
+    oxide alias wins, including when it has ``_Liq``.
     """
 
     target = parse_species_formula(formula, species=species)
@@ -1398,12 +1399,11 @@ def _match_reported_species_with_notices(
                 phase=notice_phase,
             )
         )
-    for name, value in reported.items():
-        if oxide_activity and _is_raw_element_label(str(name), species=species):
-            continue
-        parsed = parse_species_formula(str(name), species=species)
-        if parsed == target:
-            return (str(name), float(value)), repair_notices
+    if not oxide_activity:
+        for name, value in reported.items():
+            parsed = parse_species_formula(str(name), species=species)
+            if parsed == target:
+                return (str(name), float(value)), repair_notices
     if not oxide_activity:
         suffix = _GAS_PHASE_SUFFIX
         for name, value in reported.items():
@@ -1432,7 +1432,11 @@ def _oxide_projection_notices(
         return ()
     return tuple(
         Notice(
-            kind=NoticeKind.INPUT_OMITTED,
+            kind=(
+                NoticeKind.ENGINE_MODEL_CAVEAT
+                if warning.startswith("SR14:alphamelts_activity_alias_conflict ")
+                else NoticeKind.INPUT_OMITTED
+            ),
             affected_quantities=(quantity,),
             reason=warning,
             origin=f"engine:{engine.value}",
