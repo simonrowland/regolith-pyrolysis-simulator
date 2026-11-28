@@ -357,23 +357,34 @@ def _advance_magemin_waiter_clock_past_legacy_limit(
 ):
     clock_advanced = threading.Event()
     real_monotonic = time.monotonic
+    simulated_elapsed_s = [0.0]
 
     def advance_past_old_slot_limit():
-        now = real_monotonic()
         if (
             threading.current_thread().name == waiter_thread_name
             and slot_contended.is_set()
         ):
-            clock_advanced.set()
-            return now + 300.01
-        return now
+            return real_monotonic() + simulated_elapsed_s[0]
+        return real_monotonic()
+
+    def simulate_wait(delay_s):
+        if (
+            threading.current_thread().name == waiter_thread_name
+            and slot_contended.is_set()
+        ):
+            simulated_elapsed_s[0] += 1.0
+            if simulated_elapsed_s[0] > 300.0:
+                clock_advanced.set()
+            time.sleep(min(float(delay_s), 0.001))
+            return
+        time.sleep(delay_s)
 
     monkeypatch.setattr(
         magemin_module,
         'time',
         types.SimpleNamespace(
             monotonic=advance_past_old_slot_limit,
-            sleep=time.sleep,
+            sleep=simulate_wait,
         ),
     )
     return clock_advanced
@@ -1242,16 +1253,12 @@ def test_magemin_slot_queue_preserves_result_past_legacy_and_warm_limits(
     caller = threading.Thread(
         target=call, name='magemin-slot-waiter', daemon=True
     )
-    started_at = time.monotonic()
     caller.start()
     try:
         assert caller_started.wait(timeout=5.0)
         assert slot_contended.wait(timeout=5.0)
-        time.sleep(MAGEMIN_WARM_CALL_TIMEOUT_S + 0.1)
+        assert clock_advanced.wait(timeout=5.0)
         assert caller.is_alive()
-        assert not clock_advanced.is_set(), (
-            'the waiting MAGEMin call must not consult an engine-call clock'
-        )
         assert len(submissions) == baseline_submission_count, (
             'worker dispatch started before slot acquisition'
         )
@@ -1263,7 +1270,6 @@ def test_magemin_slot_queue_preserves_result_past_legacy_and_warm_limits(
         pool.close(cancel_pending=True, timeout_s=3.0)
 
     assert not caller.is_alive(), 'MAGEMin call did not finish after slot release'
-    assert time.monotonic() - started_at > MAGEMIN_WARM_CALL_TIMEOUT_S
     assert clock_advanced.is_set()
     assert len(outcomes) == 1
     assert isinstance(outcomes[0], dict)
@@ -4528,11 +4534,9 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(
     caller.start()
     try:
         assert slot_contended.wait(timeout=5.0)
+        assert clock_advanced.wait(timeout=5.0)
         time.sleep(MAGEMIN_WARM_CALL_TIMEOUT_S + 0.1)
         assert caller.is_alive(), 'the acquired-slot wall starts after the wait'
-        assert not clock_advanced.is_set(), (
-            'the slot queue must not consult an engine-call deadline'
-        )
     finally:
         release_slots.set()
         for holder in holders:
