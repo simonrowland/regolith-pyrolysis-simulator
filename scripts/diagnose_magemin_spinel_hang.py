@@ -116,7 +116,7 @@ def _timed_magemin_call(self: Any, *args: Any, **kwargs: Any) -> Any:
 
 
 @contextmanager
-def _timed_subprocess_slot(timeout_s: float) -> Iterator[None]:
+def _timed_subprocess_slot() -> Iterator[None]:
     started = time.perf_counter()
     state: dict[str, Any] = {
         'temperature_C': _CURRENT_TEMPERATURE.get(),
@@ -124,7 +124,7 @@ def _timed_subprocess_slot(timeout_s: float) -> Iterator[None]:
     token = _CURRENT_SLOT.set(state)
     try:
         try:
-            with _ORIGINAL_SLOT(timeout_s):
+            with _ORIGINAL_SLOT():
                 state['slot_wait_s'] = time.perf_counter() - started
                 state['slot_acquired'] = True
                 yield

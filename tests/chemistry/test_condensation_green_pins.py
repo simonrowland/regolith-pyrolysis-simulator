@@ -375,10 +375,6 @@ def _timeout_escape_diagnostics():
             "backend_status": "not_converged",
             "backend_failure_exception": "MAGEMinAggregateBudgetExceeded",
         },
-        "magemin_subprocess_slot_timeout": {
-            "backend_status": "not_converged",
-            "backend_failure_exception": "MAGEMinSubprocessSlotTimeout",
-        },
         "thermoengine_warm_call_equilibrium_timeout": dict(warm.diagnostics),
     }
 

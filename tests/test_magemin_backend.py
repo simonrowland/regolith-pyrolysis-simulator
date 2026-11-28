@@ -1051,12 +1051,12 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(
 
 @pytest.mark.cpu_budget(30)
 @pytest.mark.timeout(30)
-def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
+def test_magemin_slot_queue_preserves_result_past_legacy_and_warm_limits(
     monkeypatch, tmp_path,
 ):
     _use_test_magemin_slot_lock(monkeypatch, tmp_path)
     monkeypatch.setattr(
-        magemin_module, '_magemin_subprocess_slot_count', lambda: 1
+        magemin_module, '_magemin_subprocess_slot_count', lambda: 2
     )
     worker_config = {
         'warm_call_timeout_s': MAGEMIN_WARM_CALL_TIMEOUT_S,
@@ -1091,36 +1091,33 @@ def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
         return original_submit(request, timeout_s=timeout_s)
 
     pool.submit = count_submit
-    # The old owner read this cap while waiting for host-wide slots. Keeping a
-    # short legacy value here makes the real lock wait exceed that limit
-    # without spending five minutes in the test.
-    monkeypatch.setattr(
-        magemin_module,
-        '_MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S',
-        0.01,
-        raising=False,
-    )
     baseline = backend._call_magemin(
         projection,
         temperature_C=1200.0,
         pressure_bar=1.0,
         fO2_log=-8.0,
+        call_timeout_s=1.0,
     )
     baseline_bytes = pickle.dumps(baseline, protocol=pickle.HIGHEST_PROTOCOL)
     baseline_submission_count = len(submissions)
     assert isinstance(baseline, dict)
-    slot_held = threading.Event()
+    slots_held = [threading.Event(), threading.Event()]
     release_slot = threading.Event()
     slot_contended = threading.Event()
+    clock_advanced = threading.Event()
 
-    def hold_slot():
+    def hold_slot(index):
         with _magemin_subprocess_slot():
-            slot_held.set()
+            slots_held[index].set()
             release_slot.wait(25.0)
 
-    holder = threading.Thread(target=hold_slot, daemon=True)
-    holder.start()
-    assert slot_held.wait(timeout=5.0)
+    holders = [
+        threading.Thread(target=hold_slot, args=(index,), daemon=True)
+        for index in range(2)
+    ]
+    for holder in holders:
+        holder.start()
+    assert all(event.wait(timeout=5.0) for event in slots_held)
     original_flock = magemin_module.fcntl.flock
 
     def observe_slot_contention(fd, operation):
@@ -1132,6 +1129,27 @@ def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
             raise
 
     monkeypatch.setattr(magemin_module.fcntl, 'flock', observe_slot_contention)
+
+    real_monotonic = time.monotonic
+
+    def advance_past_old_slot_limit():
+        now = real_monotonic()
+        if (
+            threading.current_thread().name == 'magemin-slot-waiter'
+            and slot_contended.is_set()
+        ):
+            clock_advanced.set()
+            return now + 300.01
+        return now
+
+    monkeypatch.setattr(
+        magemin_module,
+        'time',
+        types.SimpleNamespace(
+            monotonic=advance_past_old_slot_limit,
+            sleep=time.sleep,
+        ),
+    )
     outcomes = []
     caller_started = threading.Event()
 
@@ -1143,6 +1161,7 @@ def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
                 temperature_C=1200.0,
                 pressure_bar=1.0,
                 fO2_log=-8.0,
+                call_timeout_s=1.0,
             ))
         except BaseException as exc:  # return the worker result to the test
             outcomes.append(exc)
@@ -1157,17 +1176,22 @@ def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
         assert slot_contended.wait(timeout=5.0)
         time.sleep(MAGEMIN_WARM_CALL_TIMEOUT_S + 0.1)
         assert caller.is_alive()
+        assert not clock_advanced.is_set(), (
+            'the waiting MAGEMin call must not consult an engine-call clock'
+        )
         assert len(submissions) == baseline_submission_count, (
             'worker dispatch started before slot acquisition'
         )
     finally:
         release_slot.set()
-        holder.join(timeout=2.0)
+        for holder in holders:
+            holder.join(timeout=2.0)
         caller.join(timeout=5.0)
         pool.close(cancel_pending=True, timeout_s=3.0)
 
     assert not caller.is_alive(), 'MAGEMin call did not finish after slot release'
     assert time.monotonic() - started_at > MAGEMIN_WARM_CALL_TIMEOUT_S
+    assert clock_advanced.is_set()
     assert len(outcomes) == 1
     assert isinstance(outcomes[0], dict)
     assert outcomes[0]['phases']['liq']['mass_kg'] == 1.0
@@ -1398,31 +1422,25 @@ def test_magemin_in_process_budget_exhaustion_returns_typed_status():
     )
 
 
-def test_magemin_subprocess_slot_permission_error_is_typed_environment_failure(
+def test_magemin_subprocess_slot_os_error_is_typed_environment_failure(
     monkeypatch, tmp_path,
 ):
     from simulator.melt_backend import magemin as magemin_module
 
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
     backend._config = {'timeout_s': 1.0}
-    lock_dir = tmp_path / 'read-only'
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', lock_dir
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK', lock_dir / 'magemin.lock'
-    )
-    original_mkdir = Path.mkdir
 
-    def deny_lock_dir(path, *args, **kwargs):
-        if path == lock_dir:
-            raise PermissionError('read-only filesystem')
-        return original_mkdir(path, *args, **kwargs)
+    def fail_flock(*_args, **_kwargs):
+        raise OSError('injected lock acquire failure')
 
-    monkeypatch.setattr(Path, 'mkdir', deny_lock_dir)
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot_count', lambda: 1
+    )
+    monkeypatch.setattr(magemin_module.fcntl, 'flock', fail_flock)
 
     with pytest.raises(
         magemin_module._MAGEMinEngineLifecycleError
@@ -1432,6 +1450,7 @@ def test_magemin_subprocess_slot_permission_error_is_typed_environment_failure(
 
     assert slot_error.value.exception_type == 'MAGEMinSubprocessSlotUnavailable'
     assert slot_error.value.failure_disposition == 'environment'
+    assert 'injected lock acquire failure' in str(slot_error.value)
 
     result = backend.equilibrate(
         1500.0,
@@ -1445,7 +1464,9 @@ def test_magemin_subprocess_slot_permission_error_is_typed_environment_failure(
         'MAGEMinSubprocessSlotUnavailable'
     )
     assert result.diagnostics['backend_failure_disposition'] == 'environment'
-    assert 'read-only filesystem' in result.diagnostics['backend_failure_message']
+    assert 'injected lock acquire failure' in result.diagnostics[
+        'backend_failure_message'
+    ]
 
 
 @pytest.mark.parametrize(

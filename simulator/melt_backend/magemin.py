@@ -191,9 +191,6 @@ _MAGEMIN_FO2_TOL_DEX = 2.0e-5
 # (tests/test_engine_worker_live_determinism.py A/B), so this only moves
 # when the hard wall fires. 15.0 s gives ~8x headroom over the measured p99.
 MAGEMIN_WARM_CALL_TIMEOUT_S = 15.0
-# A busy host-wide MAGEMin slot is not a stuck engine call. Keep a separate,
-# much longer bound so a wedged slot lock still returns a typed refusal.
-_MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S = 300.0
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS = 8192
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES = 16
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
@@ -249,9 +246,8 @@ def _magemin_subprocess_env() -> Dict[str, str]:
 
 
 @contextmanager
-def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
+def _magemin_subprocess_slot() -> Iterator[None]:
     """Acquire one of K machine-wide MAGEMin launch slots (see above)."""
-    deadline = time.monotonic() + max(0.001, float(timeout_s))
     lock_files = []
     acquired_index = -1
     try:
@@ -261,6 +257,7 @@ def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
             raise _MAGEMinEngineLifecycleError(
                 'MAGEMinSubprocessSlotUnavailable',
                 f'MAGEMin subprocess slot is unavailable: {exc}',
+                failure_disposition='environment',
             ) from exc
         slots = _magemin_subprocess_slot_count()
         try:
@@ -274,6 +271,7 @@ def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
             raise _MAGEMinEngineLifecycleError(
                 'MAGEMinSubprocessSlotUnavailable',
                 f'MAGEMin subprocess slot is unavailable: {exc}',
+                failure_disposition='environment',
             ) from exc
         while True:
             for index, lock_file in enumerate(lock_files):
@@ -289,18 +287,11 @@ def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
                     raise _MAGEMinEngineLifecycleError(
                         'MAGEMinSubprocessSlotUnavailable',
                         f'MAGEMin subprocess slot is unavailable: {exc}',
+                        failure_disposition='environment',
                     ) from exc
             if acquired_index >= 0:
                 break
-            remaining = deadline - time.monotonic()
-            if remaining <= 0.0:
-                raise _MAGEMinEngineLifecycleError(
-                    'MAGEMinSubprocessSlotWaitLimitExceeded',
-                    f'MAGEMin subprocess slot wait limit exceeded after '
-                    f'{timeout_s:g}s',
-                    failure_disposition='environment',
-                )
-            time.sleep(min(0.01, remaining))
+            time.sleep(0.01)
         yield
     finally:
         try:
@@ -2635,10 +2626,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # signature, stored in _MAGEMIN_ENGINE_VERSION_CACHE. A failed
         # probe stores the path fallback and keeps the typed exception
         # beside it. Later calls return that identity and do not enter
-        # the 300 s slot wait again. Wait is the host-wide launch bound,
-        # the same bound an equilibrium launch uses before a typed
-        # refusal. The subprocess itself stays on a 5 s clock once a
-        # slot is held. The cache lock is not held across that wait: a
+        # the host-wide slot wait again. Slot queueing has no deadline; the
+        # version subprocess itself stays on a 5 s clock after acquisition.
+        # The cache lock is not held across that wait: a
         # caller that already owns a slot must still be able to read a
         # cached identity.
         with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
@@ -2654,9 +2644,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             probe_failure: Optional[BaseException] = None
             try:
                 with (
-                    _magemin_subprocess_slot(
-                        _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
-                    ),
+                    _magemin_subprocess_slot(),
                     tempfile.TemporaryDirectory() as tmpdir,
                 ):
                     result = subprocess.run(
@@ -2675,11 +2663,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 lines = (result.stdout or result.stderr).strip().splitlines()
                 if result.returncode == 0 and lines:
                     probed = lines[0].strip()
-            except (
-                _MAGEMinEngineLifecycleError,
-                OSError,
-                subprocess.TimeoutExpired,
-            ) as exc:
+            except _MAGEMinEngineLifecycleError as exc:
+                if exc.exception_type.startswith('MAGEMinSubprocessSlot'):
+                    raise
+                probe_failure = exc
+            except (OSError, subprocess.TimeoutExpired) as exc:
                 probe_failure = exc
             if probed:
                 candidate = (probed, None)
@@ -3318,14 +3306,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     # The 15 s warm-call wall means the engine is stuck, not
                     # busy. Acquire its host-wide slot before starting that
                     # wall so normal queueing cannot trigger a retry.
-                    with _magemin_subprocess_slot(
-                        _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
-                    ):
+                    slot_wait_started = time.monotonic()
+                    with _magemin_subprocess_slot():
                         if call_timeout_s is not None:
+                            slot_wait_duration = max(
+                                0.0,
+                                time.monotonic() - slot_wait_started,
+                            )
                             remaining_aggregate = (
                                 self._residual_call_timeout_s(
                                     call_timeout_s,
-                                    call_started,
+                                    call_started + slot_wait_duration,
                                 )
                             )
                             timeout_s = min(timeout_s, remaining_aggregate)
@@ -3621,21 +3612,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin call cancelled: aggregate liquidus budget exhausted',
                 )
             timeout_s = min(configured_timeout_s, remaining)
-        slot_wait_started = time.monotonic()
         slot_context = (
             nullcontext()
             if slot_already_acquired
-            else _magemin_subprocess_slot(
-                _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
-            )
+            else _magemin_subprocess_slot()
         )
         with slot_context:
-            if not slot_already_acquired and call_timeout_s is not None:
-                remaining_aggregate = self._residual_call_timeout_s(
-                    call_timeout_s,
-                    slot_wait_started,
-                )
-                timeout_s = min(configured_timeout_s, remaining_aggregate)
             # The engine wall begins after the busy slot wait. It measures a
             # stuck run, not ordinary host-wide queue contention.
             call_started = time.monotonic()
@@ -4387,9 +4369,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         timeout_s = float(self._config.get('timeout_s', 60.0))
         try:
-            with _magemin_subprocess_slot(
-                _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
-            ):
+            with _magemin_subprocess_slot():
                 with tempfile.TemporaryDirectory() as tmpdir:
                     completed = subprocess.run(  # noqa: S603 - adapter-built
                         args,
