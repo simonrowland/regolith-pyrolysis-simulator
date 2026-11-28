@@ -36,6 +36,7 @@ from simulator.fe_redox import (
     kress91_furnace_activity_pressure_bar,
 )
 from simulator.metal_saturation_floor import (
+    _oxide_liquid_standard_log10_factor_per_oxide,
     activities_for_metal_saturation_floor,
     apply_melt_metal_saturation_floor,
 )
@@ -62,37 +63,6 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
     Atmosphere.O2_BACKPRESSURE,
 })
 _ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
-
-
-def _oxide_liquid_standard_log10_factor_per_oxide(
-    oxide: str,
-    temperature_K: float,
-) -> float:
-    """Return log10(K_liquid/K_crystal) for one oxide formula unit.
-
-    Premise: a crystalline-oxide K combined with liquid-standard melt
-    activities needs ΔG_fus° = G°(oxide,l) - G°(oxide,cr). The JANAF pairs
-    provide this for MgO (Mg-008/Mg-009), CaO (Ca-027/Ca-028), Al2O3
-    (Al-096/Al-100), TiO2 (O-043/O-044), Cr2O3 (Cr-014/Cr-015), and ZrO2
-    (O-052/O-053). Algebra: replacing n crystalline oxide formula units with
-    liquid-standard activities gives ΔG°_liq = ΔG°_cr +
-    n(G°_cr - G°_liq), hence log10(K_liq/K_cr) per oxide is
-    ΔG_fus°/(R T ln 10). Unit check: kJ/mol is converted to J/mol before
-    division by R T; the result is dimensionless. Sanity: below melting the
-    liquid has higher Gibbs energy and the shift is positive; at the
-    crystal/liquid crossing ΔG_fus°=0 and the correction vanishes. At
-    2156.15 K the MgO and CaO factors are +0.542275 and +0.624220 dex.
-    """
-    from simulator.reference_data.janaf import janaf_fusion_energy
-
-    delta_g_fus_kj_per_mol = float(
-        janaf_fusion_energy(oxide, temperature_K).delta_g_fus_kJ_per_mol
-    )
-    return (
-        delta_g_fus_kj_per_mol
-        * 1000.0
-        / (GAS_CONSTANT * float(temperature_K) * math.log(10.0))
-    )
 
 
 def _engine_model_standard_state_caveat(
@@ -714,16 +684,18 @@ class EquilibriumMixin:
             )
         except ValueError as exc:
             mgo_liquid_standard_log10_factor = None
-            activity_standard_state_flags['Mg'] = {
-                'type': 'typed_notice',
-                'kind': 'standard_state_mismatch_unresolved',
-                'K_reference_phase': 'MgO(cr), Ellingham Mg-010',
-                'activity_reference_phase': 'MgO(l), JANAF Mg-009',
-                'conversion_source': 'JANAF Mg-008/Mg-009',
-                'temperature_K': T_K,
-                'reason': str(exc),
-                'conversion_applied': False,
-            }
+            activity_standard_state_flags['Mg'] = (
+                _engine_model_standard_state_caveat(
+                    K_reference_phase='MgO(cr), Ellingham Mg-010',
+                    activity_reference_phase='MgO(l), JANAF Mg-009',
+                    temperature_K=T_K,
+                    reason=(
+                        'JANAF Mg-008/Mg-009 cannot ground the liquid-standard '
+                        f'conversion at this temperature: {exc}. The best '
+                        'available Mg-010 K is retained with the liquid activity.'
+                    ),
+                )
+            )
         if melt_pO2_clamped:
             # b-148: do not feed the 1e300 float sentinel into mass action.
             warnings.append(
@@ -1379,25 +1351,13 @@ class EquilibriumMixin:
             K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
 
             if parent_oxide == 'MgO':
-                if mgo_liquid_standard_log10_factor is None:
-                    _sz_omit(
-                        species,
-                        ZeroBecause.MISSING_THERMO,
-                        field='MgO_liquid_standard_conversion',
-                        detail=(
-                            'JANAF Mg-008/Mg-009 does not cover this temperature; '
-                            'MgO(cr) K cannot be paired with the liquid-standard '
-                            'activity, so this channel is omitted rather than guessed'
-                        ),
-                        category=CATEGORY_REFUSE,
+                if mgo_liquid_standard_log10_factor is not None:
+                    # Mg-010 K is a two-MgO dissociation reaction; convert
+                    # both oxide standard chemical potentials before combining
+                    # it with the liquid-standard activity.
+                    K_decomp *= 10.0 ** (
+                        n_ox * mgo_liquid_standard_log10_factor
                     )
-                    continue
-                # Mg-010 K is a two-MgO dissociation reaction; convert both
-                # oxide standard chemical potentials before combining it with
-                # the liquid-standard activity.
-                K_decomp *= 10.0 ** (
-                    n_ox * mgo_liquid_standard_log10_factor
-                )
             elif parent_oxide == 'CaO':
                 # Ca-027/Ca-028 gives ΔG_fus° = G°(CaO,l)-G°(CaO,cr).
                 # The Ca Ellingham reaction consumes n_ox crystalline CaO,
@@ -1406,12 +1366,30 @@ class EquilibriumMixin:
                 # Unit check: n_ox and the logarithmic factor are dimensionless.
                 # Sanity: Ca consumes/produces two CaO/Ca units per O2, then
                 # the square-root metal pressure law leaves one per-CaO factor.
-                cao_liquid_standard_log10_factor = (
-                    _oxide_liquid_standard_log10_factor_per_oxide('CaO', T_K)
-                )
-                K_decomp *= 10.0 ** (
-                    n_ox * cao_liquid_standard_log10_factor
-                )
+                try:
+                    cao_liquid_standard_log10_factor = (
+                        _oxide_liquid_standard_log10_factor_per_oxide('CaO', T_K)
+                    )
+                except ValueError as exc:
+                    activity_standard_state_flags[species] = (
+                        _engine_model_standard_state_caveat(
+                            K_reference_phase='CaO(cr), Ellingham CaO',
+                            activity_reference_phase=(
+                                'CaO(l), liquid-standard melt activity'
+                            ),
+                            temperature_K=T_K,
+                            reason=(
+                                'JANAF Ca-027/Ca-028 cannot ground the liquid-'
+                                f'standard conversion at this temperature: {exc}. '
+                                'The best available Ca Ellingham K is retained '
+                                'with the liquid activity.'
+                            ),
+                        )
+                    )
+                else:
+                    K_decomp *= 10.0 ** (
+                        n_ox * cao_liquid_standard_log10_factor
+                    )
             elif parent_oxide in {
                 'K2O', 'Al2O3', 'TiO2', 'Cr2O3', 'NiO', 'MnO', 'ZrO2'
             }:
@@ -1431,7 +1409,6 @@ class EquilibriumMixin:
                 liquid_phase_markers = {
                     'Al2O3': 'Al2O3(l)',
                     'TiO2': 'TiO2(l)',
-                    'MnO': 'MnO(lit. liquid range)',
                 }
                 liquid_marker = liquid_phase_markers.get(parent_oxide)
                 if liquid_marker and liquid_marker in source_phase_basis:
@@ -1440,6 +1417,11 @@ class EquilibriumMixin:
                     pass
                 else:
                     source_phase_marker = solid_phase_markers[parent_oxide]
+                    if (
+                        parent_oxide == 'MnO'
+                        and 'MnO(lit. liquid range)' in source_phase_basis
+                    ):
+                        source_phase_marker = 'MnO(lit. liquid range)'
                     source_phase_name = (
                         f"{source_phase_marker}, {active_segment.janaf_anchor}"
                     )
@@ -1682,10 +1664,7 @@ class EquilibriumMixin:
                         species=str(name),
                         field="P_sat",
                     )
-                if (
-                    parent_oxide in {'CaO', 'CoO'}
-                    and data.get('reference_pressure_model')
-                ):
+                if data.get('reference_pressure_model'):
                     from simulator.vapour_rail.catalog import compiled_catalog_for
 
                     catalog = getattr(self, 'vapour_rail_catalog', None)
@@ -1696,19 +1675,68 @@ class EquilibriumMixin:
                             None,
                         )
                         if payload is not None:
-                            catalog = compiled_catalog_for(payload)
+                            try:
+                                catalog = compiled_catalog_for(payload)
+                            except (KeyError, ValueError) as model_error:
+                                _sz_omit(
+                                    str(name),
+                                    ZeroBecause.MISSING_THERMO,
+                                    field='reference_pressure_model',
+                                    detail=(
+                                        'compiled pressure catalog lookup failed; '
+                                        f'no pressure estimate is available: {model_error}'
+                                    ),
+                                    category=CATEGORY_REFUSE,
+                                )
+                                continue
                     if catalog is None:
-                        raise RuntimeError(
-                            f'{name} requires its compiled standard-reaction model'
+                        reason = (
+                            'compiled standard-reaction catalog is unavailable'
                         )
-                    evaluator = catalog.evaluator_for_hot_train(name)
-                    reference_evaluation = evaluator.evaluate(
-                        T_K,
-                        source_activity=1.0,
-                        pO2_bar=evaluator.pO2_reference_bar,
-                    )
+                        _sz_omit(
+                            str(name),
+                            ZeroBecause.MISSING_THERMO,
+                            field='reference_pressure_model',
+                            detail=f'{reason}; no compiled pressure estimate is available',
+                            category=CATEGORY_REFUSE,
+                        )
+                        continue
+                    try:
+                        evaluator = catalog.evaluator_for_hot_train(name)
+                        reference_evaluation = evaluator.evaluate(
+                            T_K,
+                            source_activity=1.0,
+                            pO2_bar=evaluator.pO2_reference_bar,
+                        )
+                    except (KeyError, ValueError) as model_error:
+                        _sz_omit(
+                            str(name),
+                            ZeroBecause.MISSING_THERMO,
+                            field='reference_pressure_model',
+                            detail=(
+                                'compiled pressure model lookup failed; no '
+                                f'pressure estimate is available: {model_error}'
+                            ),
+                            category=CATEGORY_REFUSE,
+                        )
+                        continue
                     P_sat = reference_evaluation.pressure_pa
                     coefficient_block = 'compiled_reference_pressure_model'
+                    if reference_evaluation.out_of_range:
+                        valid_reference_range = evaluator.valid_temperature_K
+                        oxide_vapor_extrapolations[name] = (
+                            _vapor_pressure_temperature_extrapolation_notice(
+                                temperature_K=T_K,
+                                valid_range_K=valid_reference_range,
+                                reason='compiled_model_out_of_domain_marked',
+                            )
+                        )
+                        warnings.append(
+                            f'{name} compiled oxide-vapor reference model '
+                            f'extrapolated beyond valid_range_K '
+                            f'{valid_reference_range} at {T_K:.2f} K; '
+                            'best available pressure retained'
+                        )
                     if parent_oxide == 'CoO':
                         activity_standard_state_flags[name] = (
                             _engine_model_standard_state_caveat(
@@ -1776,13 +1804,11 @@ class EquilibriumMixin:
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
-                a_ox = oxide_activity.equivalent_parent_activity(
-                    activity_exponent
-                )
+                a_parent = oxide_activity.thermodynamic_parent_activity()
                 activities[name] = oxide_activity.activity
                 activity_provenance[name] = oxide_activity.provenance()
                 P_sat = _require_finite_vapor_value(
-                    P_sat * max(a_ox, 0.0) ** activity_exponent,
+                    P_sat * max(a_parent, 0.0) ** activity_exponent,
                     species=name,
                     field="P_sat_activity",
                 )
@@ -1792,29 +1818,47 @@ class EquilibriumMixin:
                     if isinstance(reaction, Mapping)
                     else ''
                 )
-                if parent_oxide == 'CaO' and 'CaO(cr)' in reaction_formula:
-                    # Ca-027/Ca-028 gives ΔG_fus° = G°(CaO,l)-G°(CaO,cr).
-                    # A standard-reaction pressure exponent α means the
-                    # reaction consumes α CaO units per gas molecule, so
-                    # K_liq/K_cr = 10**(α ΔG_fus°/(R T ln 10)). Multiplying
-                    # the pressure by that factor converts the crystalline K
-                    # to the liquid activity basis. Unit check: α and dex are
-                    # dimensionless; pressure remains Pa. Sanity: α=0 leaves
-                    # pressure unchanged, while α=1 gives one CaO correction.
-                    cao_liquid_standard_log10_factor = (
-                        _oxide_liquid_standard_log10_factor_per_oxide(
-                            'CaO', T_K
+                crystal_parent_marker = f'{parent_oxide}(cr)'
+                if parent_oxide and crystal_parent_marker in reaction_formula:
+                    # The reaction consumes activity_exponent parent units.
+                    # Each crystalline unit contributes the shared JANAF
+                    # log10(K_liquid/K_crystal) factor. If that pair is
+                    # missing or out of range, retain the compiled pressure
+                    # estimate and expose the standard-state mismatch.
+                    try:
+                        liquid_standard_log10_factor = (
+                            _oxide_liquid_standard_log10_factor_per_oxide(
+                                parent_oxide, T_K
+                            )
                         )
-                    )
-                    P_sat = _require_finite_vapor_value(
-                        P_sat
-                        * 10.0 ** (
-                            activity_exponent
-                            * cao_liquid_standard_log10_factor
-                        ),
-                        species=name,
-                        field='P_sat_CaO_liquid_standard',
-                    )
+                    except ValueError as exc:
+                        activity_standard_state_flags[name] = (
+                            _engine_model_standard_state_caveat(
+                                K_reference_phase=(
+                                    f'{parent_oxide}(cr), compiled standard reaction'
+                                ),
+                                activity_reference_phase=(
+                                    f'{parent_oxide}(l), liquid-standard melt activity'
+                                ),
+                                temperature_K=T_K,
+                                reason=(
+                                    'The JANAF crystal/liquid pair cannot ground '
+                                    f'a conversion at this temperature: {exc}. '
+                                    'The best available compiled pressure is retained '
+                                    'with the liquid-standard activity.'
+                                ),
+                            )
+                        )
+                    else:
+                        P_sat = _require_finite_vapor_value(
+                            P_sat
+                            * 10.0 ** (
+                                activity_exponent
+                                * liquid_standard_log10_factor
+                            ),
+                            species=name,
+                            field='P_sat_liquid_standard',
+                        )
 
             pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
             if pO2_exponent:

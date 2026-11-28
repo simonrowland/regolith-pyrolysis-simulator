@@ -55,6 +55,32 @@ METAL_SATURATION_FLOOR_NOTICE_PREFIX = "melt_fO2_metal_saturation_floor:"
 _FLOOR_BIND_TOLERANCE_DEX = 1.0e-9
 
 
+def _oxide_liquid_standard_log10_factor_per_oxide(
+    oxide: str,
+    temperature_K: float,
+) -> float:
+    """Return log10(K_liquid/K_crystal) per oxide formula unit.
+
+    Replacing crystalline oxide units by liquid-standard melt activities
+    changes the standard Gibbs energy by ``-n * ΔG_fus``. Thus
+    ``log10(K_liquid/K_crystal) = ΔG_fus/(R T ln 10)`` per unit. JANAF
+    reports kJ/mol, converted to J/mol here; the result is dimensionless.
+    At the crystal/liquid crossing ΔG_fus is zero, and below it the liquid
+    has higher Gibbs energy so the correction is positive.
+    """
+
+    from simulator.reference_data.janaf import janaf_fusion_energy
+
+    delta_g_fus_kj_per_mol = float(
+        janaf_fusion_energy(oxide, temperature_K).delta_g_fus_kJ_per_mol
+    )
+    return (
+        delta_g_fus_kj_per_mol
+        * J_PER_KJ
+        / (GAS_CONSTANT * float(temperature_K) * math.log(10.0))
+    )
+
+
 def _ellingham_metal_saturation_log10_fO2_bar(
     metal: str,
     temperature_K: float,
@@ -132,10 +158,40 @@ def _ellingham_metal_saturation_log10_fO2_bar(
     delta_g_j_per_mol = (
         ellingham_delta_g_kj_per_mol_o2(metal, temperature_K) * J_PER_KJ
     )
-    return (
+    log10_fO2 = (
         delta_g_j_per_mol / (GAS_CONSTANT * temperature_K * math.log(10.0))
         + float(segment.n_ox) * math.log10(activity)
     )
+    # The floor consumes the same liquid-standard formula activity as the
+    # vapour channels. For Ellingham rows whose explicit oxide reference is
+    # crystalline, convert K once per oxide unit using the shared JANAF
+    # fusion helper. If the pair is absent or outside its table, keep the
+    # Ellingham estimate; its source authority remains flagged by the owner.
+    crystal_phase_markers = {
+        "SiO2": ("SiO2(II)", "SiO2(II)"),
+        "Cr2O3": ("Cr2O3(s)", "Cr2O3"),
+        "TiO2": ("TiO2(rutile,s)", "TiO2"),
+        "MnO": ("MnO(s)", "MnO"),
+        "NiO": ("NiO(s)", "NiO"),
+    }
+    oxide = next(
+        oxide
+        for candidate, oxide in METAL_SATURATION_FLOOR_OXIDES
+        if candidate == metal
+    )
+    source_phase_marker, fusion_pair_key = crystal_phase_markers[oxide]
+    if source_phase_marker in segment.phase_basis:
+        try:
+            liquid_standard_factor = _oxide_liquid_standard_log10_factor_per_oxide(
+                fusion_pair_key, temperature_K
+            )
+        except ValueError:
+            pass
+        else:
+            # n_ox crystalline formula units enter the per-mole-O2 K, so
+            # the log-K correction is n_ox times the per-formula factor.
+            log10_fO2 += float(segment.n_ox) * liquid_standard_factor
+    return log10_fO2
 
 
 def melt_metal_saturation_floor_log10_fO2_bar(

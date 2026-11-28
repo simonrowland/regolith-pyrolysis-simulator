@@ -294,7 +294,6 @@ def test_internal_analytical_crystal_ellingham_k_is_converted_to_liquid(
     [
         ('Al', 'Al2O3', 2400.0),
         ('Ti', 'TiO2', 2156.15),
-        ('Mn', 'MnO', 2156.15),
     ],
 )
 def test_internal_analytical_liquid_ellingham_source_is_not_shifted(
@@ -338,6 +337,7 @@ def test_internal_analytical_liquid_ellingham_source_is_not_shifted(
         ('K', 'K2O', 2156.15),
         ('Ni', 'NiO', 2156.15),
         ('Mn', 'MnO', 2000.0),
+        ('Mn', 'MnO', 2156.15),
     ],
 )
 def test_internal_analytical_unresolved_oxide_standard_keeps_pressure_with_caveat(
@@ -428,7 +428,7 @@ def test_internal_analytical_cao_vapor_uses_liquid_standard_conversion(
     oxide_activity = SimpleNamespace(
         activity=0.5,
         warning=None,
-        equivalent_parent_activity=lambda exponent: 0.5 ** (1.0 / exponent),
+        thermodynamic_parent_activity=lambda: 0.5,
         provenance=lambda: {},
     )
     monkeypatch.setattr(
@@ -454,6 +454,15 @@ def test_internal_analytical_cao_vapor_uses_liquid_standard_conversion(
         crystal_standard_pressure = _run_typed_omission_sim(
             sim, monkeypatch
         ).vapor_pressures_Pa
+        oxide_activity = SimpleNamespace(
+            activity=1.0,
+            warning=None,
+            thermodynamic_parent_activity=lambda: 1.0,
+            provenance=lambda: {},
+        )
+        unit_activity_pressure = _run_typed_omission_sim(
+            sim, monkeypatch
+        ).vapor_pressures_Pa
 
     log10_factor = equilibrium_module._oxide_liquid_standard_log10_factor_per_oxide(
         'CaO', 1000.0
@@ -464,6 +473,12 @@ def test_internal_analytical_cao_vapor_uses_liquid_standard_conversion(
     )
     assert converted_ca2_pressure / crystal_standard_pressure['Ca2'] == pytest.approx(
         10.0 ** (2.0 * log10_factor),
+        rel=1e-12,
+    )
+    # Ca2 consumes two CaO formula units: P(Ca2) scales as a_CaO**2.
+    # equivalent_parent_activity(2)**2 would cancel to a_CaO and fail here.
+    assert crystal_standard_pressure['Ca2'] / unit_activity_pressure['Ca2'] == pytest.approx(
+        0.25,
         rel=1e-12,
     )
 
@@ -501,7 +516,7 @@ def test_internal_analytical_coo_keeps_prediction_with_typed_phase_caveat(
     oxide_activity = SimpleNamespace(
         activity=0.5,
         warning=None,
-        equivalent_parent_activity=lambda exponent: 0.5 ** (1.0 / exponent),
+        thermodynamic_parent_activity=lambda: 0.5,
         provenance=lambda: {},
     )
     monkeypatch.setattr(
@@ -522,7 +537,151 @@ def test_internal_analytical_coo_keeps_prediction_with_typed_phase_caveat(
     assert caveat['conversion_applied'] is False
 
 
-def test_internal_analytical_unresolved_mgo_standard_state_is_typed_and_omitted(
+@pytest.mark.parametrize(
+    ('species', 'oxide', 'reaction', 'activity_exponent', 'pO2_exponent'),
+    [
+        ('Mg2', 'MgO', '2 MgO(cr) -> Mg2(g) + O2(g)', 2.0, -1.0),
+        ('MgO_gas', 'MgO', 'MgO(cr) -> MgO(g)', 1.0, 0.0),
+        ('NiO_gas', 'NiO', 'NiO(cr) -> NiO(g)', 1.0, 0.0),
+        ('MnO_gas', 'MnO', 'MnO(cr) -> MnO(g)', 1.0, 0.0),
+    ],
+)
+def test_internal_analytical_predicts_compiled_oxide_vapors_without_antoine(
+    monkeypatch, species, oxide, reaction, activity_exponent, pO2_exponent
+):
+    class Evaluator:
+        pO2_reference_bar = 1.0
+        valid_temperature_K = (1000.0, 1000.0)
+
+        def evaluate(self, temperature_K, *, source_activity, pO2_bar):
+            assert temperature_K == 1000.0
+            assert source_activity == 1.0
+            assert pO2_bar == 1.0
+            return SimpleNamespace(pressure_pa=10.0, out_of_range=False)
+
+    class Catalog:
+        def evaluator_for_hot_train(self, species_id):
+            assert species_id == species
+            return Evaluator()
+
+    sim = _typed_omission_sim(
+        oxide_vapors={
+            species: {
+                'parent_oxide': oxide,
+                'fit_target': 'standard_reaction_term',
+                'reference_pressure_model': {'evaluator_family': 'nasa_cea_9'},
+                'valid_range_K': [1000.0, 1000.0],
+                'reaction': {'formula': reaction},
+                'oxide_activity_exponent': activity_exponent,
+                'pO2_exponent': pO2_exponent,
+                'pO2_reference_bar': 1.0,
+            }
+        },
+        species=(),
+    )
+    sim.vapour_rail_catalog = Catalog()
+    oxide_activity = SimpleNamespace(
+        activity=0.5,
+        warning=None,
+        thermodynamic_parent_activity=lambda: 0.5,
+        provenance=lambda: {},
+    )
+    monkeypatch.setattr(
+        equilibrium_module,
+        'melt_oxide_activity',
+        lambda *_args, **_kwargs: oxide_activity,
+    )
+
+    result = _run_typed_omission_sim(sim, monkeypatch)
+
+    assert species in result.vapor_pressures_Pa
+    surface_pO2 = result.diagnostics['surface_oxygen_potential_bar']
+    expected = 10.0 * 0.5**activity_exponent * (
+        surface_pO2**pO2_exponent
+    )
+    if oxide == 'MgO':
+        factor = equilibrium_module._oxide_liquid_standard_log10_factor_per_oxide(
+            'MgO', 1000.0
+        )
+        expected *= 10.0 ** (activity_exponent * factor)
+        assert species not in result.diagnostics['activity_standard_state_flags']
+    else:
+        caveat = result.diagnostics['activity_standard_state_flags'][species]
+        assert caveat['type'] == 'typed_notice'
+        assert caveat['kind'] == 'engine_model_caveat'
+        assert caveat['conversion_applied'] is False
+    assert result.vapor_pressures_Pa[species] == pytest.approx(expected)
+
+
+def test_internal_analytical_ca_channels_keep_estimates_at_3700k(monkeypatch):
+    class Evaluator:
+        pO2_reference_bar = 1.0
+        valid_temperature_K = (1757.0, 2273.15)
+
+        def evaluate(self, temperature_K, *, source_activity, pO2_bar):
+            assert temperature_K == 3700.0
+            assert source_activity == 1.0
+            assert pO2_bar == 1.0
+            return SimpleNamespace(pressure_pa=10.0, out_of_range=True)
+
+    class Catalog:
+        def evaluator_for_hot_train(self, species):
+            assert species == 'Ca2'
+            return Evaluator()
+
+    ca_metal = {
+        'parent_oxide': 'CaO',
+        'pure_component_antoine': {'A': 0.0, 'B': 0.0, 'C': 0.0},
+        'valid_range_K': [1000.0, 3000.0],
+    }
+    ca2_vapor = {
+        'parent_oxide': 'CaO',
+        'fit_target': 'standard_reaction_term',
+        'reference_pressure_model': {'evaluator_family': 'nasa_cea_9'},
+        'valid_range_K': [1757.0, 2273.15],
+        'reaction': {'formula': '2 CaO(cr) -> Ca2(g) + O2(g)'},
+        'oxide_activity_exponent': 2.0,
+        'pO2_exponent': -1.0,
+        'pO2_reference_bar': 1.0,
+    }
+    sim = _typed_omission_sim(
+        metals={'Ca': ca_metal},
+        oxide_vapors={'Ca2': ca2_vapor},
+        species=('Ca',),
+    )
+    sim.melt.temperature_C = 3700.0 - CELSIUS_TO_KELVIN_OFFSET
+    sim.vapour_rail_catalog = Catalog()
+    oxide_activity = SimpleNamespace(
+        activity=0.5,
+        warning=None,
+        equivalent_parent_activity=lambda exponent: 0.5 ** (1.0 / exponent),
+        thermodynamic_parent_activity=lambda: 0.5,
+        provenance=lambda: {},
+    )
+    monkeypatch.setattr(
+        equilibrium_module,
+        'melt_oxide_activity',
+        lambda *_args, **_kwargs: oxide_activity,
+    )
+
+    result = _run_typed_omission_sim(sim, monkeypatch)
+
+    assert result.status == 'ok'
+    assert {'Ca', 'Ca2'} <= result.vapor_pressures_Pa.keys()
+    for species in ('Ca', 'Ca2'):
+        caveat = result.diagnostics['activity_standard_state_flags'][species]
+        assert caveat['type'] == 'typed_notice'
+        assert caveat['kind'] == 'engine_model_caveat'
+        assert caveat['conversion_applied'] is False
+    assert (
+        result.diagnostics['extrapolated_beyond_valid_range_K']['Ca2'][
+            'authority_level'
+        ]
+        == 'extrapolated'
+    )
+
+
+def test_internal_analytical_unresolved_mgo_standard_state_keeps_prediction(
     monkeypatch,
 ):
     from simulator.reference_data import janaf
@@ -539,9 +698,9 @@ def test_internal_analytical_unresolved_mgo_standard_state_is_typed_and_omitted(
     flag = result.diagnostics["activity_standard_state_flags"]["Mg"]
 
     assert flag["type"] == "typed_notice"
-    assert flag["kind"] == "standard_state_mismatch_unresolved"
+    assert flag["kind"] == "engine_model_caveat"
     assert flag["conversion_applied"] is False
-    assert "Mg" not in result.vapor_pressures_Pa
+    assert "Mg" in result.vapor_pressures_Pa
 
 
 def test_internal_analytical_equal_exponent_sio_mg_ratio_cancels_fO2():

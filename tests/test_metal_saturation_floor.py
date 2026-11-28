@@ -19,11 +19,13 @@ from engines.antoine import _antoine_log10_pressure
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.ellingham_thermo import (
     ellingham_delta_g_kj_per_mol_o2,
+    ellingham_segment_for_temperature,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.fe_redox import fe_metal_saturation_log10_fO2_bar
 from simulator.metal_saturation_floor import (
+    _oxide_liquid_standard_log10_factor_per_oxide,
     melt_metal_saturation_floor_log10_fO2_bar,
 )
 from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
@@ -57,6 +59,16 @@ def _si_line_from_ellingham(temperature_K: float, a_sio2: float) -> float:
     )
 
 
+def _si_liquid_standard_line(temperature_K: float, a_sio2: float) -> float:
+    """Convert crystalline Si Ellingham K to the melt's liquid activity basis."""
+
+    return _si_line_from_ellingham(temperature_K, a_sio2) + (
+        _oxide_liquid_standard_log10_factor_per_oxide(
+            "SiO2(II)", temperature_K
+        )
+    )
+
+
 def test_fe_floor_binds_while_feo_is_present() -> None:
     floor, metal = melt_metal_saturation_floor_log10_fO2_bar(
         _T_K,
@@ -75,7 +87,7 @@ def test_si_floor_binds_once_feo_activity_collapses() -> None:
         {"FeO": 1.0e-6, "SiO2": _A_SIO2},
     )
     assert metal == "Si"
-    assert floor == pytest.approx(_si_line_from_ellingham(_T_K, _A_SIO2))
+    assert floor == pytest.approx(_si_liquid_standard_line(_T_K, _A_SIO2))
     assert floor > fe_metal_saturation_log10_fO2_bar(
         _T_K,
         a_feo_stoich=1.0e-6,
@@ -87,7 +99,7 @@ def test_si_floor_binds_once_feo_activity_collapses() -> None:
         {"SiO2": 1.0},
     )
     assert pure_metal == "Si"
-    assert pure == pytest.approx(_si_line_from_ellingham(_T_K, 1.0))
+    assert pure == pytest.approx(_si_liquid_standard_line(_T_K, 1.0))
     assert pure < feo_iw_log10_fO2_bar(_T_K) - 11.0
     # 1800 K is Si(l) + O2 -> SiO2(l), about 8.4 dex below IW.
     liquid, liquid_metal = melt_metal_saturation_floor_log10_fO2_bar(
@@ -97,6 +109,35 @@ def test_si_floor_binds_once_feo_activity_collapses() -> None:
     assert liquid_metal == "Si"
     iw_1800 = feo_iw_log10_fO2_bar(1800.0)
     assert iw_1800 - 10.0 < liquid < iw_1800 - 8.0
+
+
+def test_cr_floor_converts_crystalline_k_to_liquid_activity_basis() -> None:
+    temperature_K = 2156.15
+    activity = 0.5
+    segment = ellingham_segment_for_temperature('Cr', temperature_K)
+    delta_g_j_per_mol = (
+        ellingham_delta_g_kj_per_mol_o2('Cr', temperature_K) * J_PER_KJ
+    )
+    crystal_standard_floor = (
+        delta_g_j_per_mol
+        / (GAS_CONSTANT * temperature_K * math.log(10.0))
+        + float(segment.n_ox) * math.log10(activity)
+    )
+    floor, metal = melt_metal_saturation_floor_log10_fO2_bar(
+        temperature_K,
+        {'Cr2O3': activity},
+    )
+    liquid_standard_factor = _oxide_liquid_standard_log10_factor_per_oxide(
+        'Cr2O3', temperature_K
+    )
+
+    assert metal == 'Cr'
+    assert floor == pytest.approx(
+        crystal_standard_floor + float(segment.n_ox) * liquid_standard_factor
+    )
+    # Two Cr2O3 units enter the Ellingham reaction per three O2, so the
+    # liquid-standard correction is 2/3 of the per-formula fusion factor.
+    assert floor - crystal_standard_floor == pytest.approx(0.350, abs=0.001)
 
 
 def _crystal_si_saturation_pa(temperature_K: float) -> float:
@@ -151,12 +192,12 @@ def test_post_shuttle_si_pressure_stays_under_pure_si_saturation() -> None:
         10.0 ** notice["floor_log10_fO2_bar"],
     )
     assert dissociation_pO2_bar > 1.0e-30
-    # The dissociation log is the Ellingham Si line at the same SiO2
-    # activity the vapour path just published. For SiO2 the formula
-    # activity is that value (one cation).
+    # The dissociation log is the liquid-standard-converted Ellingham Si
+    # line at the same SiO2 activity the vapour path just published. For
+    # SiO2 the formula activity is that value (one cation).
     a_sio2 = float(result.diagnostic["activities"]["Si"])
     assert notice["floor_log10_fO2_bar"] == pytest.approx(
-        _si_line_from_ellingham(_T_K, a_sio2),
+        _si_liquid_standard_line(_T_K, a_sio2),
     )
     # a_Si = 1 on the buffer, so the corollary is P_Si <= P_sat,Si.
     # The published channel is the CEA reaction SiO2(l) -> Si(g) + O2,

@@ -449,7 +449,10 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
     # Mn beta->gamma (1360 K) and gamma->delta (1410 K) allotrope
     # transitions; reconstructed tail is exact by construction. Sanity:
     # dG(2000 K) = -463.240 kJ/mol O2. Reconstructed segments are
-    # deliberately tagged non-authoritative.
+    # deliberately tagged non-authoritative. The 2058 K split changes only
+    # the labelled oxide phase range: both upper segments carry identical
+    # coefficients and source rows, so the label does not ground a liquid-MnO
+    # standard Gibbs energy or remove the activity-reference caveat.
     "Mn": (
         EllinghamFitSegment(
             -772.183333333,
