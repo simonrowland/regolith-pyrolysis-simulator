@@ -2924,6 +2924,39 @@ def test_render_stamp_rejects_page_or_figure_mismatch(key, value, reason):
     assert reason in by_kind["unattested_sample"].detail
 
 
+def test_render_verification_identity_trims_figure_consistently():
+    doc = _figure_read_extract()
+    doc["fidelity_samples"][0]["verification"]["figure"] = " 1 "
+
+    warnings = vle.fidelity_source_warnings(doc, label="trimmed-render-figure")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert "unattested_sample" not in by_kind
+
+
+def test_legacy_untrimmed_attestation_check_makes_figure_identity_regression_fail(
+    monkeypatch,
+):
+    original = vle._sample_attestation_defects
+
+    def legacy_untrimmed_attestation(sample, **kwargs):
+        defects = original(sample, **kwargs)
+        locator = sample.get("locator")
+        verification = sample.get("verification")
+        if (
+            isinstance(locator, dict)
+            and isinstance(verification, dict)
+            and str(verification.get("figure")) != str(locator.get("figure"))
+        ):
+            defects.append("figure-read verification figure disagrees with its locator")
+        return defects
+
+    monkeypatch.setattr(vle, "_sample_attestation_defects", legacy_untrimmed_attestation)
+
+    with pytest.raises(AssertionError):
+        test_render_verification_identity_trims_figure_consistently()
+
+
 def test_render_record_accepts_source_locator_alias():
     doc = _figure_read_extract()
     sample = doc["fidelity_samples"][0]
@@ -3239,6 +3272,105 @@ def test_text_locator_accepts_an_inline_page_header_folio(tmp_path):
     assert "unattested_sample" not in by_kind
     assert "source_blind_pin" not in by_kind
     assert "uncovered_observation" not in by_kind
+
+
+def test_figure_text_locator_requires_a_page_bound_span_or_supported_cell(
+    tmp_path,
+):
+    doc = _render_partition_extract_with_temperature()
+    source = tmp_path / "text" / "render-leaf-source.txt"
+    source.parent.mkdir()
+    source.write_text(
+        "136\nIntroduction\n\f137\nTemperature 1630 C.\n\f138\nClosing\n"
+    )
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    locator = _render_leaf_locator("text/render-leaf-source.txt")
+    doc["fidelity_samples"][0]["verification"]["locators"][path] = locator
+
+    baseline_errors = vle.certify_extract_source_fidelity(
+        doc, label="page-bound-render-text", artifact_root=tmp_path
+    )
+    assert not any("source_blind_pin" in error for error in baseline_errors)
+    stored_value = doc["species"]["Fe"]["observations"][0]["values"]["T_C"]
+    source_before = source.read_bytes()
+
+    locator.update(
+        {
+            "page": 999,
+            "published_page": 999,
+            "table": "1",
+            "row": "Temperature",
+            "column": "T_C",
+        }
+    )
+    locator.pop("line_range")
+
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="unbound-render-text", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    blind = vle._locator_source_blind_reason(
+        {"value": stored_value, "locator": locator},
+        artifact_root=tmp_path,
+        corpus_root=None,
+        require_page_folio_binding=True,
+        source_page_folios={2: 137},
+    )
+    assert source.read_bytes() == source_before
+    assert doc["species"]["Fe"]["observations"][0]["values"]["T_C"] == stored_value
+    assert "unattested_sample" in joined, joined
+    assert blind is not None
+    assert "line_range is required for page-bound prose" in blind.detail
+
+
+def test_legacy_table_label_shortcut_makes_page_bound_certification_pass(
+    tmp_path, monkeypatch
+):
+    original_locator_addresses = vle._figure_render_locator_addresses
+    original_cited_text = vle._cited_text
+
+    def legacy_locator_addresses(document, sample):
+        addresses, defects = original_locator_addresses(document, sample)
+        if addresses:
+            return addresses, defects
+        verification = sample.get("verification")
+        locators = verification.get("locators") if isinstance(verification, dict) else None
+        if not isinstance(locators, dict):
+            return addresses, defects
+        sample_key, _base, measured, measured_defects = (
+            vle._figure_render_measured_addresses(document, sample)
+        )
+        if measured_defects or sample_key is None:
+            return addresses, defects
+        for path, locator in locators.items():
+            if not isinstance(locator, dict) or locator.get("line_range") is not None:
+                continue
+            if not all(
+                isinstance(locator.get(key), (str, int))
+                and str(locator[key]).strip()
+                for key in ("table", "row", "column")
+            ):
+                continue
+            address = vle._path_evidence_address(document, path)
+            key = vle._fidelity_sample_observation_key(document, {"path": path})
+            if key == sample_key and address in measured:
+                return [address], []
+        return addresses, defects
+
+    def legacy_cited_text(full, locator, *, require_line_range=False):
+        if locator.get("line_range") is None:
+            return full, None
+        return original_cited_text(full, locator)
+
+    monkeypatch.setattr(
+        vle, "_figure_render_locator_addresses", legacy_locator_addresses
+    )
+    monkeypatch.setattr(vle, "_cited_text", legacy_cited_text)
+
+    with pytest.raises(AssertionError):
+        test_figure_text_locator_requires_a_page_bound_span_or_supported_cell(
+            tmp_path
+        )
 
 
 @pytest.mark.parametrize(
@@ -15892,9 +16024,13 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     )
     nacl = observations_named(hastie, "hastie_1981_nacl_liquid_logP_prose")
     assert nacl
-    assert _matches_declared_experiment_or_method_split(
-        nacl[0].experiment_id, "hastie-1981-pt-tms"
-    )
+    from simulator.battery.enums import MethodToken
+
+    for observation in nacl:
+        experiment = hastie.experiments[observation.experiment_id]
+        assert experiment.bench_id == table2_experiment.bench_id
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.TRANSPIRATION
     allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
     emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
     mo = experiment_named(allibert, "allibert-1981-mo-kems")

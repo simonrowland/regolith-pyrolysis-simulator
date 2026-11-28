@@ -2745,6 +2745,18 @@ def _figure_render_measured_addresses(
     return sample_key, sample_address, measured, []
 
 
+def _figure_locator_identity_mismatch(
+    locator: Mapping[str, Any], verification: Mapping[str, Any]
+) -> str | None:
+    if verification.get("page") != locator.get("page"):
+        return "page"
+    if str(verification.get("figure", "")).strip() != str(
+        locator.get("figure", "")
+    ).strip():
+        return "figure"
+    return None
+
+
 def _figure_render_record_support(
     doc: Mapping[str, Any], sample: Mapping[str, Any]
 ) -> tuple[set[str], dict[int, int], list[str]]:
@@ -2886,12 +2898,10 @@ def _figure_render_record_support(
             "figure-read render record does not uniquely bind its physical page, "
             "folio, and figure"
         ]
-    if (
-        verification.get("page") != page
-        or str(verification.get("figure", "")).strip() != figure_text
-    ):
+    identity_mismatch = _figure_locator_identity_mismatch(locator, verification)
+    if identity_mismatch:
         return set(), source_page_folios, [
-            "figure-read verification page or figure disagrees with its render record"
+            f"figure-read verification {identity_mismatch} disagrees with its locator"
         ]
 
     try:
@@ -3021,10 +3031,7 @@ def _figure_render_locator_addresses(
         has_folio = isinstance(folio, int) and not isinstance(folio, bool) and folio > 0
         line_range = locator.get("line_range")
         has_lines = _parse_line_range(line_range) is not None
-        has_table_cell = all(
-            isinstance(locator.get(key), (str, int)) and str(locator[key]).strip()
-            for key in ("table", "row", "column")
-        )
+        has_table_cell = _locator_has_html_cell_address(locator)
         if not has_page or not has_folio or not (has_lines or has_table_cell):
             defects.append(
                 f"figure-read leaf locator requires page, folio, and line or table-cell address: {path}"
@@ -3153,12 +3160,14 @@ def _sample_attestation_defects(
         )
         if not has_render_figure:
             defects.append("figure-read verification requires a figure")
-        if isinstance(locator, Mapping) and render_page != locator.get("page"):
-            defects.append("figure-read verification page disagrees with its locator")
-        if isinstance(locator, Mapping) and str(render_figure) != str(
-            locator.get("figure")
-        ):
-            defects.append("figure-read verification figure disagrees with its locator")
+        if isinstance(locator, Mapping) and isinstance(verification, Mapping):
+            identity_mismatch = _figure_locator_identity_mismatch(
+                locator, verification
+            )
+            if identity_mismatch:
+                defects.append(
+                    f"figure-read verification {identity_mismatch} disagrees with its locator"
+                )
         if doc is not None:
             cover_addresses, cover_defects = _figure_render_cover_addresses(
                 doc, sample
@@ -3609,10 +3618,15 @@ def _text_is_extract_document(text: str) -> bool:
 
 
 def _cited_text(
-    full: str, locator: Mapping[str, Any]
+    full: str,
+    locator: Mapping[str, Any],
+    *,
+    require_line_range: bool = False,
 ) -> tuple[str | None, str | None]:
-    """Prose span. A table does not use this; it is parsed whole first."""
+    """Return a prose span, optionally requiring an explicit line range."""
     if "line_range" not in locator or locator.get("line_range") is None:
+        if require_line_range:
+            return None, "line_range is required for page-bound prose"
         return full, None
     span = _parse_line_range(locator.get("line_range"))
     if span is None:
@@ -4442,6 +4456,16 @@ def _locator_source_blind_reason(
             delimiter = _tabular_delimiter(path)
             if (
                 require_page_folio_binding
+                and delimiter is not None
+                and locator.get("line_range") is None
+            ):
+                candidate_reasons.append(
+                    "figure-read table locator requires a line_range"
+                )
+                candidate_reason_codes.add("cited_span_missing")
+                break
+            if (
+                require_page_folio_binding
                 and delimiter is None
                 and locator.get("line_range") is not None
             ):
@@ -4547,7 +4571,9 @@ def _locator_source_blind_reason(
                 charge_spans = superscript_spans
                 charge_superscript = has_superscript
             elif delimiter is None:
-                cited, span_error = _cited_text(text, locator)
+                cited, span_error = _cited_text(
+                    text, locator, require_line_range=require_page_folio_binding
+                )
                 if cited is None:
                     candidate_reasons.append(
                         span_error or "cited span was not opened"
