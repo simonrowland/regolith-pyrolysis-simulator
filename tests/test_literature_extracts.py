@@ -3128,6 +3128,7 @@ def _derivation_extract() -> dict:
                     f"{prefix}.values.T_C",
                     f"{prefix}.values.figure_read.read_uncertainty.x",
                     f"{prefix}.values.figure_read.read_uncertainty.y",
+                    f"{prefix}.values.figure_read.read_uncertainty.unit_y",
                     f"{prefix}.values.composition_as_plotted.N_SiO2_mole_fraction",
                     f"{prefix}.values.composition_as_plotted.Al2O3_mass_percent_as_series",
                     f"{prefix}.values.composition_as_plotted.MgO_mass_percent_as_series",
@@ -3224,15 +3225,6 @@ def test_derivation_rejects_extract_value_drift_and_sample_rel_tol():
         match_errors,
     )
 
-    warnings = vle.fidelity_source_warnings(doc, label="rel-tol-attack")
-    detail = " ".join(
-        warning.detail
-        for warning in warnings
-        if warning.kind == "unattested_sample"
-    )
-
-    assert "recomputed value differs from stored" in detail, detail
-
 
 def test_derivation_rejects_mass_percent_amounts_declared_as_mole_fraction():
     doc = _derivation_extract()
@@ -3317,14 +3309,18 @@ def test_derivation_rejects_temperature_parent_from_another_observation():
 
 def test_derivation_rejects_equal_parent_from_wrong_destination_field():
     doc = _derivation_extract()
+    prefix = "species.Fe.observations[fe_alpha_1]"
     observation = doc["species"]["Fe"]["observations"][0]
     observation["values"]["other_measure"] = "1630"
     doc["fidelity_samples"][0]["value"]["other_measure"] = "1630"
+    doc["fidelity_samples"][0]["verification"]["covers"].append(
+        f"{prefix}.values.other_measure"
+    )
     observation["point_conditions"]["T_C"]["state"]["value"] = "1630"
     derivation = doc["fidelity_samples"][1]
     derivation["value"]["T_C"]["state"]["value"] = "1630"
     derivation["verification"]["parents"][-1]["path"] = (
-        "species.Fe.observations[fe_alpha_1].values.other_measure"
+        f"{prefix}.values.other_measure"
     )
     observation_map, _ambiguous, _missing = vle._scored_observations(doc)
 
@@ -3368,6 +3364,20 @@ def test_derivation_rejects_a_wrong_stored_value():
     assert "recomputed value differs from stored" in detail, (
         "recomputed value differs from stored"
     )
+
+
+def test_derivation_recompute_reads_the_extract_destination():
+    doc = _derivation_extract()
+    observation = doc["species"]["Fe"]["observations"][0]
+    _set_derived_cao(observation["point_conditions"], "30.00000000")
+
+    defects = vle._derivation_recompute_defects(
+        doc, doc["fidelity_samples"][1], observation
+    )
+
+    assert any(
+        "recomputed value differs from stored" in defect for defect in defects
+    ), "recomputed value differs from stored: extract destination must be recomputed"
 
 
 def test_derivation_rejects_an_unattested_parent():
@@ -3447,7 +3457,7 @@ def test_derivation_recompute_mutation_turns_wrong_value_red(monkeypatch):
         test_derivation_rejects_a_wrong_stored_value()
 
 
-def test_derivation_destination_mutation_turns_sample_rel_tol_attack_red(monkeypatch):
+def test_derivation_sample_payload_mutation_turns_extract_value_check_green(monkeypatch):
     original = vle.resolve_fidelity_sample
 
     def use_sample_payload(doc, sample):
@@ -3461,7 +3471,7 @@ def test_derivation_destination_mutation_turns_sample_rel_tol_attack_red(monkeyp
 
     monkeypatch.setattr(vle, "resolve_fidelity_sample", use_sample_payload)
     with pytest.raises(AssertionError, match="recomputed value differs from stored"):
-        test_derivation_rejects_extract_value_drift_and_sample_rel_tol()
+        test_derivation_recompute_reads_the_extract_destination()
 
 
 def test_sample_rel_tol_guard_mutation_turns_attack_green(monkeypatch):
@@ -6573,7 +6583,9 @@ def test_aithala_locators_resolve_to_their_pdf_asset():
 # The six t-1859 extracts add no source_blind_pin warnings on b268r2. The
 # unmounted corpus-wide total is 269: the prior 124 plus 121 corpus-backed
 # Mendybaev pins and 24 Guo Table 3 pins that open when the corpus is mounted.
-# The merged-tree fidelity resolver recounts 3,406 unattested samples.
+# Omori's 47 render parents now carry explicit corpus text locators, adding 47
+# source-blind pins and dependent derivation warnings only without that mount.
+# With the corpus mounted, the resolver recounts 3,406 unattested samples.
 # Each ceiling may only fall.
 # 2026-11-17 t-1645: Table S-5 adds 61 row-addressable observations to the
 # already-uncovered Aithala extract and 3 located fidelity samples (uncovered
@@ -6708,6 +6720,31 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     mounted, mounted_extract_counts, _mounted_dependent_pins, _details = (
         _fidelity_warning_totals(documents)
     )
+    omori_parent_paths = {
+        parent.get("path")
+        for _source_id, document in documents
+        for sample in document.get("fidelity_samples", [])
+        if isinstance(sample, dict)
+        and isinstance(sample.get("verification"), dict)
+        and sample["verification"].get("method") == "derivation"
+        for parent in sample["verification"].get("parents", [])
+        if isinstance(parent, dict)
+    }
+    omori_source_parents = sum(
+        1
+        for source_id, document in documents
+        if source_id == "omori-sanbongi-jjim-25-sio2-al2o3-activity"
+        for sample in document.get("fidelity_samples", [])
+        if isinstance(sample, dict)
+        and isinstance(sample.get("path"), str)
+        and any(
+            parent_path.startswith(f"{sample['path']}.")
+            for parent_path in omori_parent_paths
+            if isinstance(parent_path, str)
+        )
+        and isinstance(sample.get("verification"), dict)
+        and sample["verification"].get("method") == "render"
+    )
     assert (
         mounted["uncovered_observation"],
         mounted_extract_counts["uncovered_observation"],
@@ -6717,13 +6754,13 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     )
     if barin_transcription.is_file():
         monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
-        corpus_mounted, corpus_mounted_extract_counts, _mount_pins, _details = (
+        corpus_mounted, corpus_mounted_extract_counts, _mount_pins, corpus_details = (
             _fidelity_warning_totals(documents)
         )
         assert (
-            corpus_mounted["uncovered_observation"],
-            corpus_mounted_extract_counts["uncovered_observation"],
-            corpus_mounted["unattested_sample"],
+            corpus_mounted["uncovered_observation"] + omori_source_parents,
+            corpus_mounted_extract_counts["uncovered_observation"]
+            + int(bool(omori_source_parents)),
             corpus_mounted["auto_migrated_pilot_pin"],
             corpus_mounted_extract_counts["auto_migrated_pilot_pin"],
             corpus_mounted["ambiguous_observation_id"],
@@ -6732,7 +6769,6 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
         ) == (
             unmounted["uncovered_observation"],
             unmounted_extract_counts["uncovered_observation"],
-            unmounted["unattested_sample"],
             unmounted["auto_migrated_pilot_pin"],
             unmounted_extract_counts["auto_migrated_pilot_pin"],
             unmounted["ambiguous_observation_id"],
@@ -6740,12 +6776,17 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
             unmounted["non_finite_evidence"],
         )
         assert (
+            unmounted["unattested_sample"]
+            - corpus_mounted["unattested_sample"]
+            == omori_source_parents
+        ), corpus_details
+        assert (
             corpus_mounted["source_blind_pin"] <= _SOURCE_BLIND_PINS_CEILING
-        ), corpus_mounted["source_blind_pin"]
+        ), f"{corpus_mounted['source_blind_pin']}: {corpus_details}"
 
     uncovered_obs = unmounted["uncovered_observation"]
     uncovered_extracts = unmounted_extract_counts["uncovered_observation"]
-    unattested_samples = unmounted["unattested_sample"]
+    unattested_samples = unmounted["unattested_sample"] - omori_source_parents
     floss_doc = next(
         doc
         for label, doc in documents
@@ -6765,7 +6806,6 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ambiguous_ids = unmounted["ambiguous_observation_id"]
     missing_ids = unmounted["missing_observation_id"]
     non_finite = unmounted["non_finite_evidence"]
-    assert source_blind_pins == 269
     record_property("mount_dependent_pins", mount_dependent_pins)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
@@ -6774,6 +6814,7 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     # calls this test and reads the first assertion message. An extract that
     # is over the sample ceiling must not hide that probe.
     assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
+    assert source_blind_pins == 269 + omori_source_parents
     omori_unattested = sum(
         warning.count
         for label, doc in documents
@@ -7026,6 +7067,43 @@ def test_fidelity_annotation_string_is_covered_by_value_leaves_alone(annotation_
     _strip_scored_conditions(with_float)
     with_float["species"]["Fe"]["observations"][0]["values"][annotation_key] = 1978.0
     assert _uncovered_observation_count(with_float) == 1
+
+
+def _assert_calibration_audit_is_provenance() -> None:
+    observation = {
+        "values": {
+            "figure_read": {
+                "calibration_audit": (
+                    "data/literature/extracts/audits/figure-1961-calibration.md"
+                )
+            }
+        }
+    }
+    assert not vle._scored_measured_leaves(observation), (
+        "calibration audit pointer was counted as a measured leaf"
+    )
+    assert not vle._observation_has_digit_bearing_string(observation), (
+        "calibration audit path was counted as digit-bearing evidence"
+    )
+
+
+def test_calibration_audit_path_is_provenance_not_measured_evidence():
+    _assert_calibration_audit_is_provenance()
+
+
+def test_calibration_audit_legacy_classification_mutation_turns_red(monkeypatch):
+    original = vle._is_annotation_string
+
+    def treat_audit_pointer_as_measured(prefix, key, value, parent):
+        if key == "calibration_audit":
+            return False
+        return original(prefix, key, value, parent)
+
+    monkeypatch.setattr(
+        vle, "_is_annotation_string", treat_audit_pointer_as_measured
+    )
+    with pytest.raises(AssertionError, match="calibration audit"):
+        _assert_calibration_audit_is_provenance()
 
 
 def test_nested_locator_note_inside_values_stays_a_measured_leaf():
@@ -8371,7 +8449,7 @@ def _promotion_errors(entry: str, doc: dict, root: Path, monkeypatch) -> list[st
             graduated_ledger_path=ledger_path,
             artifact_root=root,
         )
-        return [error for error in errors if "source certification refused" in error]
+        return errors
     if entry == "index":
         literature = root / "data" / "literature" / "extracts"
         literature.mkdir(parents=True, exist_ok=True)

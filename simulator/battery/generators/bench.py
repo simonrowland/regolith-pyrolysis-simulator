@@ -477,7 +477,7 @@ def melt_activity_requests(
         )
         if (
             target.convention != ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER.value
-            or target.phase != Phase.L.value
+            or target.phase != "liquid"
             or target.component_basis not in _RAOULTIAN_ACTIVITY_COMPONENT_BASES
         ):
             gap = ReadinessGap(
@@ -494,7 +494,7 @@ def melt_activity_requests(
             source_reference = "source standard-state convention and phase are unknown"
         state = StandardState(
             convention=ReferenceStateConvention(target.convention),
-            endmember=Species(target.component_id or inputs.measured_species, Phase(target.phase)),
+            endmember=Species(target.component_id or inputs.measured_species, Phase.L),
             component_basis=target.component_basis,
             reference_pressure_bar=Decimal(str(target.reference_pressure_bar)),
         )

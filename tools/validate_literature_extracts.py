@@ -2483,7 +2483,8 @@ def _is_annotation_string(
 ) -> bool:
     """True for an extractor annotation string the evidence walk skips.
 
-    A string under an annotation key other than ``reason`` is annotation
+    A ``calibration_audit`` artifact pointer is provenance at any depth. A
+    string under another annotation key other than ``reason`` is annotation
     only as a direct child of ``values``. A ``reason`` string is annotation
     only when ``parent`` is a condition state whose ``tag`` is a non-value
     ``StateTag``, at any depth. ``tag: value`` and a mapping with no state
@@ -2491,7 +2492,11 @@ def _is_annotation_string(
     Numbers stay leaves. A nested ``locator.note`` is not a direct child
     of ``values``, so it stays a leaf.
     """
-    if not isinstance(value, str) or key not in ANNOTATION_KEYS:
+    if not isinstance(value, str):
+        return False
+    if key == "calibration_audit":
+        return True
+    if key not in ANNOTATION_KEYS:
         return False
     if key != "reason":
         return prefix == ("values",)
@@ -2704,7 +2709,7 @@ def _is_figure_read_leaf(value: Any) -> bool:
 
 
 _FIGURE_RENDER_PROVENANCE_KEYS = frozenset(
-    {"locator", "source_locator", "calibration_audit"}
+    {"locator", "source_locator"}
 )
 
 

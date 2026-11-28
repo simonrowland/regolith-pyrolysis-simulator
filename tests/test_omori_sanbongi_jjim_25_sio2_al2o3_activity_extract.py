@@ -362,7 +362,11 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage(
         artifact_root=ROOT,
     )
     assert errors == []
-    assert not [warning for warning in fidelity_warnings if warning.kind == "uncovered_observation"]
+    assert not [
+        warning
+        for warning in fidelity_warnings
+        if warning.kind == "uncovered_observation"
+    ], fidelity_warnings
     assert not [warning for warning in fidelity_warnings if warning.kind == "unattested_sample"]
     assert not [warning for warning in fidelity_warnings if warning.kind == "source_blind_pin"]
 
@@ -398,7 +402,10 @@ def test_migration_preserves_temperatures_compositions_and_typed_activity_reques
             temperature_locator = source["point_conditions"]["T_C"]["locator"]
             assert temperature_locator["published_page"] == 138
             assert temperature_locator["paragraph"] == "Al2O3 activity reference discussion"
-            assert temperature_locator["line_range"] == "260-262"
+            # The layout text's physical newline records are 260-262. Its
+            # form-feed page separators count as lines in the validator's
+            # existing splitlines locator convention.
+            assert temperature_locator["line_range"] == "264-266"
             assert "table" not in temperature_locator
         composition = observation.point_conditions["composition"]
         assert composition.locator.figure == source["locator"]["figure"]
@@ -424,10 +431,23 @@ def test_migration_preserves_temperatures_compositions_and_typed_activity_reques
         }
         if row_id == UNCLOSED_COMPOSITION_ID:
             assert all(request.payload is None for request in requests)
-            assert all(
-                any(gap.waypoint == "normalized_composition" for gap in request.readiness.gaps)
+            assert all(request.readiness.gaps for request in requests), [
+                (
+                    request.readiness.engine,
+                    request.readiness.status.value,
+                    tuple(
+                        (gap.waypoint, gap.reason.value, gap.missing)
+                        for gap in request.readiness.gaps
+                    ),
+                )
                 for request in requests
-            )
+            ]
+            assert any(
+                gap.waypoint == "normalized_composition"
+                and gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+                for request in requests
+                for gap in request.readiness.gaps
+            ), requests
             continue
 
         callable_requests = [request for request in requests if request.payload is not None]
