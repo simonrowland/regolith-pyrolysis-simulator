@@ -219,7 +219,7 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
 CACHE_SITES: dict[str, dict[str, Any]] = {
     'lru:simulator/accounting/formulas.py:tokenizations': {
         "path": 'simulator/accounting/formulas.py',
-        "line": 482,
+        "line": 483,
         "kind": 'lru',
         "name": 'tokenizations',
         "carries_disclosure": False,
