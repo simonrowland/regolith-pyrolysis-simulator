@@ -36,15 +36,32 @@ def _run_pytest(path: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def _write_harness_conftest(path: Path) -> None:
-    (path / "conftest.py").write_text(
-        'pytest_plugins = ("tests._plugins.loadgroup_order",)\n',
-        encoding="utf-8",
-    )
+def _write_harness_conftest(path: Path, hints: dict[str, float] | None = None) -> None:
+    text = 'pytest_plugins = ("tests._plugins.loadgroup_order",)\n'
+    if hints is not None:
+        # Fixture-controlled hints: mutate the plugin's hint mapping in place in the subprocess, so the
+        # hook's default argument (the same dict object) sorts by these values, not the committed file.
+        text += (
+            "from tests._plugins import loadgroup_order as _lo\n"
+            "_lo.LOADGROUP_DURATION_HINTS_SECONDS.clear()\n"
+            f"_lo.LOADGROUP_DURATION_HINTS_SECONDS.update({hints!r})\n"
+        )
+    (path / "conftest.py").write_text(text, encoding="utf-8")
 
 
 def test_collection_order_is_duration_sorted_and_deterministic(tmp_path: Path) -> None:
-    _write_harness_conftest(tmp_path)
+    # Fixture hints, independent of the committed hint file (a refresh of real durations must not break
+    # this test). magemin_fullrun_c and magemin_fullrun_a tie: a stable sort keeps file order (c before a),
+    # which differs from alphabetical order, so the tie exercises stability.
+    _write_harness_conftest(
+        tmp_path,
+        {
+            "magemin_fullrun_b": 400.0,
+            "serial": 300.0,
+            "magemin_fullrun_c": 200.0,
+            "magemin_fullrun_a": 200.0,
+        },
+    )
     (tmp_path / "test_order.py").write_text(
         """
 import pytest
@@ -80,20 +97,11 @@ def test_a(): pass
             if line.startswith("test_order.py::")
         ]
 
-    # The plugin sorts by the committed hint file, so the expected order is derived from the same hints
-    # (longest group first; stable sort keeps ungrouped tests last in file order). A hard-coded order broke
-    # when the serial hint was raised above magemin_fullrun_c (Markova budget fold, 2026-11-27).
-    from tests._plugins.loadgroup_order import LOADGROUP_DURATION_HINTS_SECONDS as hints
-
-    grouped = {
-        "test_b": "magemin_fullrun_b",
-        "test_c": "magemin_fullrun_c",
-        "test_serial": "serial",
-        "test_a": "magemin_fullrun_a",
-    }
-    assert set(grouped.values()) <= set(hints)
-    assert len({hints[g] for g in grouped.values()}) == len(grouped), "hint ties would make the order file-dependent"
-    expected = sorted(grouped, key=lambda name: -hints[grouped[name]]) + [
+    expected = [
+        "test_b",
+        "test_serial",
+        "test_c",
+        "test_a",
         "test_unknown",
         "test_unknown_2",
     ]
