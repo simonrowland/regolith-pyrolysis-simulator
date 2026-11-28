@@ -51,9 +51,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from engines.alphamelts.domain import (
+    MELTS_CASIO3_LIQUID_G0_FIELD,
+    MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS,
     MELTS_CAO_EXCHANGE_MU_FIELD,
+    MELTS_LIQUID_ACTIVITY_UNAVAILABLE,
+    MELTS_PWO_G0_FIELD,
     _canonical_oxide_activity_map_with_notices,
     canonical_melt_oxide_activity_name,
+    melts_liquid_contains_parent_oxide,
 )
 from engines.alphamelts.petthermo import (
     _PetThermoToolsExternalCallFailure,
@@ -1143,6 +1148,8 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_import_error: tuple[str, str] | None = None
         self._pet_payload_preloaded = False
         self._pet_worker: Optional[WarmEngineWorker] = None
+        self._fusion_reference_transport = None
+        self._fusion_reference_unavailable: str | None = None
         self._pet_warm_enabled = False
         self._pet_warm_timeout_s = PETTHERMOTOOLS_WARM_CALL_TIMEOUT_S
         self._engine_version: Optional[str] = None
@@ -1369,6 +1376,10 @@ class _MELTSBackendSupport(MeltBackend):
         if self._pet_worker is not None:
             self._pet_worker.close()
             self._pet_worker = None
+        if self._fusion_reference_transport is not None:
+            self._fusion_reference_transport.close()
+            self._fusion_reference_transport = None
+        self._fusion_reference_unavailable = None
 
     def _initialize_petthermotools(
         self,
@@ -5633,11 +5644,19 @@ class _MELTSBackendSupport(MeltBackend):
                                      ] = None,
                                      ) -> EquilibriumResult:
         run_result = self._select_petthermotools_run(results)
+        # PetThermoTools 0.4.5 writes the solved state to Conditions at
+        # petthermotools/MELTS.py:82 and :98-102; use it for the pWo G0 query.
         conditions = self._first_row_mapping(run_result.get('Conditions', {}))
         total_mass = self._first_number(conditions, ('mass', 'Mass'))
+        solved_temperature_C = self._first_number(
+            conditions,
+            ('temperature', 'T_C', 'temperature_C'),
+        )
+        if solved_temperature_C is None:
+            solved_temperature_C = float(temperature_C)
         solved_pressure_bar = self._first_number(
             conditions,
-            ('P_bar', 'pressure_bar', 'Pressure_bar'),
+            ('pressure', 'P_bar', 'pressure_bar', 'Pressure_bar'),
         )
         if solved_pressure_bar is None:
             solved_pressure_bar = float(pressure_bar)
@@ -5747,28 +5766,66 @@ class _MELTSBackendSupport(MeltBackend):
             )
         )
         if not activity_coefficients:
-            activity_coefficients = (
-                self._extract_activities_from_chemical_potentials(
-                    run_result,
-                    temperature_C=temperature_C,
-                )
+            (
+                activity_coefficients,
+                mapping_unavailable_reason,
+            ) = self._extract_activities_from_chemical_potentials(
+                run_result,
+                temperature_C=temperature_C,
             )
             if activity_coefficients:
                 activity_diagnostics = {
                     'diagnostic_activity_source': 'chemical_potential_mu_minus_mu0'
                 }
+            if mapping_unavailable_reason is not None:
+                activity_diagnostics[
+                    'activity_mapping_unavailable_reason'
+                ] = mapping_unavailable_reason
+                result_warnings.append(
+                    f'{mapping_unavailable_reason}: no complete liquid or '
+                    'legacy mu/mu0 source pair; activity-scaled Antoine '
+                    'fallback skipped'
+                )
         if not activity_coefficients:
-            result_warnings.append(
-                'PetThermoTools activity mapping empty (no direct table, '
-                'gamma*x, phase field, or mu/mu0 path); '
-                'activity-scaled Antoine fallback skipped'
-            )
+            if 'activity_mapping_unavailable_reason' not in activity_diagnostics:
+                result_warnings.append(
+                    'PetThermoTools activity mapping empty (no direct table, '
+                    'gamma*x, phase field, or mu/mu0 path); '
+                    'activity-scaled Antoine fallback skipped'
+                )
+        cao_fusion_values: dict[str, float] = {}
         cao_exchange_mu = self._cao_exchange_mu_from_chemical_potentials(
             run_result,
             temperature_C=temperature_C,
+            liquid_values_out=cao_fusion_values,
         )
         if cao_exchange_mu is not None:
             activity_diagnostics[MELTS_CAO_EXCHANGE_MU_FIELD] = cao_exchange_mu
+            activity_diagnostics.update(cao_fusion_values)
+            g0_casio3_liquid = cao_fusion_values.get(
+                MELTS_CASIO3_LIQUID_G0_FIELD
+            )
+            if g0_casio3_liquid is not None:
+                try:
+                    g0_pwo = self._pwo_g0_for_cao_fusion(
+                        temperature_K=(
+                            solved_temperature_C
+                            + CELSIUS_TO_KELVIN_OFFSET
+                        ),
+                        pressure_bar=solved_pressure_bar,
+                    )
+                except (
+                    ImportError,
+                    RuntimeError,
+                    ValueError,
+                    EngineWorkerTimeout,
+                    TimeoutError,
+                ):
+                    # Missing references stay absent; score.py emits the
+                    # scoped fusion-gap caveat on a scoreable CaO activity.
+                    pass
+                else:
+                    activity_diagnostics[MELTS_PWO_G0_FIELD] = g0_pwo
         selected_activity_source = str(
             activity_diagnostics.get('diagnostic_activity_source') or 'none'
         )
@@ -6239,76 +6296,147 @@ class _MELTSBackendSupport(MeltBackend):
         results: Mapping[str, object],
         *,
         temperature_C: float,
-    ) -> dict:
-        mu = self._extract_potential_mapping(
-            results,
-            (
-                'chemical_potentials',
-                'chem_potentials',
-                'mu',
-                'mu_oxides',
-                'oxide_mu',
-            ),
-            ('_mu', '_chemical_potential'),
+    ) -> tuple[dict[str, float], str | None]:
+        liquid_mu, liquid_mu0 = self._selected_liquid_potential_mappings(results)
+
+        def first_legacy_potential_mapping(
+            names: tuple[str, ...],
+        ) -> tuple[dict[str, float], bool]:
+            source_seen = False
+            for name in names:
+                row = self._first_row_mapping(results.get(name, {}))
+                source_seen = source_seen or bool(row)
+                mapping = {
+                    str(species): float(value)
+                    for species, value in row.items()
+                    if self._is_number(value)
+                }
+                if mapping:
+                    return mapping, source_seen
+            return {}, source_seen
+
+        legacy_mu, legacy_mu_seen = first_legacy_potential_mapping((
+            'chemical_potentials',
+            'chem_potentials',
+            'mu',
+            'mu_oxides',
+            'oxide_mu',
+        ))
+        legacy_mu0, legacy_mu0_seen = first_legacy_potential_mapping((
+            'standard_chemical_potentials',
+            'pure_chemical_potentials',
+            'reference_chemical_potentials',
+            'mu0',
+            'mu0_oxides',
+            'oxide_mu0',
+        ))
+        potential_source_seen = bool(
+            liquid_mu
+            or liquid_mu0
+            or legacy_mu_seen
+            or legacy_mu0_seen
         )
-        mu0 = self._extract_potential_mapping(
-            results,
-            (
-                'standard_chemical_potentials',
-                'pure_chemical_potentials',
-                'reference_chemical_potentials',
-                'mu0',
-                'mu0_oxides',
-                'oxide_mu0',
-            ),
-            ('_mu0', '_pure_mu', '_standard_mu', '_reference_mu'),
+        liquid_key = self._select_liquid_phase_key(results)
+        liquid_prop_key = f'{liquid_key}_prop' if liquid_key else None
+        # Other phase tables can establish that potentials were emitted but
+        # can never contribute values to a liquid activity.
+        for name, table in results.items():
+            if not str(name).endswith('_prop') or name == liquid_prop_key:
+                continue
+            if any(
+                str(field).startswith(('mu_', 'mu0_'))
+                for field in self._first_row_mapping(table)
+            ):
+                potential_source_seen = True
+                break
+        if not potential_source_seen:
+            return {}, None
+        liquid_key = self._select_liquid_phase_key(results)
+        liquid_composition = (
+            {}
+            if liquid_key is None
+            else self._extract_liquid_composition(
+                self._first_row_mapping(results.get(liquid_key, {}))
+            )
         )
-        if not mu or not mu0:
-            return {}
+        has_calcium = melts_liquid_contains_parent_oxide(
+            liquid_composition, 'CaO'
+        )
+        calcium_bearing_species = {'CaO'} | {
+            endmember
+            for endmember, parents
+            in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.items()
+            if 'CaO' in parents
+        }
         T_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         raw_activities: Dict[str, float] = {}
-        for species, mu_i in mu.items():
-            if species not in mu0:
-                continue
-            try:
-                activity = activity_from_chem_potential(mu_i, mu0[species], T_K)
-            except (OverflowError, ValueError):
-                continue
-            if activity > 0.0 and math.isfinite(activity):
-                raw_activities[str(species)] = activity
-        return raw_activities
+        unpaired_source = False
+        # Each producer is an independent potential basis. Never fill one
+        # side of a liquid pair from the legacy maps, or vice versa.
+        for mu_source, mu0_source, is_selected_liquid in (
+            (liquid_mu, liquid_mu0, True),
+            (legacy_mu, legacy_mu0, False),
+        ):
+            if set(mu_source) != set(mu0_source):
+                unpaired_source = True
+            for species in mu_source.keys() & mu0_source.keys():
+                species_name = str(species)
+                calcium_identity = (
+                    canonical_melt_oxide_activity_name(species_name)
+                    or species_name
+                )
+                if (
+                    not is_selected_liquid
+                    and calcium_identity in calcium_bearing_species
+                ):
+                    continue
+                compound_parents = MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.get(
+                    species_name, ()
+                )
+                if not has_calcium and 'CaO' in compound_parents:
+                    continue
+                try:
+                    activity = activity_from_chem_potential(
+                        float(mu_source[species]),
+                        float(mu0_source[species]),
+                        T_K,
+                    )
+                except (OverflowError, TypeError, ValueError):
+                    continue
+                if activity > 0.0 and math.isfinite(activity):
+                    raw_activities.setdefault(str(species), activity)
+        return (
+            raw_activities,
+            (
+                MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+                if unpaired_source or not raw_activities
+                else None
+            ),
+        )
 
     def _cao_exchange_mu_from_chemical_potentials(
         self,
         results: Mapping[str, object],
         *,
         temperature_C: float,
+        liquid_values_out: dict[str, float] | None = None,
     ) -> float | None:
         """Return μ(CaSiO3)-μ(SiO2) only for a positive provider pair.
 
-        alphaMELTS may expose direct activities or its μ/μ0 maps. The latter
-        provide the absolute component chemical potentials needed by d-476;
-        a bare activity ratio has only the hypothetical liquid reference and
-        cannot be relabelled as the source's solid CaO activity.
+        PetThermoTools reports phase-specific ``mu_`` and ``mu0_`` columns in
+        the selected liquid's ``_prop`` row. The liquid composition guards the
+        maps: a Ca-free liquid has no CaO exchange potential, even when a
+        hypothetical endmember activity could be computed from a finite pair.
         """
 
-        mu = self._extract_potential_mapping(
-            results,
-            ('chemical_potentials', 'chem_potentials', 'mu', 'mu_oxides', 'oxide_mu'),
-            ('_mu', '_chemical_potential'),
-        )
-        mu0 = self._extract_potential_mapping(
-            results,
-            (
-                'standard_chemical_potentials',
-                'pure_chemical_potentials',
-                'reference_chemical_potentials',
-                'mu0',
-                'mu0_oxides',
-                'oxide_mu0',
-            ),
-            ('_mu0', '_pure_mu', '_standard_mu', '_reference_mu'),
-        )
+        liquid_key = self._select_liquid_phase_key(results)
+        if liquid_key is None:
+            return None
+        liquid_row = self._first_row_mapping(results.get(liquid_key, {}))
+        liquid_composition = self._extract_liquid_composition(liquid_row)
+        if not melts_liquid_contains_parent_oxide(liquid_composition, 'CaO'):
+            return None
+        mu, mu0 = self._selected_liquid_potential_mappings(results)
         pair = ('CaSiO3', 'SiO2')
         if not all(name in mu and name in mu0 for name in pair):
             return None
@@ -6322,43 +6450,73 @@ class _MELTSBackendSupport(MeltBackend):
                 return None
             if not math.isfinite(activity) or activity <= 0.0:
                 return None
+        if liquid_values_out is not None:
+            liquid_values_out[MELTS_CASIO3_LIQUID_G0_FIELD] = float(
+                mu0['CaSiO3']
+            )
         mu_cao = mu['CaSiO3'] - mu['SiO2']
         return mu_cao if math.isfinite(mu_cao) else None
 
-    def _extract_potential_mapping(
+    def _selected_liquid_potential_mappings(
         self,
         results: Mapping[str, object],
-        keys: tuple[str, ...],
-        suffixes: tuple[str, ...],
-    ) -> dict:
-        for key in keys:
-            if key in results:
-                row = self._first_row_mapping(results[key])
-                mapped = {
-                    str(species): float(value)
-                    for species, value in row.items()
-                    if self._is_number(value)
-                }
-                if mapped:
-                    return mapped
-        potentials: Dict[str, float] = {}
-        for key, value in results.items():
-            name = str(key)
-            if not name.endswith('_prop'):
-                continue
-            row = self._first_row_mapping(value)
-            for prop_name, prop_value in row.items():
-                if not self._is_number(prop_value):
-                    continue
-                prop = str(prop_name)
-                prop_lower = prop.lower()
-                for suffix in suffixes:
-                    if prop_lower.endswith(suffix):
-                        species = prop[: -len(suffix)]
-                        if species:
-                            potentials[species] = float(prop_value)
-                        break
-        return potentials
+    ) -> tuple[dict[str, float], dict[str, float]]:
+        liquid_key = self._select_liquid_phase_key(results)
+        if liquid_key is None:
+            return {}, {}
+        prop_key = f'{liquid_key}_prop'
+        properties = self._first_row_mapping(results.get(prop_key, {}))
+        # PetThermoTools 0.4.5 selects ``liquid1`` into PhaseList at
+        # petthermotools/MELTS.py:93-96, builds its phase-specific
+        # ``liquid1_prop`` columns at :111-121, and reads each ``mu``/``mu0``
+        # field for that same phase at :127-133. Use only that selected
+        # liquid table; a solid *_prop row is never a liquid potential.
+        mu = {
+            str(name)[3:]: float(value)
+            for name, value in properties.items()
+            if str(name).startswith('mu_') and self._is_number(value)
+        }
+        mu0 = {
+            str(name)[4:]: float(value)
+            for name, value in properties.items()
+            if str(name).startswith('mu0_') and self._is_number(value)
+        }
+        return mu, mu0
+
+    def _pwo_g0_for_cao_fusion(
+        self,
+        *,
+        temperature_K: float,
+        pressure_bar: float,
+    ) -> float:
+        """Read Berman pWo G0 through the isolated shared MELTS worker."""
+        if self._fusion_reference_unavailable is not None:
+            raise ImportError(self._fusion_reference_unavailable)
+        transport = self._fusion_reference_transport
+        if transport is None:
+            from engines.alphamelts.thermoengine import ThermoEngineTransport
+
+            transport = ThermoEngineTransport(
+                model_name=self._model,
+                activity_converter=activity_from_chem_potential,
+            )
+            try:
+                transport.initialize()
+            except (ImportError, RuntimeError, ValueError) as exc:
+                self._fusion_reference_unavailable = (
+                    f'{type(exc).__name__}: {exc}'
+                )
+                transport.close()
+                raise
+            self._fusion_reference_transport = transport
+        pwo = transport.pure_phase_properties(
+            'pWo',
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+        )
+        if pwo.G_J_mol is None or not math.isfinite(float(pwo.G_J_mol)):
+            raise ValueError('ThermoEngine pWo G is absent or nonfinite')
+        return float(pwo.G_J_mol)
 
     def decompression_path(self, T_C: float, P_start_bar: float,
                            P_end_bar: float, dp_bar: float, *,

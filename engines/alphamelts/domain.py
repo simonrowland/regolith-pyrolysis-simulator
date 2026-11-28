@@ -48,6 +48,19 @@ _MELTS_OXIDE_SET = frozenset(MELTS_OXIDE_BASIS)
 MELTS_CAO_EXCHANGE_MU_FIELD = (
     'mu_CaO_J_per_mol_melts_berman_apparent'
 )
+MELTS_CAO_EXCHANGE_UNAVAILABLE = (
+    'typed-refusal:melts_cao_exchange_unavailable'
+)
+MELTS_CASIO3_FUSION_BAND_UNAVAILABLE = (
+    'typed-refusal:melts_casio3_fusion_band_unavailable'
+)
+MELTS_LIQUID_ACTIVITY_UNAVAILABLE = (
+    'typed-refusal:alphamelts_liquid_activity_unavailable'
+)
+MELTS_CASIO3_LIQUID_G0_FIELD = (
+    'g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent'
+)
+MELTS_PWO_G0_FIELD = 'g0_pWo_J_per_mol_melts_berman_apparent'
 MELTS_CASIO3_FUSION_CAVEAT_PHRASE = 'CaSiO3(l)-pWo fusion residual'
 MELTS_CASIO3_HHR_CAVEAT_PHRASE = 'Berman-vs-HHR CaSiO3(cr) reassessment'
 MELTS_ACTIVITY_BRIDGE_REFERENCES = {
@@ -524,6 +537,33 @@ def canonical_melt_oxide_activity_name(name: object) -> str | None:
     return None
 
 
+def melts_liquid_contains_parent_oxide(
+    composition: Mapping[str, object], parent_oxide: str,
+) -> bool:
+    """Whether a positive liquid component carries ``parent_oxide``.
+
+    Identity oxide coordinates count directly. Compound liquid endmembers
+    count only through the domain-owned parent map above; their activities
+    remain distinct from parent-oxide activities.
+    """
+    parent = canonical_melt_oxide_activity_name(parent_oxide)
+    if parent is None:
+        return False
+    for name, raw_amount in composition.items():
+        try:
+            amount = float(raw_amount)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not math.isfinite(amount) or amount <= 0.0:
+            continue
+        label = str(name).strip()
+        if canonical_melt_oxide_activity_name(label) == parent:
+            return True
+        if parent in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.get(label, ()):
+            return True
+    return False
+
+
 def canonical_oxide_activity_map(values: Mapping[str, object] | None) -> dict[str, float]:
     """Parent-oxide activities from reported labels.
 
@@ -782,5 +822,6 @@ __all__: Iterable[str] = (
     'MELTS_PARENT_OXIDE_NOT_ENDMEMBER',
     'canonical_melt_oxide_activity_name',
     'canonical_oxide_activity_map',
+    'melts_liquid_contains_parent_oxide',
     'melts_endmember_to_parent_oxide_activity',
 )

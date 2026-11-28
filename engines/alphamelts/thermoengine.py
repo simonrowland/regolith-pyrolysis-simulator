@@ -26,7 +26,10 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 
-from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_MU_FIELD
+from engines.alphamelts.domain import (
+    MELTS_CAO_EXCHANGE_MU_FIELD,
+    melts_liquid_contains_parent_oxide,
+)
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.engine_local_config import (
     cache_version_for,
@@ -2514,7 +2517,8 @@ print('ok')
                         else 'nonpositive_computed_activity'
                     ),
                 ))
-        if cao_exchange_out is not None:
+        calcium_present = melts_liquid_contains_parent_oxide(comp_wt, 'CaO')
+        if cao_exchange_out is not None and calcium_present:
             pair = ('CaSiO3', 'SiO2')
             if all(
                 activities.get(name, 0.0) > 0.0

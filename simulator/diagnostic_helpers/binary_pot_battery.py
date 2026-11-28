@@ -40,7 +40,11 @@ from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
-from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_MU_FIELD
+from engines.alphamelts.domain import (
+    MELTS_CASIO3_LIQUID_G0_FIELD,
+    MELTS_CAO_EXCHANGE_MU_FIELD,
+    MELTS_PWO_G0_FIELD,
+)
 from simulator.oxygen_buffers import metal_oxide_coexistence_log10_fO2_bar
 from simulator.scalar_boundary import finite_float
 from simulator.physical_constants import (
@@ -642,6 +646,8 @@ class EquilibrateCell:
     # Score JSON omits it: a mask hit must not change the payload.
     mask_hit: str | None = None
     mu_CaO_J_per_mol_melts_berman_apparent: float | None = None
+    g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent: float | None = None
+    g0_pWo_J_per_mol_melts_berman_apparent: float | None = None
 
     def to_cache_payload(self) -> str:
         """Serialize the cell without losing its Python value types."""
@@ -710,6 +716,14 @@ class EquilibrateCell:
         if self.mu_CaO_J_per_mol_melts_berman_apparent is not None:
             payload[MELTS_CAO_EXCHANGE_MU_FIELD] = (
                 self.mu_CaO_J_per_mol_melts_berman_apparent
+            )
+        if self.g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent is not None:
+            payload[MELTS_CASIO3_LIQUID_G0_FIELD] = (
+                self.g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent
+            )
+        if self.g0_pWo_J_per_mol_melts_berman_apparent is not None:
+            payload[MELTS_PWO_G0_FIELD] = (
+                self.g0_pWo_J_per_mol_melts_berman_apparent
             )
         return payload
 
@@ -833,6 +847,12 @@ class EquilibrateCell:
             mu_CaO_J_per_mol_melts_berman_apparent=finite_float(
                 payload.get(MELTS_CAO_EXCHANGE_MU_FIELD)
             ),
+            g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent=finite_float(
+                payload.get(MELTS_CASIO3_LIQUID_G0_FIELD)
+            ),
+            g0_pWo_J_per_mol_melts_berman_apparent=finite_float(
+                payload.get(MELTS_PWO_G0_FIELD)
+            ),
         )
 
     def to_engine_cache_value(self) -> Any:
@@ -882,8 +902,16 @@ class EquilibrateCell:
             list(self.invalid_gas_partial_pressure_components),
             self.backend_failure_disposition,
         ]
-        if self.mu_CaO_J_per_mol_melts_berman_apparent is not None:
-            flags.append(self.mu_CaO_J_per_mol_melts_berman_apparent)
+        if any((
+            self.mu_CaO_J_per_mol_melts_berman_apparent is not None,
+            self.g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent is not None,
+            self.g0_pWo_J_per_mol_melts_berman_apparent is not None,
+        )):
+            flags.extend((
+                self.mu_CaO_J_per_mol_melts_berman_apparent,
+                self.g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent,
+                self.g0_pWo_J_per_mol_melts_berman_apparent,
+            ))
         return [*projection, flags]
 
     def to_hot(self) -> Any:
@@ -938,7 +966,7 @@ class EquilibrateCell:
             raise ValueError("invalid compact EquilibrateCell cache value")
         base = equilibrium_cache_from_value(payload[:11])
         flags = payload[11]
-        if not isinstance(flags, list) or len(flags) not in (11, 12):
+        if not isinstance(flags, list) or len(flags) not in (11, 12, 14):
             raise ValueError("invalid compact EquilibrateCell flags")
         (
             engine_status,
@@ -953,7 +981,9 @@ class EquilibrateCell:
             invalid_components,
             failure_disposition,
         ) = flags[:11]
-        mu_cao = flags[11] if len(flags) == 12 else None
+        mu_cao = flags[11] if len(flags) in (12, 14) else None
+        g0_casio3_liquid = flags[12] if len(flags) == 14 else None
+        g0_pwo = flags[13] if len(flags) == 14 else None
         if not isinstance(raw_notices, Mapping) or not isinstance(invalid_components, list):
             raise ValueError("invalid compact EquilibrateCell notices or components")
         from simulator.melt_backend.base import decode_engine_notice_codes
@@ -988,6 +1018,8 @@ class EquilibrateCell:
             "fe_redox_split": base.get("fe_redox_split") or {},
             "backend_failure_disposition": failure_disposition,
             MELTS_CAO_EXCHANGE_MU_FIELD: mu_cao,
+            MELTS_CASIO3_LIQUID_G0_FIELD: g0_casio3_liquid,
+            MELTS_PWO_G0_FIELD: g0_pwo,
         }
         return cls.from_payload(values)
 
@@ -1753,6 +1785,16 @@ def engine_flags_from_result(
     from engines.alphamelts.domain import (
         _ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX,
     )
+
+    activity_mapping_reason = diagnostics.get(
+        "activity_mapping_unavailable_reason"
+    )
+    if isinstance(activity_mapping_reason, str) and activity_mapping_reason:
+        notices.append({
+            "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+            "authority": None,
+            "reason": activity_mapping_reason,
+        })
 
     gas_only = diagnostics.get("fo2_gas_only")
     if isinstance(gas_only, Mapping):
@@ -5633,6 +5675,12 @@ def _equilibrate_cell_uncached(
             ),
             mu_CaO_J_per_mol_melts_berman_apparent=finite_float(
                 diagnostics.get(MELTS_CAO_EXCHANGE_MU_FIELD)
+            ),
+            g0_CaSiO3_liquid_J_per_mol_melts_berman_apparent=finite_float(
+                diagnostics.get(MELTS_CASIO3_LIQUID_G0_FIELD)
+            ),
+            g0_pWo_J_per_mol_melts_berman_apparent=finite_float(
+                diagnostics.get(MELTS_PWO_G0_FIELD)
             ),
             backend_failure_disposition=(
                 None

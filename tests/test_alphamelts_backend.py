@@ -1,6 +1,7 @@
 import contextlib
 import dataclasses
 import io
+from itertools import product
 import math
 import inspect
 import os
@@ -6713,6 +6714,37 @@ def test_petthermotools_result_parser_converts_mu_to_activity():
     results = ({
         'Conditions': {'mass': 100.0},
         'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+        'olivine1': {'SiO2': 40.0, 'MgO': 50.0},
+        'olivine1_prop': {'mass': 20.0},
+        'liquid1_prop': {
+            'mass': 80.0,
+            'mu_Na': -900.0,
+            'mu_K': -1050.0,
+            'mu0_Na': -1000.0,
+            'mu0_K': -1000.0,
+        },
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
+        'K': activity_from_chem_potential(-1050.0, -1000.0, 1800.0),
+    })
+    assert result.diagnostics['diagnostic_oxide_activities'] == {}
+
+
+def test_explicit_legacy_mu_maps_keep_non_cao_activity_extraction():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
         'liquid1_prop': {'mass': 80.0},
         'olivine1': {'SiO2': 40.0, 'MgO': 50.0},
         'olivine1_prop': {'mass': 20.0},
@@ -6732,7 +6764,222 @@ def test_petthermotools_result_parser_converts_mu_to_activity():
         'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
         'K': activity_from_chem_potential(-1050.0, -1000.0, 1800.0),
     })
-    assert result.diagnostics['diagnostic_oxide_activities'] == {}
+
+
+@pytest.mark.parametrize(
+    ('mu_name', 'mu0_name'),
+    tuple(product(
+        (
+            'chemical_potentials',
+            'chem_potentials',
+            'mu',
+            'mu_oxides',
+            'oxide_mu',
+        ),
+        (
+            'standard_chemical_potentials',
+            'pure_chemical_potentials',
+            'reference_chemical_potentials',
+            'mu0',
+            'mu0_oxides',
+            'oxide_mu0',
+        ),
+    )),
+)
+def test_legacy_potential_alias_combinations_match_base_activity(
+    mu_name,
+    mu0_name,
+):
+    """The base adapter accepted each mu alias with each mu0 alias."""
+    from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_MU_FIELD
+
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 70.0, 'CaO': 30.0},
+        'liquid1_prop': {'mass': 100.0},
+        mu_name: {'Na': -900.0, 'CaSiO3': -700000.0},
+        mu0_name: {'Na': -1000.0, 'CaSiO3': -800000.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 70.0, 'CaO': 30.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
+    })
+    assert result.diagnostics.get(MELTS_CAO_EXCHANGE_MU_FIELD) is None
+
+
+def test_two_legacy_mu0_aliases_are_not_paired_as_mu_and_mu0():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Na2O': 5.0},
+        'liquid1_prop': {'mass': 100.0},
+        'standard_chemical_potentials': {'Na': -900.0},
+        'reference_chemical_potentials': {'Na': -1000.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Na2O': 5.0},
+    )
+
+    assert result.activity_coefficients == {}
+
+
+def test_unscoped_legacy_calcium_potentials_do_not_publish_raw_activities():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 70.0, 'CaO': 30.0},
+        'liquid1_prop': {'mass': 100.0},
+        'chemical_potentials': {
+            'Na': -900.0,
+            'CaO': -700000.0,
+            'CaSiO3': -710000.0,
+            'Ca3(PO4)2': -720000.0,
+        },
+        'standard_chemical_potentials': {
+            'Na': -1000.0,
+            'CaO': -800000.0,
+            'CaSiO3': -810000.0,
+            'Ca3(PO4)2': -820000.0,
+        },
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 70.0, 'CaO': 30.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
+    })
+
+
+@pytest.mark.parametrize(
+    'calcium_label',
+    ('CaO_Liq', 'a(CaO_Liq)', 'activity(CaO_Liq)'),
+)
+def test_unscoped_legacy_cao_aliases_are_not_seen_by_vapor_fallback(
+    calcium_label,
+    monkeypatch,
+):
+    from engines.alphamelts.domain import canonical_melt_oxide_activity_name
+
+    assert canonical_melt_oxide_activity_name(calcium_label) == 'CaO'
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 70.0, 'CaO': 30.0},
+        'liquid1_prop': {'mass': 100.0},
+        'chemical_potentials': {
+            'Na': -900.0,
+            calcium_label: -700000.0,
+        },
+        'standard_chemical_potentials': {
+            'Na': -1000.0,
+            calcium_label: -800000.0,
+        },
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 70.0, 'CaO': 30.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
+    })
+    fallback_inputs = []
+    fallback_resolver = backend._activity_for_vapor_species_with_composition
+
+    def observe_fallback(species, activities, account_mol, *, temperature_K=None):
+        resolved = fallback_resolver(
+            species,
+            activities,
+            account_mol,
+            temperature_K=temperature_K,
+        )
+        fallback_inputs.append((dict(activities), resolved))
+        return resolved
+
+    monkeypatch.setattr(backend, '_load_vapor_pressure_table', lambda: {
+        'Ca': {},
+    })
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine',
+        lambda *_args, **_kwargs: {'Ca': 1.0},
+    )
+    monkeypatch.setattr(
+        backend,
+        '_activity_for_vapor_species_with_composition',
+        observe_fallback,
+    )
+
+    pressures = backend._activities_times_antoine_or_fail(
+        1526.85,
+        result.activity_coefficients,
+        {'SiO2': 70.0, 'CaO': 30.0},
+        context='legacy calcium alias regression',
+        use_melt_activity_ladder=True,
+    )
+
+    assert pressures == {'Ca': 1.0}
+    assert len(fallback_inputs) == 1
+    fallback_activities, (activity, notice) = fallback_inputs[0]
+    assert all(
+        canonical_melt_oxide_activity_name(name) != 'CaO'
+        for name in fallback_activities
+    )
+    assert activity is not None
+    assert notice is not None
+    assert notice['reason'] == (
+        'alphaMELTS supplied no oxide-component activity'
+    )
+
+
+def test_petthermotools_does_not_mix_mu_and_mu0_from_different_sources():
+    from engines.alphamelts.domain import MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Na2O': 5.0},
+        'liquid1_prop': {'mass': 100.0, 'mu_Na': -900.0},
+        'chemical_potentials': {},
+        'pure_chemical_potentials': {'Na': -1000.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Na2O': 5.0},
+    )
+
+    assert result.activity_coefficients == {}
+    assert result.diagnostics['activity_mapping_unavailable_reason'] == (
+        MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+    )
 
 
 def test_petthermotools_result_parser_prefers_reported_oxide_activities():
@@ -7165,9 +7412,12 @@ def test_petthermotools_activity_extractor_selects_liquid_row_not_spinel_first()
     })
 
 
-def test_petthermotools_activity_extractor_falls_back_without_liquid_row():
+def test_petthermotools_activity_extractor_refuses_solid_potentials_without_liquid_fields():
+    from engines.alphamelts.domain import MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+
     backend = AlphaMELTSBackend()
-    expected = activity_from_chem_potential(-900.0, -1000.0, 1800.0)
+    # PetThermoTools 0.4.5 emits phase-specific ``*_prop`` tables
+    # (MELTS.py:111-133). A spinel mu/mu0 pair cannot stand in for liquid.
     results = ({
         'Conditions': {'mass': 100.0},
         'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
@@ -7175,8 +7425,11 @@ def test_petthermotools_activity_extractor_falls_back_without_liquid_row():
         'Activities': [
             {'phase': 'spinel1', 'Na2O': 0.99},
         ],
-        'chemical_potentials': {'Na2O': -900.0},
-        'pure_chemical_potentials': {'Na2O': -1000.0},
+        'spinel1': {'SiO2': 50.0, 'Al2O3': 50.0},
+        'spinel1_prop': {
+            'mu_Na2O': -900.0,
+            'mu0_Na2O': -1000.0,
+        },
     }, {})
 
     result = backend._parse_petthermotools_result(
@@ -7187,8 +7440,14 @@ def test_petthermotools_activity_extractor_falls_back_without_liquid_row():
         comp_wt={'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
     )
 
-    assert result.activity_coefficients == pytest.approx({'Na2O': expected})
-    assert result.activity_coefficients['Na2O'] != pytest.approx(0.99)
+    assert result.activity_coefficients == {}
+    assert result.diagnostics['activity_mapping_unavailable_reason'] == (
+        MELTS_LIQUID_ACTIVITY_UNAVAILABLE
+    )
+    assert any(
+        MELTS_LIQUID_ACTIVITY_UNAVAILABLE in warning
+        for warning in result.warnings
+    )
 
 
 def test_thermoengine_activity_extractor_uses_mu_minus_mu0():

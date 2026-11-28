@@ -8575,7 +8575,7 @@ def _activity_request_or_contract_refusal(
         if identity.composition is not None and identity.composition.is_value
         else None
     )
-    return None, _activity_contract_refusal(
+    refusal = _activity_contract_refusal(
         engine,
         channel=channel,
         sources=sources,
@@ -8583,6 +8583,27 @@ def _activity_request_or_contract_refusal(
         requested=requested,
         generated=generated,
     )
+    if (
+        engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+        and identity.species is not None
+        and identity.species.formula == 'CaO'
+        and requested is not None
+        and requested.value is not None
+        and requested.value.components
+    ):
+        from engines.alphamelts.domain import (
+            MELTS_CAO_EXCHANGE_UNAVAILABLE,
+            melts_liquid_contains_parent_oxide,
+        )
+
+        components = dict(requested.value.components)
+        if not melts_liquid_contains_parent_oxide(components, 'CaO'):
+            detail = dict(refusal.refusal_detail)
+            detail['candidate_unavailable_reason'] = (
+                MELTS_CAO_EXCHANGE_UNAVAILABLE
+            )
+            refusal = replace(refusal, refusal_detail=detail)
+    return None, refusal
 
 
 def _assumption_notice(
@@ -16333,6 +16354,55 @@ def _predict_with_engine(
     if status != "ok":
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
+        melts_cao_activity = (
+            engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+            and quantity is Quantity.ACTIVITY
+            and formula == "CaO"
+        )
+        if melts_cao_activity:
+            from engines.alphamelts.domain import (
+                MELTS_CAO_EXCHANGE_UNAVAILABLE,
+                MELTS_CASIO3_FUSION_CAVEAT_PHRASE,
+                MELTS_CASIO3_FUSION_BAND_UNAVAILABLE,
+            )
+
+            engine_label = (
+                "AlphaMELTS"
+                if engine is Engine.ALPHAMELTS
+                else "ThermoEngine"
+            )
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            f"{MELTS_CAO_EXCHANGE_UNAVAILABLE}: "
+                            f"{engine_label} cell refused ({typed}); "
+                            "no CaO exchange potential is available"
+                        ),
+                        origin=(
+                            "simulator.battery.score."
+                            "d476_cao_exchange_unavailable"
+                        ),
+                    ),
+                    Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            f"{MELTS_CASIO3_FUSION_BAND_UNAVAILABLE}: "
+                            f"{engine_label} "
+                            f"{MELTS_CASIO3_FUSION_CAVEAT_PHRASE} band "
+                            f"is unavailable because the cell refused ({typed})"
+                        ),
+                        origin=(
+                            "simulator.battery.score."
+                            "d476_melts_casio3_fusion_band_gap"
+                        ),
+                    ),
+                ),
+            )
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
             cell_status = str(getattr(cell, "engine_status", "") or "")
             worker_failure = _engine_worker_lifecycle_failure(cell)
@@ -16407,6 +16477,11 @@ def _predict_with_engine(
                     "exit_code": getattr(cell, "exit_code", None),
                     "exit_signal": getattr(cell, "exit_signal", None),
                     "engine_reason": getattr(cell, "engine_reason", None),
+                    **(
+                        {"candidate_unavailable_reason": "engine_crash"}
+                        if melts_cao_activity
+                        else {}
+                    ),
                 },
                 identity=identity,
                 requested_composition=requested,
@@ -16448,6 +16523,11 @@ def _predict_with_engine(
             refusal_detail={
                 "refusal_reason": typed,
                 "engine_reason": engine_side_reason,
+                **(
+                    {"candidate_unavailable_reason": typed}
+                    if melts_cao_activity
+                    else {}
+                ),
                 **(
                     {"reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value}
                     if openimcc_outside_species
@@ -16900,6 +16980,7 @@ def _predict_with_engine(
 
     magnitude: float | None = None
     converter_reason = ""
+    candidate_unavailable_reason: str | None = None
     activity_repair_warnings: tuple[str, ...] = ()
     # The melt-activity gate already required the measured species to equal
     # the admitted endmember. Compare that exact identity; never substitute a
@@ -16986,15 +17067,22 @@ def _predict_with_engine(
         # CaSiO3/SiO2 pair. The converter returns a(SiO2) from SiO2_Liq and
         # a(H2O) from H2O or H2O_Liq; element labels are not oxide activities.
         from engines.alphamelts.domain import (
+            MELTS_CAO_EXCHANGE_UNAVAILABLE,
+            MELTS_CASIO3_FUSION_CAVEAT_PHRASE,
+            MELTS_CASIO3_FUSION_BAND_UNAVAILABLE,
             MELTS_CASIO3_HHR_CAVEAT_PHRASE,
+            MELTS_CASIO3_LIQUID_G0_FIELD,
             MELTS_ACTIVITY_BRIDGE_REFERENCES,
             MELTS_CAO_EXCHANGE_MU_FIELD,
+            MELTS_PWO_G0_FIELD,
             _canonical_oxide_activity_map_with_notices,
             melts_endmember_to_parent_oxide_activity,
+            melts_liquid_contains_parent_oxide,
         )
         from simulator.melt_backend.pure_phase_janaf_score import (
             MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL,
             cao_activity_from_melts_exchange_mu,
+            casio3_fusion_model_systematic_dex,
         )
 
         if engine is Engine.ALPHAMELTS:
@@ -17024,95 +17112,81 @@ def _predict_with_engine(
             )
         )
         bridge_target = MELTS_ACTIVITY_BRIDGE_REFERENCES.get(compared)
+        liquid_composition = getattr(cell, 'liquid_composition_wt_pct', None)
+        liquid_contains_calcium = melts_liquid_contains_parent_oxide(
+            liquid_composition
+            if isinstance(liquid_composition, Mapping)
+            else {},
+            'CaO',
+        )
         positive_cao_pair = all(
             (activity := finite_float(reported.get(name))) is not None
             and activity > 0.0
             for name in ('CaSiO3', 'SiO2')
         )
         mu_cao = finite_float(getattr(cell, MELTS_CAO_EXCHANGE_MU_FIELD, None))
-        if (
-            compared == 'CaO'
-            and reference_triple == bridge_target
-            and positive_cao_pair
-            and mu_cao is not None
-        ):
-            try:
-                value, reference_extrapolated = cao_activity_from_melts_exchange_mu(
-                    float(mu_cao),
-                    float(T),
-                    phase=str(reference_phase.value),
-                )
-            except (OverflowError, TypeError, ValueError) as exc:
+        if compared == 'CaO' and reference_triple == bridge_target:
+            if not liquid_contains_calcium:
                 value = None
-                converter_reason = (
-                    f'typed-refusal:melts_cao_reference_conversion:{exc}'
+                candidate_unavailable_reason = (
+                    MELTS_CAO_EXCHANGE_UNAVAILABLE
                 )
-            else:
-                converter_reason = ''
-                if reference_extrapolated:
-                    notices = union_notices(
-                        notices,
-                        (
-                            Notice(
-                                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                                affected_quantities=(Quantity.ACTIVITY,),
-                                reason=(
-                                    'liquid CaO G0 uses the JANAF metastable '
-                                    'liquid reference below its 3200 K '
-                                    'G_liq = G_cr crossing'
-                                ),
-                                origin=(
-                                    'simulator.melt_backend.pure_phase_janaf_score.'
-                                    'melts_reference_g0_cao_kJ_mol'
-                                ),
-                                band='CaO(l) JANAF reference: T < 3200 K',
-                                authority=Authority.EXTRAPOLATED,
-                            ),
-                        ),
+                converter_reason = (
+                    f'{MELTS_CAO_EXCHANGE_UNAVAILABLE}: '
+                    'solved_liquid_does_not_establish_calcium'
+                )
+            elif mu_cao is None:
+                value = None
+                candidate_unavailable_reason = (
+                    MELTS_CAO_EXCHANGE_UNAVAILABLE
+                )
+                converter_reason = (
+                    f'{MELTS_CAO_EXCHANGE_UNAVAILABLE}: '
+                    'liquid_exchange_mu_unavailable_from_selected_route'
+                )
+            elif positive_cao_pair:
+                try:
+                    value, reference_extrapolated = (
+                        cao_activity_from_melts_exchange_mu(
+                            float(mu_cao),
+                            float(T),
+                            phase=str(reference_phase.value),
+                        )
                     )
-                if value is not None:
-                    authority = Authority.BRIDGE
-                    hhr_residual_dex = (
-                        MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL
-                        / (GAS_CONSTANT * float(T) * math.log(10.0))
+                except (OverflowError, TypeError, ValueError) as exc:
+                    value = None
+                    converter_reason = (
+                        f'typed-refusal:melts_cao_reference_conversion:{exc}'
                     )
-                    notices = union_notices(
-                        notices,
-                        (
-                            Notice(
-                                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                                affected_quantities=(Quantity.ACTIVITY,),
-                                reason=(
-                                    'Phase-specific '
-                                    f'{MELTS_CASIO3_HHR_CAVEAT_PHRASE}: '
-                                    'raw residual +3.151 kJ/mol '
-                                    'at 1400 K for cyclowollastonite (HHR table '
-                                    'through 1800 K), and +2.947 kJ/mol at '
-                                    '1000 K for wollastonite (through 1398 K). '
-                                    'HHR does not extend to the row temperature; '
-                                    'the band is frozen at the 1400 K same-phase '
-                                    'residual. Consistency disclosure only: do '
-                                    'not validate an engine against a compilation '
-                                    'it consumes. HHR (1982) is marked '
-                                    'engine_reference_input/scoring_eligible:false; '
-                                    'Berman (1988) used Haas/Hemingway data. '
-                                    'HHR pp. 49–50 reports ±0.608 kJ/mol. '
-                                    'Robie & Hemingway (1995, USGS B2131) is '
-                                    'present in the corpus.'
-                                ),
-                                origin=(
-                                    'simulator.battery.score.'
-                                    'd476_cao_activity_model_caveat'
-                                ),
-                                band=(
-                                    f'{hhr_residual_dex:+.8g} dex at '
-                                    f'{float(T):g} K from the measured '
-                                    '+3.151 kJ/mol residual at 1400 K'
+                else:
+                    converter_reason = ''
+                    if reference_extrapolated:
+                        notices = union_notices(
+                            notices,
+                            (
+                                Notice(
+                                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                                    affected_quantities=(Quantity.ACTIVITY,),
+                                    reason=(
+                                        'liquid CaO G0 uses the JANAF metastable '
+                                        'liquid reference below its 3200 K '
+                                        'G_liq = G_cr crossing'
+                                    ),
+                                    origin=(
+                                        'simulator.melt_backend.pure_phase_janaf_score.'
+                                        'melts_reference_g0_cao_kJ_mol'
+                                    ),
+                                    band='CaO(l) JANAF reference: T < 3200 K',
+                                    authority=Authority.EXTRAPOLATED,
                                 ),
                             ),
-                        ),
-                    )
-                    if engine is Engine.ALPHAMELTS:
+                        )
+                    if value is not None:
+                        authority = Authority.BRIDGE
+                        hhr_residual_dex = (
+                            MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL
+                            / (GAS_CONSTANT * float(T) * math.log(10.0))
+                        )
                         notices = union_notices(
                             notices,
                             (
@@ -17120,24 +17194,103 @@ def _predict_with_engine(
                                     kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                                     affected_quantities=(Quantity.ACTIVITY,),
                                     reason=(
-                                        'AlphaMELTS CaSiO3 fusion residual band '
-                                        'is not computed because its cell does '
-                                        'not expose liquid/pWo pure-phase G0. '
-                                        'Both engines use the shared MELTS '
-                                        'database; the ThermoEngine CaO fusion '
-                                        'band at the same T is the reference.'
+                                        'Phase-specific '
+                                        f'{MELTS_CASIO3_HHR_CAVEAT_PHRASE}: '
+                                        'raw residual +3.151 kJ/mol '
+                                        'at 1400 K for cyclowollastonite (HHR table '
+                                        'through 1800 K), and +2.947 kJ/mol at '
+                                        '1000 K for wollastonite (through 1398 K). '
+                                        'HHR does not extend to the row temperature; '
+                                        'the band is frozen at the 1400 K same-phase '
+                                        'residual. Consistency disclosure only: do '
+                                        'not validate an engine against a compilation '
+                                        'it consumes. HHR (1982) is marked '
+                                        'engine_reference_input/scoring_eligible:false; '
+                                        'Berman (1988) used Haas/Hemingway data. '
+                                        'HHR pp. 49–50 reports ±0.608 kJ/mol. '
+                                        'Robie & Hemingway (1995, USGS B2131) is '
+                                        'present in the corpus.'
                                     ),
                                     origin=(
                                         'simulator.battery.score.'
-                                        'd476_alphamelts_fusion_band_gap'
+                                        'd476_cao_activity_model_caveat'
+                                    ),
+                                    band=(
+                                        f'{hhr_residual_dex:+.8g} dex at '
+                                        f'{float(T):g} K from the measured '
+                                        '+3.151 kJ/mol residual at 1400 K'
                                     ),
                                 ),
                             ),
                         )
+            else:
+                value, converter_reason = melts_endmember_to_parent_oxide_activity(
+                    reported, compared,
+                )
         else:
             value, converter_reason = melts_endmember_to_parent_oxide_activity(
                 reported, compared,
             )
+        if (
+            compared == 'CaO'
+            and reference_triple == bridge_target
+            and liquid_contains_calcium
+        ):
+            g0_casio3_liquid = finite_float(
+                getattr(cell, MELTS_CASIO3_LIQUID_G0_FIELD, None)
+            )
+            g0_pwo = finite_float(getattr(cell, MELTS_PWO_G0_FIELD, None))
+            fusion_residual_dex = None
+            if g0_casio3_liquid is not None and g0_pwo is not None:
+                try:
+                    fusion_residual_dex = casio3_fusion_model_systematic_dex(
+                        g0_casio3_liquid - g0_pwo,
+                        float(T),
+                    )
+                except (OverflowError, TypeError, ValueError):
+                    fusion_residual_dex = None
+            engine_label = (
+                'AlphaMELTS'
+                if engine is Engine.ALPHAMELTS
+                else 'ThermoEngine'
+            )
+            if fusion_residual_dex is None:
+                fusion_notice = Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(Quantity.ACTIVITY,),
+                    reason=(
+                        f'{MELTS_CASIO3_FUSION_BAND_UNAVAILABLE}: '
+                        f'{engine_label} {MELTS_CASIO3_FUSION_CAVEAT_PHRASE} '
+                        'band could not be computed because its cell does '
+                        'not expose finite liquid/pWo pure-phase G0.'
+                    ),
+                    origin=(
+                        'simulator.battery.score.'
+                        'd476_melts_casio3_fusion_band_gap'
+                    ),
+                )
+            else:
+                # Both G0 values share the MELTS apparent basis. Their
+                # difference cancels element reference terms; the signed
+                # calorimetric residual is disclosure only and never changes
+                # μ_CaO or the scored value.
+                fusion_notice = Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(Quantity.ACTIVITY,),
+                    reason=(
+                        f'{engine_label} {MELTS_CASIO3_FUSION_CAVEAT_PHRASE} '
+                        'against Adamkovičová et al. (1980), Eq. (8)'
+                    ),
+                    origin=(
+                        'simulator.battery.score.'
+                        'd476_melts_casio3_fusion_model_caveat'
+                    ),
+                    band=(
+                        f'{fusion_residual_dex:+.8g} dex at '
+                        f'{float(T):g} K'
+                    ),
+                )
+            notices = union_notices(notices, (fusion_notice,))
         magnitude = value
     else:
         matched, activity_repair_warnings = _match_reported_species_with_notices(
@@ -17165,6 +17318,10 @@ def _predict_with_engine(
         }
         if converter_reason:
             detail["converter"] = converter_reason
+        if candidate_unavailable_reason is not None:
+            detail["candidate_unavailable_reason"] = (
+                candidate_unavailable_reason
+            )
         refusal_reason = RefusalReason.UNSUPPORTED
         if engine is Engine.OPENIMCC and quantity in _VAPOUR_EQUILIBRIUM:
             refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
@@ -18940,6 +19097,45 @@ def _compile_residual_with_lineage(
         source_relation: SourceRelation = SourceRelation.UNKNOWN,
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
+        refusal_detail = dict(detail)
+        melts_cao_candidate_unavailable_reason = None
+        if (
+            engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+            and quantity is Quantity.ACTIVITY
+            and formula == "CaO"
+            and candidate is None
+            and isinstance(detail.get('candidate_unavailable_reason'), str)
+            and detail.get('candidate_unavailable_reason')
+        ):
+            melts_cao_candidate_unavailable_reason = str(
+                detail['candidate_unavailable_reason']
+            )
+        if melts_cao_candidate_unavailable_reason is not None:
+            refusal_detail['candidate_unavailable_reason'] = (
+                melts_cao_candidate_unavailable_reason
+            )
+            if candidate is None:
+                candidate_prediction = EnginePrediction(
+                    engine=engine,
+                    channel=ENGINE_CHANNELS[engine],
+                    execution=execution,
+                    authority=Authority.REFUSED,
+                    notices=extra_notices,
+                    coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                    lineage_complete=False,
+                    refusal_reason=reason,
+                    refusal_detail={
+                        'reason': melts_cao_candidate_unavailable_reason,
+                    },
+                    identity=(
+                        reference.identity
+                        if isinstance(reference.identity, Identity)
+                        else None
+                    ),
+                )
+                candidate = candidate_observation(
+                    reference, candidate_prediction
+                )
         return _refused_residual(
             reference,
             engine,
@@ -18947,7 +19143,7 @@ def _compile_residual_with_lineage(
             rail,
             key,
             reason,
-            detail,
+            refusal_detail,
             execution,
             notices,
             check_refs=_check_refs(gates, reason),
@@ -19113,13 +19309,34 @@ def _compile_residual_with_lineage(
         and identity.reference_state is not None
         and identity.reference_state.is_unknown
     ):
+        refusal_detail: dict[str, object] = {
+            "fields": ["reference_state"],
+            "reason": "activity_reference_state_unknown",
+            "detail": identity.reference_state.reason,
+        }
+        composition = identity.composition
+        if (
+            engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+            and formula == "CaO"
+            and composition is not None
+            and composition.is_value
+            and composition.value is not None
+            and composition.value.components
+        ):
+            from engines.alphamelts.domain import (
+                MELTS_CAO_EXCHANGE_UNAVAILABLE,
+                melts_liquid_contains_parent_oxide,
+            )
+
+            if not melts_liquid_contains_parent_oxide(
+                dict(composition.value.components), "CaO"
+            ):
+                refusal_detail["candidate_unavailable_reason"] = (
+                    MELTS_CAO_EXCHANGE_UNAVAILABLE
+                )
         return _refused(
             RefusalReason.IDENTITY_UNKNOWN,
-            {
-                "fields": ["reference_state"],
-                "reason": "activity_reference_state_unknown",
-                "detail": identity.reference_state.reason,
-            },
+            refusal_detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("identity_equal", "status_match_or_mismatch"),
         )
