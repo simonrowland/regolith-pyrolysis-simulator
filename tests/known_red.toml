@@ -55,6 +55,13 @@ reason = "The d-478 fallback predicts FeO_association_gas while the separate pro
 since = "77e0254"
 
 [[test]]
+node = "tests/chemistry/test_builtin_vapor_pressure_provider.py::test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo"
+ticket = "d-478"
+tier = "pr"
+reason = "The fallback Fe pressure uses the d-478 melt-floor surface pO2 while this provider request uses transport pO2 without an intrinsic melt fO2; Fe pressure parity waits for the provider car."
+since = "77e0254"
+
+[[test]]
 node = "tests/test_sso_r_validation_map.py::test_owner_pn2_anchor_reports_current_certification_state"
 ticket = "b-1050"
 tier = "pr"
