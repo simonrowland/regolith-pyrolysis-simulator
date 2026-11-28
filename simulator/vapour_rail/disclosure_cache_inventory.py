@@ -217,6 +217,14 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
     return found
 
 CACHE_SITES: dict[str, dict[str, Any]] = {
+    'lru:simulator/accounting/formulas.py:tokenizations': {
+        "path": 'simulator/accounting/formulas.py',
+        "line": 482,
+        "kind": 'lru',
+        "name": 'tokenizations',
+        "carries_disclosure": False,
+        "how": 'Per-formula recursive memo of element tokenizations used to detect ambiguous element casing. It is local to one normalization call and does not cache evaluated chemistry results.',
+    },
     'lru:simulator/engine_cache.py:_string_bytes': {
         "path": 'simulator/engine_cache.py',
         "line": 133,
