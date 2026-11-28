@@ -80,6 +80,9 @@ def install_synthetic_binding_receipt(
             "test_fixture": "binding_admission_synthetic/synthetic-fake.json",
         }
     )
+    provenance = admission._with_current_engine_chemistry_versions(
+        identity, provenance
+    )
     _set_engine_local_config_path(
         tmp_path / "engines.local.toml",
         monkeypatch=monkeypatch,

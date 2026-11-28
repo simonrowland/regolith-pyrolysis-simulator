@@ -1506,16 +1506,15 @@ def assess_bindings(
     pin_root = Path(pin_directory)
     entries: list[dict[str, Any]] = []
     results: list[BindingAssessmentResult] = []
+    from simulator.engine_cache import EngineCacheChemistryVersionError
+
     for candidate in candidates:
-        candidate_provenance = _with_current_engine_chemistry_versions(
-            candidate.identity,
-            candidate.provenance,
-        )
         pin_path, pin = _pin_for(
             candidate.identity,
             candidate.artifact,
             pin_root,
         )
+        candidate_provenance = dict(candidate.provenance)
         status = "failed"
         reason: str | None = None
         comparison_status = "unmatched"
@@ -1526,28 +1525,47 @@ def assess_bindings(
                 f"{candidate.identity.producer_transport}"
             )
             comparison_status = "no_reviewed_pins"
-        elif candidate.error is not None:
-            reason = f"assessment probe failed: {candidate.error}"
-            comparison_status = "probe_failed"
         else:
             try:
-                projected = _projection(candidate)
-                expected = pin.get("projection")
-                if not isinstance(expected, Mapping):
-                    raise ValueError("reviewed pin projection must be a mapping")
-                if canonical_json_bytes(projected) == canonical_json_bytes(expected):
-                    comparison_status = "matched"
-                    if candidate_provenance.get(
-                        "binding_provenance_verifiable"
-                    ) is True:
-                        status = "admitted"
-                    else:
-                        reason = "install provenance unverifiable"
+                candidate_provenance = _with_current_engine_chemistry_versions(
+                    candidate.identity,
+                    candidate.provenance,
+                )
+            except EngineCacheChemistryVersionError as exc:
+                reason = f"engine chemistry version unavailable: {exc}"
+            else:
+                if candidate.error is not None:
+                    reason = f"assessment probe failed: {candidate.error}"
+                    comparison_status = "probe_failed"
                 else:
-                    reason = "canonical output projection differs from reviewed pin"
-            except Exception as exc:  # noqa: BLE001 - assessment fails closed
-                reason = f"assessment projection failed: {type(exc).__name__}: {exc}"
-                comparison_status = "projection_failed"
+                    try:
+                        projected = _projection(candidate)
+                        expected = pin.get("projection")
+                        if not isinstance(expected, Mapping):
+                            raise ValueError(
+                                "reviewed pin projection must be a mapping"
+                            )
+                        if canonical_json_bytes(projected) == canonical_json_bytes(
+                            expected
+                        ):
+                            comparison_status = "matched"
+                            if candidate_provenance.get(
+                                "binding_provenance_verifiable"
+                            ) is True:
+                                status = "admitted"
+                            else:
+                                reason = "install provenance unverifiable"
+                        else:
+                            reason = (
+                                "canonical output projection differs from "
+                                "reviewed pin"
+                            )
+                    except Exception as exc:  # noqa: BLE001 - assessment fails closed
+                        reason = (
+                            "assessment projection failed: "
+                            f"{type(exc).__name__}: {exc}"
+                        )
+                        comparison_status = "projection_failed"
         entry = {
             "identity": candidate.identity.as_dict(),
             "status": status,

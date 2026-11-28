@@ -1779,7 +1779,11 @@ def test_metallothermic_dispatch_consumes_only_phase_context_scalar_tier(
             }
         }
 
-    monkeypatch.setattr(phase_context_module, "PhaseContext", _tier_one_context)
+    monkeypatch.setattr(
+        phase_context_module,
+        "_phase_context_with_producer_versions",
+        _tier_one_context,
+    )
     result = sim._dispatch_only(
         ChemistryIntent.METALLOTHERMIC_STEP,
         control_inputs={"liquid_fraction": 0.375},

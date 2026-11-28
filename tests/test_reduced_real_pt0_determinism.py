@@ -142,6 +142,9 @@ def _select_synthetic_gate_curve_binding(
             "magemin_selected_binary": {"sha256": "a" * 64},
         },
     }
+    provenance = admission._with_current_engine_chemistry_versions(
+        identity, provenance
+    )
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,

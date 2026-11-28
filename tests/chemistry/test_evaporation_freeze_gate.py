@@ -413,6 +413,11 @@ def _write_gate_receipt_for_test(
     identity,
     provenance,
 ):
+    provenance.update(
+        admission_module._with_current_engine_chemistry_versions(
+            identity, provenance
+        )
+    )
     receipt_path = tmp_path / 'gate-origin-receipt.json'
     receipt_path.write_text(
         json.dumps(

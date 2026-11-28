@@ -58,6 +58,17 @@ _LEGACY_SELECT = """
            AND o.producer_chemistry_versions_json IN ({producer_version_placeholders})
          ORDER BY ABS({temperature_column} - ?), o.id
 """
+
+
+def _legacy_producer_version_filter(
+    connection: sqlite3.Connection,
+) -> tuple[str, tuple[str, ...]]:
+    stamps = pc._current_producer_chemistry_version_stamps(
+        connection, chemistry_versions(ENGINE_CHEMISTRY_VERSION)
+    )
+    return ",".join("?" for _ in stamps), stamps
+
+
 def _legacy_candidate_rows(
     connection: sqlite3.Connection,
     *,
@@ -66,16 +77,11 @@ def _legacy_candidate_rows(
     fO2_log: float,
     include_isothermal: bool,
 ) -> list[sqlite3.Row]:
-    producer_chemistry_version_stamps = (
-        pc._current_producer_chemistry_version_stamps(
-            connection, chemistry_versions(ENGINE_CHEMISTRY_VERSION)
-        )
+    producer_version_placeholders, producer_chemistry_version_stamps = (
+        _legacy_producer_version_filter(connection)
     )
     if not producer_chemistry_version_stamps:
         return []
-    producer_version_placeholders = ",".join(
-        "?" for _ in producer_chemistry_version_stamps
-    )
     params = (
         temperature_C,
         LIQUIDUS_MATCH_TOLERANCE_C,
@@ -874,6 +880,9 @@ def test_limit_1_on_temperature_order_selects_the_wrong_row(tmp_path):
     with sqlite3.connect(uri, uri=True) as connection:
         connection.row_factory = sqlite3.Row
         legacy_id = _legacy_selected_id(connection, max_epoch=2, **case)
+        producer_version_placeholders, producer_version_stamps = (
+            _legacy_producer_version_filter(connection)
+        )
         limited = connection.execute(
             _LEGACY_SELECT.format(
                 temperature_column=(
@@ -881,6 +890,7 @@ def test_limit_1_on_temperature_order_selects_the_wrong_row(tmp_path):
                 ),
                 scope_literal="'liquidus_surface_epoch_1'",
                 epoch_predicate="= 1",
+                producer_version_placeholders=producer_version_placeholders,
             )
             + " LIMIT 1",
             (
@@ -890,6 +900,7 @@ def test_limit_1_on_temperature_order_selects_the_wrong_row(tmp_path):
                 CONTROL_MATCH_TOLERANCE,
                 -9.0,
                 CONTROL_MATCH_TOLERANCE,
+                *producer_version_stamps,
                 1300.0,
             ),
         ).fetchone()

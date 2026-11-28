@@ -20,7 +20,7 @@ from ..melt_regime import (
     liquid_fraction_invalidity,
     melt_regime,
 )
-from ..scalar_boundary import is_declared_real_scalar
+from ..scalar_boundary import is_declared_real_scalar, require_finite_float
 
 LIQUIDUS_MATCH_TOLERANCE_C = 0.05
 COMPOSITION_MATCH_EPS = 1.0e-6
@@ -114,9 +114,9 @@ def _phase_context(
     unity fallback. Molar masses are injected to keep this helper a leaf.
     """
 
-    temperature_C = _finite(T, "T")
-    pressure_bar = _finite(P, "P")
-    fO2_log = _finite(fO2, "fO2")
+    temperature_C = require_finite_float(T, "T")
+    pressure_bar = require_finite_float(P, "P")
+    fO2_log = require_finite_float(fO2, "fO2")
     scalar = _caller_fraction(scalar_liquid_fraction)
     composition_mol = _positive_composition(composition)
     if not composition_mol:
@@ -341,7 +341,9 @@ def _uncached_grind_cache_lookup(
         liquidus_hint = (
             None
             if liquidus_temperature_C is None
-            else _finite(liquidus_temperature_C, "liquidus_temperature_C")
+            else require_finite_float(
+                liquidus_temperature_C, "liquidus_temperature_C"
+            )
         )
         off_liquidus_request = (
             liquidus_hint is not None
@@ -783,7 +785,9 @@ def _species_record(
 def _positive_composition(composition: Mapping[str, float]) -> dict[str, float]:
     cleaned: dict[str, float] = {}
     for species, raw_amount in composition.items():
-        amount = _finite(raw_amount, f"composition[{species!r}]")
+        amount = require_finite_float(
+            raw_amount, f"composition[{species!r}]"
+        )
         if amount > 0.0:
             cleaned[str(species)] = amount
     return cleaned
@@ -848,18 +852,6 @@ def _caller_fraction(value: Any) -> float | None:
             f"scalar_liquid_fraction must be within [0, 1]; got {value!r}"
         )
     return fraction
-
-
-def _finite(value: Any, name: str) -> float:
-    try:
-        if not is_declared_real_scalar(value, allow_numeric_str=True):
-            raise TypeError
-        number = float(value)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"{name} must be finite; got {value!r}") from exc
-    if not math.isfinite(number):
-        raise ValueError(f"{name} must be finite; got {value!r}")
-    return number
 
 
 __all__ = ["InvalidLiquidFractionError", "PhaseContext"]
