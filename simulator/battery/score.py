@@ -2632,6 +2632,43 @@ def _classify_flagged_notice_facts(
     return tuple(strata)
 
 
+def _residue_engine_flag_notices(
+    flags: Sequence[str],
+    *,
+    quantity: Quantity,
+    origin: str,
+) -> tuple[Notice, ...]:
+    """Translate residue engine flags into scored notices once per flag."""
+
+    notices: list[Notice] = []
+    seen: set[str] = set()
+    for flag in flags:
+        if flag in seen:
+            continue
+        seen.add(flag)
+        extrapolated = (
+            "paper-demonstrated-window" in flag
+            or flag == "openimcc_extrapolated"
+            or flag.startswith("alpha_extrapolated:")
+        )
+        fallback = flag.startswith("mass_loss_")
+        if not extrapolated and not fallback:
+            continue
+        notices.append(
+            Notice(
+                kind=(
+                    NoticeKind.OUT_OF_CERTIFIED_BAND
+                    if extrapolated
+                    else NoticeKind.FALLBACK
+                ),
+                affected_quantities=(quantity,),
+                reason=flag,
+                origin=origin,
+            )
+        )
+    return tuple(notices)
+
+
 def _residue_redox_flag_notices(
     flags: Sequence[str],
     *,
@@ -13366,20 +13403,13 @@ def _predict_mass_loss_with_residue(
             identity=identity,
         )
 
-    notices = tuple(
-        Notice(
-            kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
-                "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
-                or flag.startswith("alpha_extrapolated:")
-            ) else NoticeKind.FALLBACK),
-            affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
-            reason=flag,
-            origin=f"engine:{engine.value}",
-        )
-        for flag in result.engine_flags
-        if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
-        or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
-    ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
+    notices = _residue_engine_flag_notices(
+        result.engine_flags,
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        origin=f"engine:{engine.value}",
+    ) + omission_notices(
+        result.engine_metadata.get("below_threshold_omissions")
+    )
     notices += _residue_redox_flag_notices(
         result.engine_flags,
         quantity=Quantity.MASS_LOSS_FRACTION,
