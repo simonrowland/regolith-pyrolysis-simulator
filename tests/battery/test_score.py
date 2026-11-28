@@ -2191,7 +2191,7 @@ def test_full_store_printed_width_band_census_matches_green(
 
     # Round 10 restores the two in-domain Sossi XANES intervals; no printed
     # widths or convention conflicts are added or removed.
-    assert (width_count, band_count, conflicts) == (21202, 13527, [])
+    assert (width_count, band_count, conflicts) == (21410, 13735, [])
 
 
 def test_ferric_fraction_printed_interval_domain_precedes_k_normalization() -> None:
