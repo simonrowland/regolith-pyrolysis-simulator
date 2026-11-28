@@ -517,6 +517,13 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             state in {"resolved", "catalog_proven_zero", "closure_proven_zero"}
             for state in state_by_species.values()
         )
+        expected_refusal_reason = (
+            "capacity_member_closure_failure"
+            if case_should_refuse
+            and "unavailable_parent" in state_by_species.values()
+            and "provider_refusal" in state_by_species.values()
+            else "vapour_batch_no_debiting_pressure_outcome"
+        )
 
         for target in (sim, capacity_sim, step_sim):
             closure_partial_mbar = {}
@@ -813,9 +820,7 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
                 step_sim.step()
             except EvaporationFluxRefusal as exc:
                 assert case_should_refuse, case_name
-                assert exc.reason == (
-                    "vapour_batch_no_debiting_pressure_outcome"
-                ), case_name
+                assert exc.reason == expected_refusal_reason, case_name
             else:
                 assert not case_should_refuse, case_name
             booked_by_production_step = {
@@ -843,6 +848,9 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
         should_refuse = case_should_refuse
         assert (live_refusal is not None) is should_refuse, case_name
         assert (capacity_refusal is not None) is should_refuse, case_name
+        if should_refuse:
+            assert live_refusal.reason == expected_refusal_reason, case_name
+            assert capacity_refusal.reason == expected_refusal_reason, case_name
 
         excluded_booking_species = set(unavailable)
         if "Fe" in unavailable:
@@ -904,12 +912,8 @@ def test_b1318_two_carrier_state_matrix_keeps_peer_outcomes_independent():
             elif should_refuse:
                 assert live_refusal is not None, case_name
                 assert capacity_refusal is not None, case_name
-                assert live_refusal.reason == (
-                    "vapour_batch_no_debiting_pressure_outcome"
-                ), case_name
-                assert capacity_refusal.reason == (
-                    "vapour_batch_no_debiting_pressure_outcome"
-                ), case_name
+                assert live_refusal.reason == expected_refusal_reason, case_name
+                assert capacity_refusal.reason == expected_refusal_reason, case_name
             else:
                 assert live_flux is not None, case_name
                 assert capacity_result is not None, case_name
@@ -2017,7 +2021,7 @@ def test_capacity_shadow_refuses_unresolved_vapour_before_empty_source_solve(
     }
     resolve_error = {}
     sim._resolve_evaporation_batch_flux_state = lambda *_args, **_kwargs: (
-        {}, overlay, None, resolve_error, {}, None, overlay
+        {}, overlay, None, resolve_error, {}, None
     )
 
     def forbidden_controls(*_args, **_kwargs):
@@ -2985,6 +2989,9 @@ def test_capacity_picard_restarts_when_production_cap_proof_expires(monkeypatch)
         )
 
     assert refusal.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+    assert refusal.value.diagnostic["reason"] == (
+        "vapour_batch_no_debiting_pressure_outcome"
+    )
     assert solver_calls == 1
     assert len(resolver_overlays) == 2
     assert resolver_overlays[0]["batch_channel_states"]["Fe"] == (
@@ -2997,6 +3004,15 @@ def test_capacity_picard_restarts_when_production_cap_proof_expires(monkeypatch)
         and notice.get("reason")
         == "langmuir_surface_oxygen_balance_not_closed"
         for notice in resolver_overlays[1]["notices"]
+    )
+    assert any(
+        notice.get("kind") == "vapour_batch_unresolved"
+        and notice.get("species") == "Fe"
+        and notice.get("reason")
+        == "langmuir_surface_oxygen_balance_not_closed"
+        for notice in refusal.value.diagnostic[
+            "vapour_batch_flux_overlay"
+        ]["notices"]
     )
     availability = sim._vapour_batch_hour_availability
     assert availability["late_unavailability_restart_used"] is True
@@ -3082,6 +3098,9 @@ def test_capacity_picard_reclose_keeps_peer_when_surface_refuses_fe(monkeypatch)
                 "hour": int(sim.melt.hour),
                 "reason": unavailable["Fe"],
             })
+        sim._last_vapour_batch_selector_overlay = copy.deepcopy(
+            current_overlay
+        )
         return (
             pressures,
             current_overlay,
@@ -3089,7 +3108,6 @@ def test_capacity_picard_reclose_keeps_peer_when_surface_refuses_fe(monkeypatch)
             {},
             pressure_diagnostic,
             None,
-            copy.deepcopy(current_overlay),
         )
 
     monkeypatch.setattr(
@@ -3224,18 +3242,23 @@ def test_capacity_picard_excludes_fe_after_initial_closure_failure(
             "transport_eligibility_by_species"
         ]
     )
-    monkeypatch.setattr(
-        sim,
-        "_resolve_evaporation_batch_flux_state",
-        lambda *_args, **_kwargs: (
+    def resolve_capacity_flux_state(*_args, **_kwargs):
+        sim._last_vapour_batch_selector_overlay = copy.deepcopy(
+            selector_overlay
+        )
+        return (
             {"Fe": 0.0, "Na": 2.0},
             copy.deepcopy(selector_overlay),
             None,
             {},
             {},
             None,
-            selector_overlay,
-        ),
+        )
+
+    monkeypatch.setattr(
+        sim,
+        "_resolve_evaporation_batch_flux_state",
+        resolve_capacity_flux_state,
     )
     reclose_calls = 0
 
@@ -5196,6 +5219,7 @@ def test_picard_keeps_persistent_batch_notice_when_peer_proves_zero(
     from simulator.langmuir_surface_oxygen import (
         LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
     )
+    from simulator.evaporation import _take_vapour_batch_selector_overlay
 
     sim = _real_capacity_sim()
     sim.melt.temperature_C = 1600.0
@@ -5227,7 +5251,7 @@ def test_picard_keeps_persistent_batch_notice_when_peer_proves_zero(
         temperature_K=equilibrium.temperature_C + 273.15,
         overhead_partials_Pa={},
     )
-    selection_overlay = resolved[-1]
+    selection_overlay = _take_vapour_batch_selector_overlay(sim, resolved[1])
     k_notices = [
         notice
         for notice in selection_overlay["notices"]
@@ -5253,15 +5277,20 @@ def test_picard_keeps_persistent_batch_notice_when_peer_proves_zero(
 
     initial_overlay = copy.deepcopy(resolved[1])
     selection_overlay = copy.deepcopy(selection_overlay)
-    sim._resolve_evaporation_batch_flux_state = lambda *_args, **_kwargs: (
-        resolved[0],
-        copy.deepcopy(initial_overlay),
-        resolved[2],
-        resolved[3],
-        resolved[4],
-        resolved[5],
-        copy.deepcopy(selection_overlay),
-    )
+    def resolve_saved_batch(*_args, **_kwargs):
+        sim._last_vapour_batch_selector_overlay = copy.deepcopy(
+            selection_overlay
+        )
+        return (
+            resolved[0],
+            copy.deepcopy(initial_overlay),
+            resolved[2],
+            resolved[3],
+            resolved[4],
+            resolved[5],
+        )
+
+    sim._resolve_evaporation_batch_flux_state = resolve_saved_batch
     capacity = FiniteCapacity(0.05)
     cold_train = SimpleNamespace(
         accumulator_enabled=False,

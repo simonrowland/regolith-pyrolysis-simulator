@@ -2129,10 +2129,12 @@ def test_provider_omission_requires_explicit_failure_to_be_unavailable(
         assert flux.carrier_authority_by_species[species]["is_refused"] is True
 
 
-def test_explicit_provider_refusal_marks_missing_selected_channels_unavailable():
+def test_request_wide_provider_refusal_keeps_original_reason():
     from types import SimpleNamespace
 
     from simulator.evaporation import (
+        EvaporationFluxRefusal,
+        _provider_flux_outcome_refusal,
         _record_unavailable_provider_flux_channels,
     )
 
@@ -2150,6 +2152,8 @@ def test_explicit_provider_refusal_marks_missing_selected_channels_unavailable()
     )
 
     assert result.status == "refused"
+    assert result.diagnostic["reason"] == "invalid_melt_surface_area_m2"
+    assert "species" not in result.diagnostic
     overlay = {}
     unavailable = _record_unavailable_provider_flux_channels(
         SimpleNamespace(melt=SimpleNamespace(hour=5)),
@@ -2159,14 +2163,18 @@ def test_explicit_provider_refusal_marks_missing_selected_channels_unavailable()
         provider_status=result.status,
     )
 
-    assert unavailable == {
-        "Na": "invalid_melt_surface_area_m2",
-        "Si": "invalid_melt_surface_area_m2",
-    }
-    assert [notice["species"] for notice in overlay["notices"]] == [
-        "Na",
-        "Si",
-    ]
+    assert unavailable == {}
+    assert overlay.get("notices", []) == []
+    refusal = _provider_flux_outcome_refusal(
+        SimpleNamespace(),
+        result.status,
+        result.diagnostic,
+        unavailable,
+        overlay,
+        selector_overlay={},
+    )
+    assert isinstance(refusal, EvaporationFluxRefusal)
+    assert refusal.reason == "invalid_melt_surface_area_m2"
 
 
 @pytest.mark.parametrize(

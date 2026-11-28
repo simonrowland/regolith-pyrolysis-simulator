@@ -7957,11 +7957,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from simulator.chemistry.kernel.dto import IntentRequest
         from simulator.evaporation import (
-            _append_capacity_solve_exclusion_notice,
             EvaporationMixin,
             _provider_resolved_flux_species,
-            _provider_flux_outcome_refusal,
-            _record_unavailable_provider_flux_channels,
+            _capacity_provider_trial_decision,
+            _take_vapour_batch_selector_overlay,
             _is_interpolated_vapour_equilibrium,
             _zero_liquid_precedes_interpolation,
         )
@@ -7991,6 +7990,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         zero_liquid = _zero_liquid_precedes_interpolation(equilibrium)
         if interpolated_provenance and not zero_liquid:
+            self._last_vapour_batch_selector_overlay = None
             (
                 _pressures,
                 unresolved_overlay,
@@ -7998,11 +7998,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 unresolved_error,
                 _diagnostic,
                 _source,
-                selector_overlay,
             ) = self._resolve_evaporation_batch_flux_state(
                 equilibrium,
                 temperature_K=temperature_K,
                 interpolated_provenance=True,
+            )
+            selector_overlay = _take_vapour_batch_selector_overlay(
+                self, unresolved_overlay
             )
             outcome = EvaporationMixin._vapour_batch_resolution_outcome(
                 self,
@@ -8045,6 +8047,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         outcome = None
         capacity_bound_notice = None
         if not zero_liquid and temperature_K >= 400.0:
+            self._last_vapour_batch_selector_overlay = None
             (
                 batch_flux_pressures,
                 batch_flux_overlay,
@@ -8052,7 +8055,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 resolve_error,
                 vapor_pressure_diagnostic,
                 _effective_pressure_source,
-                selection_flux_overlay,
             ) = (
                 self._resolve_evaporation_batch_flux_state(
                     equilibrium,
@@ -8060,6 +8062,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     overhead_partials_Pa=initial_partials,
                     interpolated_provenance=interpolated_provenance,
                 )
+            )
+            selection_flux_overlay = _take_vapour_batch_selector_overlay(
+                self, batch_flux_overlay
             )
             outcome = EvaporationMixin._vapour_batch_resolution_outcome(
                 self,
@@ -8146,15 +8151,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     equilibrium,
                     capacity_restart_used=True,
                 )
-        capacity_bound_notice = _append_capacity_solve_exclusion_notice(
-            self,
-            capacity_flux_overlay,
-            resolved_species=_provider_resolved_flux_species(
-                {},
-                capacity_flux_overlay,
-                flux_pressures=batch_flux_pressures,
-            ),
-        )
         solver_molar_masses = dict(provider_molar_masses)
         availability = getattr(
             self, '_vapour_batch_hour_availability', None
@@ -8308,11 +8304,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 owns_oxygen_drive = bool(
                     reclosed.applied and reclosed.surface_pO2_bar is not None
                 )
-            capacity_bound_notice = _append_capacity_solve_exclusion_notice(
-                self,
-                iteration_overlay,
-                resolved_species=trial_resolved_species,
-            )
             iteration_controls = EvaporationMixin._evaporation_provider_controls_for_state(
                 self,
                 controls,
@@ -8335,12 +8326,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             result = provider.dispatch(request)
             diagnostic = dict(result.diagnostic or {})
-            provider_unavailable = _record_unavailable_provider_flux_channels(
+            provider_decision = _capacity_provider_trial_decision(
                 self,
+                result.status,
                 diagnostic,
                 iteration_overlay,
                 expected_species=iteration_flux_pressures or {},
-                provider_status=getattr(result, 'status', None),
+                selector_overlay=selection_flux_overlay,
+            )
+            provider_unavailable = dict(
+                provider_decision.unavailable_by_species
             )
             if provider_unavailable:
                 restart_or_refuse_capacity_members(
@@ -8348,34 +8343,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     iteration_flux_pressures or {},
                     iteration_overlay,
                     detail_key='provider_unavailable',
-                    resolved_species=_provider_resolved_flux_species(
-                        diagnostic,
-                        iteration_overlay,
-                        flux_pressures=iteration_flux_pressures,
-                    ),
+                    resolved_species=provider_decision.resolved_species,
                     restart_message=(
                         'Picard provider member became unavailable'
                     ),
                 )
-            capacity_bound_notice = _append_capacity_solve_exclusion_notice(
-                self,
-                iteration_overlay,
-                resolved_species=_provider_resolved_flux_species(
-                    diagnostic,
-                    iteration_overlay,
-                    flux_pressures=iteration_flux_pressures,
-                ),
-            )
+            capacity_bound_notice = provider_decision.bound_notice
             diagnostic['vapour_batch_flux_overlay'] = iteration_overlay
             capacity_flux_overlay = copy.deepcopy(iteration_overlay)
-            provider_refusal = _provider_flux_outcome_refusal(
-                self,
-                result.status,
-                diagnostic,
-                provider_unavailable,
-                iteration_overlay,
-                selector_overlay=selection_flux_overlay,
-            )
+            provider_refusal = provider_decision.refusal
             if provider_refusal is not None:
                 raise provider_refusal
             # Debit vector only. Rates at or below the 1e-12 kg/h floor
