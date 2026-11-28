@@ -3217,9 +3217,14 @@ class EvaporationMixin:
                 for species, pressure in closure_publication.items()
                 if species in active_species
             }
+        published_pressures = (
+            closed_pressures
+            if langmuir_surface is not None and langmuir_surface.applied
+            else closure_publication
+        )
         vapor_pressures = {
             species: pressure
-            for species, pressure in closed_pressures.items()
+            for species, pressure in published_pressures.items()
             if species in active_species
         }
         if langmuir_surface is not None and langmuir_surface.applied:
