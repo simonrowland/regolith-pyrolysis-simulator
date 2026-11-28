@@ -49,14 +49,20 @@ _CHROMIUM_OXYGEN_PER_CR_CANDIDATES = (1.0, 1.5, 3.0)
 @lru_cache(maxsize=256)
 def _cached_molar_flux_denominators(
     temperature_hex: str,
+    gas_constant_hex: str,
     channel_keys: tuple[tuple[str, str], ...],
 ) -> tuple[float, ...]:
-    """Cache the T and channel-only denominator in each molar flux."""
+    """Cache each channel denominator from its exact binary64 inputs.
+
+    The denominator is sqrt(2*pi*R*T*M); the key carries R, T, and ordered
+    species/mass pairs so neither patched constants nor distinct channels alias.
+    """
 
     temperature = float.fromhex(temperature_hex)
+    gas_constant = float.fromhex(gas_constant_hex)
     return tuple(
         math.sqrt(
-            2.0 * math.pi * GAS_CONSTANT * temperature * float.fromhex(mass_hex)
+            2.0 * math.pi * gas_constant * temperature * float.fromhex(mass_hex)
         )
         for _species, mass_hex in channel_keys
     )
@@ -177,7 +183,7 @@ def _solve_vacuum_oxygen_balance(
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
     on_accepted_evaluation: Callable[[float], None] | None = None,
     defer_pressure_law_diagnostics: Callable[
-        [Callable[[], tuple[PressureLawChannelDiagnostic, ...]], tuple[str, ...]], None
+        [Callable[[], tuple[PressureLawChannelDiagnostic, ...]]], None
     ] | None = None,
 ) -> _VacuumOxygenBalance:
     """Solve an alpha-weighted, engine-supplied vacuum pressure model.
@@ -273,7 +279,9 @@ def _solve_vacuum_oxygen_balance(
     )
     flux_denominators = dict(zip(
         (channel.species for channel in active_channels),
-        _cached_molar_flux_denominators(temperature.hex(), flux_channel_keys),
+        _cached_molar_flux_denominators(
+            temperature.hex(), float(GAS_CONSTANT).hex(), flux_channel_keys
+        ),
         strict=True,
     ))
     fixed_parent_oxygen_demands = tuple(
@@ -491,14 +499,7 @@ def _solve_vacuum_oxygen_balance(
         ):
             # These two pressure evaluations only calculate a notice payload;
             # the root, fluxes, and integrated state are already fixed above.
-            defer_pressure_law_diagnostics(
-                calculate_pressure_law_diagnostics,
-                tuple(
-                    channel.species
-                    for channel in active_channels
-                    if pressures[channel.species] > 1.0e-300
-                ),
-            )
+            defer_pressure_law_diagnostics(calculate_pressure_law_diagnostics)
         else:
             pressure_law_diagnostics = calculate_pressure_law_diagnostics()
     if on_accepted_evaluation is not None:

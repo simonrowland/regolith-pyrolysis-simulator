@@ -90,8 +90,10 @@ move melt fO2 is golden-affecting and is a separate, owner-gated step.
 
 from __future__ import annotations
 
+import hashlib
 import math
 import pathlib
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Mapping, Sequence
@@ -646,13 +648,42 @@ def _load_cea_polynomials_from_text(
     return tuple(polynomials.items())
 
 
-@lru_cache(maxsize=4)
-def _load_cea_source_text(
-    extract_path: str, mtime_ns: int, size_bytes: int
-) -> str:
-    """Read one unchanged CEA source once per process and file signature."""
+_CEA_SOURCE_TEXT_CACHE: OrderedDict[
+    str, tuple[tuple[int, int, int, int, int], str, str]
+] = OrderedDict()
 
-    return pathlib.Path(extract_path).read_text()
+
+def _load_cea_source_text(extract_path: pathlib.Path | str) -> str:
+    """Read CEA text with stat-fast reuse and digest-checked invalidation."""
+
+    path = pathlib.Path(extract_path).resolve()
+    stat = path.stat()
+    signature = (
+        int(stat.st_dev),
+        int(stat.st_ino),
+        int(stat.st_ctime_ns),
+        int(stat.st_mtime_ns),
+        int(stat.st_size),
+    )
+    path_key = str(path)
+    cached = _CEA_SOURCE_TEXT_CACHE.get(path_key)
+    # The resolved path prevents cwd-relative aliases. Device, inode, ctime,
+    # mtime, and size detect replacements and edits; a changed signature is
+    # re-read and hashed so metadata-only changes can reuse identical text.
+    if cached is not None and cached[0] == signature:
+        _CEA_SOURCE_TEXT_CACHE.move_to_end(path_key)
+        return cached[2]
+    raw = path.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if cached is not None and cached[1] == digest:
+        source_text = cached[2]
+    else:
+        source_text = raw.decode("utf-8")
+    _CEA_SOURCE_TEXT_CACHE[path_key] = (signature, digest, source_text)
+    _CEA_SOURCE_TEXT_CACHE.move_to_end(path_key)
+    while len(_CEA_SOURCE_TEXT_CACHE) > 4:
+        _CEA_SOURCE_TEXT_CACHE.popitem(last=False)
+    return source_text
 
 
 def _load_cea_polynomials(
@@ -662,10 +693,7 @@ def _load_cea_polynomials(
     requirement: str,
 ) -> dict[str, NasaCeaPolynomial]:
     path = pathlib.Path(extract_path)
-    stat = path.stat()
-    source_text = _load_cea_source_text(
-        str(extract_path), int(stat.st_mtime_ns), int(stat.st_size)
-    )
+    source_text = _load_cea_source_text(path)
     return dict(
         _load_cea_polynomials_from_text(names, source_text, requirement)
     )

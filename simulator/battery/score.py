@@ -17812,7 +17812,6 @@ def _langmuir_residue_prediction(
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
         ResidueInventoryRefusal,
-        _KNUDSEN_EXTENT_EVALUATION_LIMIT,
         predict_langmuir_residue_composition,
     )
 
@@ -17858,17 +17857,13 @@ def _langmuir_residue_prediction(
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
-        attempted = (
-            isinstance(exc, ResidueEngineNonconvergence)
-            or exc.reason == _KNUDSEN_EXTENT_EVALUATION_LIMIT
-        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
             execution=Execution(
                 state=(
                     ExecutionState.ATTEMPTED_UNAVAILABLE
-                    if attempted
+                    if isinstance(exc, ResidueEngineNonconvergence)
                     else ExecutionState.NOT_PROBED
                 )
             ),
@@ -17877,7 +17872,7 @@ def _langmuir_residue_prediction(
             lineage_complete=False,
             refusal_reason=(
                 RefusalReason.ATTEMPTED_UNAVAILABLE
-                if attempted
+                if isinstance(exc, ResidueEngineNonconvergence)
                 else RefusalReason.UNSUPPORTED
             ),
             refusal_detail={

@@ -12109,6 +12109,40 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
         predict_with_engine(Engine.PROPRIETARY_REMOTE, observation)
 
 
+def test_langmuir_budget_refusal_retains_base_classification(monkeypatch) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery import residue
+    from simulator.battery.residue import (
+        ResidueInventoryRefusal,
+        _KNUDSEN_EXTENT_EVALUATION_LIMIT,
+    )
+    from simulator.battery.score import _langmuir_residue_prediction
+
+    identity = replace(
+        F.psat_identity("Gd"),
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    )
+    reference = SimpleNamespace(
+        identity=identity,
+        source_id="synthetic-langmuir-budget",
+        experiment_id="synthetic-experiment",
+        locator=None,
+    )
+
+    def refuse(*_args, **_kwargs):
+        raise ResidueInventoryRefusal(_KNUDSEN_EXTENT_EVALUATION_LIMIT)
+
+    monkeypatch.setattr(residue, "predict_langmuir_residue_composition", refuse)
+    prediction = _langmuir_residue_prediction(
+        SimpleNamespace(experiments={}), reference, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == _KNUDSEN_EXTENT_EVALUATION_LIMIT
+
+
 def test_equilibrium_phase_composition_is_retained_but_not_predicted() -> None:
     from simulator.battery.enums import ProprietaryEngineRefusal
     from simulator.battery.score import SCORE_ENGINE_SET, predict_with_engine

@@ -12,6 +12,7 @@ from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from multiprocessing.util import Finalize
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
@@ -83,6 +84,59 @@ class ResidueInventoryRefusal(ValueError):
         self.detail = detail or reason
 
 
+@dataclass(frozen=True)
+class _CachedPressureEvaluation(Mapping[str, float]):
+    """Immutable snapshot of a pressure callback result and its metadata."""
+
+    values: Mapping[str, float]
+    fe3_over_sum_fe: float | None = None
+    fe_activity: float | None = None
+    speciation_source: str | None = None
+    below_threshold_omissions: Mapping[str, Mapping[str, object]] | None = None
+    cr_valence: object | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "values", MappingProxyType(dict(self.values)))
+        omissions = self.below_threshold_omissions
+        if isinstance(omissions, Mapping):
+            object.__setattr__(
+                self,
+                "below_threshold_omissions",
+                MappingProxyType({
+                    species: (
+                        MappingProxyType(dict(record))
+                        if isinstance(record, Mapping)
+                        else record
+                    )
+                    for species, record in omissions.items()
+                }),
+            )
+
+    @classmethod
+    def from_response(
+        cls, response: Mapping[str, float]
+    ) -> _CachedPressureEvaluation:
+        return cls(
+            values=response,
+            fe3_over_sum_fe=getattr(response, "fe3_over_sum_fe", None),
+            fe_activity=getattr(response, "fe_activity", None),
+            speciation_source=getattr(response, "speciation_source", None),
+            below_threshold_omissions=getattr(
+                response, "below_threshold_omissions", None
+            ),
+            cr_valence=getattr(response, "cr_valence", None),
+        )
+
+    def __getitem__(self, species: str) -> float:
+        return self.values[species]
+
+    def __iter__(self):
+        return iter(self.values)
+
+    def __len__(self) -> int:
+        return len(self.values)
+
+
 def _residue_oxygen_balance_failure(exc: ValueError) -> ResidueInventoryRefusal:
     detail = str(exc)
     reason = (
@@ -135,7 +189,12 @@ class ResidueEngineNonconvergence(RuntimeError):
 def _residue_pressure_state_key(
     inventory: Mapping[str, float], logp: float, temperature: float
 ) -> tuple[tuple[tuple[str, str], ...], str, str]:
-    """Identify the exact dynamic inputs to one residue pressure evaluation."""
+    """Identify one pressure evaluation's exact dynamic inputs.
+
+    The callback law depends on inventory, log10(pO2), and temperature. The
+    integration fixes the callback and channels, while float.hex preserves
+    distinct binary64 states without merging them through decimal rounding.
+    """
 
     composition = tuple(
         sorted(
@@ -1147,8 +1206,8 @@ def integrate_residue_inventory(
             try:
                 pressures = pressure_state_cache[key]
             except KeyError:
-                pressures = pressure_model(
-                    engine_inventory, float(log10_pO2_bar)
+                pressures = _CachedPressureEvaluation.from_response(
+                    pressure_model(engine_inventory, float(log10_pO2_bar))
                 )
                 pressure_state_cache[key] = pressures
             _inherit_residue_pressure_contract(pressure_at, pressure_model)
@@ -1458,14 +1517,10 @@ def integrate_knudsen_residue_inventory(
         # step-hold prediction.
         if not linear_temperature:
             evaluations = 0
-        deferred_pressure_law_diagnostics: list[
-            tuple[Callable[[], tuple], tuple[str, ...]]
-        ] = []
+        deferred_pressure_law_diagnostics: list[Callable[[], tuple]] = []
 
-        def defer_pressure_law_diagnostics(calculate, possible_species):
-            deferred_pressure_law_diagnostics.append(
-                (calculate, possible_species)
-            )
+        def defer_pressure_law_diagnostics(calculate):
+            deferred_pressure_law_diagnostics.append(calculate)
 
         def derivative(extent, amounts):
             nonlocal evaluations
@@ -1493,7 +1548,9 @@ def integrate_knudsen_residue_inventory(
                 try:
                     pressures = pressure_state_cache[key]
                 except KeyError:
-                    pressures = pressure_model(current, p, current_temperature)
+                    pressures = _CachedPressureEvaluation.from_response(
+                        pressure_model(current, p, current_temperature)
+                    )
                     pressure_state_cache[key] = pressures
                 _inherit_residue_pressure_contract(pressure_at, pressure_model)
                 return pressures
@@ -1593,34 +1650,18 @@ def integrate_knudsen_residue_inventory(
                         else:
                             state[index] = 0.0
             state = [max(0.0, v) for v in state]
-        # The pressure-law slopes only feed residue notices. Reproduce the
-        # latest diagnostic per species after solve_ivp accepts the interval,
-        # instead of probing every trial RHS state.
-        first_seen_species_order = tuple(dict.fromkeys(
-            species
-            for _calculate, possible_species in deferred_pressure_law_diagnostics
-            for species in possible_species
-        ))
-        unresolved_species = set(first_seen_species_order)
-        latest_diagnostics: dict[str, PressureLawChannelDiagnostic] = {}
-        for calculate, _possible_species in reversed(
-            deferred_pressure_law_diagnostics
-        ):
+        # These probes also validate pressures. Replay every deferred probe in
+        # RHS order; dict replacement keeps the latest value per species while
+        # its insertion order matches the base path's first diagnostic order.
+        for calculate in deferred_pressure_law_diagnostics:
             try:
                 diagnostics = calculate()
+            except ResidueInventoryRefusal:
+                raise
             except ValueError as exc:
                 raise _residue_oxygen_balance_failure(exc) from exc
-            if diagnostics:
-                for diagnostic in diagnostics:
-                    if diagnostic.species in unresolved_species:
-                        latest_diagnostics[diagnostic.species] = diagnostic
-                        unresolved_species.remove(diagnostic.species)
-            if not unresolved_species:
-                break
-        for species in first_seen_species_order:
-            diagnostic = latest_diagnostics.get(species)
-            if diagnostic is not None:
-                pressure_law_diagnostics[species] = diagnostic
+            for diagnostic in diagnostics:
+                pressure_law_diagnostics[diagnostic.species] = diagnostic
         previous_endpoint, previous_temperature = endpoint, temperature
         if xi >= target:
             break

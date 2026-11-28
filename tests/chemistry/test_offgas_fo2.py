@@ -18,6 +18,7 @@ are not equally strong evidence and should not be read as if they were:
 from __future__ import annotations
 
 import math
+import os
 
 import pytest
 
@@ -62,6 +63,49 @@ def test_buffer_polynomial_source_values_are_pinned_before_loader_reuse(polys):
         assert polys[species].evaluate(1800.0).g_over_RT == pytest.approx(
             expected, rel=0.0, abs=1e-12
         )
+
+
+def test_cea_source_cache_reloads_same_size_content_with_preserved_mtime(tmp_path):
+    from simulator.chemistry.offgas_fo2 import _load_cea_source_text
+
+    source = tmp_path / "cea.txt"
+    original_text = "alpha!"
+    replacement_text = "bravo!"
+    assert len(original_text) == len(replacement_text)
+    source.write_text(original_text)
+    original_stat = source.stat()
+
+    assert _load_cea_source_text(source) == original_text
+    source.write_text(replacement_text)
+    os.utime(source, ns=(original_stat.st_atime_ns, original_stat.st_mtime_ns))
+
+    replacement_stat = source.stat()
+    assert replacement_stat.st_size == original_stat.st_size
+    assert replacement_stat.st_mtime_ns == original_stat.st_mtime_ns
+    assert _load_cea_source_text(source) == replacement_text
+
+
+def test_cea_source_cache_resolves_relative_paths_after_cwd_change(
+    tmp_path, monkeypatch
+):
+    from simulator.chemistry.offgas_fo2 import _load_cea_source_text
+
+    first_dir = tmp_path / "first"
+    second_dir = tmp_path / "second"
+    first_dir.mkdir()
+    second_dir.mkdir()
+    timestamp_ns = 1_700_000_000_000_000_000
+    first = first_dir / "cea.txt"
+    second = second_dir / "cea.txt"
+    first.write_text("first!")
+    second.write_text("second")
+    os.utime(first, ns=(timestamp_ns, timestamp_ns))
+    os.utime(second, ns=(timestamp_ns, timestamp_ns))
+
+    monkeypatch.chdir(first_dir)
+    assert _load_cea_source_text("cea.txt") == "first!"
+    monkeypatch.chdir(second_dir)
+    assert _load_cea_source_text("cea.txt") == "second"
 
 
 # --------------------------------------------------------------------------

@@ -434,6 +434,112 @@ def test_knudsen_defers_redox_diagnostic_probes_without_changing_result(
     assert deferred_calls < immediate_calls
 
 
+@pytest.mark.parametrize(
+    ("invalid_probe", "expected_reason"),
+    (
+        ("zero", "residue_oxygen_balance_failed"),
+        ("typed", "redox_probe_invalid"),
+    ),
+)
+def test_knudsen_replays_early_invalid_redox_probe_before_later_valid_probe(
+    monkeypatch, invalid_probe, expected_reason
+) -> None:
+    from simulator.battery import residue
+
+    original_balance = residue._residue_oxygen_balance
+    root_logp = math.log10(_closed_form_pressure_root_bar(q=0.5))
+    invalid_probe_logp = root_logp - 0.1
+    run_observations = {}
+
+    def run(*, defer_diagnostics: bool):
+        pressure_calls = []
+
+        def pressure(inventory, logp, _temperature):
+            pressure_calls.append((dict(inventory), logp))
+            p_o2_bar = 10.0**logp
+            invalid_early_probe = (
+                inventory.get("FeO") == 1.0
+                and math.isclose(logp, invalid_probe_logp, abs_tol=1.0e-9)
+            )
+            if invalid_early_probe and invalid_probe == "typed":
+                raise ResidueInventoryRefusal(
+                    "redox_probe_invalid", "synthetic invalid early probe"
+                )
+            iron_pressure = (
+                0.0 if invalid_early_probe else p_o2_bar**-0.5
+            )
+            return PressureEvaluation(
+                {"Fe": iron_pressure, "O2": 1.0e5 * p_o2_bar},
+                fe3_over_sum_fe=0.5,
+                speciation_source="test",
+            )
+
+        pressure.declares_redox_active = True
+        run_observations[defer_diagnostics] = (pressure_calls, pressure)
+
+        with monkeypatch.context() as patcher:
+            if not defer_diagnostics:
+                def immediate_diagnostics(*args, **kwargs):
+                    kwargs.pop("defer_pressure_law_diagnostics", None)
+                    return original_balance(*args, **kwargs)
+
+                patcher.setattr(
+                    residue, "_residue_oxygen_balance", immediate_diagnostics
+                )
+            return integrate_knudsen_residue_inventory(
+                {"FeO": 1.0},
+                _channels(),
+                pressure,
+                temperature_path=((0.01, 1800.0),),
+                measured_mass_loss_fraction=0.01,
+                near_saturated=True,
+                source_fO2_log_by_interval=(None,),
+            )
+
+    with pytest.raises(ResidueInventoryRefusal) as base_refusal:
+        run(defer_diagnostics=False)
+    with pytest.raises(ResidueInventoryRefusal) as deferred_refusal:
+        run(defer_diagnostics=True)
+
+    assert base_refusal.value.reason == expected_reason
+    assert deferred_refusal.value.reason == base_refusal.value.reason
+    assert deferred_refusal.value.detail == base_refusal.value.detail
+    deferred_calls, deferred_pressure = run_observations[True]
+    assert any(inventory["FeO"] < 1.0 for inventory, _logp in deferred_calls)
+    assert deferred_pressure(
+        {"FeO": 0.99}, invalid_probe_logp, 1800.0
+    )["Fe"] > 0.0
+
+
+def test_cached_pressure_evaluation_is_an_immutable_snapshot() -> None:
+    from simulator.battery.residue import _CachedPressureEvaluation
+
+    pressures = {"Fe": 1.0}
+    omissions = {"Fe": {"field": "pFe"}}
+    response = PressureEvaluation(
+        pressures,
+        fe3_over_sum_fe=0.5,
+        fe_activity=0.25,
+        speciation_source="test",
+        below_threshold_omissions=omissions,
+    )
+    response.cr_valence = 2.5
+    cached = _CachedPressureEvaluation.from_response(response)
+
+    pressures["Fe"] = 2.0
+    omissions["Fe"]["field"] = "changed"
+    assert cached["Fe"] == 1.0
+    assert cached.fe3_over_sum_fe == 0.5
+    assert cached.fe_activity == 0.25
+    assert cached.speciation_source == "test"
+    assert cached.below_threshold_omissions["Fe"]["field"] == "pFe"
+    assert cached.cr_valence == 2.5
+    with pytest.raises(TypeError):
+        cached["Fe"] = 3.0
+    with pytest.raises(TypeError):
+        cached.below_threshold_omissions["Fe"]["field"] = "changed"
+
+
 def test_undeclared_pressure_law_keeps_the_hard_exponent_check() -> None:
     def pressure(logp: float):
         return _law(

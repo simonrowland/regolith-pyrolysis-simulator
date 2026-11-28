@@ -16,6 +16,15 @@ from simulator.battery.residue import ResidueInventoryRefusal, _mass_loss_source
 from simulator.battery.score import predict_with_engine, quantity_token
 
 
+@pytest.fixture(autouse=True)
+def _isolate_molar_flux_denominator_cache():
+    from simulator.battery.oxygen_balance import _cached_molar_flux_denominators
+
+    _cached_molar_flux_denominators.cache_clear()
+    yield
+    _cached_molar_flux_denominators.cache_clear()
+
+
 @pytest.fixture
 def fig3_source():
     # Exact executable fields of 04e03ba08's Fig. 3 context, restricted to R-11.
@@ -132,21 +141,41 @@ def test_vacuum_oxygen_root_pin_before_flux_refactor():
     assert result.pO2_bar == pytest.approx(0.0000020188591846109878, rel=1e-10)
 
 
-def test_molar_flux_coefficient_cache_uses_exact_temperature_and_channels():
-    from simulator.battery.oxygen_balance import _cached_molar_flux_denominators
+def test_molar_flux_coefficient_cache_keys_exact_inputs_and_counts_misses(
+    monkeypatch,
+):
+    import simulator.battery.oxygen_balance as oxygen_balance
 
+    cache = oxygen_balance._cached_molar_flux_denominators
     channels = (("Mg", float(0.024305).hex()),)
     t_key = float(2073.15).hex()
-    exact = _cached_molar_flux_denominators(t_key, channels)
-    adjacent = _cached_molar_flux_denominators(
-        math.nextafter(2073.15, 2074.0).hex(), channels
+    gas_constant_key = float(oxygen_balance.GAS_CONSTANT).hex()
+    exact_key = (t_key, gas_constant_key, channels)
+    adjacent_key = (
+        math.nextafter(2073.15, 2074.0).hex(), gas_constant_key, channels
     )
-    other_channels = _cached_molar_flux_denominators(
-        t_key, (("MgO", float(0.040304).hex()),)
-    )
+    assert exact_key != adjacent_key
 
-    assert exact != adjacent
-    assert exact != other_channels
+    cache(*exact_key)
+    cache(*adjacent_key)
+    assert cache.cache_info().misses == 2
+
+    other_channels_key = (
+        t_key, gas_constant_key, (("MgO", float(0.040304).hex()),)
+    )
+    assert exact_key != other_channels_key
+    cache(*other_channels_key)
+    assert cache.cache_info().misses == 3
+
+    monkeypatch.setattr(
+        oxygen_balance, "GAS_CONSTANT", float(oxygen_balance.GAS_CONSTANT) * 2.0
+    )
+    changed_constant_key = (
+        t_key, float(oxygen_balance.GAS_CONSTANT).hex(), channels
+    )
+    assert exact_key != changed_constant_key
+    cache(*changed_constant_key)
+    assert cache.cache_info().misses == 4
 
 
 @pytest.mark.parametrize("with_sio,expected_po2,expected_mg,expected_sio", [
