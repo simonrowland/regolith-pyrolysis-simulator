@@ -10,14 +10,8 @@ import yaml
 
 from simulator.battery import consumer_inputs
 from simulator.battery.consumer_inputs import collect_consumer_inputs
-from simulator.battery.enums import AmountBasis, Engine, NoticeKind, Phase, Quantity
-from simulator.battery.generators.bench import melt_activity_requests
+from simulator.battery.enums import AmountBasis, Phase, Quantity
 from simulator.battery.migrate import Migrator
-from simulator.battery.score import (
-    _classify_flagged_notice_facts,
-    predict_with_engine,
-)
-from simulator.battery.waypoints import GapReason
 from simulator.corpus_paths import regolith_corpus_root
 from tests.literature_extract_test_utils import activity_test_bench, isolated_root
 from tools.validate_literature_extracts import (
@@ -371,7 +365,7 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage(
     assert not [warning for warning in fidelity_warnings if warning.kind == "source_blind_pin"]
 
 
-def test_migration_preserves_temperatures_compositions_and_typed_activity_requests(
+def test_migration_preserves_temperatures_compositions_and_unknown_reference_state(
     tmp_path: Path,
 ) -> None:
     document = _document()
@@ -425,85 +419,16 @@ def test_migration_preserves_temperatures_compositions_and_typed_activity_reques
         bench = activity_test_bench(experiment.work_id)
         inputs = collect_consumer_inputs(experiment, bench, observation)
         _assert_activity_consumer(inputs, formula, Quantity.ACTIVITY)
-        requests = melt_activity_requests(inputs, experiment=experiment, bench=bench, observation=observation)
-        assert {request.readiness.engine for request in requests} == {
-            "alphamelts", "thermoengine", "openimcc", "internal-analytical", "magemin"
-        }
-        if row_id == UNCLOSED_COMPOSITION_ID:
-            assert all(request.payload is None for request in requests)
-            assert all(request.readiness.gaps for request in requests), [
-                (
-                    request.readiness.engine,
-                    request.readiness.status.value,
-                    tuple(
-                        (gap.waypoint, gap.reason.value, gap.missing)
-                        for gap in request.readiness.gaps
-                    ),
-                )
-                for request in requests
-            ]
-            assert any(
-                gap.waypoint == "normalized_composition"
-                and gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
-                for request in requests
-                for gap in request.readiness.gaps
-            ), requests
-            continue
 
-        callable_requests = [request for request in requests if request.payload is not None]
-        assert {request.readiness.engine for request in callable_requests} == {
-            "alphamelts", "thermoengine", "openimcc", "internal-analytical"
-        }, [
-            (
-                request.readiness.engine,
-                request.readiness.status.value,
-                tuple(
-                    (gap.waypoint, gap.reason.value, gap.missing)
-                    for gap in request.readiness.gaps
-                ),
-            )
-            for request in requests
-        ]
-        for request in callable_requests:
-            assert request.payload["reference_state"] in {
-                "raoultian_pure_liquid_endmember",
-                "raoultian_pure_liquid_oxide_parent",
-            }
-            assert any(
-                flag["authority"] == "assumed"
-                and flag["flag_id"] == "registered_raoultian_pure_liquid_target"
-                and "phase and convention unknown" in flag["notice"]
-                for flag in request.readiness.flags
-            )
-        magemin = next(request for request in requests if request.readiness.engine == "magemin")
-        assert magemin.payload is None
-        assert any(
-            gap.waypoint == "reference_state"
-            and gap.reason is GapReason.REFERENCE_STATE_MISMATCH
-            for gap in magemin.readiness.gaps
-        )
-
-    prediction_row = migrated["omori_fig3_al10_mg30_01"]
-    prediction_experiment = result.experiments[prediction_row.experiment_id]
-    prediction_bench = activity_test_bench(prediction_experiment.work_id)
-    prediction = predict_with_engine(
-        Engine.INTERNAL_ANALYTICAL,
-        prediction_row,
-        experiment=prediction_experiment,
-        bench=prediction_bench,
-        handles={},
-        isolated=False,
+    reference_row = migrated["omori_fig3_al10_mg30_01"]
+    assert reference_row.identity.reference_state.is_unknown
+    source_values = source_rows["omori_fig3_al10_mg30_01"]["values"]
+    assert source_values["standard_state_as_printed"] == (
+        "1630。におけるSio2飽和"
     )
-    assert prediction.value is not None, prediction.refusal_detail
-    assert any(
-        notice.kind is NoticeKind.KNOB_DEFAULTED
-        and "phase and convention unknown" in notice.reason
-        for notice in prediction.notices
+    assert source_values["phase_as_printed"] == (
+        "CaO−MgO−SiO2−A1203−System"
     )
-    flagged_strata = _classify_flagged_notice_facts(
-        tuple((notice.kind.value, notice.reason) for notice in prediction.notices)
-    )
-    assert NoticeKind.KNOB_DEFAULTED.value in flagged_strata
 
     assert float(migrated["omori_fig3_al10_mg30_01"].value.point) == pytest.approx(0.0914745)
     for row_id, (_, _, _, _, _) in FIG5_READS.items():

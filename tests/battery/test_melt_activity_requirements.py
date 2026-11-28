@@ -606,6 +606,7 @@ def test_stolyarova_untyped_reference_state_is_not_consumed():
     observation = replace(
         observation, source_id="kems-053-stolyarova-1991"
     )
+    assert observation.identity.reference_state.is_unknown
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
     assert all(item.readiness.status is ReadinessStatus.NOT_APPLICABLE for item in results)

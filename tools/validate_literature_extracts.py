@@ -211,6 +211,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import json
 from copy import deepcopy
 from dataclasses import dataclass, field
 from decimal import (
@@ -2744,6 +2745,190 @@ def _figure_render_measured_addresses(
     return sample_key, sample_address, measured, []
 
 
+def _figure_render_record_support(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[set[str], dict[int, int], list[str]]:
+    """Load the independent record binding one rendered sample to its leaves."""
+    defects: list[str] = []
+    extraction = doc.get("extraction")
+    audit_file = (
+        extraction.get("audit_file") if isinstance(extraction, Mapping) else None
+    )
+    if not isinstance(audit_file, str) or not audit_file.strip():
+        return set(), {}, ["figure-read requires an independent render record"]
+    relative = Path(audit_file)
+    audit_root = (ROOT / "data/literature/extracts/audits").resolve()
+    audit_path = (ROOT / relative).resolve()
+    if (
+        relative.is_absolute()
+        or ".." in relative.parts
+        or not audit_path.is_relative_to(audit_root)
+        or not audit_path.is_file()
+    ):
+        return set(), {}, [
+            "figure-read render record must be a repository audit file under "
+            "data/literature/extracts/audits"
+        ]
+    try:
+        with audit_path.open("r", encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle)
+            required_columns = {
+                "source_id",
+                "source_sha256",
+                "source_asset",
+                "pdf_page",
+                "published_page",
+                "figure",
+                "printed_row",
+                "supported_leaves",
+            }
+            if not required_columns.issubset(reader.fieldnames or ()):
+                return set(), {}, [
+                    "figure-read render record lacks source identity, page, folio, "
+                    "figure, row, or supported-leaf columns"
+                ]
+            records = list(reader)
+    except (OSError, csv.Error, UnicodeError):
+        return set(), {}, ["figure-read render record could not be opened or parsed"]
+
+    source = doc.get("source")
+    source = source if isinstance(source, Mapping) else {}
+    source_id = doc.get("source_id")
+    source_sha256 = source.get("sha256")
+    source_asset = source.get("corpus_asset")
+    if (
+        not isinstance(source_id, str)
+        or not source_id.strip()
+        or not _valid_source_sha256(source_sha256)
+        or not isinstance(source_asset, str)
+        or not source_asset.strip()
+    ):
+        return set(), {}, [
+            "figure-read render record requires source_id, source.sha256, "
+            "and source.corpus_asset"
+        ]
+
+    locator_keys = [key for key in ("locator", "source_locator") if key in sample]
+    locator = sample.get(locator_keys[0]) if len(locator_keys) == 1 else None
+    verification = sample.get("verification")
+    if not isinstance(locator, Mapping) or not isinstance(verification, Mapping):
+        return set(), {}, ["figure-read render record requires a sample locator"]
+    row_name = locator.get("row")
+    page = locator.get("page")
+    folio = locator.get("published_page")
+    figure = locator.get("figure")
+    if (
+        not isinstance(row_name, str)
+        or not row_name.strip()
+        or not isinstance(page, int)
+        or isinstance(page, bool)
+        or page <= 0
+        or not isinstance(folio, int)
+        or isinstance(folio, bool)
+        or folio <= 0
+        or not (
+            isinstance(figure, str) and figure.strip()
+            or isinstance(figure, int) and not isinstance(figure, bool) and figure > 0
+        )
+    ):
+        return set(), {}, [
+            "figure-read render record requires row, physical page, folio, and figure"
+        ]
+
+    def record_page(raw: Any) -> int | None:
+        if isinstance(raw, str) and re.fullmatch(r"[1-9][0-9]*", raw.strip()):
+            return int(raw)
+        return None
+
+    identity_records = [
+        record
+        for record in records
+        if record.get("source_id") == source_id
+        and record.get("source_sha256") == source_sha256
+        and record.get("source_asset") == source_asset
+    ]
+    folios_by_page: dict[int, set[int]] = {}
+    for record in identity_records:
+        source_page = record_page(record.get("pdf_page"))
+        source_folio = record_page(record.get("published_page"))
+        if source_page is not None and source_folio is not None:
+            folios_by_page.setdefault(source_page, set()).add(source_folio)
+    source_page_folios: dict[int, int] = {}
+    for source_page, source_folios in folios_by_page.items():
+        if len(source_folios) == 1:
+            source_page_folios[source_page] = next(iter(source_folios))
+        else:
+            defects.append(
+                "figure-read render records disagree on folio for physical page "
+                f"{source_page}"
+            )
+
+    source_records = [
+        record
+        for record in identity_records
+        if record.get("printed_row") == row_name
+    ]
+    if not source_records:
+        return set(), source_page_folios, [
+            "figure-read sample has no render record for its source identity and row"
+        ]
+
+    figure_text = str(figure).strip()
+    bound_records = [
+        record
+        for record in source_records
+        if record_page(record.get("pdf_page")) == page
+        and record_page(record.get("published_page")) == folio
+        and str(record.get("figure", "")).strip() == figure_text
+    ]
+    if len(bound_records) != 1:
+        return set(), source_page_folios, [
+            "figure-read render record does not uniquely bind its physical page, "
+            "folio, and figure"
+        ]
+    if (
+        verification.get("page") != page
+        or str(verification.get("figure", "")).strip() != figure_text
+    ):
+        return set(), source_page_folios, [
+            "figure-read verification page or figure disagrees with its render record"
+        ]
+
+    try:
+        supported_raw = json.loads(bound_records[0].get("supported_leaves", ""))
+    except (TypeError, json.JSONDecodeError):
+        supported_raw = None
+    if (
+        not isinstance(supported_raw, list)
+        or not supported_raw
+        or any(not isinstance(path, str) or not path.strip() for path in supported_raw)
+        or len(supported_raw) != len(set(supported_raw))
+    ):
+        return set(), source_page_folios, [
+            "figure-read render record requires unique supported leaf paths"
+        ]
+
+    sample_key, _base, measured, measured_defects = _figure_render_measured_addresses(
+        doc, sample
+    )
+    defects.extend(measured_defects)
+    if sample_key is None:
+        return (
+            set(),
+            source_page_folios,
+            defects or ["figure-read render record has no scored observation"],
+        )
+    for path in supported_raw:
+        if (
+            _fidelity_sample_observation_key(doc, {"path": path}) != sample_key
+            or _path_evidence_address(doc, path) not in measured
+        ):
+            defects.append(
+                f"figure-read render record supports a leaf outside its sample: {path}"
+            )
+    return set(supported_raw), source_page_folios, defects
+
+
 def _figure_render_cover_addresses(
     doc: Mapping[str, Any], sample: Mapping[str, Any]
 ) -> tuple[list[tuple[Any, ...]], list[str]]:
@@ -2762,6 +2947,11 @@ def _figure_render_cover_addresses(
     )
     if defects or sample_key is None:
         return [], defects or ["figure-read covers do not resolve from a scored sample"]
+    supported_paths, _source_page_folios, record_defects = (
+        _figure_render_record_support(doc, sample)
+    )
+    if record_defects:
+        return [], [f"render record: {defect}" for defect in record_defects]
     addresses: list[tuple[Any, ...]] = []
     for path in covers:
         key = _fidelity_sample_observation_key(doc, {"path": path})
@@ -2776,6 +2966,10 @@ def _figure_render_cover_addresses(
             )
         else:
             addresses.append(address)
+            if path not in supported_paths:
+                defects.append(
+                    f"figure-read cover is not supported by the render record: {path}"
+                )
     return addresses, defects
 
 
@@ -3432,6 +3626,83 @@ def _cited_text(
     return "\n".join(lines[start - 1 : end]), None
 
 
+def _text_line_span_page_folio_defect(
+    full: str,
+    locator: Mapping[str, Any],
+    source_page_folios: Mapping[int, int],
+) -> str | None:
+    """Bind a cited span to its physical page and the source record's folio."""
+    span = _parse_line_range(locator.get("line_range"))
+    page = locator.get("page")
+    folio = locator.get("published_page")
+    if (
+        span is None
+        or not isinstance(page, int)
+        or isinstance(page, bool)
+        or page <= 0
+        or not isinstance(folio, int)
+        or isinstance(folio, bool)
+        or folio <= 0
+    ):
+        return "line span cannot be bound to a positive physical page and folio"
+
+    lines = full.splitlines()
+    pieces = full.splitlines(keepends=True)
+    start, end = span
+    if len(lines) != len(pieces) or end > len(lines):
+        return "line span cannot be bound to a physical page and folio"
+
+    page_by_line: list[int] = []
+    lines_by_page: dict[int, list[str]] = {}
+    physical_page = 1
+    for piece in pieces:
+        parts = piece.splitlines()
+        line = parts[0] if parts else ""
+        page_by_line.append(physical_page)
+        lines_by_page.setdefault(physical_page, []).append(line)
+        physical_page += piece.count("\f")
+
+    span_pages = set(page_by_line[start - 1 : end])
+    if len(span_pages) != 1:
+        return "line span crosses a physical page boundary"
+    span_page = next(iter(span_pages))
+    if span_page != page:
+        return f"line span is on physical page {span_page}, not {page}"
+
+    page_lines = [
+        line.strip()
+        for line in lines_by_page.get(span_page, ())
+        if line.strip()
+    ]
+    boundary_lines = page_lines[:3] + page_lines[-3:]
+    text_folios = {
+        int(line)
+        for line in boundary_lines
+        if re.fullmatch(r"[1-9][0-9]*", line)
+    }
+    text_folio = next(iter(text_folios)) if len(text_folios) == 1 else None
+    record_folio = source_page_folios.get(span_page)
+    if record_folio is None and page_lines:
+        header_folio = re.match(r"([1-9][0-9]*)[ \t]{2,}", page_lines[0])
+        if header_folio is not None:
+            text_folio = int(header_folio.group(1))
+    if (
+        text_folio is not None
+        and record_folio is not None
+        and text_folio != record_folio
+    ):
+        return (
+            f"line span page text says folio {text_folio}, while the independent "
+            f"render record says {record_folio}"
+        )
+    observed_folio = text_folio if text_folio is not None else record_folio
+    if observed_folio is None:
+        return f"line span page {span_page} has no printed or independently recorded folio"
+    if observed_folio != folio:
+        return f"line span is on folio {observed_folio}, not {folio}"
+    return None
+
+
 @dataclass(frozen=True)
 class _PinnedLeaf:
     """One scalar the opened source must contain."""
@@ -4042,6 +4313,8 @@ def _locator_source_blind_reason(
     corpus_root: Path | None,
     doc: Mapping[str, Any] | None = None,
     corpus_mount: CorpusMountTally | None = None,
+    require_page_folio_binding: bool = False,
+    source_page_folios: Mapping[int, int] | None = None,
 ) -> _LocatorSourceBlindReason | None:
     """Return a source-blind reason when the locator evidence is inadequate.
 
@@ -4167,6 +4440,20 @@ def _locator_source_blind_reason(
                 candidate_reason_codes.add("artifact_is_extract_document")
                 break
             delimiter = _tabular_delimiter(path)
+            if (
+                require_page_folio_binding
+                and delimiter is None
+                and locator.get("line_range") is not None
+            ):
+                page_folio_defect = _text_line_span_page_folio_defect(
+                    text, locator, source_page_folios or {}
+                )
+                if page_folio_defect:
+                    candidate_reasons.append(
+                        f"figure-read line span source-blind: {page_folio_defect}"
+                    )
+                    candidate_reason_codes.add("line_span_page_folio_mismatch")
+                    break
             charge_text = ""
             charge_cells = None
             charge_spans: tuple[tuple[int, int], ...] = ()
@@ -4378,6 +4665,13 @@ def _figure_render_locator_source_blind_reason(
         return _LocatorSourceBlindReason(
             "figure-read locator map was not opened: verification.locators is missing"
         )
+    _supported, source_page_folios, record_defects = (
+        _figure_render_record_support(doc, sample)
+    )
+    if record_defects:
+        return _LocatorSourceBlindReason(
+            "figure-read render record was not opened: " + "; ".join(record_defects)
+        )
     for path, locator in locators.items():
         if not isinstance(path, str) or not isinstance(locator, Mapping):
             continue
@@ -4392,6 +4686,8 @@ def _figure_render_locator_source_blind_reason(
             artifact_root=artifact_root,
             corpus_root=corpus_root,
             corpus_mount=corpus_mount,
+            require_page_folio_binding=True,
+            source_page_folios=source_page_folios,
         )
         if blind is not None:
             return _LocatorSourceBlindReason(
@@ -4816,49 +5112,68 @@ def _derivation_parent_supports_leaf(
     value: Any,
 ) -> bool:
     """Bind a copied source to its destination field and component basis."""
+    return (
+        address == _derivation_parent_destination(parent)
+        and _within_tighter_half_ulp(stored, value)
+    )
+
+
+def _derivation_parent_destination(
+    parent: Mapping[str, Any],
+) -> tuple[str, ...] | None:
+    """Own the canonical source-field and destination map for derivation roles."""
     role = parent.get("role")
     path = parent.get("path")
     if not isinstance(path, str):
-        return False
-    source_field = path.rsplit(".", 1)[-1]
-    if role == "copied":
-        destination_field = (
-            address[2]
-            if len(address) >= 3
-            and address[0] == "composition"
-            and address[1] == "printed_coordinates"
-            else address[0] if address else None
-        )
-        return (
-            destination_field is not None
-            and source_field == destination_field
-            and _within_tighter_half_ulp(stored, value)
-        )
+        return None
+    parts = path.split(".")
+    observation_segment = (
+        _PATH_SEGMENT_RE.match(parts[2]) if len(parts) >= 5 else None
+    )
     if (
-        len(address) >= 3
-        and address[0] == "composition"
-        and address[1] == "printed_coordinates"
+        parts[0] != "species"
+        or observation_segment is None
+        or observation_segment.group(1) != "observations"
+        or not observation_segment.group(2)
     ):
-        component = parent.get("component")
-        if not isinstance(component, str):
-            return False
-        if role == "mole_fraction":
-            expected_field = f"N_{component}_mole_fraction"
-            accepted_fields = {
-                expected_field,
-                f"{expected_field}_as_read",
-            }
-        elif role == "mole_percent":
-            accepted_fields = {f"N_{component}_percent_as_printed"}
-        elif role == "mass_percent":
-            accepted_fields = {f"{component}_mass_percent_as_series"}
-        else:
-            return False
-        return (
-            address[2] in accepted_fields
-            and _within_tighter_half_ulp(stored, value)
-        )
-    return False
+        return None
+    source_field_path = tuple(parts[3:])
+    if role == "copied":
+        return {
+            ("values", "T_C"): ("T_C", "state", "value"),
+            (
+                "values",
+                "composition_as_plotted",
+                "N_Al2O3_mole_fraction_as_read",
+            ): (
+                "composition",
+                "printed_coordinates",
+                "N_Al2O3_mole_fraction_as_read",
+            ),
+        }.get(source_field_path)
+
+    component = parent.get("component")
+    if not isinstance(component, str) or not component.strip():
+        return None
+    component = component.strip()
+    source_fields = {
+        "mole_fraction": (
+            f"N_{component}_mole_fraction",
+            f"N_{component}_mole_fraction_as_read",
+        ),
+        "mole_percent": (f"N_{component}_percent_as_printed",),
+        "mass_percent": (f"{component}_mass_percent_as_series",),
+    }.get(role)
+    if source_fields is None:
+        return None
+    for source_field in source_fields:
+        if source_field_path == (
+            "values",
+            "composition_as_plotted",
+            source_field,
+        ):
+            return ("composition", "printed_coordinates", source_field)
+    return None
 
 
 def _derivation_shape_defects(
@@ -4913,24 +5228,21 @@ def _derivation_shape_defects(
             )
             continue
         if role == "copied":
+            if _derivation_parent_destination(parent) is None:
+                defects.append(
+                    "derivation copied parent does not use a canonical source field: "
+                    f"{path}"
+                )
             continue
         name = parent.get("component")
         if not isinstance(name, str) or not name.strip():
             defects.append("derivation parent component is required")
             continue
         name = name.strip()
-        source_field = path.rsplit(".", 1)[-1]
-        expected_fields = {
-            "mole_fraction": {
-                f"N_{name}_mole_fraction",
-                f"N_{name}_mole_fraction_as_read",
-            },
-            "mole_percent": {f"N_{name}_percent_as_printed"},
-            "mass_percent": {f"{name}_mass_percent_as_series"},
-        }.get(role, set())
-        if source_field not in expected_fields:
+        if _derivation_parent_destination(parent) is None:
             defects.append(
-                "derivation parent role, component, and basis disagree with "
+                "derivation parent role, component, and canonical source field "
+                "disagree with "
                 f"source field: {path}"
             )
         if role in _DERIVATION_MOLE_ROLES:

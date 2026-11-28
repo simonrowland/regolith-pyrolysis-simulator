@@ -142,6 +142,8 @@ def test_engine_request_preserves_and_rejects_temkin_coefficient_basis(
         EngineHandle,
         EquilibrateCell,
     )
+    from simulator.battery.generators.bench import GeneratedInput
+    from simulator.battery.waypoints import ConsumerReadiness, ReadinessStatus
     import simulator.battery.score as score_module
     from tests.battery.test_melt_activity_requirements import _case
 
@@ -170,8 +172,15 @@ def test_engine_request_preserves_and_rejects_temkin_coefficient_basis(
         score_module,
         "_activity_request_or_contract_refusal",
         lambda *_args, **_kwargs: (
-            SimpleNamespace(
-                payload={"composition_mol": {"FeO": 0.5, "SiO2": 0.5}}
+            GeneratedInput(
+                readiness=ConsumerReadiness(
+                    consumer="melt_activity",
+                    status=ReadinessStatus.READY,
+                    gaps=(),
+                    engine=Engine.THERMOENGINE.value,
+                ),
+                payload={"composition_mol": {"FeO": 0.5, "SiO2": 0.5}},
+                provenance={},
             ),
             None,
         ),

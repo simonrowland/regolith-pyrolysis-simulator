@@ -80,6 +80,16 @@ from simulator.battery.waypoints import oxygen_condition  # noqa: E402
 from tests.battery import factories as battery_factories  # noqa: E402
 
 
+@pytest.fixture(autouse=True)
+def _allow_test_render_fixture_as_source(monkeypatch):
+    """Open the checked-in test artifact without changing production policy."""
+    monkeypatch.setattr(
+        vle,
+        "_SOURCE_ARTIFACT_PREFIXES",
+        (*vle._SOURCE_ARTIFACT_PREFIXES, "tests/fixtures/literature/"),
+    )
+
+
 class _DuplicateRejectingLoader(yaml.SafeLoader):
     def construct_mapping(self, node, deep=False):
         mapping = {}
@@ -848,6 +858,33 @@ def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
         )
 
 
+def _matches_declared_experiment_or_method_split(
+    experiment_id: str, local_id: str
+) -> bool:
+    declared_suffix = f"::experiment::{local_id}"
+    return experiment_id.endswith(declared_suffix) or (
+        f"{declared_suffix}::method:" in experiment_id
+    )
+
+
+def _declared_experiment_or_method_split(result, local_id: str):
+    matches = [
+        item
+        for item in result.experiments.values()
+        if _matches_declared_experiment_or_method_split(
+            item.experiment_id, local_id
+        )
+    ]
+    method_splits = [
+        item
+        for item in matches
+        if f"::experiment::{local_id}::method:" in item.experiment_id
+    ]
+    selected = method_splits or matches
+    assert len(selected) == 1, local_id
+    return selected[0]
+
+
 def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     """Every printed numeric cell in the three tables becomes a numeric observation."""
     source = EXTRACTS / "sato-1976-lunar-fo2-apollo-17.yaml"
@@ -948,9 +985,8 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         ]
         assert len(matches) == 1, (sample, temperature, condition)
         observation = matches[0]
-        assert (
-            f"::experiment::{row['experiment']}::method:"
-            in observation.experiment_id
+        assert _matches_declared_experiment_or_method_split(
+            observation.experiment_id, row["experiment"]
         )
         assert f"row={sample}" in observation.locator.note
         experiment = migrator.result.experiments[observation.experiment_id]
@@ -2802,7 +2838,17 @@ def test_numeric_index_path_does_not_cover_a_scored_observation():
 def _figure_read_extract() -> dict:
     doc = _minimal_extract()
     _strip_scored_conditions(doc)
+    doc["source_id"] = "fixture-source"
     doc["extraction"]["worker"] = "figure-extractor"
+    doc["source"].update(
+        {
+            "corpus_asset": "raw/fixture-source/fixture-source.pdf",
+            "sha256": "a" * 64,
+        }
+    )
+    doc["extraction"]["audit_file"] = (
+        "data/literature/extracts/audits/figure-render-records.csv"
+    )
     values = {
         "alpha": 0.24,
         "evidence_class": "figure_only",
@@ -2823,7 +2869,12 @@ def _figure_read_extract() -> dict:
             "value": copy.deepcopy(values),
             "reviewed_by": "independent figure checker",
             "reviewed_on": "2026-11-26",
-            "locator": {"page": 2, "figure": "1"},
+            "locator": {
+                "page": 2,
+                "published_page": 137,
+                "figure": "1",
+                "row": "Fe alpha 1",
+            },
             "verification": {
                 "method": "render",
                 "dpi": 350,
@@ -2845,7 +2896,7 @@ def test_render_stamp_does_not_attest_unverified_descendants_without_artifact():
     doc = _render_partition_extract_with_temperature()
     path = "species.Fe.observations[fe_alpha_1].values.T_C"
     doc["fidelity_samples"][0]["verification"]["locators"][path] = (
-        _render_leaf_locator()
+        _render_leaf_locator("text/missing-render-leaf.txt")
     )
 
     warnings = vle.fidelity_source_warnings(doc, label="figure-read")
@@ -2871,6 +2922,87 @@ def test_render_stamp_rejects_page_or_figure_mismatch(key, value, reason):
 
     assert by_kind["unattested_sample"].count == 1
     assert reason in by_kind["unattested_sample"].detail
+
+
+def test_render_record_accepts_source_locator_alias():
+    doc = _figure_read_extract()
+    sample = doc["fidelity_samples"][0]
+    sample["source_locator"] = sample.pop("locator")
+
+    warnings = vle.fidelity_source_warnings(doc, label="source-locator-render")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert "unattested_sample" not in by_kind
+    assert "uncovered_observation" not in by_kind
+
+
+def test_render_record_rejects_sample_self_certified_page_folio_and_figure():
+    doc = _figure_read_extract()
+    sample = doc["fidelity_samples"][0]
+    sample["locator"].update(
+        {"page": 999, "published_page": 999, "figure": "999"}
+    )
+    sample["verification"].update({"page": 999, "figure": "999"})
+
+    warnings = vle.fidelity_source_warnings(doc, label="self-certified-render")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "render record" in detail, detail
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("source_id", "other-source"),
+        ("source.sha256", "b" * 64),
+        ("source.corpus_asset", "raw/other-source/other-source.pdf"),
+    ),
+)
+def test_render_record_rejects_mismatched_source_identity(field, value):
+    doc = _figure_read_extract()
+    if field == "source_id":
+        doc["source_id"] = value
+    else:
+        key = field.split(".", 1)[1]
+        doc["source"][key] = value
+
+    warnings = vle.fidelity_source_warnings(doc, label="wrong-render-source")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "render record" in detail, detail
+
+
+def test_render_record_rejects_a_changed_printed_row():
+    doc = _figure_read_extract()
+    doc["fidelity_samples"][0]["locator"]["row"] = "Fe alpha 2"
+
+    warnings = vle.fidelity_source_warnings(doc, label="wrong-render-row")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "render record" in detail, detail
+
+
+def test_render_record_binding_mutation_makes_self_certification_pass(monkeypatch):
+    def trust_sample_covers(document, sample):
+        verification = sample.get("verification", {})
+        return set(verification.get("covers", ())), {}, []
+
+    monkeypatch.setattr(vle, "_figure_render_record_support", trust_sample_covers)
+
+    with pytest.raises(AssertionError, match="render record"):
+        test_render_record_rejects_sample_self_certified_page_folio_and_figure()
 
 
 def test_render_cover_cannot_attest_a_different_observation():
@@ -2953,11 +3085,13 @@ def test_render_verification_does_not_attest_a_non_figure_leaf():
     assert "unattested_sample" not in by_kind
 
 
-def _render_leaf_locator(path: str = "text/render-leaf-source.txt") -> dict:
+def _render_leaf_locator(
+    path: str = "tests/fixtures/literature/figure-render-text.txt",
+) -> dict:
     return {
         "page": 2,
         "published_page": 137,
-        "line_range": "1",
+        "line_range": "5",
         "source_path": path,
     }
 
@@ -3019,14 +3153,61 @@ def test_render_sample_cannot_cover_a_prose_leaf():
     ].detail
 
 
+def test_render_sample_rejects_a_covers_only_prose_leaf():
+    doc = _render_partition_extract_with_temperature()
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    verification = doc["fidelity_samples"][0]["verification"]
+    verification["covers"].append(path)
+    verification["locators"].pop(path, None)
+
+    warnings = vle.fidelity_source_warnings(doc, label="render-covers-only-prose")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "render record" in detail, detail
+
+
+def test_legacy_render_leaf_acceptance_mutation_makes_covers_only_prose_pass(
+    monkeypatch,
+):
+    def legacy_cover(document, sample):
+        verification = sample.get("verification")
+        covers = verification.get("covers") if isinstance(verification, dict) else None
+        if not isinstance(covers, list):
+            return [], []
+        sample_key, _base, measured, defects = vle._figure_render_measured_addresses(
+            document, sample
+        )
+        if defects or sample_key is None:
+            return [], defects
+        addresses = []
+        for path in covers:
+            key = vle._fidelity_sample_observation_key(document, {"path": path})
+            address = vle._path_evidence_address(document, path)
+            if key == sample_key and address in measured:
+                addresses.append(address)
+        return addresses, []
+
+    monkeypatch.setattr(vle, "_figure_render_cover_addresses", legacy_cover)
+    with pytest.raises(AssertionError, match="render record"):
+        test_render_sample_rejects_a_covers_only_prose_leaf()
+
+
 def test_render_sample_accepts_a_correct_render_and_text_leaf_split(tmp_path):
     doc = _render_partition_extract_with_temperature()
     source = tmp_path / "text" / "render-leaf-source.txt"
     source.parent.mkdir()
-    source.write_text("Temperature 1630 C.\n")
+    source.write_text(
+        "136\nIntroduction\n\f137\nTemperature 1630 C.\n\f138\nClosing\n"
+    )
     path = "species.Fe.observations[fe_alpha_1].values.T_C"
     verification = doc["fidelity_samples"][0]["verification"]
-    verification["locators"][path] = _render_leaf_locator()
+    verification["locators"][path] = _render_leaf_locator(
+        "text/render-leaf-source.txt"
+    )
 
     warnings = vle.fidelity_source_warnings(
         doc, label="correct-render-text-split", artifact_root=tmp_path
@@ -3036,6 +3217,86 @@ def test_render_sample_accepts_a_correct_render_and_text_leaf_split(tmp_path):
     assert "unattested_sample" not in by_kind
     assert "source_blind_pin" not in by_kind
     assert "uncovered_observation" not in by_kind
+
+
+def test_text_locator_accepts_an_inline_page_header_folio(tmp_path):
+    doc = _render_partition_extract_with_temperature()
+    source = tmp_path / "text" / "render-leaf-source.txt"
+    source.parent.mkdir()
+    source.write_text(
+        "136    Journal volume 25\nTemperature 1630 C.\n\f137\nClosing\n"
+    )
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    locator = _render_leaf_locator("text/render-leaf-source.txt")
+    locator.update(page=1, published_page=136, line_range="2")
+    doc["fidelity_samples"][0]["verification"]["locators"][path] = locator
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="inline-page-header-folio", artifact_root=tmp_path
+    )
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert "unattested_sample" not in by_kind
+    assert "source_blind_pin" not in by_kind
+    assert "uncovered_observation" not in by_kind
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (("page", 3), ("published_page", 138)),
+)
+def test_text_locator_page_and_folio_are_bound_to_its_line_span(
+    tmp_path, field, value
+):
+    doc = _render_partition_extract_with_temperature()
+    source = tmp_path / "text" / "render-leaf-source.txt"
+    source.parent.mkdir()
+    source.write_text(
+        "136\nIntroduction\n\f137\nTemperature 1630 C.\n\f138\nClosing\n"
+    )
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    locator = _render_leaf_locator("text/render-leaf-source.txt")
+    locator[field] = value
+    doc["fidelity_samples"][0]["verification"]["locators"][path] = locator
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="text-page-span", artifact_root=tmp_path
+    )
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "source_blind_pin"
+    )
+
+    assert "line span" in detail, detail
+
+
+def test_legacy_text_span_page_binding_mutation_accepts_wrong_page(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        vle, "_text_line_span_page_folio_defect", lambda *_args: None
+    )
+    doc = _render_partition_extract_with_temperature()
+    source = tmp_path / "text" / "render-leaf-source.txt"
+    source.parent.mkdir()
+    source.write_text(
+        "136\nIntroduction\n\f137\nTemperature 1630 C.\n\f138\nClosing\n"
+    )
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    locator = _render_leaf_locator("text/render-leaf-source.txt")
+    locator["page"] = 3
+    doc["fidelity_samples"][0]["verification"]["locators"][path] = locator
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="legacy-line-span-binding", artifact_root=tmp_path
+    )
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "source_blind_pin"
+    )
+
+    with pytest.raises(AssertionError):
+        assert "line span" in detail, detail
 
 
 def test_legacy_render_binding_without_leaf_locators_would_fail(monkeypatch):
@@ -3063,7 +3324,17 @@ def _derivation_extract() -> dict:
     """
     doc = _minimal_extract()
     _strip_scored_conditions(doc)
+    doc["source_id"] = "fixture-source"
     doc["extraction"]["worker"] = "figure-extractor"
+    doc["source"].update(
+        {
+            "corpus_asset": "raw/fixture-source/fixture-source.pdf",
+            "sha256": "a" * 64,
+        }
+    )
+    doc["extraction"]["audit_file"] = (
+        "data/literature/extracts/audits/figure-render-records.csv"
+    )
     values = {
         "evidence_class": "figure_only",
         "figure_read": {
@@ -3118,14 +3389,18 @@ def _derivation_extract() -> dict:
             "value": copy.deepcopy(values),
             "reviewed_by": "independent figure checker",
             "reviewed_on": "2026-11-26",
-            "locator": {"page": 2, "figure": "3"},
+            "locator": {
+                "page": 2,
+                "published_page": 137,
+                "figure": "3",
+                "row": "Fe alpha 1 derivation",
+            },
             "verification": {
                 "method": "render",
                 "dpi": 350,
                 "page": 2,
                 "figure": "3",
                 "covers": [
-                    f"{prefix}.values.T_C",
                     f"{prefix}.values.figure_read.read_uncertainty.x",
                     f"{prefix}.values.figure_read.read_uncertainty.y",
                     f"{prefix}.values.figure_read.read_uncertainty.unit_y",
@@ -3133,7 +3408,9 @@ def _derivation_extract() -> dict:
                     f"{prefix}.values.composition_as_plotted.Al2O3_mass_percent_as_series",
                     f"{prefix}.values.composition_as_plotted.MgO_mass_percent_as_series",
                 ],
-                "locators": {},
+                "locators": {
+                    f"{prefix}.values.T_C": _render_leaf_locator(),
+                },
             },
         },
         {
@@ -3141,7 +3418,12 @@ def _derivation_extract() -> dict:
             "value": copy.deepcopy(point),
             "reviewed_by": "derivation checker",
             "reviewed_on": "2026-11-27",
-            "locator": {"page": 2, "figure": "3"},
+            "locator": {
+                "page": 2,
+                "published_page": 137,
+                "figure": "3",
+                "row": "Fe alpha 1 derivation",
+            },
             "verification": {
                 "method": "derivation",
                 "closure": "by_difference",
@@ -3335,7 +3617,53 @@ def test_derivation_rejects_equal_parent_from_wrong_destination_field():
     )
     rendered = " ".join(defect for _index, group in defects for defect in group)
 
-    assert "is not an attested parent" in rendered, rendered
+    assert "canonical source field" in rendered, rendered
+
+
+def test_derivation_rejects_same_row_unrelated_temperature_parent():
+    doc = _derivation_extract()
+    prefix = "species.Fe.observations[fe_alpha_1]"
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"]["unrelated"] = {"T_C": "1530"}
+    doc["fidelity_samples"][0]["value"]["unrelated"] = {"T_C": "1530"}
+    unrelated_path = f"{prefix}.values.unrelated.T_C"
+    unrelated_locator = _render_leaf_locator()
+    unrelated_locator["line_range"] = "6"
+    doc["fidelity_samples"][0]["verification"]["locators"][unrelated_path] = (
+        unrelated_locator
+    )
+    observation["point_conditions"]["T_C"]["state"]["value"] = "1530"
+    derivation = doc["fidelity_samples"][1]
+    derivation["value"]["T_C"]["state"]["value"] = "1530"
+    derivation["verification"]["parents"][-1]["path"] = unrelated_path
+
+    warnings = vle.fidelity_source_warnings(doc, label="same-row-temperature-decoy")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "canonical source field" in detail, detail
+
+
+def test_derivation_terminal_name_mutation_accepts_same_row_temperature_decoy(
+    monkeypatch,
+):
+    original = vle._derivation_parent_destination
+
+    def terminal_name_binding(parent):
+        path = parent.get("path")
+        if parent.get("role") == "copied" and isinstance(path, str):
+            if path.rsplit(".", 1)[-1] == "T_C":
+                return ("T_C", "state", "value")
+        return original(parent)
+
+    monkeypatch.setattr(
+        vle, "_derivation_parent_destination", terminal_name_binding
+    )
+    with pytest.raises(AssertionError, match="canonical source field"):
+        test_derivation_rejects_same_row_unrelated_temperature_parent()
 
 
 def test_derivation_recompute_attests_a_closed_composition():
@@ -3533,18 +3861,6 @@ def test_derivation_observation_identity_mutation_turns_cross_row_red(monkeypatc
     monkeypatch.setattr(vle, "_fidelity_sample_observation_key", collapse_observation_identity)
     with pytest.raises(AssertionError, match="different observation"):
         test_derivation_rejects_temperature_parent_from_another_observation()
-
-
-def test_derivation_destination_field_mutation_turns_wrong_field_red(monkeypatch):
-    monkeypatch.setattr(
-        vle,
-        "_derivation_parent_supports_leaf",
-        lambda address, stored, parent, value: vle._within_tighter_half_ulp(
-            stored, value
-        ),
-    )
-    with pytest.raises(AssertionError, match="is not an attested parent"):
-        test_derivation_rejects_equal_parent_from_wrong_destination_field()
 
 
 def test_independence_mutation_turns_same_extractor_rejection_red(monkeypatch):
@@ -15476,13 +15792,7 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     from tests.battery.test_migrate import _migrate_real_extract
 
     def experiment_named(result, local):
-        rows = [
-            item
-            for item in result.experiments.values()
-            if f"::experiment::{local}::method:" in item.experiment_id
-        ]
-        assert len(rows) == 1, local
-        return rows[0]
+        return _declared_experiment_or_method_split(result, local)
 
     def observations_named(result, local):
         rows = [
@@ -15570,7 +15880,9 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     table2_experiment = hastie.experiments[table2[0].experiment_id]
     assert table2_experiment.bench_id is not None
     assert table2_experiment.bench_id.endswith("::bench::hastie-1981-tms")
-    assert "::experiment::hastie-1981-pt-tms::method:" in table2_experiment.experiment_id
+    assert _matches_declared_experiment_or_method_split(
+        table2_experiment.experiment_id, "hastie-1981-pt-tms"
+    )
     tms_bench = hastie.benches[table2_experiment.bench_id]
     assert tms_bench.cell_material_and_liner is not None
     assert tms_bench.cell_material_and_liner.state.is_value
@@ -15580,7 +15892,9 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     )
     nacl = observations_named(hastie, "hastie_1981_nacl_liquid_logP_prose")
     assert nacl
-    assert nacl[0].experiment_id == table2_experiment.experiment_id
+    assert _matches_declared_experiment_or_method_split(
+        nacl[0].experiment_id, "hastie-1981-pt-tms"
+    )
     allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
     emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
     mo = experiment_named(allibert, "allibert-1981-mo-kems")
@@ -15621,10 +15935,7 @@ def test_shornikov_kems_methods_migrate_with_typed_unverified_regime(
         migrated = _migrate_real_extract(
             tmp_path / f"{source.stem}-current", filename, extract_doc=extract
         )
-        experiment = next(
-            item for item in migrated.experiments.values()
-            if f"::experiment::{local_id}::method:" in item.experiment_id
-        )
+        experiment = _declared_experiment_or_method_split(migrated, local_id)
         assert experiment.method.is_value
         assert experiment.method.value.value == "knudsen_effusion"
         assert experiment.pressure_environment.regime.regime_class.is_value
@@ -15663,9 +15974,8 @@ def test_shornikov_kems_methods_migrate_with_typed_unverified_regime(
             filename,
             extract_doc=mutated,
         )
-        mutant_experiment = next(
-            item for item in mutant_migration.experiments.values()
-            if f"::experiment::{local_id}::method:" in item.experiment_id
+        mutant_experiment = _declared_experiment_or_method_split(
+            mutant_migration, local_id
         )
         assert mutant_experiment.method.is_value
         assert mutant_experiment.method.value.value == "knudsen_effusion"

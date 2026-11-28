@@ -346,7 +346,6 @@ extract's own value.
 | `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR artifact this was checked |
 | `T_K` / `T` or `index` | no | Pin a series point by temperature or list index |
 | `field` / `value_key` | no | Key inside `values` (or the series point) |
-| `rel_tol` | no | Finite numeric magnitude tolerance, `0 <= rel_tol < 1`; never changes type matching |
 
 **Path-based (accepted; pilot DRAFT migrations):**
 
@@ -431,9 +430,7 @@ the same rule for YAML binary/set values. Mutable set aliases are refused along
 with mapping/list aliases. Match uses type-strict equality at every scalar leaf
 and mapping key, including `int` versus `float`; sequence container types also
 must agree.
-Explicit `rel_tol` relaxes numeric magnitude only after concrete numeric types
-It must be a finite, non-boolean number in `0 <= rel_tol < 1`; null, negative,
-infinite, and nonnumeric tolerances are refused rather than ignored.
+Numeric magnitude tolerance fields such as `rel_tol` are not supported.
 
 #### Policy: `ENFORCED_FOR_NEW` (effective 2026-08-03)
 
@@ -790,6 +787,20 @@ zero-based PDF page index (the first PDF page is 0). `published_page` is the
 folio printed on the page; it may be absent, Roman-numeral, or non-numeric.
 Example: a figure on the 12th PDF page with printed folio 7 has `page: 12`,
 `pdf_page_index: 11`, and `published_page: 7`.
+
+For a fidelity sample whose resolved value contains `figure_read`, the
+extract's `source` must identify `corpus_asset` and `sha256`, and
+`extraction.audit_file` must point to a CSV under
+`data/literature/extracts/audits/`. The independent render record has columns
+`source_id`, `source_sha256`, `source_asset`, `pdf_page`, `published_page`,
+`figure`, `printed_row`, and `supported_leaves`. Its source id, exact PDF
+digest and asset, physical page, printed folio, figure, and row must match the
+sample locator and verification. `supported_leaves` is a JSON list of full
+paths under the addressed observation; only those leaves may appear in render
+`verification.covers`. A prose or table leaf belongs in
+`verification.locators` and must be opened as text or a selected table cell.
+For a text locator with `line_range`, the whole span must lie on the locator's
+physical page, and that page's printed folio must match `published_page`.
 
 When the source PDF is absent from the corpus, a locator whose physical page
 could not be verified because no corpus PDF exists at either the extract's `source_id`

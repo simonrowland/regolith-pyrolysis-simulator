@@ -407,6 +407,7 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
             assert reference_state["value"]["endmember"]["phase"] == {"tag": "value", "value": "l"}
         else:
             assert reference_state["tag"] == "unknown"
+            assert migrated.identity.reference_state.is_unknown
         composition = plain["point_conditions"]["composition"]
         composition_value = composition["state"]["value"]
         composition_map = derived_compositions[expected["composition"]]
