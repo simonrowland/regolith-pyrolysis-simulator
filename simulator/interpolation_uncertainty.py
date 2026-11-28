@@ -557,7 +557,12 @@ def _computed_neighbor_distances(
         vector = _coordinate_vector(key)
         if len(vector) != len(query_vector):
             continue
-        distances.append(_standardized_distance(query_vector, vector))
+        try:
+            distance = _standardized_distance(query_vector, vector)
+        except OverflowError:
+            continue
+        if math.isfinite(distance):
+            distances.append(distance)
     return distances
 
 

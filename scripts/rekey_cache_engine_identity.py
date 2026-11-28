@@ -56,7 +56,19 @@ class RekeyResult:
 def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
     """Keep the rekey index hook while delegating its fields to the owner."""
 
-    return _pt1_physics_index_columns(_derive_pt1_key_indexes(key))
+    try:
+        derived_indexes = _derive_pt1_key_indexes(key)
+    except (TypeError, ValueError, OverflowError, ZeroDivisionError, KeyError) as exc:
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 stored request key cannot derive physics indexes"
+        ) from exc
+    return _PhysicsIndexColumns(derived_indexes)
+
+
+class _PhysicsIndexColumns(dict[str, Any]):
+    def __init__(self, indexes: Any) -> None:
+        super().__init__(_pt1_physics_index_columns(indexes))
+        self.derived_indexes = indexes
 
 
 def _json_loads(raw: bytes) -> dict[str, Any]:
@@ -299,6 +311,7 @@ def rekey_cache(
             physics_columns = (
                 _physics_columns(key) if physics_columns_present else {}
             )
+            derived_indexes = getattr(physics_columns, "derived_indexes", None)
             if legacy_layout:
                 candidate_row = dict(row)
                 candidate_row["corpus_version"] = target
@@ -320,6 +333,7 @@ def rekey_cache(
                     "_write_key": key,
                     "_write_replace_key": True,
                     "_write_rebuild_indexes": rebuild_indexes,
+                    "_write_derived_indexes": derived_indexes,
                 }
             )
             candidate_row = _gate_row_for_write(candidate_row)

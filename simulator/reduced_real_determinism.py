@@ -1413,14 +1413,14 @@ class PT0DeterminismStore:
         payload = canonical_replay_output_projection(
             "equilibrium_post_record", sim, result
         )
+        if not self._cached_real_binding_eligible(sim):
+            self._mark_uncacheable_capture(sim)
+            return
         validate_reduced_real_equilibrium_record_key(
             "equilibrium_post_record",
             key,
             payload,
         )
-        if not self._cached_real_binding_eligible(sim):
-            self._mark_uncacheable_capture(sim)
-            return
         readback_policy_miss = False
         try:
             readback_policy_miss = self._store(
@@ -2836,21 +2836,30 @@ def _validate_pt1_key_indexes(
     stored_bucket_schema = row.get("physics_bucket_schema_version")
     replay_scope_sha256 = derived_indexes.replay_scope_sha256
     if stored_bucket_schema is not None:
-        if stored_bucket_bytes is None:
+        if "physics_key_bytes" in row and stored_bucket_bytes is None:
             _pt1_row_bytes(
                 row["physics_key_bytes"],
                 field="physics bucket key",
                 key_hash=row_hash,
             )
+        if stored_bucket_schema != PHYSICS_BUCKET_SCHEMA_VERSION:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key does not reproduce physics bucket: {row_hash}"
+            )
         if (
-            stored_bucket_schema != PHYSICS_BUCKET_SCHEMA_VERSION
-            or row["physics_bucket_sha256"] != bucket_hash
-            or stored_bucket_bytes != bucket_bytes
+            "physics_bucket_sha256" in row
+            and row["physics_bucket_sha256"] != bucket_hash
+        ) or (
+            stored_bucket_bytes is not None
+            and stored_bucket_bytes != bucket_bytes
         ):
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row exact key does not reproduce physics bucket: {row_hash}"
             )
-        if row["replay_scope_sha256"] != replay_scope_sha256:
+        if (
+            "replay_scope_sha256" in row
+            and row["replay_scope_sha256"] != replay_scope_sha256
+        ):
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row exact key replay scope mismatch: {row_hash}"
             )
@@ -2956,6 +2965,32 @@ def _validate_pt1_key_indexes(
         selected_indexed_distance=selected_indexed_distance,
         nonfinite_requested_rung=nonfinite_requested_rung,
     )
+
+
+def _pt1_has_current_layout(columns: Iterable[str]) -> bool:
+    required_columns = {
+        "key_hash",
+        "artifact",
+        "store_schema_version",
+        "key_sha256",
+        "payload_sha256",
+        "payload_codec_version",
+        "key_bytes",
+        "payload_bytes",
+        "physics_bucket_schema_version",
+        "physics_bucket_sha256",
+        "replay_scope_sha256",
+        "physics_key_bytes",
+        *(
+            column
+            for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+            for column in (
+                _physics_ladder_hash_column(rung_tag),
+                _physics_ladder_distance_column(rung_tag),
+            )
+        ),
+    }
+    return required_columns.issubset(columns)
 
 
 def _admit_stored_row(
@@ -3130,6 +3165,7 @@ def _admit_stored_row(
 
     try:
         row = dict(raw_row)
+        physical_row_columns = set(row)
         if output_columns is not None:
             row_keys = set(row)
             row = {
@@ -3141,6 +3177,12 @@ def _admit_stored_row(
         row_hash = str(row["key_hash"])
         row_artifact = str(row["artifact"])
         store_schema_version = row.get("store_schema_version")
+        current_layout = _pt1_has_current_layout(physical_row_columns)
+        if current_layout and store_schema_version != PT1_STORE_SCHEMA_VERSION:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 current-layout row has an invalid store schema stamp: "
+                f"{store_schema_version!r}: {row_hash}"
+            )
         if (
             store_schema_version is not None
             and store_schema_version != "pt1"
@@ -3252,7 +3294,6 @@ def _admit_stored_row(
         law_disclosures = _law_disclosures_from_json(
             row.get("law_disclosures_json")
         )
-        current_layout = store_schema_version == PT1_STORE_SCHEMA_VERSION
         invalid_types = []
         for field in _PT1_SOURCE_REQUIRED_TEXT_FIELDS:
             if current_layout and not isinstance(row.get(field), str):
@@ -3457,6 +3498,7 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
     input_bucket_key = row.pop("_write_physics_bucket_key", None)
     input_bucket_bytes = row.pop("_write_physics_bucket_bytes", None)
     input_bucket_hash = row.pop("_write_physics_bucket_hash", None)
+    input_derived_indexes = row.pop("_write_derived_indexes", None)
     rebuild_indexes = row.pop("_write_rebuild_indexes", False)
     artifact = row.get("artifact")
     artifact_name = artifact if isinstance(artifact, str) else "unknown"
@@ -3527,7 +3569,12 @@ def _gate_row_for_write(raw_row: Mapping[str, Any]) -> dict[str, Any]:
             )
             stored_key = _pt1_row_key(stored_key_bytes, key_hash=key_hash)
 
-        derived_indexes = _derive_pt1_key_indexes(stored_key)
+        if input_derived_indexes is None:
+            derived_indexes = _derive_pt1_key_indexes(stored_key)
+        elif isinstance(input_derived_indexes, _PT1DerivedKeyIndexes):
+            derived_indexes = input_derived_indexes
+        else:
+            raise TypeError("invalid PT1 precomputed key indexes")
         if any(
             value is not None
             for value in (

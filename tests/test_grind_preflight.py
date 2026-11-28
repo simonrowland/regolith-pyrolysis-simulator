@@ -735,58 +735,73 @@ def test_strict_vapor_pt1_preflight_uses_table_layout_when_row_stamp_is_damaged(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "strict-pt1-current-layout-damaged-stamp.sqlite"
-    _write_pt1_store(db_path, source="builtin-vapor-pressure")
-    index_columns = {
-        "physics_bucket_schema_version": "TEXT",
-        "physics_bucket_sha256": "TEXT",
-        "replay_scope_sha256": "TEXT",
-        "physics_key_bytes": "BLOB",
-        **{
-            column: sql_type
-            for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
-            for column, sql_type in (
-                (rrd._physics_ladder_hash_column(rung_tag), "TEXT"),
-                (rrd._physics_ladder_distance_column(rung_tag), "REAL"),
-            )
+    key = {
+        "schema_version": "pt1-test-key",
+        "namespace_id": "alphamelts:strict-stamp-test",
+        "composition_mol_fraction": [["FeO", 0.5], ["SiO2", 0.5]],
+        "controls": {"T_K": 1500.0, "pO2_bar": 1.0e-6},
+    }
+    key_bytes = rrd.canonical_json_bytes(key)
+    payload = {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "melts",
+            "backend_family": "alphamelts",
+            "backend": {
+                "backend_name": "AlphaMELTSBackend",
+                "backend_class": (
+                    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
+                ),
+            },
+            "provider": rrd._provider_authority_payload(
+                resolved_provider_id="alphamelts-diagnostic",
+                resolved_role="authoritative",
+                authoritative_provider_id="alphamelts-diagnostic",
+                fallback_provider_id=None,
+                fallback_allowed=False,
+                model="MELTSv1.0.2",
+                mode="subprocess",
+            ),
+            "vapor_pressure": rrd._provider_authority_payload(
+                resolved_provider_id="builtin-vapor-pressure",
+                resolved_role="authoritative",
+                authoritative_provider_id="builtin-vapor-pressure",
+                fallback_provider_id=None,
+                fallback_allowed=False,
+                model="BuiltinVaporPressureProvider",
+                mode="BuiltinVaporPressureProvider",
+            ),
         },
+        "equilibrium_result": {},
     }
-    metadata_columns = {
-        "store_schema_version": "TEXT",
-        "request_schema_version": "TEXT",
-        "key_sha256": "TEXT",
-        "payload_sha256": "TEXT",
-        "payload_codec_version": "INTEGER",
-        "code_version": "TEXT",
-        "corpus_version": "TEXT",
-        "engine_version": "TEXT",
-        "data_digests_json": "TEXT",
-        "repair_notices_json": "TEXT",
-        "created_at": "TEXT",
-        "git_dirty": "INTEGER",
-        "law_disclosures_json": "TEXT",
-    }
+    payload_bytes = rrd.canonical_json_bytes(payload)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    rrd.PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
     with sqlite3.connect(db_path) as conn:
-        for column, sql_type in {**metadata_columns, **index_columns}.items():
-            conn.execute(
-                f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
-                f"ADD COLUMN {column} {sql_type}"
-            )
-        (key_bytes,) = conn.execute(
-            f"SELECT key_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        (original_payload_sha256,) = conn.execute(
+            f"SELECT payload_sha256 FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
         ).fetchone()
-        key_hash = hashlib.sha256(key_bytes).hexdigest()
         conn.execute(
             f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET key_hash = ?, artifact = ?, store_schema_version = ?, "
-            "key_sha256 = ?, payload_sha256 = ?, payload_codec_version = NULL",
-            (
-                key_hash,
-                "equilibrium_post_record",
-                "pt1",
-                key_hash,
-                "damaged-payload-checksum",
-            ),
+            "SET store_schema_version = ? WHERE key_hash = ?",
+            ("pt1", key_hash),
         )
+        (stored_payload_sha256,) = conn.execute(
+            f"SELECT payload_sha256 FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored_payload_sha256 == original_payload_sha256
 
     with pytest.raises(GrindSourceGateError, match="stored row is corrupt"):
         assert_strict_vapor_result_store(

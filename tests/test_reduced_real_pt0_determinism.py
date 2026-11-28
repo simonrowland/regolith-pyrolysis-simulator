@@ -8032,12 +8032,13 @@ def test_empty_gate_curve_capture_is_a_reader_miss_and_can_be_replaced(
     if persistent:
         assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
     assert capture._lookup_optional("freeze_gate_curve", key) is None
-    notices = getattr(sim, rrd.REPAIR_NOTICE_COLLECTOR_ATTRIBUTE)
+    notices = getattr(sim, rrd.REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, None)
     if persistent:
+        assert isinstance(notices, list)
         assert len(notices) == 1
         assert notices[0]["kind"] == "reduced_real_cache_capture_readback_miss"
     else:
-        assert notices == []
+        assert notices is None
 
     replacement_curve = {**curve, "path": ((1200.0, 0.0), (1300.0, 1.0))}
     seed_gate_curve_memo_record(sim, replacement_curve)

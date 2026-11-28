@@ -2200,6 +2200,7 @@ def test_rekey_legacy_h40_index_rejects_subnormal_derived_distance(
 
 def test_rekey_legacy_bucket_columns_keeps_layout_without_ladder_columns(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "legacy-bucket-without-ladder.db"
     key = {
@@ -2211,6 +2212,15 @@ def test_rekey_legacy_bucket_columns_keeps_layout_without_ladder_columns(
     }
     key_bytes = rekey.canonical_json_bytes(key)
     key_hash = hashlib.sha256(key_bytes).hexdigest()
+    original_derive = rrd._derive_pt1_key_indexes
+    derive_calls = []
+
+    def count_derive(derived_key):
+        derive_calls.append(derived_key)
+        return original_derive(derived_key)
+
+    monkeypatch.setattr(rekey, "_derive_pt1_key_indexes", count_derive)
+    monkeypatch.setattr(rrd, "_derive_pt1_key_indexes", count_derive)
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"""
@@ -2273,6 +2283,116 @@ def test_rekey_legacy_bucket_columns_keeps_layout_without_ladder_columns(
     assert bucket_hash
     assert replay_scope
     assert bucket_bytes
+    assert len(derive_calls) == 1
+
+
+def test_rekey_legacy_invalid_control_is_typed_corruption_and_rolls_back(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "legacy-invalid-control.db"
+    key = {
+        "backend": {"backend_name": "alphamelts"},
+        "engine_version": "legacy-engine",
+        "namespace_id": "legacy-invalid-control-test",
+        "composition_mol_fraction": [["FeO", 0.5], ["SiO2", 0.5]],
+        "controls": {"T_K": "bad"},
+    }
+    key_bytes = rekey.canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"""
+            CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
+                key_hash TEXT PRIMARY KEY,
+                key_sha256 TEXT,
+                key_bytes BLOB,
+                engine_version TEXT,
+                corpus_version TEXT,
+                replay_scope_sha256 TEXT
+            )
+            """
+        )
+        conn.execute(
+            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?, ?)",
+            (key_hash, key_hash, key_bytes, "legacy-engine", None, "stale-scope"),
+        )
+
+    with pytest.raises(PT1PersistentStoreCorrupt):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=current_corpus_version(),
+        )
+
+    with sqlite3.connect(db_path) as conn:
+        corpus_version, stored_key_bytes, replay_scope = conn.execute(
+            f"SELECT corpus_version, key_bytes, replay_scope_sha256 "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert corpus_version is None
+    assert stored_key_bytes == key_bytes
+    assert replay_scope == "stale-scope"
+
+
+def test_rekey_legacy_bucket_schema_without_bucket_bytes_is_updated(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "legacy-bucket-schema-without-bytes.db"
+    key = {
+        "backend": {"backend_name": "alphamelts"},
+        "engine_version": "legacy-engine",
+        "namespace_id": "legacy-partial-bucket-test",
+        "composition_mol_fraction": [["FeO", 0.5], ["SiO2", 0.5]],
+        "controls": {"T_K": 1500.0},
+    }
+    key_bytes = rekey.canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"""
+            CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
+                key_hash TEXT PRIMARY KEY,
+                key_sha256 TEXT,
+                key_bytes BLOB,
+                engine_version TEXT,
+                corpus_version TEXT,
+                physics_bucket_schema_version TEXT,
+                physics_bucket_sha256 TEXT
+            )
+            """
+        )
+        conn.execute(
+            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                key_hash,
+                key_hash,
+                key_bytes,
+                "legacy-engine",
+                None,
+                None,
+                None,
+            ),
+        )
+
+    result = rekey.rekey_cache(
+        db_path,
+        target_corpus_version=current_corpus_version(),
+    )
+
+    with sqlite3.connect(db_path) as conn:
+        columns = {
+            row[1]
+            for row in conn.execute(
+                f"PRAGMA table_info({rekey.PT1_EQUILIBRIUM_TABLE})"
+            )
+        }
+        bucket_schema, bucket_hash = conn.execute(
+            f"SELECT physics_bucket_schema_version, physics_bucket_sha256 "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert result.rows_updated == 1
+    assert bucket_schema == rrd.PHYSICS_BUCKET_SCHEMA_VERSION
+    assert bucket_hash
+    assert "physics_key_bytes" not in columns
 
 
 def test_rekey_rejects_legacy_key_that_is_not_a_json_object(

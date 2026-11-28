@@ -534,11 +534,9 @@ def _strict_vapor_pt1_store_summary(
     strict_vapor_gate: bool,
 ) -> dict[str, int]:
     from simulator.reduced_real_determinism import (
-        PHYSICS_BUCKET_ALL_LADDER_RUNGS,
         PT1PersistentStoreCorrupt,
-        _physics_ladder_distance_column,
-        _physics_ladder_hash_column,
         _admit_stored_row,
+        _pt1_has_current_layout,
     )
 
     rows = conn.execute(
@@ -561,28 +559,7 @@ def _strict_vapor_pt1_store_summary(
             f"PRAGMA table_info({_PT1_EQUILIBRIUM_TABLE})"
         ).fetchall()
     }
-    current_layout = {
-        "key_hash",
-        "artifact",
-        "store_schema_version",
-        "key_sha256",
-        "payload_sha256",
-        "payload_codec_version",
-        "key_bytes",
-        "payload_bytes",
-        "physics_bucket_schema_version",
-        "physics_bucket_sha256",
-        "replay_scope_sha256",
-        "physics_key_bytes",
-        *(
-            column
-            for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
-            for column in (
-                _physics_ladder_hash_column(rung_tag),
-                _physics_ladder_distance_column(rung_tag),
-            )
-        ),
-    }.issubset(table_columns)
+    current_layout = _pt1_has_current_layout(table_columns)
 
     vapor_active_rows = 0
     source_reports = 0

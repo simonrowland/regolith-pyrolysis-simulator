@@ -176,6 +176,46 @@ def _put_interpolation_row(
     )
 
 
+def test_pt1_exact_lookup_rejects_legacy_stamp_on_current_layout(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "current-layout-with-legacy-stamp.sqlite"
+    key = _interpolation_key(
+        "legacy-stamp-on-current-layout",
+        feo_fraction=0.20,
+        temperature_K=1500.0,
+    )
+    _put_interpolation_row(
+        db_path,
+        key,
+        liquid_fraction=0.7,
+        sio_pa=7.0,
+    )
+    key_bytes = canonical_json_bytes(key)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+
+    with sqlite3.connect(db_path) as conn:
+        (original_stamp,) = conn.execute(
+            f"SELECT store_schema_version FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+        assert original_stamp == rrd.PT1_STORE_SCHEMA_VERSION
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = ? WHERE key_hash = ?",
+            ("pt1", key_hash),
+        )
+
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt, match="current-layout"):
+        PT1PersistentEquilibriumStore(db_path).get(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+        )
+
+
 def _candidate(key: dict, payload: dict, *, label: str | None = None) -> dict:
     candidate = {
         "key": key,
@@ -271,11 +311,12 @@ def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> 
     )
 
     assert rci.interpolation_key_domain_violation(candidate_key) is None
-    assert rci.greedy_nearest_neighbors(
+    neighbors = rci.greedy_nearest_neighbors(
         query,
         [candidate],
         max_distance=float("inf"),
-    ) == []
+    )
+    assert neighbors == []
     uncertainty = rci.build_interpolation_uncertainty_vector(query, [candidate])
     assert uncertainty["components"]["cache_distance"]["status"] == (
         "insufficient_neighbors"

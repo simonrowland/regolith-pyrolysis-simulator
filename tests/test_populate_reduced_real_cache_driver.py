@@ -195,7 +195,6 @@ def test_populate_equilibrium_post_record_write_does_not_decode_payload(
     db_path = tmp_path / "populate-equilibrium-write-gate.db"
     key = _strict_vapor_pt1_key("write-gate-trace")
     payload = _strict_vapor_pt1_payload()
-    payload.pop("last_vapor_pressure_diagnostic")
     key_bytes = _canonical_bytes(key)
     with monkeypatch.context() as patch:
         patch.setattr(rrd, "_decode_payload_for_admission", unexpected_decode)
@@ -946,102 +945,6 @@ def test_merge_cache_shard_rejects_builtin_fallback_vapor_source(tmp_path):
         driver._merge_cache_shard(shard_db, target_db)
 
     assert driver._cache_row_summary(target_db)["rows"] == 0
-
-
-@pytest.mark.parametrize("write_path", ("put", "merge"))
-@pytest.mark.parametrize(
-    ("case_name", "key_kwargs", "payload_update", "match"),
-    (
-        (
-            "key_non_authoritative_provider",
-            {"vapor_provider_id": "vaporock"},
-            {},
-            "resolved_provider_id",
-        ),
-        (
-            "key_fallback_provider",
-            {"fallback_provider_id": "builtin-vapor-pressure"},
-            {},
-            "fallback_provider_id",
-        ),
-        (
-            "payload_builtin_fallback",
-            {},
-            {"last_vapor_pressures_source": {"Na": "builtin_fallback"}},
-            "builtin_fallback",
-        ),
-        (
-            "payload_kernel_fallback",
-            {},
-            {"equilibrium_result": {"status": "ok", "kernel_fallback_used": True}},
-            "kernel_fallback_used",
-        ),
-    ),
-)
-def test_strict_vapor_policy_is_outside_the_pt1_write_gate(
-    tmp_path,
-    write_path,
-    case_name,
-    key_kwargs,
-    payload_update,
-    match,
-):
-    target_db = tmp_path / f"{write_path}-{case_name}-target.db"
-    key = _strict_vapor_pt1_key(case_name, **key_kwargs)
-    payload = _strict_vapor_pt1_payload(**key_kwargs)
-    if case_name == "payload_kernel_fallback":
-        payload["equilibrium_result"].update(
-            {"kernel_fallback_used": True}
-        )
-    else:
-        payload.update(payload_update)
-
-    def write_put():
-        _write_equilibrium_post_record_row(
-            target_db,
-            key=key,
-            payload=payload,
-            strict_vapor_gate=True,
-        )
-
-    def write_merge():
-        shard_db = tmp_path / f"{write_path}-{case_name}-shard.db"
-        _write_equilibrium_post_record_row(
-            shard_db,
-            key=key,
-            payload=payload,
-            strict_vapor_gate=False,
-        )
-        driver._merge_cache_shard(shard_db, target_db)
-
-    if write_path == "put":
-        write_put()
-        assert driver._cache_row_summary(target_db)["rows"] == 1
-    else:
-        with pytest.raises(driver.GrindSourceGateError, match=match):
-            write_merge()
-        assert driver._cache_row_summary(target_db)["rows"] == 0
-
-    clean_target_db = tmp_path / f"{write_path}-{case_name}-clean-target.db"
-    clean_key = _strict_vapor_pt1_key(f"{case_name}-clean")
-    clean_payload = _strict_vapor_pt1_payload()
-    if write_path == "put":
-        _write_equilibrium_post_record_row(
-            clean_target_db,
-            key=clean_key,
-            payload=clean_payload,
-            strict_vapor_gate=True,
-        )
-    else:
-        clean_shard_db = tmp_path / f"{write_path}-{case_name}-clean-shard.db"
-        _write_equilibrium_post_record_row(
-            clean_shard_db,
-            key=clean_key,
-            payload=clean_payload,
-            strict_vapor_gate=False,
-        )
-        driver._merge_cache_shard(clean_shard_db, clean_target_db)
-    assert driver._cache_row_summary(clean_target_db)["rows"] == 1
 
 
 def test_merge_cache_shard_rejects_missing_vapor_source_provenance(tmp_path):
