@@ -745,6 +745,58 @@ def _pt0_equilibrium_capture_context(
     return sim, result
 
 
+def test_direct_activity_alias_precedence_survives_compact_and_pt1_replay(
+    tmp_path: Path,
+) -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    db_path = tmp_path / "activity-alias-replay.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    backend = AlphaMELTSBackend()
+    live = backend._parse_petthermotools_result(
+        (
+            {
+                "Conditions": {"mass": 100.0},
+                "liquid1": {"SiO2": 100.0},
+                "liquid1_prop": {"mass": 100.0},
+                "Activities": {
+                    "liquid1": {"SiO2_Liq": 0.6, "SiO2": 0.4},
+                },
+            },
+            {},
+        ),
+        temperature_C=float(sim.melt.temperature_C),
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        comp_wt={"SiO2": 100.0},
+        total_input_kg=1.0,
+    )
+
+    assert live.activity_coefficients == {"SiO2": pytest.approx(0.6)}
+    assert live.diagnostics["diagnostic_reported_activities"] == {
+        "SiO2_Liq": 0.6,
+        "SiO2": 0.4,
+    }
+    result.activity_coefficients = live.activity_coefficients
+    result.diagnostics.update(live.diagnostics)
+    result.warnings.extend(live.warnings)
+
+    compact = EquilibriumResult.from_hot(
+        result.to_engine_cache_value(engine_id="alphamelts"),
+        engine_id="alphamelts",
+    )
+    assert compact.activity_coefficients == live.activity_coefficients
+
+    capture.capture_equilibrium(sim, result)
+    assert capture.capture_sequence
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim, _ = _pt0_equilibrium_capture_context(replay)
+    replayed = replay.replay_equilibrium(replay_sim)
+
+    assert replayed.activity_coefficients == live.activity_coefficients
+
+
 def _alphamelts_silicate_equilibrium_key(
     *,
     model: str = "MELTSv1.0.2",

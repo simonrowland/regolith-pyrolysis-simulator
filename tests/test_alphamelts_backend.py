@@ -4034,7 +4034,7 @@ def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
     )
 
     assert result.status == 'ok'
-    assert result.activity_coefficients == {'SiO2_Liq': 0.4}
+    assert result.activity_coefficients == {'SiO2': 0.4}
     assert result.vapor_pressures_Pa == {}
     _assert_no_fo2_or_qfm_publication(
         result,
@@ -6768,6 +6768,11 @@ def test_petthermotools_result_parser_prefers_reported_oxide_activities():
     )
 
     assert result.activity_coefficients == pytest.approx({
+        'SiO2': 0.42,
+        'Na': 0.08,
+        'K': 0.03,
+    })
+    assert result.diagnostics['diagnostic_reported_activities'] == pytest.approx({
         'SiO2_Liq': 0.42,
         'Na': 0.08,
         'K': 0.03,
@@ -7295,7 +7300,7 @@ def test_petthermotools_activity_extractor_selects_liquid_row_not_spinel_first()
 
     assert result.activity_coefficients == pytest.approx({
         'Na2O': 0.08,
-        'SiO2_Liq': 0.42,
+        'SiO2': 0.42,
     })
     assert result.diagnostics['diagnostic_oxide_activities'] == pytest.approx({
         'Na2O': 0.08,

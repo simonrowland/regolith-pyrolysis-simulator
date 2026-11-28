@@ -1737,6 +1737,7 @@ def engine_flags_from_result(
         ):
             certified_band = dict(band)
     from engines.alphamelts.domain import (
+        _ALPHAMELTS_ACTIVITY_ALIAS_CONFLICT_NOTICE_PREFIX,
         _ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX,
     )
 
@@ -1755,7 +1756,9 @@ def engine_flags_from_result(
     for warning in getattr(result, "warnings", None) or ():
         if not isinstance(warning, str):
             continue
-        if warning.startswith("SR14:alphamelts_activity_alias_conflict "):
+        if warning.startswith(
+            _ALPHAMELTS_ACTIVITY_ALIAS_CONFLICT_NOTICE_PREFIX
+        ):
             notices.append(
                 {
                     "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,

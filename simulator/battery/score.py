@@ -1440,13 +1440,19 @@ def _oxide_projection_notices(
     quantity: Quantity | None,
     engine: Engine,
 ) -> tuple[Notice, ...]:
+    from engines.alphamelts.domain import (
+        _ALPHAMELTS_ACTIVITY_ALIAS_CONFLICT_NOTICE_PREFIX,
+    )
+
     if quantity is None:
         return ()
     return tuple(
         Notice(
             kind=(
                 NoticeKind.ENGINE_MODEL_CAVEAT
-                if warning.startswith("SR14:alphamelts_activity_alias_conflict ")
+                if warning.startswith(
+                    _ALPHAMELTS_ACTIVITY_ALIAS_CONFLICT_NOTICE_PREFIX
+                )
                 else NoticeKind.INPUT_OMITTED
             ),
             affected_quantities=(quantity,),

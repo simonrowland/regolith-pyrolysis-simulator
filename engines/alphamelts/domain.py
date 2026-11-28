@@ -479,6 +479,9 @@ MELTS_PARENT_OXIDE_NOT_ENDMEMBER = (
     'typed-refusal:melts_endmember_not_parent_oxide'
 )
 _ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX = 'AlphaMELTS provider omitted'
+_ALPHAMELTS_ACTIVITY_ALIAS_CONFLICT_NOTICE_PREFIX = (
+    'SR14:alphamelts_activity_alias_conflict '
+)
 
 
 def canonical_melt_oxide_activity_name(name: object) -> str | None:
@@ -586,8 +589,8 @@ def _activity_alias_conflict_notice(
         else f" selected_source={selected_source!r}"
     )
     return (
-        "SR14:alphamelts_activity_alias_conflict "
-        f"producer={producer} field={field} oxide={oxide!r} "
+        _ALPHAMELTS_ACTIVITY_ALIAS_CONFLICT_NOTICE_PREFIX
+        + f"producer={producer} field={field} oxide={oxide!r} "
         f"kept_label={kept_label!r} kept_activity={kept_activity!r} "
         f"conflicting_label={conflicting_label!r} "
         f"conflicting_activity={conflicting_activity!r} "

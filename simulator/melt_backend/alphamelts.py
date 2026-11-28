@@ -2655,8 +2655,15 @@ class _MELTSBackendSupport(MeltBackend):
         result_status = str(status)
         result_diagnostics = dict(diagnostics or {})
         reported_activities = dict(activity_coefficients or {})
+        reported_activity_provenance = result_diagnostics.get(
+            'diagnostic_reported_activities'
+        )
         activity_diagnostics, activity_notices = (
-            self._activity_diagnostic_payload(reported_activities)
+            self._activity_diagnostic_payload(
+                reported_activity_provenance
+                if isinstance(reported_activity_provenance, Mapping)
+                else reported_activities
+            )
         )
         result_diagnostics.update(activity_diagnostics)
         result_warnings = list(warnings or [])
@@ -5897,13 +5904,16 @@ class _MELTSBackendSupport(MeltBackend):
                 failed_conversion_sources=failed_conversion_sources,
             )
             if mapped:
+                resolved, source_diagnostics = (
+                    self._resolve_direct_activity_mapping(mapped, key)
+                )
                 self._record_skipped_activity_sources(
                     skipped_sources,
                     key,
                     repair_issues,
                     failed_sources,
                 )
-                return mapped, {'diagnostic_activity_source': key}
+                return resolved, source_diagnostics
             skipped_sources.append(key)
 
         for key in ('activities', 'Activities'):
@@ -5917,13 +5927,16 @@ class _MELTSBackendSupport(MeltBackend):
                 failed_conversion_sources=failed_conversion_sources,
             )
             if mapped:
+                resolved, source_diagnostics = (
+                    self._resolve_direct_activity_mapping(mapped, key)
+                )
                 self._record_skipped_activity_sources(
                     skipped_sources,
                     key,
                     repair_issues,
                     failed_sources,
                 )
-                return mapped, {'diagnostic_activity_source': key}
+                return resolved, source_diagnostics
             skipped_sources.append(key)
 
         coefficient_source = 'activity_coefficients_times_oxide_mole_fraction'
@@ -6007,17 +6020,38 @@ class _MELTSBackendSupport(MeltBackend):
             failed_conversion_sources=failed_conversion_sources,
         )
         if mapped:
-            source_diagnostics = {
-                'diagnostic_activity_source': 'phase_activity_fields'
-            }
+            resolved, source_diagnostics = self._resolve_direct_activity_mapping(
+                mapped,
+                'phase_activity_fields',
+            )
             self._record_skipped_activity_sources(
                 skipped_sources,
                 'phase_activity_fields',
                 repair_issues,
                 failed_sources,
             )
-            return mapped, source_diagnostics
+            return resolved, source_diagnostics
         return {}, {}
+
+    @staticmethod
+    def _resolve_direct_activity_mapping(
+        values: Mapping[str, float],
+        source: str,
+    ) -> tuple[dict[str, float], dict[str, object]]:
+        """Resolve oxide aliases before direct activities reach a cache."""
+        oxide_activities, _conflicts, _invalid = (
+            _canonical_oxide_activity_projection(values)
+        )
+        resolved = {
+            str(label): float(value)
+            for label, value in values.items()
+            if canonical_melt_oxide_activity_name(str(label)) is None
+        }
+        resolved.update(oxide_activities)
+        return resolved, {
+            'diagnostic_activity_source': source,
+            'diagnostic_reported_activities': dict(values),
+        }
 
     @staticmethod
     def _record_skipped_activity_sources(

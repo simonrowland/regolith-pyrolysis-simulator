@@ -35,7 +35,6 @@ def _put_cache_row(
     *,
     tag: str,
     artifact: str = "freeze_gate_curve",
-    complete_replay_vector: bool = False,
 ) -> dict:
     key = {
         "artifact": artifact,
@@ -45,25 +44,6 @@ def _put_cache_row(
         "schema_version": "test",
         "tag": tag,
     }
-    if complete_replay_vector:
-        key.update(
-            {
-                "namespace_id": "test:freeze_gate_curve",
-                "engine_chemistry_versions": {},
-                "vapor_pressure_provider_selection": "test-vapor-pressure",
-                "sulfur_side": {
-                    "S_input_ppm": 0.0,
-                    "inventory": {"salt_phase": {}, "sulfide_matte": {}},
-                    "sulfsat_available": False,
-                    "sulfsat_provider_selection": "test-sulfur",
-                },
-                "model": {
-                    "model": "test-model",
-                    "mode": "test",
-                    "magemin_database": None,
-                },
-            }
-        )
     payload = {"curve": {"status": "in_range", "tag": tag}}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
@@ -152,14 +132,41 @@ def _db_bytes(path: Path) -> int:
     return path.stat().st_size if path.exists() else 0
 
 
-def test_read_only_base_attach_exact_hit(tmp_path: Path) -> None:
+def test_read_only_base_attach_exact_hit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.state import CampaignPhase
+    from tests.binding_admission_fixtures import (
+        register_synthetic_gate_curve_producer,
+        seed_gate_curve_memo_record,
+    )
+    from tests.test_reduced_real_pt0_determinism import (
+        _build_pt0_sim,
+        _select_synthetic_gate_curve_binding,
+    )
+
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     base = tmp_path / "base.sqlite"
     shard = tmp_path / "shard.sqlite"
-    key = _put_cache_row(
-        base,
-        tag="from-base",
-        complete_replay_vector=True,
+    capture = PT0DeterminismStore("capture", db_path=base)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(sim)
+    curve = {
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
+        "status": "ok",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+    }
+    seed_gate_curve_memo_record(sim, curve)
+    capture.capture_gate_curve(
+        sim,
+        fO2_log=sim._current_melt_redox_fO2_log(),
+        curve=curve,
     )
+    key = capture.capture_sequence[-1]["key"]
+    assert key["engine_chemistry_versions"]
     PT1PersistentEquilibriumStore(shard)
 
     store = PT0DeterminismStore(
@@ -169,13 +176,14 @@ def test_read_only_base_attach_exact_hit(tmp_path: Path) -> None:
     )
     store.cache_tier_ceiling = "cached_exact"
     payload = store._lookup_optional(
-        str(key["artifact"]),
+        "freeze_gate_curve",
         key,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
     )
 
     assert payload is not None
-    assert payload["curve"]["tag"] == "from-base"
+    assert payload["curve"]["source"] == curve["source"]
+    assert payload["curve"]["solidus_T_C"] == curve["solidus_T_C"]
     assert store.last_cache_state == "cached_exact"
     assert payload_count(shard) == 0
 
