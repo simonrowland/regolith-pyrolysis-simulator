@@ -36,6 +36,7 @@ import math
 import sqlite3
 import warnings
 from collections import Counter
+import hashlib
 from pathlib import Path
 from typing import Mapping
 
@@ -52,7 +53,6 @@ from simulator.reduced_real_determinism import (
     validated_rekey_corpus_version,
 )
 from scripts import rekey_cache_engine_identity as rekey
-from tests.cache_rekey_fixtures import put_rekey_gate_row
 from scripts import sso_r_validation_map
 from scripts import validate_cache_c4_interpolation as c4_validation
 
@@ -2098,18 +2098,29 @@ def test_f353_backend_or_unknown_status_is_not_physics_refusal(status: str) -> N
 
 
 def _write_rekey_table_with_physics_column(db_path: Path) -> None:
-    put_rekey_gate_row(
-        db_path,
+    key_bytes = rekey.canonical_json_bytes(
         {
             "backend": {"backend_name": "alphamelts"},
             "engine_version": "legacy-engine",
-        },
-        engine_version="legacy-engine",
+        }
     )
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
     with sqlite3.connect(db_path) as conn:
         conn.execute(
-            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
-            "SET store_schema_version = 'pt1'"
+            f"""
+            CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
+                key_hash TEXT PRIMARY KEY,
+                key_sha256 TEXT,
+                key_bytes BLOB,
+                engine_version TEXT,
+                corpus_version TEXT,
+                replay_scope_sha256 TEXT
+            )
+            """
+        )
+        conn.execute(
+            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?, ?)",
+            (key_hash, key_hash, key_bytes, "legacy-engine", None, "stale-scope"),
         )
 
 

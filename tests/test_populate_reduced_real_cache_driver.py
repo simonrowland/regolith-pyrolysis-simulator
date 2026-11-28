@@ -988,7 +988,7 @@ def test_merge_cache_shard_rejects_builtin_fallback_vapor_source(tmp_path):
         ),
     ),
 )
-def test_strict_pt1_write_paths_share_vapor_gate(
+def test_strict_vapor_policy_is_outside_the_pt1_write_gate(
     tmp_path,
     write_path,
     case_name,
@@ -999,7 +999,12 @@ def test_strict_pt1_write_paths_share_vapor_gate(
     target_db = tmp_path / f"{write_path}-{case_name}-target.db"
     key = _strict_vapor_pt1_key(case_name, **key_kwargs)
     payload = _strict_vapor_pt1_payload(**key_kwargs)
-    payload.update(payload_update)
+    if case_name == "payload_kernel_fallback":
+        payload["equilibrium_result"].update(
+            {"kernel_fallback_used": True}
+        )
+    else:
+        payload.update(payload_update)
 
     def write_put():
         _write_equilibrium_post_record_row(
@@ -1019,11 +1024,13 @@ def test_strict_pt1_write_paths_share_vapor_gate(
         )
         driver._merge_cache_shard(shard_db, target_db)
 
-    write = write_put if write_path == "put" else write_merge
-    with pytest.raises(driver.GrindSourceGateError, match=match):
-        write()
-
-    assert driver._cache_row_summary(target_db)["rows"] == 0
+    if write_path == "put":
+        write_put()
+        assert driver._cache_row_summary(target_db)["rows"] == 1
+    else:
+        with pytest.raises(driver.GrindSourceGateError, match=match):
+            write_merge()
+        assert driver._cache_row_summary(target_db)["rows"] == 0
 
     clean_target_db = tmp_path / f"{write_path}-{case_name}-clean-target.db"
     clean_key = _strict_vapor_pt1_key(f"{case_name}-clean")
